@@ -1306,7 +1306,7 @@ DimensionRole *cube__dim_role(Cube *cube, char *dim_role_name)
 		if (strcmp(dr->name, dim_role_name) == 0)
 			return dr;
 	}
-	printf("[warn] no DimensionRole that name is [%s]\n", dim_role_name);
+	// printf("[warn] no DimensionRole that name is [%s]\n", dim_role_name);
 	return NULL;
 }
 
