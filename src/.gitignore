@@ -1,0 +1,10 @@
+meta/
+data/
+
+*.log
+
+euclid
+euclid-cli
+mdxext-lex.yy.c
+mdxext-yacc.tab.c
+mdxext-yacc.tab.h
