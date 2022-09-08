@@ -1,1 +1,1 @@
-### An analytics engine that aggregates data in real time
+### An analytics engine that aggregates data in real time.
