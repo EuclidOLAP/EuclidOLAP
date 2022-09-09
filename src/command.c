@@ -8,6 +8,7 @@
 #include "cfg.h"
 #include "mdx.h"
 #include "mdd.h"
+#include "rb-tree.h"
 
 extern Stack YC_STC;
 
@@ -20,6 +21,8 @@ static LinkedQueue *_ec_pool;
 static pthread_mutex_t _ec_p_mtx;
 // static pthread_cond_t _ec_p_cond;
 static sem_t _ec_p_sem;
+
+RedBlackTree *_thread_mam_pool;
 
 static int command_processor_thread_startup();
 
@@ -57,6 +60,8 @@ int init_command_module()
 	pthread_mutex_init(&_ec_p_mtx, NULL);
 	// pthread_cond_init(&_ec_p_cond, NULL);
 	sem_init(&_ec_p_sem, 0, 0);
+
+	_thread_mam_pool = rbt_create("MemAllocMng *", mam_comp, NULL);
 
 	command_processor_thread_startup();
 
@@ -122,6 +127,11 @@ static int command_processor_thread_startup()
 		pthread_t thread_id;
 		pthread_create(&thread_id, NULL, do_process_command, NULL);
 		int detach_r = pthread_detach(thread_id);
+
+		MemAllocMng *mam = MemAllocMng_new();
+		mam->thread_id = thread_id;
+		rbt_add(_thread_mam_pool, mam);
+
 		printf("EuclidCommand processor thread [%lu] <%d>.\n", thread_id, detach_r);
 	}
 
@@ -130,6 +140,8 @@ static int command_processor_thread_startup()
 
 static void *do_process_command(void *addr)
 {
+	// pthread_t thread_id = pthread_self();
+
 	EuclidCommand *ec = NULL;
 	while (1)
 	{
@@ -147,6 +159,11 @@ static void *do_process_command(void *addr)
 
 		obj_release(ec->bytes);
 		obj_release(ec);
+
+		MemAllocMng *mam = MemAllocMng_current_thread_mam();
+		if (mam) {
+			mam_reset(mam);
+		}
 
 		ec = NULL;
 	}

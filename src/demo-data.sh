@@ -4,13 +4,9 @@
 
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Create dimensions complete."
 
-sleep 1
-
 ./euclid-cli "create levels [Calendar] (2:year, 3:quarter, 4:month), [Region] (2:[continent], 3:[country])"
 
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Create levels complete."
-
-sleep 1
 
 ./euclid-cli "create members " \
 "[Calendar].[ALL].[2019].[Q1].[M1]," \
@@ -97,23 +93,17 @@ sleep 1
 
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Create members complete."
 
-sleep 1
-
 ./euclid-cli build cube [Online Store] \
 dimensions [Store Type] [Store Type] [Payment Method] [Payment Method] [Goods] [Goods] [Calendar] [Calendar] \
 measures [sales amount] [sales quantity] [cash back]
 
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Build cube [Online Store] complete."
 
-sleep 1
-
 ./euclid-cli build cube [logistics.test] \
 dimensions Goods Goods Transport Transport Region [starting region] Region [ending region] Calendar [starting date] Calendar [completion date] \
 measures cost income quantity
 
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Build cube [logistics.test] complete."
-
-sleep 1
 
 ./euclid-cli " insert [Online Store] " \
 "([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Kitchen & Dining].[Bento Boxes],[Calendar].[ALL].[2020].[Q1].[M1] measures [sales amount] 10 [sales quantity] 1 )," \
@@ -3574,8 +3564,6 @@ sleep 1
 "([Store Type].[ALL].[Other],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2021].[Q4].[M12] measures [sales amount] 0 [sales quantity] 61 )"
 
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Data imported into cube [Online Store] is complete."
-
-sleep 5
 
 ./euclid-cli " insert [logistics.test] " \
 " (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2021].[Q2].[M4], [completion date].[ALL].[2020].[Q1].[M1] measures quantity 9 income 88.88 cost 1 ), " \

@@ -1210,12 +1210,16 @@ dims_and_roles:
 
 str:
 	STRING {
-		char *str = str_clone(yytext);
-		int i, len = strlen(str);
-		for (i = 1; i < len - 1; i++) {
-			str[i - 1] = str[i];
-		}
-		str[len - 2] = '\0';
+		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL);
+		memcpy(str, yytext + 1, strlen(yytext) - 2);
+
+		// char *str = str_clone(yytext);
+		// int i, len = strlen(str);
+		// for (i = 1; i < len - 1; i++) {
+		// 	str[i - 1] = str[i];
+		// }
+		// str[len - 2] = '\0';
+
 		stack_push(&YC_STC, str);
 	}
 ;
@@ -1245,17 +1249,26 @@ vars:
 
 var_or_block:
 	VAR	{
-		stack_push(&YC_STC, str_clone(yytext));
+		char *str = mam_alloc(strlen(yytext) + 1, OBJ_TYPE__RAW_BYTES, NULL);
+		memcpy(str, yytext, strlen(yytext));
+		stack_push(&YC_STC, str);
+
+
+
+		// stack_push(&YC_STC, str_clone(yytext));
 //printf("TOKEN - val  : VAR <%s>\n", yytext);
 //printf("STACK - push : var_or_block\n");
 	}
   |	BLOCK	{
-	  	char *str = str_clone(yytext);
-		int i, len = strlen(str);
-		for (i = 1; i < len - 1; i++) {
-			str[i - 1] = str[i];
-		}
-		str[len - 2] = '\0';
+		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL);
+		memcpy(str, yytext + 1, strlen(yytext) - 2);
+
+	  	// char *str = str_clone(yytext);
+		// int i, len = strlen(str);
+		// for (i = 1; i < len - 1; i++) {
+		// 	str[i - 1] = str[i];
+		// }
+		// str[len - 2] = '\0';
 		stack_push(&YC_STC, str);
 //printf("TOKEN - val  : BLOCK <%s>\n", yytext);
 //printf("STACK - push : var_or_block\n");
