@@ -14,6 +14,38 @@
 
 #define COMMON_OBJ_DESC_LEN 256
 
+#define MAM_BLOCK_MAX (0x01<<20)
+
+struct memory_allocation_manager
+{
+	pthread_t thread_id;
+
+	/**
+	 * Points to the data block that is allocating memory.
+	 * 
+	 * memory block structure:
+	 * 0th to 7th bytes - Pointer to the next block of data.
+	 * 8th to 11th bytes - The index of the currently allocated memory location.
+	 * the rest of the bytes - Memory for allocation.
+	 */
+	char *current_block;
+};
+
+typedef struct memory_allocation_manager MemAllocMng;
+
+/**
+ * @param mam If mam is NULL, use the memory allocation manager of current thread.
+ */
+void *mam_alloc(size_t size, short type, MemAllocMng *mam);
+
+int mam_comp(void *mam, void *other);
+
+MemAllocMng *MemAllocMng_new();
+
+MemAllocMng *MemAllocMng_current_thread_mam();
+
+void mam_reset(MemAllocMng *);
+
 // TODO about to be deprecated
 void *__objAlloc__(size_t size, short type);
 

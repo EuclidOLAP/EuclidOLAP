@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include <semaphore.h>
 
 #include "command.h"
 #include "utils.h"
 #include "cfg.h"
 #include "mdx.h"
 #include "mdd.h"
+#include "rb-tree.h"
 
 extern Stack YC_STC;
 
@@ -17,7 +19,10 @@ static EuclidCommand *CCI_TERML_CTRL;
 
 static LinkedQueue *_ec_pool;
 static pthread_mutex_t _ec_p_mtx;
-static pthread_cond_t _ec_p_cond;
+// static pthread_cond_t _ec_p_cond;
+static sem_t _ec_p_sem;
+
+RedBlackTree *_thread_mam_pool;
 
 static int command_processor_thread_startup();
 
@@ -53,7 +58,10 @@ int init_command_module()
 	// init_LinkedList(&_ec_pool);
 	_ec_pool = create_lnk_queue();
 	pthread_mutex_init(&_ec_p_mtx, NULL);
-	pthread_cond_init(&_ec_p_cond, NULL);
+	// pthread_cond_init(&_ec_p_cond, NULL);
+	sem_init(&_ec_p_sem, 0, 0);
+
+	_thread_mam_pool = rbt_create("MemAllocMng *", mam_comp, NULL);
 
 	command_processor_thread_startup();
 
@@ -105,8 +113,9 @@ int submit_command(EuclidCommand *ec)
 {
 	pthread_mutex_lock(&_ec_p_mtx);
 	int res = lnk_q_add_obj(_ec_pool, ec);
-	pthread_cond_signal(&_ec_p_cond);
+	// pthread_cond_signal(&_ec_p_cond);
 	pthread_mutex_unlock(&_ec_p_mtx);
+	sem_post(&_ec_p_sem);
 	return res;
 }
 
@@ -118,6 +127,11 @@ static int command_processor_thread_startup()
 		pthread_t thread_id;
 		pthread_create(&thread_id, NULL, do_process_command, NULL);
 		int detach_r = pthread_detach(thread_id);
+
+		MemAllocMng *mam = MemAllocMng_new();
+		mam->thread_id = thread_id;
+		rbt_add(_thread_mam_pool, mam);
+
 		printf("EuclidCommand processor thread [%lu] <%d>.\n", thread_id, detach_r);
 	}
 
@@ -126,21 +140,30 @@ static int command_processor_thread_startup()
 
 static void *do_process_command(void *addr)
 {
+	// pthread_t thread_id = pthread_self();
+
 	EuclidCommand *ec = NULL;
 	while (1)
 	{
+		sem_wait(&_ec_p_sem);
 		pthread_mutex_lock(&_ec_p_mtx);
-		while (ec == NULL)
-		{
-			pthread_cond_wait(&_ec_p_cond, &_ec_p_mtx);
-			ec = (EuclidCommand *)lnk_q_get(_ec_pool);
-		}
+		ec = (EuclidCommand *)lnk_q_get(_ec_pool);
+		// while (ec == NULL)
+		// {
+		// 	pthread_cond_wait(&_ec_p_cond, &_ec_p_mtx);
+		// 	ec = (EuclidCommand *)lnk_q_get(_ec_pool);
+		// }
 		pthread_mutex_unlock(&_ec_p_mtx);
 
 		execute_command(ec);
 
 		obj_release(ec->bytes);
 		obj_release(ec);
+
+		MemAllocMng *mam = MemAllocMng_current_thread_mam();
+		if (mam) {
+			mam_reset(mam);
+		}
 
 		ec = NULL;
 	}

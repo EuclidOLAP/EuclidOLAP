@@ -135,6 +135,8 @@
 
 #define OBJ_TYPE__ExpFnCoalesceEmpty 67
 
+#define OBJ_TYPE__MemAllocMng 68
+
 #define OBJ_TYPE__RAW_BYTES 1000
 
 #endif

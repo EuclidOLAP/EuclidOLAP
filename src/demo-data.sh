@@ -2,7 +2,11 @@
 
 ./euclid-cli "create dimensions [Calendar] [Goods] [Store Type] [Payment Method] [Region] [Transport]"
 
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Create dimensions complete."
+
 ./euclid-cli "create levels [Calendar] (2:year, 3:quarter, 4:month), [Region] (2:[continent], 3:[country])"
+
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Create levels complete."
 
 ./euclid-cli "create members " \
 "[Calendar].[ALL].[2019].[Q1].[M1]," \
@@ -87,23 +91,19 @@
 "[Transport].[ALL].[aviation]," \
 "[Transport].[ALL].[ocean freight]"
 
-echo "create dimensions and members ... finished"
-
-sleep 1
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Create members complete."
 
 ./euclid-cli build cube [Online Store] \
 dimensions [Store Type] [Store Type] [Payment Method] [Payment Method] [Goods] [Goods] [Calendar] [Calendar] \
 measures [sales amount] [sales quantity] [cash back]
 
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Build cube [Online Store] complete."
+
 ./euclid-cli build cube [logistics.test] \
 dimensions Goods Goods Transport Transport Region [starting region] Region [ending region] Calendar [starting date] Calendar [completion date] \
 measures cost income quantity
 
-echo "build cubes ... finished"
-
-sleep 1
-
-
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Build cube [logistics.test] complete."
 
 ./euclid-cli " insert [Online Store] " \
 "([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Kitchen & Dining].[Bento Boxes],[Calendar].[ALL].[2020].[Q1].[M1] measures [sales amount] 10 [sales quantity] 1 )," \
@@ -3563,12 +3563,7 @@ sleep 1
 "([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2021].[Q4].[M12] measures [sales amount] 92 [sales quantity] 3 )," \
 "([Store Type].[ALL].[Other],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2021].[Q4].[M12] measures [sales amount] 0 [sales quantity] 61 )"
 
-
-
-
-sleep 3
-
-
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Data imported into cube [Online Store] is complete."
 
 ./euclid-cli " insert [logistics.test] " \
 " (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2021].[Q2].[M4], [completion date].[ALL].[2020].[Q1].[M1] measures quantity 9 income 88.88 cost 1 ), " \
@@ -4625,4 +4620,4 @@ sleep 3
 " (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Asia].[South Korea], [starting date].[ALL].[2019].[Q3].[M9], [completion date].[ALL].[2020].[Q2].[M5] measures quantity 333.333 income 222.222 cost 111.111 ), " \
 " (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2019].[Q3].[M7], [completion date].[ALL].[2020].[Q2].[M4] measures quantity 333.333 income 222.222 cost 111.111 ) "
 
-echo "insert measure values ... finished"
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Data imported into cube [logistics.test] is complete."

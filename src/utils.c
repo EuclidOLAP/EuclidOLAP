@@ -7,6 +7,85 @@
 #include <pthread.h>
 
 #include "utils.h"
+#include "rb-tree.h"
+
+extern RedBlackTree *_thread_mam_pool;
+
+void *mam_alloc(size_t size, short type, MemAllocMng *mam) {
+
+	if (size > (MAM_BLOCK_MAX - sizeof(char *) - sizeof(int) - sizeof(short))) {
+		printf("[ error ] program exit! cause by: Out of line for memory allocation manager.\n");
+		exit(1);
+	}
+
+	mam = mam ? mam : MemAllocMng_current_thread_mam();
+
+	// if (mam == NULL) {
+	// 	MemAllocMng key;
+	// 	key.thread_id = pthread_self();
+	// 	mam = rbt__find(_thread_mam_pool, &key)->obj;
+	// }
+
+	char *blk = mam->current_block;
+
+	int remaining_capacity = MAM_BLOCK_MAX -        *((int *)(blk + sizeof(char *)));
+
+	if ((size + sizeof(short)) > remaining_capacity) {
+		blk = obj_alloc(MAM_BLOCK_MAX, OBJ_TYPE__RAW_BYTES);
+		*((int *)(blk + sizeof(char *))) = sizeof(char *) + sizeof(int);
+
+		*((char **)&blk) = mam->current_block;
+		mam->current_block = blk;
+	}
+
+	int index = *((int *)(blk + sizeof(char *)));
+	*((short *)(blk + index)) = (0x01<<15) | type;
+
+	void *obj_ins = blk + index + sizeof(short);
+
+	*((int *)(blk + sizeof(char *))) = index + size + sizeof(short);
+
+	return obj_ins;
+}
+
+MemAllocMng *MemAllocMng_current_thread_mam() {
+	MemAllocMng key;
+	key.thread_id = pthread_self();
+	return rbt__find(_thread_mam_pool, &key)->obj;
+}
+
+void mam_reset(MemAllocMng *mam) {
+	char *curr_blk = mam->current_block;
+	char *next_blk = *((void **)curr_blk);
+
+	memset(curr_blk, 0, MAM_BLOCK_MAX);
+	// *((void **)curr_blk) = NULL;
+	*((int *)(curr_blk + sizeof(char *))) = sizeof(char *) + sizeof(int);
+
+	while (next_blk) {
+		curr_blk = next_blk;
+		next_blk = *((void **)curr_blk);
+		obj_release(curr_blk);
+	}
+}
+
+int mam_comp(void *mam, void *other) {
+	MemAllocMng *m = mam;
+	MemAllocMng *o = other;
+	if (o->thread_id < m->thread_id)
+		return -1;
+	if (o->thread_id > m->thread_id)
+		return 1;
+
+	return 0;
+}
+
+MemAllocMng *MemAllocMng_new() {
+	MemAllocMng *mam = obj_alloc(sizeof(MemAllocMng), OBJ_TYPE__MemAllocMng);
+	mam->current_block = obj_alloc(MAM_BLOCK_MAX, OBJ_TYPE__RAW_BYTES);
+	*((int *)(mam->current_block + sizeof(char *))) = sizeof(char *) + sizeof(int);
+	return mam;
+}
 
 // TODO about to be deprecated
 void *__objAlloc__(size_t size, short type)
@@ -26,7 +105,7 @@ void *__objAlloc__(size_t size, short type)
 // TODO about to be deprecated
 short obj_type_of(void *obj)
 {
-	return *(((short *)obj) - 1);
+	return (*(((short *)obj) - 1)) & 0x7FFF;
 }
 
 void *obj_alloc(size_t size, short type) {

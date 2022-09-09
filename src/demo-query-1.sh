@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 ./euclid-cli \
 "select " \
 "{ " \
@@ -15,8 +16,6 @@
 "} on 1 " \
 "from [Online Store]"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with " \
@@ -38,9 +37,6 @@ sleep 1
 "} on 1 " \
 "from [Online Store]"
 
-echo "........................................................................................... done"
-sleep 1
-
 
 ./euclid-cli \
 "with member [Payment Method].PROPORTION as ([Payment Method].[ALL].[Credit Card]) / ([Payment Method].[ALL])" \
@@ -54,18 +50,12 @@ sleep 1
 "{ ([Payment Method].[ALL].[Credit Card]), ([Payment Method].[ALL]), ([Payment Method].PROPORTION) } on 1 " \
 "from [Online Store] where (measure.[sales amount])"
 
-echo "........................................................................................... done"
-sleep 1
-
 
 ./euclid-cli \
 "select " \
 "children([Goods].[Kitchen & Dining]) on 0, " \
 "children([Calendar].[ALL].[2021].[Q4]) on 1" \
 "from [Online Store] where (measure.[sales amount])"
-
-echo "........................................................................................... done"
-sleep 1
 
 
 ./euclid-cli \
@@ -74,18 +64,12 @@ sleep 1
 "members(Calendar, LEAFS) on 100 " \
 "from [Online Store]"
 
-echo "........................................................................................... done"
-sleep 1
-
 
 ./euclid-cli \
 "select " \
 "{ (measure.[sales amount]), (measure.[sales quantity]) } on 10, " \
 "crossjoin(members([Store Type], LEAFS), members([Payment Method], ALL))  on 100 " \
 "from [Online Store]"
-
-echo "........................................................................................... done"
-sleep 1
 
 
 ./euclid-cli \
@@ -94,8 +78,6 @@ sleep 1
 "crossjoin(members([Store Type], LEAFS), members([Payment Method], ALL), children([Calendar].[ALL].[2021].[Q4]))  on 100 " \
 "from [Online Store]"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -103,8 +85,6 @@ sleep 1
 "crossjoin(members([Store Type], LEAFS), members([Payment Method], ALL), children([Calendar].[ALL].[2021].[Q4]), children(Goods.[ALL]))  on 100 " \
 "from [Online Store]"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -112,8 +92,6 @@ sleep 1
 "crossjoin(children([Store Type].[ALL]), members([Payment Method])) on 1 " \
 "from [Online Store]"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -131,8 +109,6 @@ sleep 1
 "} on 1 " \
 "from [logistics.test] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select	 " \
@@ -153,8 +129,6 @@ sleep 1
 "} on 2	 " \
 "from [logistics.test]"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select	 " \
@@ -178,8 +152,6 @@ sleep 1
 "} on 0 " \
 "from [logistics.test] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -207,8 +179,6 @@ sleep 1
 "} on 1 " \
 "from [logistics.test] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -223,8 +193,6 @@ sleep 1
 "} on 2 " \
 "from [logistics.test] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -236,8 +204,6 @@ sleep 1
 "} on 1 " \
 "from [logistics.test] where ( [starting date].[2021].[Q2].[M5] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -257,8 +223,6 @@ sleep 1
 "} on 0 " \
 "from [logistics.test] where ( Goods.[foods].[nut], Transport.[railway], [starting region].[Asia].[China], [starting date].[2019].[Q3].[M7], [completion date].[2019].[Q3].[M7] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with member [measure].[MM001] as (measure.cost) + (measure.cost) * (measure.cost) - (measure.cost) " \
@@ -281,8 +245,6 @@ sleep 1
 "} on 0 " \
 "from [logistics.test] where ( Goods.[foods].[nut], Transport.[railway], [starting region].[Asia].[China], [starting date].[2019].[Q3].[M7], [completion date].[2019].[Q3].[M7] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with " \
@@ -303,8 +265,6 @@ sleep 1
 "} on 0 " \
 "from [logistics.test] where ( Goods.[foods].[nut], Transport.[railway], [starting region].[Asia].[China], [starting date].[2019].[Q3].[M7], [completion date].[2019].[Q3].[M7] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with " \
@@ -312,8 +272,6 @@ sleep 1
 "select SSSSSS on 999 " \
 "from [logistics.test] where ( Goods.[foods].[nut], Transport.[railway], [starting region].[Asia].[China], [starting date].[2019].[Q3].[M7], [completion date].[2019].[Q3].[M7] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with set QQQ as XXX " \
@@ -330,8 +288,6 @@ sleep 1
 "measure.cost " \
 ")"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with set QQQ as XXX " \
@@ -348,8 +304,6 @@ sleep 1
 "measure.income " \
 ")"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with " \
@@ -366,8 +320,6 @@ sleep 1
 "[ending region].[Europe].[Italy] " \
 ")"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with " \
@@ -385,8 +337,6 @@ sleep 1
 "[ending region].[Europe].[Italy] " \
 ")"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with " \
@@ -398,8 +348,6 @@ sleep 1
 "from [logistics.test] " \
 "where ( Transport.railway, [starting region].[Europe].[UK], [ending region].[Europe].[Italy], [completion date].[2020].[Q1].[M3], measure.cost )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -408,8 +356,6 @@ sleep 1
 "from [logistics.test] " \
 "where ( [Goods].[electronic product].[computer] , Transport.railway,  [starting region].[Europe].[UK],  [ending region].[Europe].[Italy],  [completion date].[2020].[Q1].[M3] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -418,8 +364,6 @@ sleep 1
 "from [logistics.test] " \
 "where ( [Goods].[electronic product].[computer] , Transport.railway,  [starting region].[Europe].[UK],  [ending region].[Europe].[Italy],  [completion date].[2020].[Q1].[M3] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -427,8 +371,6 @@ sleep 1
 " crossJoin(members(measure), members([ending region])) on 1 " \
 "from [logistics.test] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with member [starting date].PPPPPP as ([starting date].[2021].Q1.M2) + ([starting date].[2021].Q1.M3) " \
@@ -439,8 +381,6 @@ sleep 1
 "from [logistics.test] " \
 "where ( [Goods].[electronic product].[computer] , Transport.railway,  [starting region].[Europe].[UK],  [ending region].[Europe].[Italy],  [completion date].[2020].[Q1].[M3] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with member [starting date].PPPPPP as ([starting date].[2021].Q1.M2) + ([starting date].[2021].Q1.M3) " \
@@ -452,8 +392,6 @@ sleep 1
 "where ( [Goods].[electronic product].[computer] , Transport.railway,  [starting region].[Europe].[UK]," \
 "[ending region].[Europe].[Italy],  [completion date].[2020].[Q1].[M3] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with  " \
@@ -466,8 +404,6 @@ sleep 1
 " members(Calendar) on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with  " \
@@ -482,8 +418,6 @@ sleep 1
 " { ([Calendar].[ALL].[2019]),  ([Calendar].[ALL].[2020]), (Calendar.VVV) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with  " \
@@ -495,8 +429,6 @@ sleep 1
 " { ([Calendar].[ALL].[2019]),  ([Calendar].[ALL].[2020]), (Calendar.SSSSSS), (Calendar.EEE), (Calendar.III) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with  " \
@@ -508,13 +440,9 @@ sleep 1
 " members(Calendar) on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli "select {(measure.[sales amount])} on 0, {(measure.[sales amount])} on 1 from [Online Store]"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -523,8 +451,6 @@ sleep 1
 " from [Online Store] where " \
 "([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Kitchen & Dining].[Bento Boxes])"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -534,8 +460,6 @@ sleep 1
 " where " \
 " ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Kitchen & Dining].[Bento Boxes]) "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -543,8 +467,6 @@ sleep 1
 " filter(members(Calendar), ([Store Type].[ALL]) > 17279.999999999) on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -552,8 +474,6 @@ sleep 1
 " filter(members(Calendar), (([Store Type].[ALL]) <= 2000) oR ([Store Type].[ALL]) > 30000) on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -568,8 +488,6 @@ sleep 1
 "}, ((Transport.[ALL].railway) > 0) OR (1 < 2)) on 1 " \
 "from [logistics.test] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with member [Payment Method].PROPORTION as ([Payment Method].[ALL].[Credit Card]) / ([Payment Method].[ALL])" \
@@ -580,8 +498,6 @@ sleep 1
 "filter( { ([Payment Method].[ALL].[Credit Card]), ([Payment Method].[ALL]), ([Payment Method].PROPORTION) }, (measure.[sales amount]) <> 4320 ) on 1 " \
 "from [Online Store] where (measure.[sales amount])"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with  " \
@@ -596,8 +512,6 @@ sleep 1
 " filter(members(Calendar), (((measure.SSSSSS) <= 30000) or ((measure.SSSSSS) >= 40000)) and (((measure.SSSSSS) <= 360000) or ((measure.SSSSSS) >= 370000))) on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with set QQQ as XXX " \
@@ -614,17 +528,6 @@ sleep 1
 "measure.income " \
 ")"
 
-echo "........................................................................................... done"
-sleep 1
-
-# ./euclid-cli \
-# " select " \
-# " crossjoin(members([Store Type]), members([Payment Method]), members([Goods]), members([Calendar])) on 0, " \
-# " {(measure.[sales amount]), (measure.[sales amount]), (measure.[sales amount]) , (measure.[sales amount]), (measure.[sales amount]) , (measure.[sales amount]), (measure.[sales amount]) , (measure.[sales amount]), (measure.[sales amount]) , (measure.[sales amount]), (measure.[sales amount]) , (measure.[sales amount]), (measure.[sales amount])  } on 1 " \
-# " from [Online Store] "
-
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "WITH set QQQ as XXX " \
@@ -641,8 +544,6 @@ sleep 1
 "measure.income " \
 ")"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -650,8 +551,6 @@ sleep 1
 " { (parent(Calendar.[ALL].[2020]), parent([Payment Method].[ALL])) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with MEmber measure.XXX as ([measure].[sales amount]) / (paREnt(CurrentMember(Calendar)), [measure].[sales amount]) " \
@@ -660,8 +559,6 @@ sleep 1
 " FIlter(members(Calendar), ([measure].[sales amount]) > 4000) on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with member [starting date].PPPPPP as ([starting date].[2021].Q1.M2) + ([starting date].[2021].Q1.M3) " \
@@ -672,8 +569,6 @@ sleep 1
 "from [logistics.test] " \
 " where ( [Goods].[ALL].[electronic product].[computer] , Transport.[ALL].railway,  [starting region].[ALL].[Europe].[UK],  [ending region].[ALL].[Europe].[Italy], [completion date].[ALL].[2020].[Q1].[M3] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with member [starting date].XXX as (prevMember(currentMember([measure])), [starting date].[2021]) " \
@@ -684,8 +579,6 @@ sleep 1
 " where " \
 " (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2021].[Q2].[M4], [completion date].[ALL].[2020].[Q1].[M1]) "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -693,8 +586,6 @@ sleep 1
 " { (measure.[sales amount]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -702,8 +593,6 @@ sleep 1
 " { (measure.[sales amount]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with member measure.XXX as (measure.[sales amount], parallelPeriod())" \
@@ -712,8 +601,6 @@ sleep 1
 " { (measure.XXX) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -721,8 +608,6 @@ sleep 1
 " { (measure.[sales amount]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with member measure.XXX as (measure.[sales amount], parallelPeriod(Calendar.year))" \
@@ -731,8 +616,6 @@ sleep 1
 " { (measure.XXX) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -740,8 +623,6 @@ sleep 1
 " { (measure.[sales amount], parallelPeriod(Calendar.year)) } on 0 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -749,8 +630,6 @@ sleep 1
 " { (measure.[sales amount]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with member measure.XXX as (measure.[sales amount], parallelPeriod(Calendar.quarter, 3))" \
@@ -759,8 +638,6 @@ sleep 1
 " { (measure.XXX) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with member measure.XXX as (measure.[sales amount], parallelPeriod(Calendar.quarter, 0 - 2, Calendar.[ALL].[2021].Q1.M2))" \
@@ -769,8 +646,6 @@ sleep 1
 " { (measure.XXX) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with member measure.XXX as (measure.[sales amount], parallelPeriod(Calendar.year, 0 - 1))" \
@@ -779,8 +654,6 @@ sleep 1
 " { (measure.XXX) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with member measure.XXX as (measure.[sales amount], parallelPeriod(Calendar.year, 0 - 1))" \
@@ -789,8 +662,6 @@ sleep 1
 " { (measure.[sales amount]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -798,8 +669,6 @@ sleep 1
 " { (measure.[sales amount]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with member measure.AAA as (measure.[sales amount],   parallelPeriod(Calendar.month, 0 - 3)) " \
@@ -810,8 +679,6 @@ sleep 1
 " {(measure.AAA),(measure.SSS),(measure.DDD)} on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -819,8 +686,6 @@ sleep 1
 " { (measure.[sales amount]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -828,8 +693,6 @@ sleep 1
 " LateralMembers(Calendar.[ALL].[2020].Q4) on 10 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "SELECT " \
@@ -837,8 +700,6 @@ sleep 1
 " LATERALMEMBERS([completion date].[ALL]) On 1 " \
 "frOM [logistics.test] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -846,8 +707,6 @@ sleep 1
 " { (measure.[sales amount]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -855,8 +714,6 @@ sleep 1
 " { (measure.[sales amount]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -864,8 +721,6 @@ sleep 1
 " { (measure.[sales amount]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -873,8 +728,6 @@ sleep 1
 " { (measure.[sales amount]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -882,8 +735,6 @@ sleep 1
 " { (measure.[sales amount]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -891,8 +742,6 @@ sleep 1
 " order(members(Calendar), (measure.[sales amount]), basc) on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -900,8 +749,6 @@ sleep 1
 " topCount(crossjoin(members(measure), children([Store Type].[ALL]), lateralMembers([Payment Method].[ALL].Other)), 10, ([Calendar].[ALL].[2021])) on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -909,8 +756,6 @@ sleep 1
 " crossJoin(members(measure), members([ending region])) on 1 " \
 "from [logistics.test] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -920,8 +765,6 @@ sleep 1
 "} on 0 " \
 "from [logistics.test] where ( Goods.[foods].[nut], Transport.[railway], [starting region].[Asia].[China], [starting date].[2019].[Q3].[M7], [completion date].[2019].[Q3].[M7] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -929,8 +772,6 @@ sleep 1
 " except(members( measure ), {(measure.cost), (measure.income)}) on 0 " \
 "from [logistics.test] where ( Goods.[foods].[nut], Transport.[railway], [starting region].[Asia].[China], [starting date].[2019].[Q3].[M7], [completion date].[2019].[Q3].[M7] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -938,8 +779,6 @@ sleep 1
 " {([starting date].[ALL].[2020])} on 0 " \
 "from [logistics.test]"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with " \
@@ -949,8 +788,6 @@ sleep 1
 " {([starting date].[ALL].[2020])} on 0 " \
 "from [logistics.test]"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with " \
@@ -961,8 +798,6 @@ sleep 1
 " from [Online Store] " \
 " where (Calendar.[ALL].[2021].Q4.M12, [Payment Method].[ALL].[Credit Card])"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with " \
@@ -973,8 +808,6 @@ sleep 1
 " from [Online Store] " \
 " where (Calendar.[ALL].[2021].Q4.M12, [Payment Method].[ALL].[Credit Card])"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -984,8 +817,6 @@ sleep 1
 " where " \
 " (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2021].[Q2].[M4], [completion date].[ALL].[2020].[Q1].[M1]) "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -995,8 +826,6 @@ sleep 1
 " where " \
 " (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2021].[Q2].[M4], [completion date].[ALL].[2020].[Q1].[M1]) "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -1006,8 +835,6 @@ sleep 1
 " where " \
 " (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2021].[Q2].[M4], [completion date].[ALL].[2020].[Q1].[M1]) "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -1017,8 +844,6 @@ sleep 1
 " where " \
 " (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2021].[Q2].[M4], [completion date].[ALL].[2020].[Q1].[M1]) "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -1028,8 +853,6 @@ sleep 1
 " where " \
 " (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2021].[Q2].[M4], [completion date].[ALL].[2020].[Q1].[M1]) "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -1039,8 +862,6 @@ sleep 1
 " where " \
 " (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2021].[Q2].[M4], [completion date].[ALL].[2020].[Q1].[M1]) "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " select " \
@@ -1048,8 +869,6 @@ sleep 1
 " Descendants([starting date].[ALL], 3) on 10 " \
 " from [logistics.test]  "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with set SSSSSS as tail(" \
@@ -1060,8 +879,6 @@ sleep 1
 " LATERALMEMBERS([completion date].[ALL]) On 1 " \
 "frOM [logistics.test] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with set SSSSSS as tail(" \
@@ -1072,8 +889,6 @@ sleep 1
 " LATERALMEMBERS([completion date].[ALL]) On 1 " \
 "frOM [logistics.test] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with set SSSSSS as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measure.[sales amount]) > 1) " \
@@ -1083,8 +898,6 @@ sleep 1
 "{(measure.XXXXXX)} on 1 " \
 "from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with set SSSSSS as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measure.[sales amount]) > 1) " \
@@ -1094,8 +907,6 @@ sleep 1
 "{(measure.[sales amount])} on 1 " \
 "from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with set SSSSSS as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measure.[sales amount]) > 1) " \
@@ -1105,8 +916,6 @@ sleep 1
 "{(measure.[sales amount])} on 1 " \
 "from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with set SSSSSS as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measure.[sales amount]) > 1) " \
@@ -1116,8 +925,6 @@ sleep 1
 "{(measure.[XXXXXX])} on 1 " \
 "from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with " \
@@ -1126,8 +933,6 @@ sleep 1
 "from [logistics.test] " \
 "where ( Goods.[foods].[nut], Transport.[railway], [starting region].[Asia].[China], [starting date].[2019].[Q3].[M7], [completion date].[2019].[Q3].[M7] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "with " \
@@ -1136,8 +941,6 @@ sleep 1
 "from [logistics.test] " \
 "where ( Goods.[foods].[nut], Transport.[railway], [starting region].[Asia].[China], [starting date].[2019].[Q3].[M7], [completion date].[2019].[Q3].[M7] )"
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -1145,8 +948,6 @@ sleep 1
 "intersect(members(Calendar), children(Calendar.[ALL].[2021])) on 1 " \
 "from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -1154,8 +955,6 @@ sleep 1
 "intersect(members(Calendar), UNION(children(Calendar.[ALL].[2021]), children(Calendar.[ALL].[2021].Q3))) on 1 " \
 "from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 "select " \
@@ -1163,8 +962,6 @@ sleep 1
 "intersect(members(Calendar), UNION(children(Calendar.[ALL].[2021]), children(Calendar.[ALL].[2021].Q1)), ALL) on 1 " \
 "from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with " \
@@ -1174,8 +971,6 @@ sleep 1
 " children(Calendar.[ALL].[2021]) on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 ' with ' \
@@ -1188,8 +983,6 @@ sleep 1
 ' children(Goods.[ALL]) on 1 ' \
 ' from [logistics.test] '
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with  " \
@@ -1205,8 +998,6 @@ sleep 1
 " filter(members(Calendar), (((measure.SSSSSS) <= 30000) or ((measure.SSSSSS) >= 40000)) and (((measure.SSSSSS) <= 360000) or ((measure.SSSSSS) >= 370000))) on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with  " \
@@ -1223,8 +1014,6 @@ sleep 1
 " filter(members(Calendar), (((measure.SSSSSS) <= 30000) or ((measure.SSSSSS) >= 40000)) and (((measure.SSSSSS) <= 360000) or ((measure.SSSSSS) >= 370000))) on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with " \
@@ -1234,8 +1023,6 @@ sleep 1
 " { (Calendar.[ALL]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... done"
-sleep 1
 
 ./euclid-cli \
 " with " \
@@ -1245,4 +1032,14 @@ sleep 1
 " { (Calendar.[ALL]) } on 1 " \
 " from [Online Store] "
 
-echo "........................................................................................... finished"
+
+./euclid-cli \
+" with " \
+" member measure.[#################################### successful ####################################] as 660880 " \
+" member measure.[####################################################################################] as 660880 " \
+" select " \
+" { (Calendar.[ALL]) } on 0, " \
+" { (measure.[####################################################################################]), " \
+" (measure.[#################################### successful ####################################]), " \
+" (measure.[####################################################################################]) } on 1 " \
+" from [Online Store] "
