@@ -1146,8 +1146,6 @@ create_members:
 		ArrayList *mbrs_ls = als_create(128, "ele type: ArrayList *, yacc create_members");
 		als_add(mbrs_ls, mbr_path_ls);
 		stack_push(&YC_STC, mbrs_ls);
-//printf("STACK - pop  : var_block_chain\n");
-//printf("STACK - push : create_members\n");
 	}
   |	create_members COMMA var_block_chain {
 		ArrayList *mbr_path_ls;
@@ -1156,9 +1154,6 @@ create_members:
 		stack_pop(&YC_STC, (void **) &mbrs_ls);
 		als_add(mbrs_ls, mbr_path_ls);
 		stack_push(&YC_STC, mbrs_ls);
-//printf("STACK - pop  : var_block_chain\n");
-//printf("STACK - pop  : create_members\n");
-//printf("STACK - push : create_members\n");
 	}
 ;
 
@@ -1213,36 +1208,24 @@ str:
 		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL);
 		memcpy(str, yytext + 1, strlen(yytext) - 2);
 
-		// char *str = str_clone(yytext);
-		// int i, len = strlen(str);
-		// for (i = 1; i < len - 1; i++) {
-		// 	str[i - 1] = str[i];
-		// }
-		// str[len - 2] = '\0';
-
 		stack_push(&YC_STC, str);
 	}
 ;
 
 vars:
 	var_or_block	{
-//printf("STACK - pop  : var_or_block\n");
 		char *vb_str;
 		stack_pop(&YC_STC, (void **) &vb_str);
 		ArrayList *vb_ls = als_create(8, "yacc vars ::=");
 		als_add(vb_ls, vb_str);
-//printf("STACK - push : vars\n");
 		stack_push(&YC_STC, vb_ls);
 	}
   |	vars var_or_block	{
-//printf("STACK - pop  : var_or_block\n");
 		char *vb_str;
 		stack_pop(&YC_STC, (void **) &vb_str);
-//printf("STACK - pop  : vars\n");
 		ArrayList *vb_ls;
 		stack_pop(&YC_STC, (void **) &vb_ls);
 		als_add(vb_ls, vb_str);
-//printf("STACK - push : vars\n");
 		stack_push(&YC_STC, vb_ls);
 	}
 ;
@@ -1252,26 +1235,11 @@ var_or_block:
 		char *str = mam_alloc(strlen(yytext) + 1, OBJ_TYPE__RAW_BYTES, NULL);
 		memcpy(str, yytext, strlen(yytext));
 		stack_push(&YC_STC, str);
-
-
-
-		// stack_push(&YC_STC, str_clone(yytext));
-//printf("TOKEN - val  : VAR <%s>\n", yytext);
-//printf("STACK - push : var_or_block\n");
 	}
   |	BLOCK	{
 		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL);
 		memcpy(str, yytext + 1, strlen(yytext) - 2);
-
-	  	// char *str = str_clone(yytext);
-		// int i, len = strlen(str);
-		// for (i = 1; i < len - 1; i++) {
-		// 	str[i - 1] = str[i];
-		// }
-		// str[len - 2] = '\0';
 		stack_push(&YC_STC, str);
-//printf("TOKEN - val  : BLOCK <%s>\n", yytext);
-//printf("STACK - push : var_or_block\n");
 	}
 
 %%
