@@ -1205,7 +1205,7 @@ dims_and_roles:
 
 str:
 	STRING {
-		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL);
+		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
 		memcpy(str, yytext + 1, strlen(yytext) - 2);
 
 		stack_push(&YC_STC, str);
@@ -1216,7 +1216,10 @@ vars:
 	var_or_block	{
 		char *vb_str;
 		stack_pop(&YC_STC, (void **) &vb_str);
-		ArrayList *vb_ls = als_create(8, "yacc vars ::=");
+
+		// ArrayList *vb_ls = als_create(8, "yacc vars ::=");
+		ArrayList *vb_ls = als_new(8, "yacc vars ::=", THREAD_MAM, NULL);
+
 		als_add(vb_ls, vb_str);
 		stack_push(&YC_STC, vb_ls);
 	}
@@ -1232,12 +1235,12 @@ vars:
 
 var_or_block:
 	VAR	{
-		char *str = mam_alloc(strlen(yytext) + 1, OBJ_TYPE__RAW_BYTES, NULL);
+		char *str = mam_alloc(strlen(yytext) + 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
 		memcpy(str, yytext, strlen(yytext));
 		stack_push(&YC_STC, str);
 	}
   |	BLOCK	{
-		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL);
+		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
 		memcpy(str, yytext + 1, strlen(yytext) - 2);
 		stack_push(&YC_STC, str);
 	}

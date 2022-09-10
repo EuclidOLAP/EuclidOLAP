@@ -137,6 +137,6 @@
 
 #define OBJ_TYPE__MemAllocMng 68
 
-#define OBJ_TYPE__RAW_BYTES 1000
+#define OBJ_TYPE__RAW_BYTES 1024
 
 #endif

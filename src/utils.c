@@ -11,39 +11,49 @@
 
 extern RedBlackTree *_thread_mam_pool;
 
-void *mam_alloc(size_t size, short type, MemAllocMng *mam) {
+void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 
-	if (size > (MAM_BLOCK_MAX - sizeof(char *) - sizeof(int) - sizeof(short))) {
+	int required = (mam_mark ? sizeof(MemAllocMng *) : 0) + sizeof(short) + size;
+
+	if (required > (MAM_BLOCK_MAX - sizeof(char *) - sizeof(int))) {
 		printf("[ error ] program exit! cause by: Out of line for memory allocation manager.\n");
 		exit(1);
 	}
 
 	mam = mam ? mam : MemAllocMng_current_thread_mam();
 
-	// if (mam == NULL) {
-	// 	MemAllocMng key;
-	// 	key.thread_id = pthread_self();
-	// 	mam = rbt__find(_thread_mam_pool, &key)->obj;
-	// }
-
 	char *blk = mam->current_block;
+	int remaining_capacity = MAM_BLOCK_MAX - *((int *)(blk + sizeof(char *)));
 
-	int remaining_capacity = MAM_BLOCK_MAX -        *((int *)(blk + sizeof(char *)));
-
-	if ((size + sizeof(short)) > remaining_capacity) {
+	if (required > remaining_capacity) {
 		blk = obj_alloc(MAM_BLOCK_MAX, OBJ_TYPE__RAW_BYTES);
 		*((int *)(blk + sizeof(char *))) = sizeof(char *) + sizeof(int);
-
 		*((char **)&blk) = mam->current_block;
 		mam->current_block = blk;
 	}
 
 	int index = *((int *)(blk + sizeof(char *)));
-	*((short *)(blk + index)) = (0x01<<15) | type;
+	// memset(blk + index, 0, required);
 
-	void *obj_ins = blk + index + sizeof(short);
+	void *obj_ins;
 
-	*((int *)(blk + sizeof(char *))) = index + size + sizeof(short);
+	if (mam_mark) {
+		/**
+		 * The memory allocation manager information and object type need to be recorded in
+		 * the header hidden data, occupying 10 bytes.
+		 */
+		*((MemAllocMng **)(blk + index)) = mam;
+		*((short *)(blk + index + sizeof(MemAllocMng *))) = (0xC000) | type;
+		obj_ins = blk + index + sizeof(MemAllocMng *) + sizeof(short);
+	} else {
+		/**
+		 * The object type needs to be recorded in the header hidden data, occupying 2 bytes.
+		 */
+		*((short *)(blk + index)) = (0x8000) | type;
+		obj_ins = blk + index + sizeof(short);
+	}
+
+	*((int *)(blk + sizeof(char *))) = index + required;
 
 	return obj_ins;
 }
@@ -105,7 +115,7 @@ void *__objAlloc__(size_t size, short type)
 // TODO about to be deprecated
 short obj_type_of(void *obj)
 {
-	return (*(((short *)obj) - 1)) & 0x7FFF;
+	return (*(((short *)obj) - 1)) & 0x3FFF;
 }
 
 void *obj_alloc(size_t size, short type) {
@@ -383,11 +393,38 @@ int append_file_uint(char *file_path, __uint32_t val)
 	return append_file_data(file_path, (char *)&val, sizeof(val));
 }
 
+// TODO deprecated - replaced by als_new
 ArrayList *als_create(unsigned int init_capacity, char *desc)
 {
 	ArrayList *als = (ArrayList *)__objAlloc__(sizeof(ArrayList), OBJ_TYPE__ArrayList);
 	als->ele_arr_capacity = init_capacity;
 	als->elements_arr_p = __objAlloc__(sizeof(void *) * init_capacity, OBJ_TYPE__RAW_BYTES);
+	if (desc != NULL)
+	{
+		int desc_len = strlen(desc);
+		desc_len = desc_len < COMMON_OBJ_DESC_LEN ? desc_len : COMMON_OBJ_DESC_LEN - 1;
+		memcpy(als->desc, desc, desc_len);
+	}
+
+	return als;
+}
+
+ArrayList *als_new(unsigned int init_capacity, char *desc, enum obj_mem_alloc_strategy strat, MemAllocMng *mam) {
+
+	ArrayList *als;
+
+	if (strat == DIRECT) {
+		als = obj_alloc(sizeof(ArrayList), OBJ_TYPE__ArrayList);
+		als->elements_arr_p = obj_alloc(sizeof(void *) * init_capacity, OBJ_TYPE__RAW_BYTES);
+	} else {
+		// mam = mam ? mam : MemAllocMng_current_thread_mam();
+		mam = strat == SPEC_MAM ? mam : MemAllocMng_current_thread_mam();
+		als = mam_alloc(sizeof(ArrayList), OBJ_TYPE__ArrayList, mam, 1);
+		als->elements_arr_p = mam_alloc(sizeof(void *) * init_capacity, OBJ_TYPE__RAW_BYTES, mam, 0);
+	}
+
+	als->ele_arr_capacity = init_capacity;
+
 	if (desc != NULL)
 	{
 		int desc_len = strlen(desc);

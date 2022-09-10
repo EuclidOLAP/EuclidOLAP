@@ -14,6 +14,15 @@
 
 #define COMMON_OBJ_DESC_LEN 256
 
+enum obj_mem_alloc_strategy {
+	// Memory is allocated directly by the operating system.
+	DIRECT,
+	// Allocate memory in the thread memory allocation manager.
+	THREAD_MAM,
+	// Use the specified memory allocation manager.
+	SPEC_MAM
+};
+
 #define MAM_BLOCK_MAX (0x01<<20)
 
 struct memory_allocation_manager
@@ -35,8 +44,10 @@ typedef struct memory_allocation_manager MemAllocMng;
 
 /**
  * @param mam If mam is NULL, use the memory allocation manager of current thread.
+ * @param mam_mark When it is not 0, the address of the memory allocation manager isrecorded in
+ * 				   the object header information, and when it is 0, it is not recorded.
  */
-void *mam_alloc(size_t size, short type, MemAllocMng *mam);
+void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark);
 
 int mam_comp(void *mam, void *other);
 
@@ -142,7 +153,14 @@ typedef struct _array_list_
 	char desc[COMMON_OBJ_DESC_LEN];
 } ArrayList;
 
+// TODO deprecated - replaced by als_new
 ArrayList *als_create(unsigned int init_capacity, char *desc);
+
+/**
+ * @param strat Memory allocation strategy.
+ * @param mam When the strat parameter is SPEC_MAM, mam cannot be NULL.
+ */
+ArrayList *als_new(unsigned int init_capacity, char *desc, enum obj_mem_alloc_strategy strat, MemAllocMng *mam);
 
 void *ArrayList_set(ArrayList *, unsigned int, void *);
 
