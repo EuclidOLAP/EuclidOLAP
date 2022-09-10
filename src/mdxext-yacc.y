@@ -330,7 +330,7 @@ expression_list:
 	expression {
 		Expression *exp;
 		stack_pop(&YC_STC, (void **) &exp);
-		ArrayList *exp_ls = als_create(8, "Expression *");
+		ArrayList *exp_ls = als_new(8, "Expression *", THREAD_MAM, NULL);
 		als_add(exp_ls, exp);
 		stack_push(&YC_STC, exp_ls);
 	}
@@ -439,7 +439,7 @@ axes_statement:
 	axis_statement {
 		AxisDef *ax_def;
 		stack_pop(&YC_STC, (void **) &ax_def);
-		ArrayList *ax_def_ls = als_create(32, "AxisDef *");
+		ArrayList *ax_def_ls = als_new(32, "AxisDef *", THREAD_MAM, NULL);
 		als_add(ax_def_ls, ax_def);
 		stack_push(&YC_STC, ax_def_ls);
 	}
@@ -832,7 +832,7 @@ boolean_factory:
 
 set_list:
 	set_statement {
-		ArrayList *set_def_ls = als_create(16, "SetDef *");
+		ArrayList *set_def_ls = als_new(16, "SetDef *", THREAD_MAM, NULL);
 		SetDef *sd;
 		stack_pop(&YC_STC, (void **) &sd);
 		als_add(set_def_ls, sd);
@@ -860,7 +860,7 @@ tuples_statement:
 	tuple_statement {
 		TupleDef *t_def;
 		stack_pop(&YC_STC, (void **) &t_def);
-		ArrayList *t_def_ls = als_create(32, "TupleDef *");
+		ArrayList *t_def_ls = als_new(32, "TupleDef *", THREAD_MAM, NULL);
 		als_add(t_def_ls, t_def);
 		stack_push(&YC_STC, t_def_ls);
 	}
@@ -985,7 +985,7 @@ level_role_statement:
 
 insert_cube_measures:
 	INSERT var_or_block vector_measures {
-		ArrayList *ls_vms = als_create(128, "{ insert_cube_measures ::= }, { IDSVectorMears * }");
+		ArrayList *ls_vms = als_new(128, "{ insert_cube_measures ::= }, { IDSVectorMears * }", THREAD_MAM, NULL);
 		IDSVectorMears *ids_vm;
 		stack_pop(&YC_STC, (void **) &ids_vm);
 		als_add(ls_vms, ids_vm);
@@ -1015,7 +1015,7 @@ vector_measures:
 
 vector:
 	mdm_entity_path {
-		ArrayList *ls_vector = als_create(16, "{ vector ::= }, { ArrayList * }");
+		ArrayList *ls_vector = als_new(16, "{ vector ::= }, { ArrayList * }", THREAD_MAM, NULL);
 		ArrayList *ls_mep;
 		stack_pop(&YC_STC, (void **) &ls_mep);
 		als_add(ls_vector, ls_mep);
@@ -1036,7 +1036,7 @@ measures_values:
 		stack_pop(&YC_STC, (void **) &mmbr_name);
 		double *val = __objAlloc__(sizeof(double), OBJ_TYPE__RAW_BYTES);
 		*val = atof(yytext);
-		ArrayList *mear_vals_ls = als_create(16, "{ yacc measures_values ::= }, { 0,2,4 ... char * }, { 1,3,5 ... double * }");
+		ArrayList *mear_vals_ls = als_new(16, "{ yacc measures_values ::= }, { 0,2,4 ... char * }, { 1,3,5 ... double * }", THREAD_MAM, NULL);
 		als_add(mear_vals_ls, mmbr_name);
 		als_add(mear_vals_ls, val);
 		stack_push(&YC_STC, mear_vals_ls);
@@ -1056,7 +1056,7 @@ measures_values:
 
 mdm_entity_path:
 	var_or_block {
-		ArrayList *path_ls = als_create(12, "yacc mdm_entity_path ::= , type of elements is char *");
+		ArrayList *path_ls = als_new(12, "yacc mdm_entity_path ::= , type of elements is char *", THREAD_MAM, NULL);
 		char *str;
 		stack_pop(&YC_STC, (void **) &str);
 		als_add(path_ls, str);
@@ -1082,7 +1082,7 @@ create_levels:
 	CREATE LEVELS dim_levels {
 		ArrayList *dim_lvs;
 		stack_pop(&YC_STC, (void **) &dim_lvs);
-		ArrayList *dim_lv_map_ls = als_create(32, "ArrayList *");
+		ArrayList *dim_lv_map_ls = als_new(32, "ArrayList *", THREAD_MAM, NULL);
 		als_add(dim_lv_map_ls, dim_lvs);
 		stack_push(&YC_STC, dim_lv_map_ls);
 	}
@@ -1113,7 +1113,7 @@ levels_list:
 		stack_pop(&YC_STC, (void **) &lv_name);
 		void *lv_trans;
 		stack_pop(&YC_STC, (void **) &lv_trans);
-		ArrayList *lv_ls = als_create(64, "[ (char *dim_name), (long level), (char *level_name), (long level), (char *level_name) ... ]");
+		ArrayList *lv_ls = als_new(64, "[ (char *dim_name), (long level), (char *level_name), (long level), (char *level_name) ... ]", THREAD_MAM, NULL);
 		als_add(lv_ls, NULL);
 		als_add(lv_ls, lv_trans);
 		als_add(lv_ls, lv_name);
@@ -1143,11 +1143,9 @@ create_members:
 	CREATE MEMBERS var_block_chain {
 		ArrayList *mbr_path_ls;
 		stack_pop(&YC_STC, (void **) &mbr_path_ls);
-		ArrayList *mbrs_ls = als_create(128, "ele type: ArrayList *, yacc create_members");
+		ArrayList *mbrs_ls = als_new(128, "ele type: ArrayList *, yacc create_members", THREAD_MAM, NULL);
 		als_add(mbrs_ls, mbr_path_ls);
 		stack_push(&YC_STC, mbrs_ls);
-//printf("STACK - pop  : var_block_chain\n");
-//printf("STACK - push : create_members\n");
 	}
   |	create_members COMMA var_block_chain {
 		ArrayList *mbr_path_ls;
@@ -1156,9 +1154,6 @@ create_members:
 		stack_pop(&YC_STC, (void **) &mbrs_ls);
 		als_add(mbrs_ls, mbr_path_ls);
 		stack_push(&YC_STC, mbrs_ls);
-//printf("STACK - pop  : var_block_chain\n");
-//printf("STACK - pop  : create_members\n");
-//printf("STACK - push : create_members\n");
 	}
 ;
 
@@ -1166,7 +1161,7 @@ var_block_chain:
 	var_or_block {
 		char *str;
 		stack_pop(&YC_STC, (void **) &str);
-		ArrayList *als = als_create(16, "ele type: char *, yacc var_block_chain");
+		ArrayList *als = als_new(16, "ele type: char *, yacc var_block_chain", THREAD_MAM, NULL);
 		als_add(als, str);
 		stack_push(&YC_STC, als);
 	}
@@ -1191,7 +1186,7 @@ dims_and_roles:
 		char *dim_name, *role_name;
 		stack_pop(&YC_STC, (void **) &role_name);
 		stack_pop(&YC_STC, (void **) &dim_name);
-		ArrayList *dr_ls = als_create(64, "yacc dims_and_roles ::= var_or_block var_or_block");
+		ArrayList *dr_ls = als_new(64, "yacc dims_and_roles ::= var_or_block var_or_block", THREAD_MAM, NULL);
 		als_add(dr_ls, dim_name);
 		als_add(dr_ls, role_name);
 		stack_push(&YC_STC, dr_ls);
@@ -1210,15 +1205,8 @@ dims_and_roles:
 
 str:
 	STRING {
-		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL);
+		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
 		memcpy(str, yytext + 1, strlen(yytext) - 2);
-
-		// char *str = str_clone(yytext);
-		// int i, len = strlen(str);
-		// for (i = 1; i < len - 1; i++) {
-		// 	str[i - 1] = str[i];
-		// }
-		// str[len - 2] = '\0';
 
 		stack_push(&YC_STC, str);
 	}
@@ -1226,52 +1214,35 @@ str:
 
 vars:
 	var_or_block	{
-//printf("STACK - pop  : var_or_block\n");
 		char *vb_str;
 		stack_pop(&YC_STC, (void **) &vb_str);
-		ArrayList *vb_ls = als_create(8, "yacc vars ::=");
+
+		// ArrayList *vb_ls = als_create(8, "yacc vars ::=");
+		ArrayList *vb_ls = als_new(8, "yacc vars ::=", THREAD_MAM, NULL);
+
 		als_add(vb_ls, vb_str);
-//printf("STACK - push : vars\n");
 		stack_push(&YC_STC, vb_ls);
 	}
   |	vars var_or_block	{
-//printf("STACK - pop  : var_or_block\n");
 		char *vb_str;
 		stack_pop(&YC_STC, (void **) &vb_str);
-//printf("STACK - pop  : vars\n");
 		ArrayList *vb_ls;
 		stack_pop(&YC_STC, (void **) &vb_ls);
 		als_add(vb_ls, vb_str);
-//printf("STACK - push : vars\n");
 		stack_push(&YC_STC, vb_ls);
 	}
 ;
 
 var_or_block:
 	VAR	{
-		char *str = mam_alloc(strlen(yytext) + 1, OBJ_TYPE__RAW_BYTES, NULL);
+		char *str = mam_alloc(strlen(yytext) + 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
 		memcpy(str, yytext, strlen(yytext));
 		stack_push(&YC_STC, str);
-
-
-
-		// stack_push(&YC_STC, str_clone(yytext));
-//printf("TOKEN - val  : VAR <%s>\n", yytext);
-//printf("STACK - push : var_or_block\n");
 	}
   |	BLOCK	{
-		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL);
+		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
 		memcpy(str, yytext + 1, strlen(yytext) - 2);
-
-	  	// char *str = str_clone(yytext);
-		// int i, len = strlen(str);
-		// for (i = 1; i < len - 1; i++) {
-		// 	str[i - 1] = str[i];
-		// }
-		// str[len - 2] = '\0';
 		stack_push(&YC_STC, str);
-//printf("TOKEN - val  : BLOCK <%s>\n", yytext);
-//printf("STACK - push : var_or_block\n");
 	}
 
 %%
