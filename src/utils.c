@@ -28,7 +28,7 @@ void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 	if (required > remaining_capacity) {
 		blk = obj_alloc(MAM_BLOCK_MAX, OBJ_TYPE__RAW_BYTES);
 		*((int *)(blk + sizeof(char *))) = sizeof(char *) + sizeof(int);
-		*((char **)&blk) = mam->current_block;
+		*((char **)blk) = mam->current_block;
 		mam->current_block = blk;
 	}
 
@@ -112,10 +112,29 @@ void *__objAlloc__(size_t size, short type)
 // 	free(((int *)obj) - 1);
 // }
 
-// TODO about to be deprecated
+// TODO about to be deprecated, replaced by obj_info
 short obj_type_of(void *obj)
 {
 	return (*(((short *)obj) - 1)) & 0x3FFF;
+}
+
+void obj_info(void *obj, short *type, enum obj_mem_alloc_strategy *strat, MemAllocMng **mp) {
+	*type = (*(((short *)obj) - 1)) & 0x3FFF;
+	*mp = NULL;
+	switch ((*(((short *)obj) - 1)) & 0xC000)
+	{
+		case 0x0000:
+			*strat = DIRECT;
+			break;
+		case 0xC000:
+			*mp = *((MemAllocMng **)(obj - sizeof(short) - sizeof(MemAllocMng *)));
+		case 0x8000:
+			*strat = USED_MAM;
+			break;
+		default:
+			printf("[ error ] program exit! cause by: exception in obj_info(...)\n");
+			exit(1);
+	}
 }
 
 void *obj_alloc(size_t size, short type) {
@@ -453,10 +472,24 @@ int als_add(ArrayList *als, void *obj)
 
 	if (als->idx >= als->ele_arr_capacity)
 	{
+		short _als_type;
+		enum obj_mem_alloc_strategy strat;
+		MemAllocMng *als_mam;
+		obj_info(als, &_als_type, &strat, &als_mam);
+
 		als->ele_arr_capacity += 16;
-		void **new_ele_arr_p = __objAlloc__(sizeof(void *) * (als->ele_arr_capacity), OBJ_TYPE__RAW_BYTES);
+
+		void **new_ele_arr_p;
+		if (strat == DIRECT)
+			new_ele_arr_p = obj_alloc(sizeof(void *) * (als->ele_arr_capacity), OBJ_TYPE__RAW_BYTES);
+		else
+			new_ele_arr_p = mam_alloc(sizeof(void *) * (als->ele_arr_capacity), OBJ_TYPE__RAW_BYTES, als_mam, 0);
+
 		memcpy(new_ele_arr_p, als->elements_arr_p, als->idx * sizeof(void *));
-		// _release_mem_(als->elements_arr_p);
+
+		if (strat == DIRECT)
+			obj_release(als->elements_arr_p);
+
 		als->elements_arr_p = new_ele_arr_p;
 	}
 
