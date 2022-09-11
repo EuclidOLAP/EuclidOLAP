@@ -22,6 +22,8 @@ static ArrayList *member_pool = NULL;
 static ArrayList *cubes_pool = NULL;
 static ArrayList *levels_pool = NULL;
 
+static MemAllocMng *meta_mam;
+
 static Member *_create_member_lv1(Dimension *dim, char *mbr_name);
 static Member *_create_member_child(Member *parent, char *child_name);
 
@@ -45,10 +47,12 @@ static MddTuple *ids_tupledef__build(MDContext *md_ctx, TupleDef *t_def, MddTupl
 
 int mdd_init()
 {
-	dims_pool = als_create(32, "dimensions pool");
-	member_pool = als_create(256, "members pool | Member *");
-	cubes_pool = als_create(8, "cubes pool");
-	levels_pool = als_create(128, "Level *");
+	meta_mam = MemAllocMng_new();
+
+	dims_pool = als_new(32, "dimensions pool", SPEC_MAM, meta_mam);
+	member_pool = als_new(256, "members pool | Member *", SPEC_MAM, meta_mam);
+	cubes_pool = als_new(8, "cubes pool", SPEC_MAM, meta_mam);
+	levels_pool = als_new(128, "Level *", SPEC_MAM, meta_mam);
 }
 
 static int load_dimensions() {
@@ -60,7 +64,7 @@ static int load_dimensions() {
 		if (fread(&dim, sizeof(Dimension), 1, dims_file) < 1)
 			break;
 
-		Dimension *dimension = __objAlloc__(sizeof(Dimension), OBJ_TYPE__Dimension);
+		Dimension *dimension = mam_alloc(sizeof(Dimension), OBJ_TYPE__Dimension, meta_mam, 0);
 		memcpy(dimension, &dim, sizeof(Dimension));
 		als_add(dims_pool, dimension);
     }
@@ -75,7 +79,7 @@ static int load_levels() {
 		if (fread(&level, sizeof(Level), 1, levels_file) < 1)
 			break;
 
-		Level *lv = __objAlloc__(sizeof(Level), OBJ_TYPE__Level);
+		Level *lv = mam_alloc(sizeof(Level), OBJ_TYPE__Level, meta_mam, 0);
 		memcpy(lv, &level, sizeof(Level));
 		als_add(levels_pool, lv);
     }
@@ -90,7 +94,7 @@ static int load_members() {
 		if (fread(&memb, sizeof(Member), 1, members_file) < 1)
 			break;
 
-		Member *member = __objAlloc__(sizeof(Member), OBJ_TYPE__Member);
+		Member *member = mam_alloc(sizeof(Member), OBJ_TYPE__Member, meta_mam, 0);
 		memcpy(member, &memb, sizeof(Member));
 
 		/* TODO
@@ -138,7 +142,7 @@ static int load_cubes() {
 
 		FILE *cube_fd = open_file(cube_stru_file, "r");
 
-		Cube *cube = __objAlloc__(sizeof(Cube), OBJ_TYPE__Cube);
+		Cube *cube = mam_alloc(sizeof(Cube), OBJ_TYPE__Cube, meta_mam, 0);
 		fread(cube, sizeof(Cube), 1, cube_fd);
 		cube->dim_role_ls = als_create(24, "DimensionRole *");
 		cube->measure_mbrs = als_create(12, "Member *");
@@ -146,7 +150,7 @@ static int load_cubes() {
 		int i, dr_count;
 		fread(&dr_count, sizeof(unsigned int), 1, cube_fd);
 		for (i=0;i<dr_count;i++) {
-			DimensionRole *dim_role = __objAlloc__(sizeof(DimensionRole), OBJ_TYPE__DimensionRole);
+			DimensionRole *dim_role = mam_alloc(sizeof(DimensionRole), OBJ_TYPE__DimensionRole, meta_mam, 0);
 			fread(dim_role, sizeof(DimensionRole), 1, cube_fd);
 			als_add(cube->dim_role_ls, dim_role);
 		}
@@ -158,7 +162,7 @@ static int load_cubes() {
 		int mea_mbrs_count;
 		fread(&mea_mbrs_count, sizeof(unsigned int), 1, cube_fd);
 		for (i=0;i<mea_mbrs_count;i++) {
-			Member *mea_mbr = __objAlloc__(sizeof(Member), OBJ_TYPE__Member);
+			Member *mea_mbr = mam_alloc(sizeof(Member), OBJ_TYPE__Member, meta_mam, 0);
 			fread(mea_mbr, sizeof(Member), 1, cube_fd);
 			mdd__gen_mbr_abs_path(mea_mbr);
 			als_add(cube->measure_mbrs, mea_mbr);
@@ -189,7 +193,7 @@ Dimension *create_dimension(char *dim_name)
 	}
 
 	// 1 - create a dimension object.
-	Dimension *dim = (Dimension *)__objAlloc__(sizeof(Dimension), OBJ_TYPE__Dimension);
+	Dimension *dim = mam_alloc(sizeof(Dimension), OBJ_TYPE__Dimension, meta_mam, 0);
 	dim->gid = gen_md_gid();
 	memcpy(dim->name, dim_name, strlen(dim_name));
 	printf("[INFO] create dimension [ %ld ] %s\n", dim->gid, dim->name);
@@ -235,7 +239,7 @@ Level *Level_creat(char *name_, Dimension *dim, unsigned int level_)
 	if (strlen(name_) >= MD_ENTITY_NAME_BYTSZ)
 		return NULL;
 
-	Level *lv = __objAlloc__(sizeof(Level), OBJ_TYPE__Level);
+	Level *lv = mam_alloc(sizeof(Level), OBJ_TYPE__Level, meta_mam, 0);
 	lv->gid = gen_md_gid();
 	memcpy(lv->name, name_, strlen(name_));
 	lv->dim_gid = dim->gid;
@@ -487,7 +491,7 @@ Member *_new_member(char *name, md_gid dim_gid, md_gid parent_gid, __u_short lv)
 	if (strlen(name) >= MD_ENTITY_NAME_BYTSZ)
 		return NULL;
 
-	Member *mbr = __objAlloc__(sizeof(Member), OBJ_TYPE__Member);
+	Member *mbr = mam_alloc(sizeof(Member), OBJ_TYPE__Member, meta_mam, 0);
 	memcpy(mbr->name, name, strlen(name));
 	mbr->gid = gen_md_gid();
 	mbr->dim_gid = dim_gid;
@@ -504,7 +508,7 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 		return -1;
 
 	// Create a cube object.
-	Cube *cube = (Cube *)__objAlloc__(sizeof(Cube), OBJ_TYPE__Cube);
+	Cube *cube = mam_alloc(sizeof(Cube), OBJ_TYPE__Cube, meta_mam, 0);
 	memcpy(cube->name, name, strlen(name));
 	cube->gid = gen_md_gid();
 	cube->dim_role_ls = als_create(24, "DimensionRole *");
@@ -519,7 +523,7 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 		char *dim_role_name = als_get(dim_role_ls, i + 1);
 		Dimension *dim = find_dim_by_name(dim_name);
 
-		DimensionRole *d_role = __objAlloc__(sizeof(DimensionRole), OBJ_TYPE__DimensionRole);
+		DimensionRole *d_role = mam_alloc(sizeof(DimensionRole), OBJ_TYPE__DimensionRole, meta_mam, 0);
 		d_role->sn = i / 2;
 		memcpy(d_role->name, dim_role_name, strlen(dim_role_name));
 		d_role->gid = gen_md_gid();
@@ -590,8 +594,8 @@ int distribute_store_measure(EuclidCommand *ec)
 // TODO [ bug? ] When inserting duplicate data, the later data will not overwrite the previous data.
 int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 {
-	size_t data_m_capacity = 2 * 1024 * 1024, data_m_sz = sizeof(__uint32_t) + sizeof(__uint16_t);
-	char *data = __objAlloc__(data_m_capacity, OBJ_TYPE__RAW_BYTES);
+	size_t data_m_capacity = 4 * 1024 * 1024, data_m_sz = sizeof(__uint32_t) + sizeof(__uint16_t);
+	char *data = obj_alloc(data_m_capacity, OBJ_TYPE__RAW_BYTES);
 	*((__uint16_t *)(data + sizeof(__uint32_t))) = INTENT__INSERT_CUBE_MEARSURE_VALS;
 
 	Cube *cube = find_cube_by_name(cube_name);
@@ -617,11 +621,22 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 
 			void *abs_path = gen_member_gid_abs_path(cube, mbr_path_str);
 			size_t ap_bsz = *((__uint32_t *)abs_path) * sizeof(md_gid) + sizeof(__uint32_t);
+
+			if ((data_m_sz + ap_bsz) > data_m_capacity) {
+				printf("[ error ] exit, cause by: Too much data inserted.\n");
+				exit(EXIT_FAILURE);
+			}
 			memcpy(data + data_m_sz, abs_path, ap_bsz);
 			data_m_sz += ap_bsz;
 		}
 
 		__uint32_t cube_mmbrs_sz = als_size(cube->measure_mbrs);
+
+		if ((data_m_sz + (sizeof(double) + sizeof(char)) * cube_mmbrs_sz) > data_m_capacity) {
+			printf("[ error ] exit, cause by: Too much data inserted.\n");
+			exit(EXIT_FAILURE);
+		}
+
 		__uint32_t mv_sz = als_size(ids_vm->ls_mears_vals);
 		for (j = 0; j < cube_mmbrs_sz; j++)
 		{
@@ -645,14 +660,19 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 	}
 
 	*((__uint32_t *)data) = data_m_sz; // set data package capacity
-	char *_ec_data_ = __objAlloc__(data_m_sz, OBJ_TYPE__RAW_BYTES);
-	memcpy(_ec_data_, data, data_m_sz);
+	// char *_ec_data_ = __objAlloc__(data_m_sz, OBJ_TYPE__RAW_BYTES);
+	// memcpy(_ec_data_, data, data_m_sz);
 	// _release_mem_(data);
 
-	EuclidCommand *_ec_ = create_command(_ec_data_);
+	EuclidCommand *_ec_ = create_command(data);
 
 	// Store measure values locally or distribute it to downstream nodes for processing
-	return distribute_store_measure(_ec_);
+	int res = distribute_store_measure(_ec_);
+
+	obj_release(_ec_->bytes);
+	obj_release(_ec_);
+
+	return res;
 }
 
 Cube *find_cube_by_name(char *cube_name)
