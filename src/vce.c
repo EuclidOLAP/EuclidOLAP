@@ -485,8 +485,9 @@ double *vce_vactors_values(MDContext *md_ctx, MddTuple **tuples_matrix_h, unsign
         }
     }
 
-    double *result = __objAlloc__(v_len * sizeof(double), OBJ_TYPE__RAW_BYTES);
-    *null_flags = __objAlloc__(v_len * sizeof(char), OBJ_TYPE__RAW_BYTES);
+    double *result = mam_alloc(v_len * sizeof(double), OBJ_TYPE__RAW_BYTES, NULL, 0);
+    *null_flags = mam_alloc(v_len * sizeof(char), OBJ_TYPE__RAW_BYTES, NULL, 0);
+
 
     GridData tmp;
     for (i = 0; i < v_len; i++)

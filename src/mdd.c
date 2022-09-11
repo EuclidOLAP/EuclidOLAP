@@ -714,8 +714,12 @@ void *gen_member_gid_abs_path(Cube *cube, ArrayList *mbr_path_str)
 	return abs_path;
 }
 
+static long query_times = 1;
+
 MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 {
+	printf("\n[ debug ] >>>>>>>>>>>>>>>>>>>>>>> The number of times the query was executed: %ld\n\n", query_times++);
+
 	MDContext *md_ctx = MDContext_creat();
 	md_ctx->select_def = select_def;
 

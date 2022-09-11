@@ -25,6 +25,8 @@ enum obj_mem_alloc_strategy {
 	USED_MAM
 };
 
+typedef enum obj_mem_alloc_strategy enum_oms;
+
 #define MAM_BLOCK_MAX (0x01<<20)
 
 struct memory_allocation_manager

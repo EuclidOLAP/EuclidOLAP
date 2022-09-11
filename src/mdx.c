@@ -84,12 +84,24 @@ CubeDef *ids_cubedef_new(char *name)
     return def;
 }
 
-SelectDef *ids_selectdef_new(CubeDef *cube_def, ArrayList *ax_def_ls)
-{
-    SelectDef *def = (SelectDef *)__objAlloc__(sizeof(SelectDef), OBJ_TYPE__SelectDef);
-    def->cube_def = cube_def;
-    def->ax_def_ls = ax_def_ls;
-    return def;
+SelectDef *SelectDef_new(enum_oms strat, MemAllocMng *mam) {
+
+	if (strat == DIRECT)
+        return obj_alloc(sizeof(SelectDef), OBJ_TYPE__SelectDef);
+
+    if (strat == USED_MAM) {
+        printf("[ error ] exit! exception in SelectDef_new(..)\n");
+        exit(1);
+    }
+
+    if (strat == THREAD_MAM)
+        mam = MemAllocMng_current_thread_mam();
+
+    if (mam)
+        return mam_alloc(sizeof(SelectDef), OBJ_TYPE__SelectDef, mam, 0);
+
+    printf("[ error ] exit! exception in SelectDef_new(..)\n");
+    exit(1);
 }
 
 Factory *Factory_creat()
