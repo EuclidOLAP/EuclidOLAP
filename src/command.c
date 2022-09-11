@@ -37,19 +37,19 @@ extern void *parse_mdx(char *mdx);
 int init_command_module()
 {
 	// init CCI_ALLOW
-	void *addr = __objAlloc__(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
+	void *addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
 	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT;
 	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__ALLOW;
 	CCI_ALLOW = create_command(addr);
 
 	// init CCI_CHILD_NODE_JOIN
-	addr = __objAlloc__(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
+	addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
 	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT;
 	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__CHILD_NODE_JOIN;
 	CCI_CHILD_NODE_JOIN = create_command(addr);
 
 	// init CCI_TERML_CTRL
-	addr = __objAlloc__(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
+	addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
 	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT;
 	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__TERMINAL_CONTROL;
 	CCI_TERML_CTRL = create_command(addr);

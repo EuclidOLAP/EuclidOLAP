@@ -171,9 +171,9 @@ SetFormula *SetFormula_creat()
 
 FormulaContext *FormulaContext_creat()
 {
-    FormulaContext *fc = (FormulaContext *)__objAlloc__(sizeof(FormulaContext), OBJ_TYPE__FormulaContext);
-    fc->member_formulas = als_create(32, "MemberFormula *");
-    fc->set_formulas = als_create(32, "SetFormula *");
+    FormulaContext *fc = mam_alloc(sizeof(FormulaContext), OBJ_TYPE__FormulaContext, NULL, 0);
+    fc->member_formulas = als_new(32, "MemberFormula *", THREAD_MAM, NULL);
+    fc->set_formulas = als_new(32, "SetFormula *", THREAD_MAM, NULL);
     return fc;
 }
 
