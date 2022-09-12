@@ -616,17 +616,12 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 		for (j = 0; j < vct_sz; j++)
 		{
 			ArrayList *mbr_path_str = als_get(ids_vm->ls_vector, j);
-
-			__uint32_t mbr_path_len = als_size(mbr_path_str);
-
-			void *abs_path = gen_member_gid_abs_path(cube, mbr_path_str);
-			size_t ap_bsz = *((__uint32_t *)abs_path) * sizeof(md_gid) + sizeof(__uint32_t);
-
+			size_t ap_bsz = sizeof(int) + sizeof(md_gid) * (als_size(mbr_path_str) - 1);
 			if ((data_m_sz + ap_bsz) > data_m_capacity) {
 				printf("[ error ] exit, cause by: Too much data inserted.\n");
 				exit(EXIT_FAILURE);
 			}
-			memcpy(data + data_m_sz, abs_path, ap_bsz);
+			gen_member_gid_abs_path(cube, mbr_path_str, data + data_m_sz);
 			data_m_sz += ap_bsz;
 		}
 
@@ -659,10 +654,8 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 		}
 	}
 
-	*((__uint32_t *)data) = data_m_sz; // set data package capacity
-	// char *_ec_data_ = __objAlloc__(data_m_sz, OBJ_TYPE__RAW_BYTES);
-	// memcpy(_ec_data_, data, data_m_sz);
-	// _release_mem_(data);
+	// set data package capacity
+	*((__uint32_t *)data) = data_m_sz;
 
 	EuclidCommand *_ec_ = create_command(data);
 
@@ -699,7 +692,7 @@ Cube *find_cube_by_gid(md_gid id)
 	return NULL;
 }
 
-void *gen_member_gid_abs_path(Cube *cube, ArrayList *mbr_path_str)
+void gen_member_gid_abs_path(Cube *cube, ArrayList *mbr_path_str, char *abs_path)
 {
 	char *dim_role_name = als_get(mbr_path_str, 0);
 	DimensionRole *dr;
@@ -716,11 +709,8 @@ void *gen_member_gid_abs_path(Cube *cube, ArrayList *mbr_path_str)
 		break;
 	}
 
-	// printf("dim_role_name [ %s ], dim->name [ %s ], lv1_mbr->name [ %s ]\n", dim_role_name, dim->name, lv1_mbr->name);
-
 	__uint32_t sz = als_size(mbr_path_str);
 
-	char *abs_path = __objAlloc__(sizeof(__uint32_t) + sizeof(md_gid) * (sz - 1), OBJ_TYPE__RAW_BYTES);
 	*((__uint32_t *)abs_path) = sz - 1;
 	*((md_gid *)(abs_path + sizeof(__uint32_t))) = lv1_mbr->gid;
 
@@ -728,10 +718,8 @@ void *gen_member_gid_abs_path(Cube *cube, ArrayList *mbr_path_str)
 	{
 		mbr = find_member_child(mbr, als_get(mbr_path_str, i));
 		*((md_gid *)(abs_path + sizeof(__uint32_t) + sizeof(md_gid) * (i - 1))) = mbr->gid;
-		// printf("::>> child member name - %s\n", mbr->name);
 	}
 
-	return abs_path;
 }
 
 static long query_times = 1;
