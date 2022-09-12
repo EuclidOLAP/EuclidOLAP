@@ -148,7 +148,11 @@ multi_dim_query:
 		stack_pop(&YC_STC, (void **) &cube_def);
 		ArrayList *ax_def_ls;
 		stack_pop(&YC_STC, (void **) &ax_def_ls);
-		SelectDef *select_def = ids_selectdef_new(cube_def, ax_def_ls);
+
+		SelectDef *select_def = SelectDef_new(THREAD_MAM, NULL);
+		select_def->cube_def = cube_def;
+		select_def->ax_def_ls = ax_def_ls;
+
 		FormulaContext *fc;
 		stack_pop(&YC_STC, (void **) &fc);
 		select_def->member_formulas = fc->member_formulas;
@@ -162,7 +166,11 @@ multi_dim_query:
 		stack_pop(&YC_STC, (void **) &cube_def);
 		ArrayList *ax_def_ls;
 		stack_pop(&YC_STC, (void **) &ax_def_ls);
-		SelectDef *select_def = ids_selectdef_new(cube_def, ax_def_ls);
+
+		SelectDef *select_def = SelectDef_new(THREAD_MAM, NULL);
+		select_def->cube_def = cube_def;
+		select_def->ax_def_ls = ax_def_ls;
+
 		stack_push(&YC_STC, select_def);
 	}
   | multi_dim_query WHERE tuple_statement {
@@ -1006,7 +1014,7 @@ vector_measures:
 		ArrayList *ls_vector, *ls_mears_vals;
 		stack_pop(&YC_STC, (void **) &ls_mears_vals);
 		stack_pop(&YC_STC, (void **) &ls_vector);
-		IDSVectorMears *ids_vm = __objAlloc__(sizeof(IDSVectorMears), OBJ_TYPE__IDSVectorMears);
+		IDSVectorMears *ids_vm = mam_alloc(sizeof(IDSVectorMears), OBJ_TYPE__IDSVectorMears, NULL, 0);
 		ids_vm->ls_vector = ls_vector;
 		ids_vm->ls_mears_vals = ls_mears_vals;
 		stack_push(&YC_STC, ids_vm);
@@ -1034,7 +1042,7 @@ measures_values:
 	var_or_block DECIMAL {
 		char *mmbr_name;
 		stack_pop(&YC_STC, (void **) &mmbr_name);
-		double *val = __objAlloc__(sizeof(double), OBJ_TYPE__RAW_BYTES);
+		double *val = mam_alloc(sizeof(double), OBJ_TYPE__RAW_BYTES, NULL, 0);
 		*val = atof(yytext);
 		ArrayList *mear_vals_ls = als_new(16, "{ yacc measures_values ::= }, { 0,2,4 ... char * }, { 1,3,5 ... double * }", THREAD_MAM, NULL);
 		als_add(mear_vals_ls, mmbr_name);
@@ -1046,7 +1054,7 @@ measures_values:
 		stack_pop(&YC_STC, (void **) &mmbr_name);
 		ArrayList *mear_vals_ls;
 		stack_pop(&YC_STC, (void **) &mear_vals_ls);
-		double *val = __objAlloc__(sizeof(double), OBJ_TYPE__RAW_BYTES);
+		double *val = mam_alloc(sizeof(double), OBJ_TYPE__RAW_BYTES, NULL, 0);
 		*val = atof(yytext);
 		als_add(mear_vals_ls, mmbr_name);
 		als_add(mear_vals_ls, val);
@@ -1217,7 +1225,6 @@ vars:
 		char *vb_str;
 		stack_pop(&YC_STC, (void **) &vb_str);
 
-		// ArrayList *vb_ls = als_create(8, "yacc vars ::=");
 		ArrayList *vb_ls = als_new(8, "yacc vars ::=", THREAD_MAM, NULL);
 
 		als_add(vb_ls, vb_str);

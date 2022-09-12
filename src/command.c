@@ -37,19 +37,19 @@ extern void *parse_mdx(char *mdx);
 int init_command_module()
 {
 	// init CCI_ALLOW
-	void *addr = __objAlloc__(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
+	void *addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
 	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT;
 	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__ALLOW;
 	CCI_ALLOW = create_command(addr);
 
 	// init CCI_CHILD_NODE_JOIN
-	addr = __objAlloc__(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
+	addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
 	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT;
 	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__CHILD_NODE_JOIN;
 	CCI_CHILD_NODE_JOIN = create_command(addr);
 
 	// init CCI_TERML_CTRL
-	addr = __objAlloc__(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
+	addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
 	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT;
 	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__TERMINAL_CONTROL;
 	CCI_TERML_CTRL = create_command(addr);
@@ -70,7 +70,7 @@ int init_command_module()
 
 EuclidCommand *create_command(char *bytes)
 {
-	EuclidCommand *ec_p = (EuclidCommand *)__objAlloc__(sizeof(EuclidCommand), OBJ_TYPE__EuclidCommand);
+	EuclidCommand *ec_p = obj_alloc(sizeof(EuclidCommand), OBJ_TYPE__EuclidCommand);
 	ec_p->bytes = bytes;
 	return ec_p;
 }
@@ -271,8 +271,8 @@ EuclidCommand *build_intent_command_mdx(char *mdx)
 	// The last byte is to hold the final null character of the string.
 	unsigned int capacity = SZOF_USG_INT + SZOF_USG_SHORT + SZOF_USG_INT + strlen(mdx) + 1;
 
-	EuclidCommand *ec = (EuclidCommand *)__objAlloc__(sizeof(EuclidCommand), OBJ_TYPE__EuclidCommand);
-	void *addr = __objAlloc__(capacity, OBJ_TYPE__RAW_BYTES);
+	EuclidCommand *ec = obj_alloc(sizeof(EuclidCommand), OBJ_TYPE__EuclidCommand);
+	void *addr = obj_alloc(capacity, OBJ_TYPE__RAW_BYTES);
 
 	*((unsigned int *)addr) = capacity;
 	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__MDX;

@@ -110,7 +110,11 @@ typedef struct select_definition
     TupleDef *where_tuple_def;
 } SelectDef;
 
-SelectDef *ids_selectdef_new(CubeDef *, ArrayList *);
+/**
+ * @param strat Memory allocation strategy.
+ * @param mam When the strat parameter is SPEC_MAM, mam cannot be NULL.
+ */
+SelectDef *SelectDef_new(enum_oms strat, MemAllocMng *mam);
 
 typedef struct _MD_context_
 {

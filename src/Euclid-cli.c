@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	{
 		statement_len += strlen(argv[i]) + 1;
 	}
-	char *statement = (char *)__objAlloc__(statement_len, OBJ_TYPE__RAW_BYTES);
+	char *statement = obj_alloc(statement_len, OBJ_TYPE__RAW_BYTES);
 	for (i = 1; i < argc; i++)
 	{
 		strncat(statement, argv[i], strlen(argv[i]));
