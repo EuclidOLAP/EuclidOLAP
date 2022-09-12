@@ -27,6 +27,11 @@ enum obj_mem_alloc_strategy {
 
 typedef enum obj_mem_alloc_strategy enum_oms;
 
+/**
+ * This value cannot be less than 16, otherwise a program memory error will result because 
+ * the allocated memory block cannot hold a memory address pointer (char *) and a memory 
+ * address offset (unsigned long).
+ */
 #define MAM_BLOCK_MAX (0x01UL<<20)
 
 struct memory_allocation_manager
@@ -42,6 +47,11 @@ struct memory_allocation_manager
 	 * the rest of the bytes             - Memory for allocation.
 	 */
 	char *current_block;
+
+	/**
+	 * Used to allocate data blocks that exceed MAM_BLOCK_MAX capacity.
+	 */
+	char *big_block;
 };
 
 typedef struct memory_allocation_manager MemAllocMng;

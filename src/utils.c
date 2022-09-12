@@ -14,13 +14,26 @@ extern RedBlackTree *_thread_mam_pool;
 void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 
 	size_t required = (mam_mark ? sizeof(MemAllocMng *) : 0) + sizeof(short) + size;
+	mam = mam ? mam : MemAllocMng_current_thread_mam();
+	void *obj_ins;
 
-	if (required > (MAM_BLOCK_MAX - sizeof(char *) - sizeof(unsigned long))) {
-		printf("[ error ] program exit! cause by: Out of line for memory allocation manager.\n");
-		exit(1);
+	if ((required + sizeof(char *) + sizeof(unsigned long)) > MAM_BLOCK_MAX) {
+		char *big_blk = obj_alloc(sizeof(char *) + required, OBJ_TYPE__RAW_BYTES);
+		if (mam->big_block)
+			*((char **)big_blk) = mam->big_block;
+		mam->big_block = big_blk;
+		char *obj_hide_head = mam->big_block + sizeof(char *);
+		if (mam_mark) {
+			*((MemAllocMng **)obj_hide_head) = mam;
+			*((short *)(obj_hide_head + sizeof(MemAllocMng *))) = (0xC000) | type;
+			obj_ins = obj_hide_head + sizeof(MemAllocMng *) + sizeof(short);
+		} else {
+			*((short *)obj_hide_head) = (0x8000) | type;
+			obj_ins = obj_hide_head + sizeof(short);
+		}
+		return obj_ins;
 	}
 
-	mam = mam ? mam : MemAllocMng_current_thread_mam();
 	char *blk = mam->current_block;
 	unsigned long remaining_capacity = MAM_BLOCK_MAX - *((unsigned long *)(blk + sizeof(char *)));
 
@@ -32,8 +45,6 @@ void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 	}
 
 	unsigned long index = *((unsigned long *)(blk + sizeof(char *)));
-
-	void *obj_ins;
 
 	if (mam_mark) {
 		/**
@@ -73,6 +84,14 @@ void mam_reset(MemAllocMng *mam) {
 		curr_blk = next_blk;
 		next_blk = *((void **)curr_blk);
 		obj_release(curr_blk);
+	}
+
+	curr_blk = mam->big_block;
+	mam->big_block = NULL;
+	while (curr_blk) {
+		next_blk = *((char **)curr_blk);
+		obj_release(curr_blk);
+		curr_blk = next_blk;
 	}
 }
 
