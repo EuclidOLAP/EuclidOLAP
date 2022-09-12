@@ -13,47 +13,44 @@ extern RedBlackTree *_thread_mam_pool;
 
 void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 
-	int required = (mam_mark ? sizeof(MemAllocMng *) : 0) + sizeof(short) + size;
+	size_t required = (mam_mark ? sizeof(MemAllocMng *) : 0) + sizeof(short) + size;
 
-	if (required > (MAM_BLOCK_MAX - sizeof(char *) - sizeof(int))) {
+	if (required > (MAM_BLOCK_MAX - sizeof(char *) - sizeof(unsigned long))) {
 		printf("[ error ] program exit! cause by: Out of line for memory allocation manager.\n");
 		exit(1);
 	}
 
 	mam = mam ? mam : MemAllocMng_current_thread_mam();
-
 	char *blk = mam->current_block;
-	int remaining_capacity = MAM_BLOCK_MAX - *((int *)(blk + sizeof(char *)));
+	unsigned long remaining_capacity = MAM_BLOCK_MAX - *((unsigned long *)(blk + sizeof(char *)));
 
 	if (required > remaining_capacity) {
 		blk = obj_alloc(MAM_BLOCK_MAX, OBJ_TYPE__RAW_BYTES);
-		*((int *)(blk + sizeof(char *))) = sizeof(char *) + sizeof(int);
+		*((unsigned long *)(blk + sizeof(char *))) = sizeof(char *) + sizeof(unsigned long);
 		*((char **)blk) = mam->current_block;
 		mam->current_block = blk;
 	}
 
-	int index = *((int *)(blk + sizeof(char *)));
-	// memset(blk + index, 0, required);
+	unsigned long index = *((unsigned long *)(blk + sizeof(char *)));
 
 	void *obj_ins;
 
 	if (mam_mark) {
 		/**
-		 * The memory allocation manager information and object type need to be recorded in
-		 * the header hidden data, occupying 10 bytes.
+		 * The memory allocation manager information and object type need to be recorded in the header hidden data.
 		 */
 		*((MemAllocMng **)(blk + index)) = mam;
 		*((short *)(blk + index + sizeof(MemAllocMng *))) = (0xC000) | type;
 		obj_ins = blk + index + sizeof(MemAllocMng *) + sizeof(short);
 	} else {
 		/**
-		 * The object type needs to be recorded in the header hidden data, occupying 2 bytes.
+		 * The object type needs to be recorded in the header hidden data.
 		 */
 		*((short *)(blk + index)) = (0x8000) | type;
 		obj_ins = blk + index + sizeof(short);
 	}
 
-	*((int *)(blk + sizeof(char *))) = index + required;
+	*((unsigned long *)(blk + sizeof(char *))) = index + required;
 
 	return obj_ins;
 }
@@ -69,8 +66,8 @@ void mam_reset(MemAllocMng *mam) {
 	char *next_blk = *((void **)curr_blk);
 
 	memset(curr_blk, 0, MAM_BLOCK_MAX);
-	// *((void **)curr_blk) = NULL;
-	*((int *)(curr_blk + sizeof(char *))) = sizeof(char *) + sizeof(int);
+
+	*((unsigned long *)(curr_blk + sizeof(char *))) = sizeof(char *) + sizeof(unsigned long);
 
 	while (next_blk) {
 		curr_blk = next_blk;
@@ -93,7 +90,7 @@ int mam_comp(void *mam, void *other) {
 MemAllocMng *MemAllocMng_new() {
 	MemAllocMng *mam = obj_alloc(sizeof(MemAllocMng), OBJ_TYPE__MemAllocMng);
 	mam->current_block = obj_alloc(MAM_BLOCK_MAX, OBJ_TYPE__RAW_BYTES);
-	*((int *)(mam->current_block + sizeof(char *))) = sizeof(char *) + sizeof(int);
+	*((unsigned long *)(mam->current_block + sizeof(char *))) = sizeof(char *) + sizeof(unsigned long);
 	return mam;
 }
 
