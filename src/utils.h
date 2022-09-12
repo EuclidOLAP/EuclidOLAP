@@ -27,7 +27,7 @@ enum obj_mem_alloc_strategy {
 
 typedef enum obj_mem_alloc_strategy enum_oms;
 
-#define MAM_BLOCK_MAX (0x01<<20)
+#define MAM_BLOCK_MAX (0x01UL<<20)
 
 struct memory_allocation_manager
 {
@@ -37,9 +37,9 @@ struct memory_allocation_manager
 	 * Points to the data block that is allocating memory.
 	 * 
 	 * memory block structure:
-	 * 0th to 7th bytes - Pointer to the next block of data.
-	 * 8th to 11th bytes - The index of the currently allocated memory location.
-	 * the rest of the bytes - Memory for allocation.
+	 * 0th to  7th bytes (void *)        - Pointer to the next block of data.
+	 * 8th to 15th bytes (unsigned long) - The index of the currently allocated memory location.
+	 * the rest of the bytes             - Memory for allocation.
 	 */
 	char *current_block;
 };
@@ -48,7 +48,7 @@ typedef struct memory_allocation_manager MemAllocMng;
 
 /**
  * @param mam If mam is NULL, use the memory allocation manager of current thread.
- * @param mam_mark When it is not 0, the address of the memory allocation manager isrecorded in
+ * @param mam_mark When it is not 0, the address of the memory allocation manager is recorded in
  * 				   the object header information, and when it is 0, it is not recorded.
  */
 void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark);

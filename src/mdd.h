@@ -133,7 +133,7 @@ Cube *find_cube_by_name(char *cube_name);
 
 Cube *find_cube_by_gid(md_gid);
 
-void *gen_member_gid_abs_path(Cube *cube, ArrayList *mbr_path_str);
+void gen_member_gid_abs_path(Cube *cube, ArrayList *mbr_path_str, char *abs_path);
 
 int store_measure(EuclidCommand *ec);
 
