@@ -759,7 +759,7 @@ MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 	for (i = x_size - 2; i >= 0; i--)
 		offset_arr[i] = offset_arr[i + 1] * mdd_ax__len(als_get(axes, i + 1));
 
-	MddTuple **tuples_matrix_h = __objAlloc__(rs_len * x_size * sizeof(void *), OBJ_TYPE__RAW_BYTES);
+	MddTuple **tuples_matrix_h = mam_alloc(rs_len * x_size * sizeof(void *), OBJ_TYPE__RAW_BYTES, NULL, 0);
 
 	int matx_col, matx_row, f;
 	for (matx_col = 0; matx_col < x_size; matx_col++)
@@ -1022,8 +1022,8 @@ void mdd_mbr__set_as_leaf(Member *m)
 
 MddTuple *mdd_tp__create()
 {
-	MddTuple *tp = (MddTuple *)__objAlloc__(sizeof(MddTuple), OBJ_TYPE__MddTuple);
-	tp->mr_ls = als_create(32, "MddMemberRole *");
+	MddTuple *tp = mam_alloc(sizeof(MddTuple), OBJ_TYPE__MddTuple, NULL, 0);
+	tp->mr_ls = als_new(32, "MddMemberRole *", THREAD_MAM, NULL);
 	return tp;
 }
 
@@ -1044,7 +1044,7 @@ int Tuple__cmp(MddTuple *t1, MddTuple *t2)
 
 MddMemberRole *mdd_mr__create(Member *m, DimensionRole *dr)
 {
-	MddMemberRole *mr = __objAlloc__(sizeof(MddMemberRole), OBJ_TYPE__MddMemberRole);
+	MddMemberRole *mr = mam_alloc(sizeof(MddMemberRole), OBJ_TYPE__MddMemberRole, NULL, 0);
 	mr->member = m;
 	mr->dim_role = dr;
 	return mr;
@@ -1334,14 +1334,14 @@ Member *dim__find_mbr(Dimension *dim, ArrayList *mbr_name_path)
 
 MddSet *mdd_set__create()
 {
-	MddSet *set = __objAlloc__(sizeof(MddSet), OBJ_TYPE__MddSet);
-	set->tuples = als_create(64, "MddTuple *");
+	MddSet *set = mam_alloc(sizeof(MddSet), OBJ_TYPE__MddSet, NULL, 0);
+	set->tuples = als_new(64, "MddTuple *", THREAD_MAM, NULL);
 	return set;
 }
 
 MddAxis *mdd_ax__create()
 {
-	return (MddAxis *)__objAlloc__(sizeof(MddAxis), OBJ_TYPE__MddAxis);
+	return mam_alloc(sizeof(MddAxis), OBJ_TYPE__MddAxis, NULL, 0);
 }
 
 MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tuple, Cube *cube)
@@ -1567,7 +1567,7 @@ void mdd__gen_mbr_abs_path(Member *m)
 	if (m->abs_path)
 		return;
 
-	m->abs_path = __objAlloc__(m->lv * sizeof(md_gid), OBJ_TYPE__RAW_BYTES);
+	m->abs_path = mam_alloc(m->lv * sizeof(md_gid), OBJ_TYPE__RAW_BYTES, meta_mam, 0);
 
 	Member *current_m = m;
 
@@ -2693,7 +2693,7 @@ MddMemberRole *MemberRoleFnParallelPeriod_evolving(MDContext *md_ctx, MemberRole
 
 MultiDimResult *MultiDimResult_creat()
 {
-	return __objAlloc__(sizeof(MultiDimResult), OBJ_TYPE__MultiDimResult);
+	return mam_alloc(sizeof(MultiDimResult), OBJ_TYPE__MultiDimResult, NULL, 0);
 }
 
 void MultiDimResult_print(MultiDimResult *md_rs)
@@ -2874,7 +2874,7 @@ void ExpFnCount_evolving(MDContext *md_ctx, ExpFnCount *count, Cube *cube, MddTu
 		return;
 	}
 
-	MddTuple **tuples_matrix_h = __objAlloc__(sizeof(MddTuple *) * tuples_size, OBJ_TYPE__RAW_BYTES);
+	MddTuple **tuples_matrix_h = mam_alloc(sizeof(MddTuple *) * tuples_size, OBJ_TYPE__RAW_BYTES, NULL, 0);
 
 	for (i = 0; i < tuples_size; i++)
 	{
@@ -2895,7 +2895,7 @@ void ExpFnLookUpCube_evolving(MDContext *md_ctx, ExpFnLookUpCube *luc, Cube *cub
 {
 	if (luc->exp_str)
 	{
-		char *flag_exp = __objAlloc__(strlen(luc->exp_str) + 50, OBJ_TYPE__RAW_BYTES);
+		char *flag_exp = mam_alloc(strlen(luc->exp_str) + strlen("@@EXP ") + 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
 		sprintf(flag_exp, "@@EXP %s", luc->exp_str);
 		parse_mdx(flag_exp);
 		stack_pop(&YC_STC, (void **)&(luc->exp));
@@ -2925,7 +2925,7 @@ void ExpFnCoalesceEmpty_evolving(MDContext *md_ctx, ExpFnCoalesceEmpty *ce, Cube
 
 LevelRole *LevelRole_creat(Level *lv, DimensionRole *dr)
 {
-	LevelRole *lr = __objAlloc__(sizeof(LevelRole), OBJ_TYPE__LevelRole);
+	LevelRole *lr = mam_alloc(sizeof(LevelRole), OBJ_TYPE__LevelRole, NULL, 0);
 	lr->lv = lv;
 	lr->dim_role = dr;
 	return lr;
