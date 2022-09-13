@@ -195,6 +195,7 @@ void *als_get(ArrayList *als, unsigned int position);
 
 unsigned int als_size(ArrayList *als);
 
+// TODO deprecated, there may be bugs
 int als_remove(ArrayList *als, void *obj);
 
 void *slide_over_mem(void *addr, ssize_t range, size_t *idx);

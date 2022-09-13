@@ -524,10 +524,10 @@ unsigned int als_size(ArrayList *als)
 	return als ? als->idx : -1;
 }
 
+// TODO deprecated, there may be bugs
 int als_remove(ArrayList *als, void *obj)
 {
-	int i;
-	for (i = 0; i < als->idx; i++)
+	for (int i = 0; i < als->idx; i++)
 	{
 		if (*((int *)(als->elements_arr_p[i])) != *((int *)obj))
 			continue;
