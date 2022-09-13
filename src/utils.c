@@ -223,12 +223,12 @@ ssize_t read_sock_pkg(int sock_fd, void **buf, size_t *buf_len)
 
 LinkedQueue *create_lnk_queue()
 {
-	return (LinkedQueue *)__objAlloc__(sizeof(LinkedQueue), OBJ_TYPE__LinkedQueue);
+	return obj_alloc(sizeof(LinkedQueue), OBJ_TYPE__LinkedQueue);
 }
 
 int lnk_q_add_obj(LinkedQueue *lnk_q, void *obj)
 {
-	LinkedQueueNode *n = (LinkedQueueNode *)__objAlloc__(sizeof(LinkedQueueNode), OBJ_TYPE__LinkedQueueNode);
+	LinkedQueueNode *n = obj_alloc(sizeof(LinkedQueueNode), OBJ_TYPE__LinkedQueueNode);
 	n->obj = obj;
 
 	if (lnk_q->tail)
@@ -260,7 +260,7 @@ void *lnk_q_get(LinkedQueue *lnk_q)
 	}
 
 	void *res = cn->obj;
-	// _release_mem_(cn);
+	obj_release(cn);
 	return res;
 }
 
