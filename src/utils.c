@@ -68,6 +68,7 @@ void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 
 MemAllocMng *MemAllocMng_current_thread_mam() {
 	MemAllocMng key;
+	memset(&key, 0, sizeof(MemAllocMng));
 	key.thread_id = pthread_self();
 	return rbt__find(_thread_mam_pool, &key)->obj;
 }
@@ -98,12 +99,19 @@ void mam_reset(MemAllocMng *mam) {
 int mam_comp(void *mam, void *other) {
 	MemAllocMng *m = mam;
 	MemAllocMng *o = other;
-	if (o->thread_id < m->thread_id)
-		return -1;
-	if (o->thread_id > m->thread_id)
-		return 1;
 
-	return 0;
+	if ((m->id | m->thread_id == 0) || (m->id * m->thread_id != 0) || (o->id | o->thread_id == 0) || (o->id * o->thread_id != 0)) {
+		printf("[ error ] exit. cause by: exception in mam_comp(..)\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (m->id * o->id)
+		return o->id < m->id ? -1 : (o->id > m->id ? 1 : 0);
+
+	if (m->thread_id * o->thread_id)
+		return o->thread_id < m->thread_id ? -1 : (o->thread_id > m->thread_id ? 1 : 0);
+
+	return o->id ? -1 : 1;
 }
 
 MemAllocMng *MemAllocMng_new() {

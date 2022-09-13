@@ -36,6 +36,7 @@ typedef enum obj_mem_alloc_strategy enum_oms;
 
 struct memory_allocation_manager
 {
+	unsigned long id;
 	pthread_t thread_id;
 
 	/**
@@ -63,6 +64,23 @@ typedef struct memory_allocation_manager MemAllocMng;
  */
 void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark);
 
+/*
++--------------------------------+---------------------------------------+
+|                                |                 other                 |
+|                                +---------------------------------------+
+|                                | thread_id == 0    | thread_id != 0    |
+|                                +-------------------+-------------------+
+|                                | id == 0 | id != 0 | id == 0 | id != 0 |
++-----+----------------+---------+---------+---------+---------+---------+
+|     |                | id == 0 | error   | error   | error   | error   |
+|     | thread_id == 0 +---------+---------+---------+---------+---------+
+|     |                | id != 0 | error   | compare | 1       | error   |
+| mam +----------------+---------+---------+---------+---------+---------+
+|     |                | id == 0 | error   | -1      | compare | error   |
+|     | thread_id != 0 +---------+---------+---------+-------------------+
+|     |                | id != 0 | error   | error   | error   | error   |
++-----+----------------+---------+---------+---------+---------+---------+
+*/
 int mam_comp(void *mam, void *other);
 
 MemAllocMng *MemAllocMng_new();

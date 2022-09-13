@@ -6,6 +6,8 @@
 #include "vce.h"
 #include "utils.h"
 
+static MemAllocMng *vce_mam;
+static ArrayList *space_mam_ls;
 static ArrayList *coor_sys_ls;
 static ArrayList *space_ls;
 
@@ -15,8 +17,10 @@ static void MeasureSpace_coordinate_intersection_value(MeasureSpace *space, unsi
 
 void vce_init()
 {
-    coor_sys_ls = als_create(16, "CoordinateSystem *");
-    space_ls = als_create(16, "MeasureSpace *");
+    vce_mam = MemAllocMng_new();
+    coor_sys_ls = als_new(16, "CoordinateSystem *", SPEC_MAM, vce_mam);
+    space_ls = als_new(16, "MeasureSpace *", SPEC_MAM, vce_mam);
+    space_mam_ls = als_new(16, "MemAllocMng *", SPEC_MAM, vce_mam);
 }
 
 void vce_load() {
@@ -303,8 +307,7 @@ int scal_cmp(void *_one, void *_other)
 
 void space_unload(__uint64_t id)
 {
-    int i;
-    for (i = 0; i < als_size(space_ls); i++)
+    for (int i = 0; i < als_size(space_ls); i++)
     {
         MeasureSpace *space = (MeasureSpace *)als_get(space_ls, i);
         if (space->id == id)
