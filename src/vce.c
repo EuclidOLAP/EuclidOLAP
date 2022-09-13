@@ -389,8 +389,12 @@ void *build_space_measure(RBNode *node, void *callback_params)
 
 void space_plan(MeasureSpace *space)
 {
-    int i;
-    for (i = 0; i < space->segment_count; i++)
+    short type;
+    enum_oms strat;
+    MemAllocMng *mam;
+    obj_info(space, &type, &strat, &mam);
+
+    for (int i = 0; i < space->segment_count; i++)
     {
         RedBlackTree *tree = space->tree_ls_h[i];
         rbt__reordering(tree);
@@ -399,7 +403,7 @@ void space_plan(MeasureSpace *space)
         unsigned int actual_cells_sz = rbt__size(tree);
         space->data_lens[i] = actual_cells_sz;
         int posi_cell_sz = (sizeof(unsigned long) + cell_size);
-        space->data_ls_h[i] = __objAlloc__(actual_cells_sz * posi_cell_sz, OBJ_TYPE__RAW_BYTES);
+        space->data_ls_h[i] = mam_alloc(actual_cells_sz * posi_cell_sz, OBJ_TYPE__RAW_BYTES, mam, 0);
 
         char callback_params[sizeof(int) + sizeof(void *)];
         *((int *)callback_params) = cell_size;
