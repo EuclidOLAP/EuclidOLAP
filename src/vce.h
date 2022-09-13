@@ -47,8 +47,6 @@ typedef struct _axis_scale
 
 void Scale_print(Scale *);
 
-Scale *scal_create();
-
 void *scal__destory(void *scale);
 
 int scal_cmp(void *_one, void *_other);
@@ -56,8 +54,6 @@ int scal_cmp(void *_one, void *_other);
 // void scal_set_len(Scale *scale, int fgs_len);
 
 void scal_put_fragments(Scale *scale, int fgs_len, void *fragments);
-
-Scale *scal__alloc(int fgs_len, void *fragments);
 
 typedef struct _scale_offset_range
 {
@@ -109,8 +105,6 @@ MeasureSpace *space_create(size_t segment_count, size_t segment_scope, int cell_
 MeasureSpace *space_new(unsigned long id, size_t segment_count, size_t segment_scope, int cell_vals_count, MemAllocMng *mam);
 
 void MeasureSpace_print(MeasureSpace *);
-
-__uint64_t ax_scale_position(Axis *axis, int fgs_len, void *fragments);
 
 __uint64_t cs_axis_span(CoordinateSystem *cs, int axis_order);
 

@@ -130,7 +130,7 @@ void reload_space(unsigned long cs_id) {
     while (fread(&coor_pointer_len, sizeof(int), 1, data_fd) > 0) {
         fread(tmpbuf, coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
         // At the same time, hang the scale objects on the corresponding axis in the coordinate system object.
-        Scale *scale = scal_create();
+        Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
         scal_put_fragments(scale, coor_pointer_len, tmpbuf);
         Axis *axis = cs_get_axis(cs, 0);
         ax_set_scale(axis, scale);
@@ -138,7 +138,7 @@ void reload_space(unsigned long cs_id) {
         for (i=1;i<axes_count;i++) {
             fread(&coor_pointer_len, sizeof(int), 1, data_fd);
             fread(tmpbuf, coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
-            Scale *scale = scal_create();
+            Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
             scal_put_fragments(scale, coor_pointer_len, tmpbuf);
             Axis *axis = cs_get_axis(cs, i);
             ax_set_scale(axis, scale);
@@ -189,7 +189,12 @@ void reload_space(unsigned long cs_id) {
 
             fread(tmpbuf, sizeof(md_gid), scale_len, data_fd);
             Axis *axis = cs_get_axis(cs, i);
-            __uint64_t sc_posi = ax_scale_position(axis, scale_len, tmpbuf);
+
+            Scale *__inl_s = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
+            scal_put_fragments(__inl_s, scale_len, tmpbuf);
+            RBNode *__inl_n = rbt__find(axis->rbtree, __inl_s);
+            __uint64_t sc_posi = __inl_n->index;
+
             __uint64_t ax_span = cs_axis_span(cs, i);
             measure_space_idx += sc_posi * ax_span;
         }
@@ -253,11 +258,6 @@ void *scal__destory(void *scale)
     // _release_mem_(s);
 }
 
-Scale *scal_create()
-{
-    return __objAlloc__(sizeof(Scale), OBJ_TYPE__Scale);
-}
-
 void cs_add_axis(CoordinateSystem *cs, Axis *axis)
 {
     als_add(cs->axes, axis);
@@ -268,13 +268,6 @@ void scal_put_fragments(Scale *scale, int fgs_len, void *fragments)
     scale->fragments_len = fgs_len;
     scale->fragments = __objAlloc__(fgs_len * sizeof(__uint64_t), OBJ_TYPE__RAW_BYTES);
     memcpy(scale->fragments, fragments, fgs_len * sizeof(__uint64_t));
-}
-
-Scale *scal__alloc(int fgs_len, void *fragments)
-{
-    Scale *s = scal_create();
-    scal_put_fragments(s, fgs_len, fragments);
-    return s;
 }
 
 void ax_set_scale(Axis *axis, Scale *scale)
@@ -430,14 +423,6 @@ void space_plan(MeasureSpace *space)
         rbt__scan_do(tree, callback_params, build_space_measure);
         rbt__clear(tree);
     }
-}
-
-__uint64_t ax_scale_position(Axis *axis, int fgs_len, void *fragments)
-{
-    Scale *s = scal__alloc(fgs_len, fragments);
-    // Scale_print(s);
-    RBNode *n = rbt__find(axis->rbtree, s);
-    return n->index;
 }
 
 __uint64_t cs_axis_span(CoordinateSystem *cs, int axis_order)
