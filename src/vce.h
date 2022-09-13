@@ -30,7 +30,7 @@ typedef struct _coordinate_axis
     unsigned int max_path_len;
 } Axis;
 
-Axis *ax_create();
+Axis *ax_create(MemAllocMng *mam);
 
 void ax_reordering(Axis *axis);
 int ax_size(Axis *axis);

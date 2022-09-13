@@ -221,19 +221,23 @@ CoordinateSystem *coosys_new(unsigned long id, int axes_count, MemAllocMng *mam)
 
     for (int i = 0; i < axes_count; i++)
     {
-        // TODO at once. use mam
-        Axis *axis = ax_create();
+        Axis *axis = ax_create(mam);
         als_add(cs->axes, axis);
     }
 
     return cs;
 }
 
-Axis *ax_create()
+Axis *ax_create(MemAllocMng *mam)
 {
-    Axis *ax = __objAlloc__(sizeof(Axis), OBJ_TYPE__Axis);
+    Axis *ax = mam_alloc(sizeof(Axis), OBJ_TYPE__Axis, mam, 0);
+
+    // TODO at once. use mam
     ax->rbtree = rbt_create("struct _axis_scale *", scal_cmp, scal__destory);
+
+    // TODO at once. use mam
     ax->sor_idx_tree = rbt_create("ScaleOffsetRange *", ScaleOffsetRange_cmp, ScaleOffsetRange_destory);
+
     return ax;
 }
 
