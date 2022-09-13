@@ -216,6 +216,11 @@ unsigned int als_size(ArrayList *als);
 // TODO deprecated, there may be bugs
 int als_remove(ArrayList *als, void *obj);
 
+/**
+ * @param idx The element at this position will be removed.
+ */
+void *als_rm_index(ArrayList *als, unsigned int idx);
+
 void *slide_over_mem(void *addr, ssize_t range, size_t *idx);
 
 FILE *open_file(char *r_path, char *modes);

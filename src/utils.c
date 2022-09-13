@@ -551,6 +551,21 @@ int als_remove(ArrayList *als, void *obj)
 	return 0;
 }
 
+void *als_rm_index(ArrayList *als, unsigned int idx) {
+
+	if (idx >= als->idx)
+		return NULL;
+
+
+	void *obj = als->elements_arr_p[idx];
+	for (int i = idx; i < als->idx - 1; i++)
+		als->elements_arr_p[i] = als->elements_arr_p[i + 1];
+
+	als->idx--;
+
+	return obj;
+}
+
 void *slide_over_mem(void *addr, ssize_t range, size_t *idx)
 {
 	size_t _idx = *idx;
