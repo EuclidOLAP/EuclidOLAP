@@ -14,13 +14,26 @@ extern RedBlackTree *_thread_mam_pool;
 void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 
 	size_t required = (mam_mark ? sizeof(MemAllocMng *) : 0) + sizeof(short) + size;
+	mam = mam ? mam : MemAllocMng_current_thread_mam();
+	void *obj_ins;
 
-	if (required > (MAM_BLOCK_MAX - sizeof(char *) - sizeof(unsigned long))) {
-		printf("[ error ] program exit! cause by: Out of line for memory allocation manager.\n");
-		exit(1);
+	if ((required + sizeof(char *) + sizeof(unsigned long)) > MAM_BLOCK_MAX) {
+		char *big_blk = obj_alloc(sizeof(char *) + required, OBJ_TYPE__RAW_BYTES);
+		if (mam->big_block)
+			*((char **)big_blk) = mam->big_block;
+		mam->big_block = big_blk;
+		char *obj_hide_head = mam->big_block + sizeof(char *);
+		if (mam_mark) {
+			*((MemAllocMng **)obj_hide_head) = mam;
+			*((short *)(obj_hide_head + sizeof(MemAllocMng *))) = (0xC000) | type;
+			obj_ins = obj_hide_head + sizeof(MemAllocMng *) + sizeof(short);
+		} else {
+			*((short *)obj_hide_head) = (0x8000) | type;
+			obj_ins = obj_hide_head + sizeof(short);
+		}
+		return obj_ins;
 	}
 
-	mam = mam ? mam : MemAllocMng_current_thread_mam();
 	char *blk = mam->current_block;
 	unsigned long remaining_capacity = MAM_BLOCK_MAX - *((unsigned long *)(blk + sizeof(char *)));
 
@@ -32,8 +45,6 @@ void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 	}
 
 	unsigned long index = *((unsigned long *)(blk + sizeof(char *)));
-
-	void *obj_ins;
 
 	if (mam_mark) {
 		/**
@@ -57,6 +68,7 @@ void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 
 MemAllocMng *MemAllocMng_current_thread_mam() {
 	MemAllocMng key;
+	memset(&key, 0, sizeof(MemAllocMng));
 	key.thread_id = pthread_self();
 	return rbt__find(_thread_mam_pool, &key)->obj;
 }
@@ -74,17 +86,32 @@ void mam_reset(MemAllocMng *mam) {
 		next_blk = *((void **)curr_blk);
 		obj_release(curr_blk);
 	}
+
+	curr_blk = mam->big_block;
+	mam->big_block = NULL;
+	while (curr_blk) {
+		next_blk = *((char **)curr_blk);
+		obj_release(curr_blk);
+		curr_blk = next_blk;
+	}
 }
 
 int mam_comp(void *mam, void *other) {
 	MemAllocMng *m = mam;
 	MemAllocMng *o = other;
-	if (o->thread_id < m->thread_id)
-		return -1;
-	if (o->thread_id > m->thread_id)
-		return 1;
 
-	return 0;
+	if ((m->id | m->thread_id == 0) || (m->id * m->thread_id != 0) || (o->id | o->thread_id == 0) || (o->id * o->thread_id != 0)) {
+		printf("[ error ] exit. cause by: exception in mam_comp(..)\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (m->id * o->id)
+		return o->id < m->id ? -1 : (o->id > m->id ? 1 : 0);
+
+	if (m->thread_id * o->thread_id)
+		return o->thread_id < m->thread_id ? -1 : (o->thread_id > m->thread_id ? 1 : 0);
+
+	return o->id ? -1 : 1;
 }
 
 MemAllocMng *MemAllocMng_new() {
@@ -502,13 +529,13 @@ void *als_get(ArrayList *als, unsigned int position)
 
 unsigned int als_size(ArrayList *als)
 {
-	return als ? als->idx : -1;
+	return als->idx;
 }
 
+// TODO deprecated, there may be bugs
 int als_remove(ArrayList *als, void *obj)
 {
-	int i;
-	for (i = 0; i < als->idx; i++)
+	for (int i = 0; i < als->idx; i++)
 	{
 		if (*((int *)(als->elements_arr_p[i])) != *((int *)obj))
 			continue;
@@ -522,6 +549,21 @@ int als_remove(ArrayList *als, void *obj)
 	}
 	printf("INFO - als_remove ... no object < %p >\n", obj);
 	return 0;
+}
+
+void *als_rm_index(ArrayList *als, unsigned int idx) {
+
+	if (idx >= als->idx)
+		return NULL;
+
+
+	void *obj = als->elements_arr_p[idx];
+	for (int i = idx; i < als->idx - 1; i++)
+		als->elements_arr_p[i] = als->elements_arr_p[i + 1];
+
+	als->idx--;
+
+	return obj;
 }
 
 void *slide_over_mem(void *addr, ssize_t range, size_t *idx)

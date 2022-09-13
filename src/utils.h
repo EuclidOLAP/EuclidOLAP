@@ -27,10 +27,16 @@ enum obj_mem_alloc_strategy {
 
 typedef enum obj_mem_alloc_strategy enum_oms;
 
+/**
+ * This value cannot be less than 16, otherwise a program memory error will result because 
+ * the allocated memory block cannot hold a memory address pointer (char *) and a memory 
+ * address offset (unsigned long).
+ */
 #define MAM_BLOCK_MAX (0x01UL<<20)
 
 struct memory_allocation_manager
 {
+	unsigned long id;
 	pthread_t thread_id;
 
 	/**
@@ -42,6 +48,11 @@ struct memory_allocation_manager
 	 * the rest of the bytes             - Memory for allocation.
 	 */
 	char *current_block;
+
+	/**
+	 * Used to allocate data blocks that exceed MAM_BLOCK_MAX capacity.
+	 */
+	char *big_block;
 };
 
 typedef struct memory_allocation_manager MemAllocMng;
@@ -53,6 +64,23 @@ typedef struct memory_allocation_manager MemAllocMng;
  */
 void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark);
 
+/*
++--------------------------------+---------------------------------------+
+|                                |                 other                 |
+|                                +---------------------------------------+
+|                                | thread_id == 0    | thread_id != 0    |
+|                                +-------------------+-------------------+
+|                                | id == 0 | id != 0 | id == 0 | id != 0 |
++-----+----------------+---------+---------+---------+---------+---------+
+|     |                | id == 0 | error   | error   | error   | error   |
+|     | thread_id == 0 +---------+---------+---------+---------+---------+
+|     |                | id != 0 | error   | compare | 1       | error   |
+| mam +----------------+---------+---------+---------+---------+---------+
+|     |                | id == 0 | error   | -1      | compare | error   |
+|     | thread_id != 0 +---------+---------+---------+-------------------+
+|     |                | id != 0 | error   | error   | error   | error   |
++-----+----------------+---------+---------+---------+---------+---------+
+*/
 int mam_comp(void *mam, void *other);
 
 MemAllocMng *MemAllocMng_new();
@@ -185,7 +213,13 @@ void *als_get(ArrayList *als, unsigned int position);
 
 unsigned int als_size(ArrayList *als);
 
+// TODO deprecated, there may be bugs
 int als_remove(ArrayList *als, void *obj);
+
+/**
+ * @param idx The element at this position will be removed.
+ */
+void *als_rm_index(ArrayList *als, unsigned int idx);
 
 void *slide_over_mem(void *addr, ssize_t range, size_t *idx);
 

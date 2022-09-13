@@ -16,7 +16,10 @@ typedef struct _coordinate_system
     ArrayList *axes;
 } CoordinateSystem;
 
+// TODO about to be deprecated, replaced by the function coosys_new.
 CoordinateSystem *cs_create(__uint64_t *id_addr);
+
+CoordinateSystem *coosys_new(unsigned long id, int axes_count, MemAllocMng *mam);
 
 void CoordinateSystem__gen_auxiliary_index(CoordinateSystem *);
 void CoordinateSystem__calculate_offset(CoordinateSystem *);
@@ -103,7 +106,10 @@ typedef struct _measure_space_
 
 void space_unload(__uint64_t id);
 
+// TODO about to be deprecated, replaced by the function space_new.
 MeasureSpace *space_create(size_t segment_count, size_t segment_scope, int cell_vals_count);
+
+MeasureSpace *space_new(unsigned long id, size_t segment_count, size_t segment_scope, int cell_vals_count, MemAllocMng *mam);
 
 void MeasureSpace_print(MeasureSpace *);
 

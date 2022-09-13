@@ -1,6 +1,9 @@
 #ifndef OBJ_TYPE_DEF_H
 #define OBJ_TYPE_DEF_H 1
 
+// TODO Replace the logic in the header section of the program about object hiding with the type type_obj.
+typedef short type_obj;
+
 #define OBJ_TYPE__MD_CONTEXT 1
 
 #define OBJ_TYPE__SET_FN_CHILDREN 2
