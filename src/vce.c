@@ -574,7 +574,7 @@ void CoordinateSystem__calculate_offset(CoordinateSystem *coor)
 
                 if (sor == NULL || id != prev_id)
                 {
-                    sor = ScaleOffsetRange_create();
+                    sor = mam_alloc(sizeof(ScaleOffsetRange), OBJ_TYPE__ScaleOffsetRange, obj_mam(coor), 0);
                     sor->gid = id;
                     sor->offset = axis->coor_offset;
                     sor->end_position = sor->start_position = row;
@@ -647,7 +647,7 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
 
         Axis *ax = cs_get_axis(coor, i);
 
-        ScaleOffsetRange *key = ScaleOffsetRange_create();
+        ScaleOffsetRange *key = mam_alloc(sizeof(ScaleOffsetRange), OBJ_TYPE__ScaleOffsetRange, NULL, 0);
         key->gid = mr->member->gid;
 
         RBNode *node = rbt__find(ax->sor_idx_tree, key);
@@ -712,11 +712,6 @@ static void _do_calculate_measure_value(MDContext *md_ctx, MeasureSpace *space, 
             _do_calculate_measure_value(md_ctx, space, sor_ls, deep + 1, offset + _position * sor->offset, grid_data, mea_val_idx);
         }
     }
-}
-
-ScaleOffsetRange *ScaleOffsetRange_create()
-{
-    return __objAlloc__(sizeof(ScaleOffsetRange), OBJ_TYPE__ScaleOffsetRange);
 }
 
 void ScaleOffsetRange_print(ScaleOffsetRange *sor)

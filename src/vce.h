@@ -66,8 +66,6 @@ typedef struct _scale_offset_range
     unsigned long end_offset;
 } ScaleOffsetRange;
 
-ScaleOffsetRange *ScaleOffsetRange_create();
-
 void ScaleOffsetRange_print(ScaleOffsetRange *);
 
 int ScaleOffsetRange_cmp(void *obj, void *other);
