@@ -115,27 +115,12 @@ void reload_space(unsigned long cs_id) {
     fread(&vals_count, sizeof(vals_count), 1, pfd);
     fclose(pfd);
 
-    CoordinateSystem *cs;
-    int i, csz = als_size(coor_sys_ls);
-    for (i = 0; i < csz; i++)
-    {
-        cs = als_get(coor_sys_ls, i);
-        if (cs->id == cs_id)
-            goto cs_completed;
-    }
+    int i;
 
-    // Create a coordinate system object in memory
-    cs = cs_create(&cs_id);
-    for (i = 0; i < axes_count; i++)
-    {
-        Axis *axis = ax_create();
-        cs_add_axis(cs, axis);
-    }
+    // Create a coordinate system object by MemAllocMng.
+    MemAllocMng *cs_mam = MemAllocMng_new();
+    CoordinateSystem *cs = coosys_new(cs_id, axes_count, cs_mam);
     als_add(coor_sys_ls, cs);
-
-cs_completed:
-
-    i = i;
 
     char data_file[128];
     sprintf(data_file, "data/data-%lu", cs_id);
@@ -186,9 +171,8 @@ cs_completed:
 
     printf("[debug] space_capacity < %lu >, SPACE_DEF_PARTITION_COUNT < %d >, space_partition_count < %lu >\n", space_capacity, SPACE_DEF_PARTITION_COUNT, space_partition_count);
 
-    // Creates a new logical multidimensional array object in memory.
-    MeasureSpace *space = space_create(space_partition_count, SPACE_DEF_PARTITION_SPAN_MIN, vals_count);
-    space->id = cs_id;
+    // Creates a new logical multidimensional array object by MemAllocMng.
+    MeasureSpace *space = space_new(cs_id, space_partition_count, SPACE_DEF_PARTITION_SPAN_MIN, vals_count, cs_mam);
 
     // Traverse the data file and insert all measure data into the logical multidimensional array.
     data_fd = open_file(data_file, "r");
@@ -229,12 +213,29 @@ finished:
 
 }
 
+// TODO about to be deprecated, replaced by the function coosys_new.
 CoordinateSystem *cs_create(__uint64_t *id_addr)
 {
     CoordinateSystem *cs = __objAlloc__(sizeof(CoordinateSystem), OBJ_TYPE__CoordinateSystem);
     if (id_addr != NULL)
         cs->id = *id_addr;
     cs->axes = als_create(32, "Axis *");
+    return cs;
+}
+
+CoordinateSystem *coosys_new(unsigned long id, int axes_count, MemAllocMng *mam) {
+
+    CoordinateSystem *cs = mam_alloc(sizeof(CoordinateSystem), OBJ_TYPE__CoordinateSystem, mam, 1);
+    cs->id = id;
+    cs->axes = als_new(axes_count, "Axis *", SPEC_MAM, mam);
+
+    for (int i = 0; i < axes_count; i++)
+    {
+        // TODO at once. use mam
+        Axis *axis = ax_create();
+        als_add(cs->axes, axis);
+    }
+
     return cs;
 }
 
@@ -307,13 +308,28 @@ int scal_cmp(void *_one, void *_other)
 
 void space_unload(__uint64_t id)
 {
-    for (int i = 0; i < als_size(space_ls); i++)
-    {
-        MeasureSpace *space = (MeasureSpace *)als_get(space_ls, i);
-        if (space->id == id)
-        {
-            als_remove(space_ls, space);
-            space__destory(space);
+    for (int i = 0; i < als_size(coor_sys_ls); i++) {
+        CoordinateSystem *cs = als_get(coor_sys_ls, i);
+        if (cs->id == id) {
+            als_rm_index(coor_sys_ls, i);
+            break;
+        }
+    }
+    
+    for (int i = 0; i < als_size(space_ls); i++) {
+        MeasureSpace *ms = als_get(space_ls, i);
+        if (ms->id == id) {
+            als_rm_index(space_ls, i);
+
+            short type;
+            enum_oms strat;
+            MemAllocMng *mam;
+            obj_info(ms, &type, &strat, &mam);
+
+            mam_reset(mam);
+            obj_release(mam->current_block);
+            obj_release(mam);
+
             break;
         }
     }
@@ -357,6 +373,7 @@ static void *_cell__destory(void *cell)
     // _release_mem_(cell);
 }
 
+// TODO about to be deprecated, replaced by the function space_new.
 MeasureSpace *space_create(size_t segment_count, size_t segment_scope, int cell_vals_count)
 {
     MeasureSpace *s = __objAlloc__(sizeof(MeasureSpace), OBJ_TYPE__MeasureSpace);
@@ -369,6 +386,24 @@ MeasureSpace *space_create(size_t segment_count, size_t segment_scope, int cell_
 
     int i;
     for (i = 0; i < segment_count; i++)
+        s->tree_ls_h[i] = rbt_create("*cell", cell_cmp, _cell__destory);
+
+    return s;
+}
+
+MeasureSpace *space_new(unsigned long id, size_t segment_count, size_t segment_scope, int cell_vals_count, MemAllocMng *mam) {
+
+    MeasureSpace *s = mam_alloc(sizeof(MeasureSpace), OBJ_TYPE__MeasureSpace, mam, 1);
+    s->id = id;
+    s->cell_vals_count = cell_vals_count;
+    s->segment_count = segment_count;
+    s->segment_scope = segment_scope;
+    s->tree_ls_h = mam_alloc(sizeof(RedBlackTree *) * segment_count, OBJ_TYPE__RedBlackTree, mam, 0);
+    s->data_ls_h = mam_alloc(sizeof(void *) * segment_count, OBJ_TYPE__RAW_BYTES, mam, 0);
+    s->data_lens = mam_alloc(sizeof(unsigned long) * segment_count, OBJ_TYPE__RAW_BYTES, mam, 0);
+
+    for (int i = 0; i < segment_count; i++)
+        // TODO at once. use mam.
         s->tree_ls_h[i] = rbt_create("*cell", cell_cmp, _cell__destory);
 
     return s;
