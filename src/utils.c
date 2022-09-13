@@ -529,7 +529,7 @@ void *als_get(ArrayList *als, unsigned int position)
 
 unsigned int als_size(ArrayList *als)
 {
-	return als ? als->idx : -1;
+	return als->idx;
 }
 
 // TODO deprecated, there may be bugs
