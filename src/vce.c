@@ -194,7 +194,7 @@ void reload_space(unsigned long cs_id) {
             measure_space_idx += sc_posi * ax_span;
         }
         size_t cell_mem_sz = vals_count * (sizeof(double) + sizeof(char));
-        void *cell = __objAlloc__(sizeof(measure_space_idx) + cell_mem_sz, OBJ_TYPE__RAW_BYTES);
+        void *cell = mam_alloc(sizeof(measure_space_idx) + cell_mem_sz, OBJ_TYPE__RAW_BYTES, cs_mam, 0);
         *((unsigned long *)cell) = measure_space_idx;
         fread(cell + sizeof(measure_space_idx), cell_mem_sz, 1, data_fd);
 
@@ -211,16 +211,6 @@ finished:
 
     als_add(space_ls, space);
 
-}
-
-// TODO about to be deprecated, replaced by the function coosys_new.
-CoordinateSystem *cs_create(__uint64_t *id_addr)
-{
-    CoordinateSystem *cs = __objAlloc__(sizeof(CoordinateSystem), OBJ_TYPE__CoordinateSystem);
-    if (id_addr != NULL)
-        cs->id = *id_addr;
-    cs->axes = als_create(32, "Axis *");
-    return cs;
 }
 
 CoordinateSystem *coosys_new(unsigned long id, int axes_count, MemAllocMng *mam) {

@@ -16,9 +16,6 @@ typedef struct _coordinate_system
     ArrayList *axes;
 } CoordinateSystem;
 
-// TODO about to be deprecated, replaced by the function coosys_new.
-CoordinateSystem *cs_create(__uint64_t *id_addr);
-
 CoordinateSystem *coosys_new(unsigned long id, int axes_count, MemAllocMng *mam);
 
 void CoordinateSystem__gen_auxiliary_index(CoordinateSystem *);
