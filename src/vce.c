@@ -131,7 +131,10 @@ void reload_space(unsigned long cs_id) {
         fread(tmpbuf, coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
         // At the same time, hang the scale objects on the corresponding axis in the coordinate system object.
         Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
-        scal_put_fragments(scale, coor_pointer_len, tmpbuf);
+        scale->fragments_len = coor_pointer_len;
+        scale->fragments = mam_alloc(coor_pointer_len * sizeof(__uint64_t), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
+        memcpy(scale->fragments, tmpbuf, coor_pointer_len * sizeof(__uint64_t));
+
         Axis *axis = cs_get_axis(cs, 0);
         ax_set_scale(axis, scale);
 
@@ -139,7 +142,10 @@ void reload_space(unsigned long cs_id) {
             fread(&coor_pointer_len, sizeof(int), 1, data_fd);
             fread(tmpbuf, coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
             Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
-            scal_put_fragments(scale, coor_pointer_len, tmpbuf);
+            scale->fragments_len = coor_pointer_len;
+            scale->fragments = mam_alloc(coor_pointer_len * sizeof(__uint64_t), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
+            memcpy(scale->fragments, tmpbuf, coor_pointer_len * sizeof(__uint64_t));
+
             Axis *axis = cs_get_axis(cs, i);
             ax_set_scale(axis, scale);
         }
@@ -191,7 +197,10 @@ void reload_space(unsigned long cs_id) {
             Axis *axis = cs_get_axis(cs, i);
 
             Scale *__inl_s = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
-            scal_put_fragments(__inl_s, scale_len, tmpbuf);
+            __inl_s->fragments_len = scale_len;
+            __inl_s->fragments = mam_alloc(scale_len * sizeof(__uint64_t), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
+            memcpy(__inl_s->fragments, tmpbuf, scale_len * sizeof(__uint64_t));
+
             RBNode *__inl_n = rbt__find(axis->rbtree, __inl_s);
             __uint64_t sc_posi = __inl_n->index;
 
@@ -261,13 +270,6 @@ void *scal__destory(void *scale)
 void cs_add_axis(CoordinateSystem *cs, Axis *axis)
 {
     als_add(cs->axes, axis);
-}
-
-void scal_put_fragments(Scale *scale, int fgs_len, void *fragments)
-{
-    scale->fragments_len = fgs_len;
-    scale->fragments = __objAlloc__(fgs_len * sizeof(__uint64_t), OBJ_TYPE__RAW_BYTES);
-    memcpy(scale->fragments, fragments, fgs_len * sizeof(__uint64_t));
 }
 
 void ax_set_scale(Axis *axis, Scale *scale)

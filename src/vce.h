@@ -53,8 +53,6 @@ int scal_cmp(void *_one, void *_other);
 
 // void scal_set_len(Scale *scale, int fgs_len);
 
-void scal_put_fragments(Scale *scale, int fgs_len, void *fragments);
-
 typedef struct _scale_offset_range
 {
     md_gid gid; // The ID of the detail or fee detail dimension member
