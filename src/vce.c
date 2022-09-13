@@ -526,13 +526,14 @@ void *__Axis_build_index(RBNode *node, void *axis)
 
 void CoordinateSystem__gen_auxiliary_index(CoordinateSystem *coor)
 {
+    MemAllocMng *coormam = obj_mam(coor);
     unsigned int i, ax_sz = als_size(coor->axes);
     for (i = 0; i < ax_sz; i++)
     {
         Axis *ax = als_get(coor->axes, i);
         RedBlackTree *tree = ax->rbtree;
         rbt__scan_do(tree, &(ax->max_path_len), __set_ax_max_path_len);
-        ax->index = __objAlloc__(rbt__size(tree) * ax->max_path_len * sizeof(md_gid), OBJ_TYPE__RAW_BYTES);
+        ax->index = mam_alloc(rbt__size(tree) * ax->max_path_len * sizeof(md_gid), OBJ_TYPE__RAW_BYTES, coormam, 0);
         rbt__scan_do(tree, ax, __Axis_build_index);
     }
 }

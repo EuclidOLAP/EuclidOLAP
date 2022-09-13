@@ -161,6 +161,14 @@ void obj_info(void *obj, short *type, enum obj_mem_alloc_strategy *strat, MemAll
 	}
 }
 
+MemAllocMng *obj_mam(void *obj) {
+	short type;
+	enum_oms strat;
+	MemAllocMng *mam;
+	obj_info(obj, &type, &strat, &mam);
+	return mam;
+}
+
 void *obj_alloc(size_t size, short type) {
 	size += sizeof(short);
 	short *obj_head = malloc(size);

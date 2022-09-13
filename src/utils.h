@@ -105,6 +105,8 @@ short obj_type_of(void *obj);
  */
 void obj_info(void *obj, short *type, enum obj_mem_alloc_strategy *strat, MemAllocMng **mp);
 
+MemAllocMng *obj_mam(void *obj);
+
 /**
  * Directly call the operating system interface to allocate memory,
  * and the memory allocated using this function needs to be released manually.
