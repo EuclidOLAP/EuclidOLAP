@@ -362,24 +362,6 @@ static void *_cell__destory(void *cell)
     // _release_mem_(cell);
 }
 
-// TODO about to be deprecated, replaced by the function space_new.
-MeasureSpace *space_create(size_t segment_count, size_t segment_scope, int cell_vals_count)
-{
-    MeasureSpace *s = __objAlloc__(sizeof(MeasureSpace), OBJ_TYPE__MeasureSpace);
-    s->cell_vals_count = cell_vals_count;
-    s->segment_count = segment_count;
-    s->segment_scope = segment_scope;
-    s->tree_ls_h = __objAlloc__(sizeof(RedBlackTree *) * segment_count, OBJ_TYPE__RedBlackTree);
-    s->data_ls_h = __objAlloc__(sizeof(void *) * segment_count, OBJ_TYPE__RAW_BYTES);
-    s->data_lens = __objAlloc__(sizeof(unsigned long) * segment_count, OBJ_TYPE__RAW_BYTES);
-
-    int i;
-    for (i = 0; i < segment_count; i++)
-        s->tree_ls_h[i] = rbt_create("*cell", cell_cmp, _cell__destory);
-
-    return s;
-}
-
 MeasureSpace *space_new(unsigned long id, size_t segment_count, size_t segment_scope, int cell_vals_count, MemAllocMng *mam) {
 
     MeasureSpace *s = mam_alloc(sizeof(MeasureSpace), OBJ_TYPE__MeasureSpace, mam, 1);
