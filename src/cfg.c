@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
 #include "cfg.h"
 #include "utils.h"
@@ -32,6 +34,13 @@ int init_cfg(int argc, char *argv[])
 	{
 		fetch_param(argv[i]);
 	}
+
+	// create meta and data folders
+ 	if (access("meta", F_OK) != 0)
+		mkdir("meta", S_IRWXU);
+
+ 	if (access("data", F_OK) != 0)
+		mkdir("data", S_IRWXU);
 
 	printf("info - node mode [ %c ]\n", cfg.mode);
 
