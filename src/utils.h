@@ -166,7 +166,7 @@ int open_serv_sock(int *ss_fd_p, int port);
 
 int sock_conn_to(int *sock_fd, char *ip, int port);
 
-char *str_clone(char *str);
+// char *str_clone(char *str);
 
 long now_microseconds();
 

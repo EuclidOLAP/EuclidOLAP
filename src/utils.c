@@ -360,17 +360,17 @@ int stack_pop(Stack *s, void **addr)
 	return 0;
 }
 
-char *str_clone(char *str)
-{
-	if (str == NULL)
-		return NULL;
+// char *str_clone(char *str)
+// {
+// 	if (str == NULL)
+// 		return NULL;
 
-	char *str_b_cl = (char *)__objAlloc__(strlen(str) + 1, OBJ_TYPE__RAW_BYTES);
+// 	char *str_b_cl = (char *)obj_alloc(strlen(str) + 1, OBJ_TYPE__RAW_BYTES);
 
-	strcpy(str_b_cl, str);
+// 	strcpy(str_b_cl, str);
 
-	return str_b_cl;
-}
+// 	return str_b_cl;
+// }
 
 int open_serv_sock(int *ss_fd_p, int port)
 {
