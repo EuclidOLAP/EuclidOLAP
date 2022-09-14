@@ -5,6 +5,8 @@
 
 #include "command.h"
 
+void net_init();
+
 typedef struct sock_intent_thread
 {
 	int sock_fd;

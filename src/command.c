@@ -61,7 +61,7 @@ int init_command_module()
 	// pthread_cond_init(&_ec_p_cond, NULL);
 	sem_init(&_ec_p_sem, 0, 0);
 
-	_thread_mam_pool = rbt_create("MemAllocMng *", mam_comp, NULL);
+	_thread_mam_pool = rbt_create("MemAllocMng *", mam_comp, NULL, DIRECT, NULL);
 
 	command_processor_thread_startup();
 

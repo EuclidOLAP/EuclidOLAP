@@ -246,11 +246,9 @@ Axis *ax_create(MemAllocMng *mam)
 {
     Axis *ax = mam_alloc(sizeof(Axis), OBJ_TYPE__Axis, mam, 0);
 
-    // TODO at once. use mam
-    ax->rbtree = rbt_create("struct _axis_scale *", scal_cmp, scal__destory);
+    ax->rbtree = rbt_create("struct _axis_scale *", scal_cmp, scal__destory, SPEC_MAM, mam);
 
-    // TODO at once. use mam
-    ax->sor_idx_tree = rbt_create("ScaleOffsetRange *", ScaleOffsetRange_cmp, ScaleOffsetRange_destory);
+    ax->sor_idx_tree = rbt_create("ScaleOffsetRange *", ScaleOffsetRange_cmp, ScaleOffsetRange_destory, SPEC_MAM, mam);
 
     return ax;
 }
@@ -374,8 +372,7 @@ MeasureSpace *space_new(unsigned long id, size_t segment_count, size_t segment_s
     s->data_lens = mam_alloc(sizeof(unsigned long) * segment_count, OBJ_TYPE__RAW_BYTES, mam, 0);
 
     for (int i = 0; i < segment_count; i++)
-        // TODO at once. use mam.
-        s->tree_ls_h[i] = rbt_create("*cell", cell_cmp, _cell__destory);
+        s->tree_ls_h[i] = rbt_create("*cell", cell_cmp, _cell__destory, SPEC_MAM, mam);
 
     return s;
 }
@@ -561,7 +558,7 @@ void CoordinateSystem__calculate_offset(CoordinateSystem *coor)
          * which may cause some problems. Here, a new red-black tree is temporarily created, and this place needs to be
          * performed in the follow-up. Revise.
          */
-        axis->sor_idx_tree = rbt_create("ScaleOffsetRange *", ScaleOffsetRange_cmp, ScaleOffsetRange_destory);
+        axis->sor_idx_tree = rbt_create("ScaleOffsetRange *", ScaleOffsetRange_cmp, ScaleOffsetRange_destory, SPEC_MAM, obj_mam(coor));
         int tree_sz = rbt__size(axis->rbtree);
         ScaleOffsetRange *sor = NULL;
         md_gid id, prev_id = 0;
