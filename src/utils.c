@@ -161,6 +161,14 @@ void obj_info(void *obj, short *type, enum obj_mem_alloc_strategy *strat, MemAll
 	}
 }
 
+MemAllocMng *obj_mam(void *obj) {
+	short type;
+	enum_oms strat;
+	MemAllocMng *mam;
+	obj_info(obj, &type, &strat, &mam);
+	return mam;
+}
+
 void *obj_alloc(size_t size, short type) {
 	size += sizeof(short);
 	short *obj_head = malloc(size);
@@ -215,12 +223,12 @@ ssize_t read_sock_pkg(int sock_fd, void **buf, size_t *buf_len)
 
 LinkedQueue *create_lnk_queue()
 {
-	return (LinkedQueue *)__objAlloc__(sizeof(LinkedQueue), OBJ_TYPE__LinkedQueue);
+	return obj_alloc(sizeof(LinkedQueue), OBJ_TYPE__LinkedQueue);
 }
 
 int lnk_q_add_obj(LinkedQueue *lnk_q, void *obj)
 {
-	LinkedQueueNode *n = (LinkedQueueNode *)__objAlloc__(sizeof(LinkedQueueNode), OBJ_TYPE__LinkedQueueNode);
+	LinkedQueueNode *n = obj_alloc(sizeof(LinkedQueueNode), OBJ_TYPE__LinkedQueueNode);
 	n->obj = obj;
 
 	if (lnk_q->tail)
@@ -252,7 +260,7 @@ void *lnk_q_get(LinkedQueue *lnk_q)
 	}
 
 	void *res = cn->obj;
-	// _release_mem_(cn);
+	obj_release(cn);
 	return res;
 }
 
@@ -284,10 +292,10 @@ StrArr *str_split(char *orig_str, char *deli_str)
 		len++;
 	}
 
-	StrArr *str_arr = __objAlloc__(sizeof(StrArr), OBJ_TYPE__StrArr);
+	StrArr *str_arr = obj_alloc(sizeof(StrArr), OBJ_TYPE__StrArr);
 	str_arr->length = len;
 
-	str_arr->head_str_p = __objAlloc__(sizeof(void *) * len + 1 + strlen(orig_str), OBJ_TYPE__RAW_BYTES);
+	str_arr->head_str_p = obj_alloc(sizeof(void *) * len + 1 + strlen(orig_str), OBJ_TYPE__RAW_BYTES);
 
 	strcpy(((char *)str_arr->head_str_p) + sizeof(void *) * len, orig_str);
 	p = ((char *)str_arr->head_str_p) + sizeof(void *) * len;
@@ -309,11 +317,8 @@ StrArr *str_split(char *orig_str, char *deli_str)
 
 void destory_StrArr(StrArr *arr_address)
 {
-	if (!arr_address)
-		return;
-
-	// _release_mem_(arr_address->head_str_p);
-	// _release_mem_(arr_address);
+	obj_release(arr_address->head_str_p);
+	obj_release(arr_address);
 }
 
 void show_StrArr(StrArr *arr)
@@ -355,17 +360,17 @@ int stack_pop(Stack *s, void **addr)
 	return 0;
 }
 
-char *str_clone(char *str)
-{
-	if (str == NULL)
-		return NULL;
+// char *str_clone(char *str)
+// {
+// 	if (str == NULL)
+// 		return NULL;
 
-	char *str_b_cl = (char *)__objAlloc__(strlen(str) + 1, OBJ_TYPE__RAW_BYTES);
+// 	char *str_b_cl = (char *)obj_alloc(strlen(str) + 1, OBJ_TYPE__RAW_BYTES);
 
-	strcpy(str_b_cl, str);
+// 	strcpy(str_b_cl, str);
 
-	return str_b_cl;
-}
+// 	return str_b_cl;
+// }
 
 int open_serv_sock(int *ss_fd_p, int port)
 {
@@ -436,22 +441,6 @@ int append_file_uint(char *file_path, __uint32_t val)
 	return append_file_data(file_path, (char *)&val, sizeof(val));
 }
 
-// TODO deprecated - replaced by als_new
-ArrayList *als_create(unsigned int init_capacity, char *desc)
-{
-	ArrayList *als = (ArrayList *)__objAlloc__(sizeof(ArrayList), OBJ_TYPE__ArrayList);
-	als->ele_arr_capacity = init_capacity;
-	als->elements_arr_p = __objAlloc__(sizeof(void *) * init_capacity, OBJ_TYPE__RAW_BYTES);
-	if (desc != NULL)
-	{
-		int desc_len = strlen(desc);
-		desc_len = desc_len < COMMON_OBJ_DESC_LEN ? desc_len : COMMON_OBJ_DESC_LEN - 1;
-		memcpy(als->desc, desc, desc_len);
-	}
-
-	return als;
-}
-
 ArrayList *als_new(unsigned int init_capacity, char *desc, enum obj_mem_alloc_strategy strat, MemAllocMng *mam) {
 
 	ArrayList *als;
@@ -476,6 +465,22 @@ ArrayList *als_new(unsigned int init_capacity, char *desc, enum obj_mem_alloc_st
 	}
 
 	return als;
+}
+
+void als_destroy(ArrayList *al) {
+	short type;
+	enum_oms strat;
+	MemAllocMng *mam;
+	obj_info(al, &type, &strat, &mam);
+
+	if (strat == DIRECT) {
+		obj_release(al->elements_arr_p);
+		obj_release(al);
+		return;
+	}
+
+	printf("[ error ] exit. als_destroy.\n");
+	exit(EXIT_FAILURE);
 }
 
 void *ArrayList_set(ArrayList *ls, unsigned int index, void *obj) {

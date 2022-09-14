@@ -105,6 +105,8 @@ short obj_type_of(void *obj);
  */
 void obj_info(void *obj, short *type, enum obj_mem_alloc_strategy *strat, MemAllocMng **mp);
 
+MemAllocMng *obj_mam(void *obj);
+
 /**
  * Directly call the operating system interface to allocate memory,
  * and the memory allocated using this function needs to be released manually.
@@ -164,7 +166,7 @@ int open_serv_sock(int *ss_fd_p, int port);
 
 int sock_conn_to(int *sock_fd, char *ip, int port);
 
-char *str_clone(char *str);
+// char *str_clone(char *str);
 
 long now_microseconds();
 
@@ -193,14 +195,13 @@ typedef struct _array_list_
 	char desc[COMMON_OBJ_DESC_LEN];
 } ArrayList;
 
-// TODO deprecated - replaced by als_new
-ArrayList *als_create(unsigned int init_capacity, char *desc);
-
 /**
  * @param strat Memory allocation strategy.
  * @param mam When the strat parameter is SPEC_MAM, mam cannot be NULL.
  */
 ArrayList *als_new(unsigned int init_capacity, char *desc, enum obj_mem_alloc_strategy strat, MemAllocMng *mam);
+
+void als_destroy(ArrayList *al);
 
 void *ArrayList_set(ArrayList *, unsigned int, void *);
 

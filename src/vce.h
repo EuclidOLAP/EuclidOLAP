@@ -16,9 +16,6 @@ typedef struct _coordinate_system
     ArrayList *axes;
 } CoordinateSystem;
 
-// TODO about to be deprecated, replaced by the function coosys_new.
-CoordinateSystem *cs_create(__uint64_t *id_addr);
-
 CoordinateSystem *coosys_new(unsigned long id, int axes_count, MemAllocMng *mam);
 
 void CoordinateSystem__gen_auxiliary_index(CoordinateSystem *);
@@ -33,7 +30,7 @@ typedef struct _coordinate_axis
     unsigned int max_path_len;
 } Axis;
 
-Axis *ax_create();
+Axis *ax_create(MemAllocMng *mam);
 
 void ax_reordering(Axis *axis);
 int ax_size(Axis *axis);
@@ -50,17 +47,11 @@ typedef struct _axis_scale
 
 void Scale_print(Scale *);
 
-Scale *scal_create();
-
 void *scal__destory(void *scale);
 
 int scal_cmp(void *_one, void *_other);
 
 // void scal_set_len(Scale *scale, int fgs_len);
-
-void scal_put_fragments(Scale *scale, int fgs_len, void *fragments);
-
-Scale *scal__alloc(int fgs_len, void *fragments);
 
 typedef struct _scale_offset_range
 {
@@ -74,8 +65,6 @@ typedef struct _scale_offset_range
     unsigned long start_offset;
     unsigned long end_offset;
 } ScaleOffsetRange;
-
-ScaleOffsetRange *ScaleOffsetRange_create();
 
 void ScaleOffsetRange_print(ScaleOffsetRange *);
 
@@ -106,14 +95,9 @@ typedef struct _measure_space_
 
 void space_unload(__uint64_t id);
 
-// TODO about to be deprecated, replaced by the function space_new.
-MeasureSpace *space_create(size_t segment_count, size_t segment_scope, int cell_vals_count);
-
 MeasureSpace *space_new(unsigned long id, size_t segment_count, size_t segment_scope, int cell_vals_count, MemAllocMng *mam);
 
 void MeasureSpace_print(MeasureSpace *);
-
-__uint64_t ax_scale_position(Axis *axis, int fgs_len, void *fragments);
 
 __uint64_t cs_axis_span(CoordinateSystem *cs, int axis_order);
 

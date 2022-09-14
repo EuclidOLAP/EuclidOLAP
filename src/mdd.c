@@ -134,7 +134,7 @@ static int load_cubes() {
 
 	char cube_stru_file[128];
 	md_gid cube_id;
-	// ArrayList *cube_id_arr = als_create(16, "md_gid");
+
 	while (fread((void *)&cube_id, sizeof(md_gid), 1, cubes_fd) > 0) {
 		// als_add(cube_id_arr, *((void **)&cube_id));
 		memset(cube_stru_file, 0, 128);
@@ -144,8 +144,8 @@ static int load_cubes() {
 
 		Cube *cube = mam_alloc(sizeof(Cube), OBJ_TYPE__Cube, meta_mam, 0);
 		fread(cube, sizeof(Cube), 1, cube_fd);
-		cube->dim_role_ls = als_create(24, "DimensionRole *");
-		cube->measure_mbrs = als_create(12, "Member *");
+		cube->dim_role_ls = als_new(24, "DimensionRole *", SPEC_MAM, meta_mam);
+		cube->measure_mbrs = als_new(12, "Member *", SPEC_MAM, meta_mam);
 
 		int i, dr_count;
 		fread(&dr_count, sizeof(unsigned int), 1, cube_fd);
@@ -359,7 +359,7 @@ Member *find_member_lv1(Dimension *dim, char *mbr_name)
 Member *Member_same_lv_m(Member *member, int offset)
 {
 	int i, curr_m_idx, m_pool_sz = als_size(member_pool);
-	ArrayList *same_lv_ms = als_create(128, "Member *");
+	ArrayList *same_lv_ms = als_new(128, "Member *", DIRECT, NULL);
 	for (i = 0; i < m_pool_sz; i++)
 	{
 		Member *m = als_get(member_pool, i);
@@ -368,23 +368,36 @@ Member *Member_same_lv_m(Member *member, int offset)
 		if (m->gid == member->gid)
 			curr_m_idx = als_size(same_lv_ms) - 1;
 	}
+
+	Member *result = NULL;
+
 	int sibling_idx = curr_m_idx + offset;
 	if (sibling_idx >= 0 && sibling_idx < als_size(same_lv_ms))
-		return als_get(same_lv_ms, sibling_idx);
-	return NULL;
+		result = als_get(same_lv_ms, sibling_idx);
+
+	als_destroy(same_lv_ms);
+
+	return result;
 }
 
 Member *Member_get_posi_child(Member *parent, int child_posi)
 {
 	int i, m_pool_sz = als_size(member_pool);
-	ArrayList *children = als_create(128, "Member *");
+
+	ArrayList *children = als_new(128, "Member *", DIRECT, NULL);
+
 	for (i = 0; i < m_pool_sz; i++)
 	{
 		Member *m = als_get(member_pool, i);
 		if (m->p_gid == parent->gid)
 			als_add(children, m);
 	}
-	return child_posi >= 0 && child_posi < als_size(children) ? als_get(children, child_posi) : NULL;
+
+	Member *_child_ = child_posi >= 0 && child_posi < als_size(children) ? als_get(children, child_posi) : NULL;
+
+	als_destroy(children);
+
+	return _child_;
 }
 
 Member *Member_find_ancestor(Member *member, unsigned int distance)
@@ -401,7 +414,7 @@ Member *Member_find_ancestor(Member *member, unsigned int distance)
 
 ArrayList *Member_descendant_position(Member *ancestor, Member *descendant)
 {
-	ArrayList *posi = als_create(32, "long");
+	ArrayList *posi = als_new(32, "long", THREAD_MAM, NULL);
 	int i, distance = descendant->lv - ancestor->lv;
 	for (i = 0; i < distance; i++)
 	{
@@ -420,7 +433,7 @@ ArrayList *Member_descendant_position(Member *ancestor, Member *descendant)
 ArrayList *Member__descendants(Member *ancestor)
 {
 	int i, sz = als_size(member_pool);
-	ArrayList *descendants = als_create(128, "Member *");
+	ArrayList *descendants = als_new(128, "Member *", THREAD_MAM, NULL);
 	for (i = 0; i < sz; i++)
 	{
 		Member *member = als_get(member_pool, i);
@@ -511,8 +524,8 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 	Cube *cube = mam_alloc(sizeof(Cube), OBJ_TYPE__Cube, meta_mam, 0);
 	memcpy(cube->name, name, strlen(name));
 	cube->gid = gen_md_gid();
-	cube->dim_role_ls = als_create(24, "DimensionRole *");
-	cube->measure_mbrs = als_create(12, "Member *");
+	cube->dim_role_ls = als_new(24, "DimensionRole *", SPEC_MAM, meta_mam);
+	cube->measure_mbrs = als_new(12, "Member *", SPEC_MAM, meta_mam);
 	printf("[INFO] new Cube - gid [ %ld ] name [ %s ]\n", cube->gid, cube->name);
 
 	// Create several dimensional role objects and associate them to the cube.
@@ -838,7 +851,7 @@ static ArrayList *select_def__build_axes(MDContext *md_ctx, SelectDef *select_de
 			ref_tuple = tuple__merge(ref_tuple, ax_head_ref_tuple);
 		}
 	}
-	ArrayList *axes_ls = als_create(16, "MddAxis *");
+	ArrayList *axes_ls = als_new(16, "MddAxis *", THREAD_MAM, NULL);
 	for (i = 0; i < ax_count; i++)
 	{
 		AxisDef *ax_def = als_get(ax_def_ls, i);
@@ -1208,7 +1221,7 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 					break;
 			}
 
-			ArrayList *mbr_path = als_create(32, "char *");
+			ArrayList *mbr_path = als_new(32, "char *", THREAD_MAM, NULL);
 			int ap_len = als_size(m_def->mbr_abs_path);
 			for (i = 1; i < ap_len; i++)
 			{
@@ -1464,7 +1477,7 @@ MddTuple *_MddTuple__mergeTuples(MddTuple **tps, int count)
 
 ArrayList *Cube_find_date_dim_roles(Cube *cube)
 {
-	ArrayList *date_drs = als_create(8, "DimensionRole *");
+	ArrayList *date_drs = als_new(8, "DimensionRole *", THREAD_MAM, NULL);
 	int i, dr_count = als_size(cube->dim_role_ls);
 	for (i = 0; i < dr_count; i++)
 	{
@@ -1892,7 +1905,7 @@ MddSet *SetFnCrossJoin_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, Mdd
 	for (i = 1; i < ls_len; i++)
 	{
 		MddSet *set = ids_setdef__build(md_ctx, als_get(crossJoin->set_def_ls, i), ctx_tuple, cube);
-		ArrayList *tuple_ls = als_create(512, "MddTuple *");
+		ArrayList *tuple_ls = als_new(512, "MddTuple *", THREAD_MAM, NULL);
 		int j, k, ctx_sz = als_size(ctx_tuple_ls), set_sz = als_size(set->tuples);
 
 		for (j = 0; j < ctx_sz; j++)
@@ -1977,7 +1990,7 @@ MddSet *SetFnOrder_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTupl
 	MddSet *set = ids_setdef__build(md_ctx, order->set, ctx_tuple, cube);
 	int i, j, sz = als_size(set->tuples);
 
-	ArrayList *val_ls = als_create(als_size(set->tuples), "double");
+	ArrayList *val_ls = als_new(als_size(set->tuples), "double", THREAD_MAM, NULL);
 	for (i = 0; i < sz; i++)
 	{
 		MddTuple *tuple = als_get(set->tuples, i);
@@ -2038,7 +2051,7 @@ MddSet *SetFnTopCount_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddT
 
 	if (top_count->num_exp)
 	{
-		ArrayList *val_ls = als_create(als_size(set->tuples), "double");
+		ArrayList *val_ls = als_new(als_size(set->tuples), "double", THREAD_MAM, NULL);
 		for (i = 0; i < sz; i++)
 		{
 			MddTuple *tuple = als_get(set->tuples, i);
@@ -2330,7 +2343,7 @@ MddSet *SetFnBottomOrTopPercent_evolving(MDContext *md_ctx, void *set_fn, Cube *
 	GridData data;
 	Expression_evaluate(md_ctx, per->percentage, cube, ctx_tuple, &data);
 	double global = 0, percent = data.val / 100;
-	ArrayList *vals = als_create(128, "double");
+	ArrayList *vals = als_new(128, "double", THREAD_MAM, NULL);
 	int i, j, sz = als_size(set->tuples);
 	for (i = 0; i < sz; i++)
 	{
@@ -2399,7 +2412,7 @@ MddSet *SetFnBottomOrTopPercent_evolving(MDContext *md_ctx, void *set_fn, Cube *
 MddSet *SetFnUnion_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
 {
 	SetFnUnion *uni = set_fn;
-	ArrayList *tuples = als_create(64, "MddTuple *");
+	ArrayList *tuples = als_new(64, "MddTuple *", THREAD_MAM, NULL);
 	int i, j, len = als_size(uni->set_def_ls);
 	for (i = len - 1; i >= 0; i--)
 	{
@@ -2418,7 +2431,7 @@ MddSet *SetFnUnion_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTupl
 	}
 	else
 	{
-		ArrayList *nonredundant = als_create(64, "MddTuple *");
+		ArrayList *nonredundant = als_new(64, "MddTuple *", THREAD_MAM, NULL);
 		len = als_size(tuples);
 		for (i = 0; i < len; i++)
 		{
@@ -2960,7 +2973,7 @@ ArrayList *mdd__lv_ancestor_peer_descendants(Level *ancestor_lv, Member *member)
 {
 	Member *member_anc = Member_find_ancestor(member, member->lv - ancestor_lv->level);
 	int i, sz = als_size(member_pool);
-	ArrayList *peer_descendants = als_create(64, "Member *");
+	ArrayList *peer_descendants = als_new(64, "Member *", THREAD_MAM, NULL);
 	for (i = 0; i < sz; i++)
 	{
 		Member *m = als_get(member_pool, i);
