@@ -10,6 +10,8 @@
 #include "utils.h"
 #include "command.h"
 
+static MemAllocMng *net_mam;
+
 static ArrayList *downstream_sockets;
 
 static void *sit_startup(void *sit_addr);
@@ -21,6 +23,10 @@ static int sit_close(SockIntentThread *sit);
 static void *command_receiving_thread(void *addr);
 
 static void receive_command_loop(SockIntentThread *sit);
+
+void net_init() {
+	net_mam = MemAllocMng_new();
+}
 
 int net_service_startup()
 {
@@ -50,7 +56,7 @@ int net_service_startup()
 
 	socklen_t cs_len = sizeof(struct sockaddr_in);
 
-	downstream_sockets = als_new(16, "downstream_sockets, int *", DIRECT, NULL);
+	downstream_sockets = als_new(16, "downstream_sockets, int *", SPEC_MAM, net_mam);
 	while (1)
 	{
 		struct sockaddr_in sock;
@@ -63,7 +69,7 @@ int net_service_startup()
 			continue;
 		}
 
-		int *skt_v_p = __objAlloc__(sizeof(int), OBJ_TYPE__RAW_BYTES);
+		int *skt_v_p = mam_alloc(sizeof(int), OBJ_TYPE__RAW_BYTES, net_mam, 0);
 		*skt_v_p = sock_fd;
 		als_add(downstream_sockets, skt_v_p);
 
@@ -78,7 +84,7 @@ int net_service_startup()
 
 SockIntentThread *create_SockIntentThread(int sock_fd)
 {
-	SockIntentThread *sit_p = (SockIntentThread *)__objAlloc__(sizeof(SockIntentThread), OBJ_TYPE__SockIntentThread);
+	SockIntentThread *sit_p = (SockIntentThread *)mam_alloc(sizeof(SockIntentThread), OBJ_TYPE__SockIntentThread, net_mam, 0);
 	sit_p->sock_fd = sock_fd;
 	return sit_p;
 }

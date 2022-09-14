@@ -89,9 +89,6 @@ MemAllocMng *MemAllocMng_current_thread_mam();
 
 void mam_reset(MemAllocMng *);
 
-// TODO about to be deprecated
-void *__objAlloc__(size_t size, short type);
-
 // void _release_mem_(void *obj);
 
 // TODO about to be deprecated, replaced by obj_info

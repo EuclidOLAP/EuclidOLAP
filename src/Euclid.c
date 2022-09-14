@@ -24,6 +24,8 @@ int main(int argc, char *argv[])
 
 	init_command_module();
 
+	net_init();
+
 	if (get_cfg()->mode == WORKER_MODE)
 		join_cluster();
 

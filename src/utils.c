@@ -121,21 +121,6 @@ MemAllocMng *MemAllocMng_new() {
 	return mam;
 }
 
-// TODO about to be deprecated
-void *__objAlloc__(size_t size, short type)
-{
-	size += sizeof(short);
-	short *obj_head = malloc(size);
-	memset(obj_head, 0, size);
-	*obj_head = type;
-	return obj_head + 1;
-}
-
-// void _release_mem_(void *obj)
-// {
-// 	free(((int *)obj) - 1);
-// }
-
 // TODO about to be deprecated, replaced by obj_info
 short obj_type_of(void *obj)
 {
