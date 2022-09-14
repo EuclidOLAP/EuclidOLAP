@@ -8,16 +8,33 @@
 #include "rb-tree.h"
 #include "utils.h"
 
-RedBlackTree *rbt_create(char *desc, int (*comparison_func)(void *obj, void *other), void *(*release_obj_func)(void *obj))
+RedBlackTree *rbt_create(char *desc, int (*comparison_func)(void *obj, void *other), void *(*release_obj_func)(void *obj), enum_oms strat, MemAllocMng *mam)
 {
-	RedBlackTree *t = __objAlloc__(sizeof(RedBlackTree), OBJ_TYPE__RedBlackTree);
-	t->comparison_func = comparison_func;
-	t->release_obj_func = release_obj_func;
+	RedBlackTree *t;
+	if (strat == DIRECT) {
+		t = obj_alloc(sizeof(RedBlackTree), OBJ_TYPE__RedBlackTree);
+		if (desc)
+		{
+			t->desc = obj_alloc(strlen(desc) + 1, OBJ_TYPE__RAW_BYTES);
+			sprintf(t->desc, "%s", desc);
+		}
+		goto before_rt;
+	}
+
+	if (strat == THREAD_MAM)
+		mam = MemAllocMng_current_thread_mam();
+
+	t = mam_alloc(sizeof(RedBlackTree), OBJ_TYPE__RedBlackTree, mam, 1);
 	if (desc)
 	{
-		t->desc = __objAlloc__(strlen(desc) + 1, OBJ_TYPE__RAW_BYTES);
+		t->desc = mam_alloc(strlen(desc) + 1, OBJ_TYPE__RAW_BYTES, mam, 0);
 		sprintf(t->desc, "%s", desc);
 	}
+
+before_rt:
+
+	t->comparison_func = comparison_func;
+	t->release_obj_func = release_obj_func;
 	return t;
 }
 
@@ -107,7 +124,18 @@ void rbt_add(RedBlackTree *rbt, void *obj)
 
 RBNode *rbt_create_node(void *obj, RedBlackTree *tree, char _attrs)
 {
-	RBNode *n = __objAlloc__(sizeof(RBNode), OBJ_TYPE__RBNode);
+	short type;
+	enum_oms strat;
+	MemAllocMng *mam;
+	obj_info(tree, &type, &strat, &mam);
+
+	RBNode *n = NULL;
+	if (strat == DIRECT) {
+		n = obj_alloc(sizeof(RBNode), OBJ_TYPE__RBNode);
+	} else {
+		n = mam_alloc(sizeof(RBNode), OBJ_TYPE__RBNode, mam, 0);
+	}
+
 	n->obj = obj;
 	n->attrs = _attrs;
 	n->tree = tree;

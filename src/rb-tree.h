@@ -1,6 +1,8 @@
 #ifndef EUCLID__RB_TREE_H
 #define EUCLID__RB_TREE_H 1
 
+#include "utils.h"
+
 #define RED_NODE 0x01
 #define BLACK_NODE 0x00
 
@@ -40,9 +42,13 @@ void rbt__destory_node(RBNode *);
 void rbt__destory(RedBlackTree *);
 
 /**
+ * @param desc
  * @param comparison_func when `other` is sorted before `obj`, return -1
+ * @param release_obj_func
+ * @param strat Memory allocation strategy.
+ * @param mam When the strat parameter is SPEC_MAM, mam cannot be NULL.
  */
-RedBlackTree *rbt_create(char *desc, int (*comparison_func)(void *obj, void *other), void *(*release_obj_func)(void *obj));
+RedBlackTree *rbt_create(char *desc, int (*comparison_func)(void *obj, void *other), void *(*release_obj_func)(void *obj), enum_oms strat, MemAllocMng *mam);
 
 void rbt_add(RedBlackTree *rbt, void *obj);
 
