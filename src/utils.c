@@ -292,10 +292,10 @@ StrArr *str_split(char *orig_str, char *deli_str)
 		len++;
 	}
 
-	StrArr *str_arr = __objAlloc__(sizeof(StrArr), OBJ_TYPE__StrArr);
+	StrArr *str_arr = obj_alloc(sizeof(StrArr), OBJ_TYPE__StrArr);
 	str_arr->length = len;
 
-	str_arr->head_str_p = __objAlloc__(sizeof(void *) * len + 1 + strlen(orig_str), OBJ_TYPE__RAW_BYTES);
+	str_arr->head_str_p = obj_alloc(sizeof(void *) * len + 1 + strlen(orig_str), OBJ_TYPE__RAW_BYTES);
 
 	strcpy(((char *)str_arr->head_str_p) + sizeof(void *) * len, orig_str);
 	p = ((char *)str_arr->head_str_p) + sizeof(void *) * len;
@@ -317,11 +317,8 @@ StrArr *str_split(char *orig_str, char *deli_str)
 
 void destory_StrArr(StrArr *arr_address)
 {
-	if (!arr_address)
-		return;
-
-	// _release_mem_(arr_address->head_str_p);
-	// _release_mem_(arr_address);
+	obj_release(arr_address->head_str_p);
+	obj_release(arr_address);
 }
 
 void show_StrArr(StrArr *arr)
