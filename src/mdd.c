@@ -383,14 +383,21 @@ Member *Member_same_lv_m(Member *member, int offset)
 Member *Member_get_posi_child(Member *parent, int child_posi)
 {
 	int i, m_pool_sz = als_size(member_pool);
-	ArrayList *children = als_create(128, "Member *");
+
+	ArrayList *children = als_new(128, "Member *", DIRECT, NULL);
+
 	for (i = 0; i < m_pool_sz; i++)
 	{
 		Member *m = als_get(member_pool, i);
 		if (m->p_gid == parent->gid)
 			als_add(children, m);
 	}
-	return child_posi >= 0 && child_posi < als_size(children) ? als_get(children, child_posi) : NULL;
+
+	Member *_child_ = child_posi >= 0 && child_posi < als_size(children) ? als_get(children, child_posi) : NULL;
+
+	als_destroy(children);
+
+	return _child_;
 }
 
 Member *Member_find_ancestor(Member *member, unsigned int distance)
