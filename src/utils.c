@@ -483,6 +483,22 @@ ArrayList *als_new(unsigned int init_capacity, char *desc, enum obj_mem_alloc_st
 	return als;
 }
 
+void als_destroy(ArrayList *al) {
+	short type;
+	enum_oms strat;
+	MemAllocMng *mam;
+	obj_info(al, &type, &strat, &mam);
+
+	if (strat == DIRECT) {
+		obj_release(al->elements_arr_p);
+		obj_release(al);
+		return;
+	}
+
+	printf("[ error ] exit. als_destroy.\n");
+	exit(EXIT_FAILURE);
+}
+
 void *ArrayList_set(ArrayList *ls, unsigned int index, void *obj) {
 
 	if (index >= ls->idx)

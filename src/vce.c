@@ -629,7 +629,7 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
         }
     }
 
-    ArrayList *sor_ls = als_create(64, "ScaleOffsetRange *");
+    ArrayList *sor_ls = als_new(64, "ScaleOffsetRange *", THREAD_MAM, NULL);
 
     MddMemberRole *measure_mr;
 

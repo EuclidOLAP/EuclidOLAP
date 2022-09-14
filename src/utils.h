@@ -204,6 +204,8 @@ ArrayList *als_create(unsigned int init_capacity, char *desc);
  */
 ArrayList *als_new(unsigned int init_capacity, char *desc, enum obj_mem_alloc_strategy strat, MemAllocMng *mam);
 
+void als_destroy(ArrayList *al);
+
 void *ArrayList_set(ArrayList *, unsigned int, void *);
 
 // when `other` is sorted before `obj`, return -1

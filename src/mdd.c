@@ -134,7 +134,7 @@ static int load_cubes() {
 
 	char cube_stru_file[128];
 	md_gid cube_id;
-	// ArrayList *cube_id_arr = als_create(16, "md_gid");
+
 	while (fread((void *)&cube_id, sizeof(md_gid), 1, cubes_fd) > 0) {
 		// als_add(cube_id_arr, *((void **)&cube_id));
 		memset(cube_stru_file, 0, 128);
@@ -144,8 +144,8 @@ static int load_cubes() {
 
 		Cube *cube = mam_alloc(sizeof(Cube), OBJ_TYPE__Cube, meta_mam, 0);
 		fread(cube, sizeof(Cube), 1, cube_fd);
-		cube->dim_role_ls = als_create(24, "DimensionRole *");
-		cube->measure_mbrs = als_create(12, "Member *");
+		cube->dim_role_ls = als_new(24, "DimensionRole *", SPEC_MAM, meta_mam);
+		cube->measure_mbrs = als_new(12, "Member *", SPEC_MAM, meta_mam);
 
 		int i, dr_count;
 		fread(&dr_count, sizeof(unsigned int), 1, cube_fd);
@@ -359,7 +359,7 @@ Member *find_member_lv1(Dimension *dim, char *mbr_name)
 Member *Member_same_lv_m(Member *member, int offset)
 {
 	int i, curr_m_idx, m_pool_sz = als_size(member_pool);
-	ArrayList *same_lv_ms = als_create(128, "Member *");
+	ArrayList *same_lv_ms = als_new(128, "Member *", DIRECT, NULL);
 	for (i = 0; i < m_pool_sz; i++)
 	{
 		Member *m = als_get(member_pool, i);
@@ -368,10 +368,16 @@ Member *Member_same_lv_m(Member *member, int offset)
 		if (m->gid == member->gid)
 			curr_m_idx = als_size(same_lv_ms) - 1;
 	}
+
+	Member *result = NULL;
+
 	int sibling_idx = curr_m_idx + offset;
 	if (sibling_idx >= 0 && sibling_idx < als_size(same_lv_ms))
-		return als_get(same_lv_ms, sibling_idx);
-	return NULL;
+		result = als_get(same_lv_ms, sibling_idx);
+
+	als_destroy(same_lv_ms);
+
+	return result;
 }
 
 Member *Member_get_posi_child(Member *parent, int child_posi)
