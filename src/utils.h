@@ -195,9 +195,6 @@ typedef struct _array_list_
 	char desc[COMMON_OBJ_DESC_LEN];
 } ArrayList;
 
-// TODO deprecated - replaced by als_new
-ArrayList *als_create(unsigned int init_capacity, char *desc);
-
 /**
  * @param strat Memory allocation strategy.
  * @param mam When the strat parameter is SPEC_MAM, mam cannot be NULL.

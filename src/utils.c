@@ -441,22 +441,6 @@ int append_file_uint(char *file_path, __uint32_t val)
 	return append_file_data(file_path, (char *)&val, sizeof(val));
 }
 
-// TODO deprecated - replaced by als_new
-ArrayList *als_create(unsigned int init_capacity, char *desc)
-{
-	ArrayList *als = (ArrayList *)__objAlloc__(sizeof(ArrayList), OBJ_TYPE__ArrayList);
-	als->ele_arr_capacity = init_capacity;
-	als->elements_arr_p = __objAlloc__(sizeof(void *) * init_capacity, OBJ_TYPE__RAW_BYTES);
-	if (desc != NULL)
-	{
-		int desc_len = strlen(desc);
-		desc_len = desc_len < COMMON_OBJ_DESC_LEN ? desc_len : COMMON_OBJ_DESC_LEN - 1;
-		memcpy(als->desc, desc, desc_len);
-	}
-
-	return als;
-}
-
 ArrayList *als_new(unsigned int init_capacity, char *desc, enum obj_mem_alloc_strategy strat, MemAllocMng *mam) {
 
 	ArrayList *als;

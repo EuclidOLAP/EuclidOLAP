@@ -50,7 +50,7 @@ int net_service_startup()
 
 	socklen_t cs_len = sizeof(struct sockaddr_in);
 
-	downstream_sockets = als_create(16, "downstream_sockets, int *");
+	downstream_sockets = als_new(16, "downstream_sockets, int *", DIRECT, NULL);
 	while (1)
 	{
 		struct sockaddr_in sock;
