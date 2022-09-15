@@ -5,6 +5,7 @@
 #include <string.h> // for memset
 #include <unistd.h> // for close
 
+#include "log.h"
 #include "net.h"
 #include "cfg.h"
 #include "utils.h"
@@ -43,16 +44,16 @@ int net_service_startup()
 
 	if (bind(ss_fd, (struct sockaddr *)&ss_addr, sizeof(ss_addr)) != 0)
 	{
-		printf("program exit. cause: bind failed.");
+		log_print("program exit. cause: bind failed.");
 		exit(1);
 	}
 
 	if (listen(ss_fd, 5) != 0)
 	{
-		printf("program exit. cause: listen failed.");
+		log_print("program exit. cause: listen failed.");
 		exit(1);
 	}
-	printf("Net service startup on port %d\n", cfg->port);
+	log_print("Net service startup on port %d\n", cfg->port);
 
 	socklen_t cs_len = sizeof(struct sockaddr_in);
 
@@ -62,10 +63,10 @@ int net_service_startup()
 		struct sockaddr_in sock;
 
 		int sock_fd = accept(ss_fd, (struct sockaddr *)&sock, &cs_len);
-		printf("info - accept client. sock_fd = %d\n", sock_fd);
+		log_print("info - accept client. sock_fd = %d\n", sock_fd);
 		if (sock_fd < 3)
 		{ // 0 stdin, 1 stdout, 2 stderr, -1 INVALID_SOCKET
-			printf("warning: accept return [%d].\n", sock_fd);
+			log_print("warning: accept return [%d].\n", sock_fd);
 			continue;
 		}
 
@@ -142,7 +143,7 @@ int join_cluster()
 	int p_port = get_cfg()->parent_node_port;
 	if (sock_conn_to(&to_parent_sock_fd, p_ip, p_port) != 0)
 	{
-		printf("[net] error. connect %s:%d\n", p_ip, p_port);
+		log_print("[net] error. connect %s:%d\n", p_ip, p_port);
 		return -1;
 	}
 
@@ -184,7 +185,7 @@ static void receive_command_loop(SockIntentThread *sit)
 		buf = NULL;
 		buf_len = 0;
 		ssize_t pkg_size = read_sock_pkg(sit->sock_fd, &buf, &buf_len);
-		printf("INFO - receive_command_loop() ... read_sock_pkg, pkg_size = %ld\n", pkg_size);
+		log_print("INFO - receive_command_loop() ... read_sock_pkg, pkg_size = %ld\n", pkg_size);
 		if (pkg_size >= min_pkg_size)
 		{
 			// command module process command intention.
@@ -194,10 +195,10 @@ static void receive_command_loop(SockIntentThread *sit)
 		if (buf)
 			obj_release(buf);
 
-		printf("warning! receive intention: buf_len = %d\n", buf_len);
+		log_print("warning! receive intention: buf_len = %d\n", buf_len);
 		als_remove(downstream_sockets, &(sit->sock_fd));
 		int _c_ = close(sit->sock_fd);
-		printf("-------------------------------------------------------  _c_ = %d\n", _c_);
+		log_print("-------------------------------------------------------  _c_ = %d\n", _c_);
 		break;
 	}
 }
