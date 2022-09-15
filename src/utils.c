@@ -297,7 +297,7 @@ StrArr *str_split(char *orig_str, char *deli_str)
 		len++;
 	}
 
-	show_StrArr(str_arr);
+	// show_StrArr(str_arr);
 	return str_arr;
 }
 
