@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include "log.h"
 #include "utils.h"
 #include "rb-tree.h"
 
@@ -101,7 +102,7 @@ int mam_comp(void *mam, void *other) {
 	MemAllocMng *o = other;
 
 	if ((m->id | m->thread_id == 0) || (m->id * m->thread_id != 0) || (o->id | o->thread_id == 0) || (o->id * o->thread_id != 0)) {
-		printf("[ error ] exit. cause by: exception in mam_comp(..)\n");
+		log_print("[ error ] exit. cause by: exception in mam_comp(..)\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -141,7 +142,7 @@ void obj_info(void *obj, short *type, enum obj_mem_alloc_strategy *strat, MemAll
 			*strat = USED_MAM;
 			break;
 		default:
-			printf("[ error ] program exit! cause by: exception in obj_info(...)\n");
+			log_print("[ error ] program exit! cause by: exception in obj_info(...)\n");
 			exit(1);
 	}
 }
@@ -165,7 +166,7 @@ void *obj_alloc(size_t size, short type) {
 void obj_release(void *obj) {
 
 	if ( *(((short *)obj)-1) < 0 ) {
-		printf("[ error ] - Program exit! Cause by: this memory cannot be freed here.\n");
+		log_print("[ error ] - Program exit! Cause by: this memory cannot be freed here.\n");
 		exit(1);
 	}
 	free(((short *)obj) - 1);
@@ -262,7 +263,7 @@ int sock_conn_to(int *sock_fd, char *ip, int port)
 	if (connect(*sock_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == 0)
 		return 0;
 
-	printf("[utils] error. connect %s:%d\n", ip, port);
+	log_print("[utils] error. connect %s:%d\n", ip, port);
 	return -1;
 }
 
@@ -308,13 +309,13 @@ void destory_StrArr(StrArr *arr_address)
 
 void show_StrArr(StrArr *arr)
 {
-	printf("\n");
+	log_print("\n");
 	int i;
 	for (i = 0; i < arr->length; i++)
 	{
-		printf("%d\t%s\n", i, *(arr->head_str_p + i));
+		log_print("%d\t%s\n", i, *(arr->head_str_p + i));
 	}
-	printf("\n");
+	log_print("\n");
 }
 
 char *str_arr_get(StrArr *sa, unsigned int i)
@@ -362,7 +363,7 @@ int open_serv_sock(int *ss_fd_p, int port)
 	int ss_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (ss_fd < 0)
 	{
-		printf("error at fn:open_serv_sock\n");
+		log_print("error at fn:open_serv_sock\n");
 		return -1;
 	}
 
@@ -382,9 +383,9 @@ int open_serv_sock(int *ss_fd_p, int port)
 	return 0;
 
 failed_close_exit:
-	printf("failed at fn:open_serv_sock.\n");
+	log_print("failed at fn:open_serv_sock.\n");
 	if (close(ss_fd) != 0)
-		printf("failed at fn:open_serv_sock.\n");
+		log_print("failed at fn:open_serv_sock.\n");
 
 	return -1;
 }
@@ -464,7 +465,7 @@ void als_destroy(ArrayList *al) {
 		return;
 	}
 
-	printf("[ error ] exit. als_destroy.\n");
+	log_print("[ error ] exit. als_destroy.\n");
 	exit(EXIT_FAILURE);
 }
 
@@ -537,7 +538,7 @@ int als_remove(ArrayList *als, void *obj)
 		}
 		return 0;
 	}
-	printf("INFO - als_remove ... no object < %p >\n", obj);
+	log_print("INFO - als_remove ... no object < %p >\n", obj);
 	return 0;
 }
 

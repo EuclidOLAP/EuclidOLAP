@@ -8,6 +8,7 @@
 //#include "utils.h"
 //#include "command.h"
 
+#include "log.h"
 #include "mdx.h"
 #include "obj-type-def.h"
 
@@ -90,7 +91,7 @@ SelectDef *SelectDef_new(enum_oms strat, MemAllocMng *mam) {
         return obj_alloc(sizeof(SelectDef), OBJ_TYPE__SelectDef);
 
     if (strat == USED_MAM) {
-        printf("[ error ] exit! exception in SelectDef_new(..)\n");
+        log_print("[ error ] exit! exception in SelectDef_new(..)\n");
         exit(1);
     }
 
@@ -100,7 +101,7 @@ SelectDef *SelectDef_new(enum_oms strat, MemAllocMng *mam) {
     if (mam)
         return mam_alloc(sizeof(SelectDef), OBJ_TYPE__SelectDef, mam, 0);
 
-    printf("[ error ] exit! exception in SelectDef_new(..)\n");
+    log_print("[ error ] exit! exception in SelectDef_new(..)\n");
     exit(1);
 }
 
@@ -152,16 +153,16 @@ MemberFormula *MemberFormula_creat()
 
 void MemberFormula_print(MemberFormula *mf)
 {
-    printf("{\"type\": \"MemberFormula\",\"display\":\"");
+    log_print("{\"type\": \"MemberFormula\",\"display\":\"");
     int i, len = als_size(mf->path);
     for (i = 0; i < len; i++)
     {
         if (i < len - 1)
-            printf("[%s].", als_get(mf->path, i));
+            log_print("[%s].", als_get(mf->path, i));
         else
-            printf("[%s]", als_get(mf->path, i));
+            log_print("[%s]", als_get(mf->path, i));
     }
-    printf("\"}");
+    log_print("\"}");
 }
 
 SetFormula *SetFormula_creat()

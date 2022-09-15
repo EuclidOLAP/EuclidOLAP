@@ -31,8 +31,6 @@ int main(int argc, char *argv[])
 			strcat(statement, " ");
 	}
 
-	// printf("<<<<<<\n%s\n>>>>>>\n", statement);
-
 	// parse_mdx(statement);
 
 	// init_cfg(argc, argv);

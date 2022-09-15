@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "log.h"
 #include "mdd.h"
 #include "vce.h"
 #include "utils.h"
@@ -175,7 +176,7 @@ void reload_space(unsigned long cs_id) {
         ++space_partition_count;
     }
 
-    printf("[debug] space_capacity < %lu >, SPACE_DEF_PARTITION_COUNT < %d >, space_partition_count < %lu >\n", space_capacity, SPACE_DEF_PARTITION_COUNT, space_partition_count);
+    log_print("[debug] space_capacity < %lu >, SPACE_DEF_PARTITION_COUNT < %d >, space_partition_count < %lu >\n", space_capacity, SPACE_DEF_PARTITION_COUNT, space_partition_count);
 
     // Creates a new logical multidimensional array object by MemAllocMng.
     MeasureSpace *space = space_new(cs_id, space_partition_count, SPACE_DEF_PARTITION_SPAN_MIN, vals_count, cs_mam);
@@ -430,13 +431,13 @@ void space_add_measure(MeasureSpace *space, __uint64_t measure_position, void *c
 
 void Scale_print(Scale *s)
 {
-    printf("Scale <%p> [ fragments_len = %d ] ", s, s->fragments_len);
+    log_print("Scale <%p> [ fragments_len = %d ] ", s, s->fragments_len);
     int i;
     for (i = 0; i < s->fragments_len; i++)
     {
-        printf("  %lu", s->fragments[i]);
+        log_print("  %lu", s->fragments[i]);
     }
-    printf("\n");
+    log_print("\n");
 }
 
 void space__destory(MeasureSpace *s)
@@ -483,7 +484,7 @@ double *vce_vactors_values(MDContext *md_ctx, MddTuple **tuples_matrix_h, unsign
             if (mr->member && (!mr->member->abs_path))
                 mdd__gen_mbr_abs_path(mr->member);
             // else
-            //     printf("[ info ] - This member role represents a calculation formula member.\n");
+            //     log_print("[ info ] - This member role represents a calculation formula member.\n");
         }
     }
 
@@ -713,7 +714,7 @@ static void _do_calculate_measure_value(MDContext *md_ctx, MeasureSpace *space, 
 
 void ScaleOffsetRange_print(ScaleOffsetRange *sor)
 {
-    printf("[ ScaleOffsetRange %p ] gid = %lu, position [ %lu, %lu ], offset [ %lu, %lu ]\n", sor, sor->gid, sor->start_position, sor->end_position, sor->start_offset, sor->end_offset);
+    log_print("[ ScaleOffsetRange %p ] gid = %lu, position [ %lu, %lu ], offset [ %lu, %lu ]\n", sor, sor->gid, sor->start_position, sor->end_position, sor->start_offset, sor->end_offset);
 }
 
 int ScaleOffsetRange_cmp(void *_obj, void *_other)
@@ -726,7 +727,7 @@ int ScaleOffsetRange_cmp(void *_obj, void *_other)
 void *ScaleOffsetRange_destory(void *sor)
 {
     // TODO may 17 2022 - 20:00:05
-    // printf("[ func - ScaleOffsetRange_destory ] This function has not been implemented yet.\n");
+    // log_print("[ func - ScaleOffsetRange_destory ] This function has not been implemented yet.\n");
     return NULL;
 }
 
@@ -825,47 +826,47 @@ static void MeasureSpace_coordinate_intersection_value(MeasureSpace *space, unsi
 }
 
 void MeasureSpace_print(MeasureSpace *space) {
-    printf(">>>>>>>>\n");
-    printf(">>>>>>>>>>>>>>>>\n");
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>\n");
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    log_print(">>>>>>>>\n");
+    log_print(">>>>>>>>>>>>>>>>\n");
+    log_print(">>>>>>>>>>>>>>>>>>>>>>>>\n");
+    log_print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    log_print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    log_print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    log_print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    printf("id              - %lu\n", space->id);
-    printf("segment_count   - %lu\n", space->segment_count);
-    printf("segment_scope   - %lu\n", space->segment_scope);
-    printf("cell_vals_count - %d\n", space->cell_vals_count);
+    log_print("id              - %lu\n", space->id);
+    log_print("segment_count   - %lu\n", space->segment_count);
+    log_print("segment_scope   - %lu\n", space->segment_scope);
+    log_print("cell_vals_count - %d\n", space->cell_vals_count);
 
     int cell_len = sizeof(long) + space->cell_vals_count * (sizeof(double) + sizeof(char));
 
     int i;
     for (i=0;i<space->segment_count;i++) {
-        printf("\n");
+        log_print("\n");
 
-        printf("%lu\n", space->data_lens[i]);
+        log_print("%lu\n", space->data_lens[i]);
         int j;
         for (j=0;j<space->data_lens[i];j++) {
             void *cell = space->data_ls_h[i] + j * cell_len;
-            printf("% 12lu  >  ", *((unsigned long *)cell));
+            log_print("% 12lu  >  ", *((unsigned long *)cell));
             cell += sizeof(long);
             int k;
             for (k=0;k<space->cell_vals_count;k++) {
-                printf("% 20lf - ", *((double *)(cell + k * (sizeof(double) + sizeof(char)))));
-                printf("%d    ", *((char *)(cell + k * (sizeof(double) + sizeof(char)) + sizeof(double))));
+                log_print("% 20lf - ", *((double *)(cell + k * (sizeof(double) + sizeof(char)))));
+                log_print("%d    ", *((char *)(cell + k * (sizeof(double) + sizeof(char)) + sizeof(double))));
             }
-            printf("\n");
+            log_print("\n");
         }
 
-        printf("\n");
+        log_print("\n");
     }
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>\n");
-    printf(">>>>>>>>>>>>>>>>\n");
-    printf(">>>>>>>>\n");
+    log_print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    log_print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    log_print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    log_print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    log_print(">>>>>>>>>>>>>>>>>>>>>>>>\n");
+    log_print(">>>>>>>>>>>>>>>>\n");
+    log_print(">>>>>>>>\n");
 }

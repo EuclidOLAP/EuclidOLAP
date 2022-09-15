@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
+#include "log.h"
 #include "cfg.h"
 #include "utils.h"
 
@@ -33,7 +36,14 @@ int init_cfg(int argc, char *argv[])
 		fetch_param(argv[i]);
 	}
 
-	printf("info - node mode [ %c ]\n", cfg.mode);
+	// create meta and data folders
+ 	if (access("meta", F_OK) != 0)
+		mkdir("meta", S_IRWXU);
+
+ 	if (access("data", F_OK) != 0)
+		mkdir("data", S_IRWXU);
+
+	log_print("info - node mode [ %c ]\n", cfg.mode);
 
 	return 0;
 }
@@ -65,7 +75,7 @@ int set_param(char *p_key, char *p_val)
 		}
 		else
 		{
-			printf("Unknown mode %s.\n", p_val);
+			log_print("Unknown mode %s.\n", p_val);
 			exit(1);
 		}
 	}
@@ -82,7 +92,7 @@ int set_param(char *p_key, char *p_val)
 		cfg.port = atoi(p_val);
 		if (cfg.port < 0 || cfg.port > 65535)
 		{
-			printf("Invalid port %d, valid port 0 ~ 65535\n", cfg.port);
+			log_print("Invalid port %d, valid port 0 ~ 65535\n", cfg.port);
 			exit(1);
 		}
 	}
@@ -99,7 +109,7 @@ int set_param(char *p_key, char *p_val)
 	}
 	else
 	{
-		printf("Unknown parameter type %s=%s.\n", p_key, p_val);
+		log_print("Unknown parameter type %s=%s.\n", p_key, p_val);
 		exit(1);
 	}
 
