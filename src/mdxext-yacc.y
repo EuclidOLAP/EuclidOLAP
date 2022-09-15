@@ -132,7 +132,6 @@ statement:
 	}
   | insert_cube_measures {
 	  	stack_push(&YC_STC, IDS_CXOBJ_ISRTCUBEMEARS);
-		printf("stack_push(&YC_STC, IDS_CXOBJ_ISRTCUBEMEARS);\n");
 	}
   | multi_dim_query {
 		stack_push(&YC_STC, IDS_MULTI_DIM_SELECT_DEF);
@@ -158,10 +157,8 @@ multi_dim_query:
 		select_def->member_formulas = fc->member_formulas;
 		select_def->set_formulas = fc->set_formulas;
 		stack_push(&YC_STC, select_def);
-		printf("[ debug ] - <:::: --- with_section SELECT axes_statement FROM cube__statement --- ::::>\n");
 	}
   |	SELECT axes_statement FROM cube__statement {
-	  	// printf("[debug] yacc - multi_dim_query ::= SELECT axes_statement FROM cube__statement\n");
 		CubeDef *cube_def;
 		stack_pop(&YC_STC, (void **) &cube_def);
 		ArrayList *ax_def_ls;
@@ -180,7 +177,6 @@ multi_dim_query:
 		stack_pop(&YC_STC, (void **) &select_def);
 		select_def->where_tuple_def = where_tuple_def;
 		stack_push(&YC_STC, select_def);
-		printf("[ debug ] - <:::: multi_dim_query WHERE tuple_statement ::::>\n");
 	}
 ;
 
@@ -1266,7 +1262,6 @@ void *parse_mdx(char *mdx)
 
 int yyerror(const char *s)
 {
-	//printf("[yy error] <%s>\n", s);
     return -100;
 }
 // yacc_f_004
