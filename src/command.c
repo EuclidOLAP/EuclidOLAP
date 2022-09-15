@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 
+#include "log.h"
 #include "command.h"
 #include "utils.h"
 #include "cfg.h"
@@ -132,7 +133,7 @@ static int command_processor_thread_startup()
 		mam->thread_id = thread_id;
 		rbt_add(_thread_mam_pool, mam);
 
-		printf("EuclidCommand processor thread [%lu] <%d>.\n", thread_id, detach_r);
+		log_print("EuclidCommand processor thread [%lu] <%d>.\n", thread_id, detach_r);
 	}
 
 	return 0;
@@ -214,18 +215,18 @@ static int execute_command(EuclidCommand *ec)
 		}
 		else if (ids_type == IDS_MULTI_DIM_SELECT_DEF)
 		{
-			printf("[ INFO ] - MDX QUERY: %s\n", (ec->bytes) + 10);
+			log_print("[ INFO ] - MDX QUERY: %s\n", (ec->bytes) + 10);
 			SelectDef *select_def;
 			stack_pop(&YC_STC, (void **)&select_def);
 			MultiDimResult *md_rs = exe_multi_dim_queries(select_def);
-			printf("// TODO ....................... %s:%d\n", __FILE__, __LINE__); // TODO should be return a multi-dim-result
+			log_print("// TODO ....................... %s:%d\n", __FILE__, __LINE__); // TODO should be return a multi-dim-result
 			MultiDimResult_print(md_rs);
 		}
 		else if (ids_type == IDS_ARRLS_DIMS_LVS_INFO)
 		{
-			// printf("**********************************************************************************\n");
-			// printf("**********************************************************************************\n");
-			// printf("**********************************************************************************\n");
+			// log_print("**********************************************************************************\n");
+			// log_print("**********************************************************************************\n");
+			// log_print("**********************************************************************************\n");
 			ArrayList *dim_lv_map_ls;
 			stack_pop(&YC_STC, (void **)&dim_lv_map_ls);
 			int i,j,map_len, map_count = als_size(dim_lv_map_ls);
@@ -246,20 +247,20 @@ static int execute_command(EuclidCommand *ec)
 					// create_level(dimension_name, *lv_p, level_name);
 
 					// if (j % 2 == 0) {
-					// 	printf("[%s]    ",ele);
+					// 	log_print("[%s]    ",ele);
 					// } else {
 					// 	long *lv_p = (long *)&ele;
-					// 	printf("%ld:",*lv_p);
+					// 	log_print("%ld:",*lv_p);
 					// }
 				}
-				// printf("\n");
+				// log_print("\n");
 			}
-			// printf("**********************************************************************************\n");
-			// printf("**********************************************************************************\n");
-			// printf("**********************************************************************************\n");
+			// log_print("**********************************************************************************\n");
+			// log_print("**********************************************************************************\n");
+			// log_print("**********************************************************************************\n");
 		}
 		else {
-			printf("[ error ] program exit(1), cause by: unknow ids_type < %p >\n", ids_type);
+			log_print("[ error ] program exit(1), cause by: unknow ids_type < %p >\n", ids_type);
 			exit(1);
 		}
 	}

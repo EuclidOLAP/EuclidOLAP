@@ -3,6 +3,7 @@
 // #include <dirent.h>
 #include <unistd.h> // for usleep
 
+#include "log.h"
 #include "mdd.h"
 #include "mdx.h"
 #include "command.h"
@@ -188,7 +189,7 @@ Dimension *create_dimension(char *dim_name)
 {
 	if (strlen(dim_name) >= MD_ENTITY_NAME_BYTSZ)
 	{
-		printf("[WARN] - dim name too long <%s>\n", dim_name);
+		log_print("[WARN] - dim name too long <%s>\n", dim_name);
 		return NULL;
 	}
 
@@ -196,7 +197,7 @@ Dimension *create_dimension(char *dim_name)
 	Dimension *dim = mam_alloc(sizeof(Dimension), OBJ_TYPE__Dimension, meta_mam, 0);
 	dim->gid = gen_md_gid();
 	memcpy(dim->name, dim_name, strlen(dim_name));
-	printf("[INFO] create dimension [ %ld ] %s\n", dim->gid, dim->name);
+	log_print("[INFO] create dimension [ %ld ] %s\n", dim->gid, dim->name);
 
 	// 2 - save the dim-obj into a persistent file.
 	append_file_data(META_DEF_DIMS_FILE_PATH, (char *)dim, sizeof(Dimension));
@@ -207,7 +208,7 @@ Dimension *create_dimension(char *dim_name)
 	mdd__use_level(rootLv);
 
 	als_add(dims_pool, dim);
-	// printf("========================= dim->name %s\n", dim->name);
+	// log_print("========================= dim->name %s\n", dim->name);
 	return dim;
 }
 
@@ -510,7 +511,7 @@ Member *_new_member(char *name, md_gid dim_gid, md_gid parent_gid, __u_short lv)
 	mbr->dim_gid = dim_gid;
 	mbr->p_gid = parent_gid;
 	mbr->lv = lv;
-	printf("[INFO] new Member - dim_gid [ %ld ] p_gid [% 17ld ] gid [ %ld ] name [ %s ] lv [ %d ]\n", mbr->dim_gid, mbr->p_gid, mbr->gid, mbr->name, mbr->lv);
+	log_print("[INFO] new Member - dim_gid [ %ld ] p_gid [% 17ld ] gid [ %ld ] name [ %s ] lv [ %d ]\n", mbr->dim_gid, mbr->p_gid, mbr->gid, mbr->name, mbr->lv);
 
 	return mbr;
 }
@@ -526,7 +527,7 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 	cube->gid = gen_md_gid();
 	cube->dim_role_ls = als_new(24, "DimensionRole *", SPEC_MAM, meta_mam);
 	cube->measure_mbrs = als_new(12, "Member *", SPEC_MAM, meta_mam);
-	printf("[INFO] new Cube - gid [ %ld ] name [ %s ]\n", cube->gid, cube->name);
+	log_print("[INFO] new Cube - gid [ %ld ] name [ %s ]\n", cube->gid, cube->name);
 
 	// Create several dimensional role objects and associate them to the cube.
 	size_t i, dr_sz = als_size(dim_role_ls);
@@ -542,7 +543,7 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 		d_role->gid = gen_md_gid();
 		d_role->cube_gid = cube->gid;
 		d_role->dim_gid = dim->gid;
-		printf("[INFO] new DimensionRole - Cube [ %ld % 16s ] Dim [ %ld % 16s ] DR [ %ld % 16s ]\n",
+		log_print("[INFO] new DimensionRole - Cube [ %ld % 16s ] Dim [ %ld % 16s ] DR [ %ld % 16s ]\n",
 			   cube->gid, cube->name, dim->gid, dim->name, d_role->gid, d_role->name);
 
 		als_add(cube->dim_role_ls, d_role);
@@ -631,7 +632,7 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 			ArrayList *mbr_path_str = als_get(ids_vm->ls_vector, j);
 			size_t ap_bsz = sizeof(int) + sizeof(md_gid) * (als_size(mbr_path_str) - 1);
 			if ((data_m_sz + ap_bsz) > data_m_capacity) {
-				printf("[ error ] exit, cause by: Too much data inserted.\n");
+				log_print("[ error ] exit, cause by: Too much data inserted.\n");
 				exit(EXIT_FAILURE);
 			}
 			gen_member_gid_abs_path(cube, mbr_path_str, data + data_m_sz);
@@ -641,7 +642,7 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 		__uint32_t cube_mmbrs_sz = als_size(cube->measure_mbrs);
 
 		if ((data_m_sz + (sizeof(double) + sizeof(char)) * cube_mmbrs_sz) > data_m_capacity) {
-			printf("[ error ] exit, cause by: Too much data inserted.\n");
+			log_print("[ error ] exit, cause by: Too much data inserted.\n");
 			exit(EXIT_FAILURE);
 		}
 
@@ -739,7 +740,7 @@ static long query_times = 1;
 
 MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 {
-	printf("\n[ debug ] >>>>>>>>>>>>>>>>>>>>>>> The number of times the query was executed: %ld\n\n", query_times++);
+	log_print("\n[ debug ] >>>>>>>>>>>>>>>>>>>>>>> The number of times the query was executed: %ld\n\n", query_times++);
 
 	MDContext *md_ctx = MDContext_creat();
 	md_ctx->select_def = select_def;
@@ -813,16 +814,16 @@ MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 	md_result->vals = measure_vals;
 	md_result->rs_len = rs_len;
 
-	// printf("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-	// printf("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+	// log_print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+	// log_print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
 	// int lv_count = als_size(levels_pool);
 	// for (i=0;i<lv_count;i++) {
 	// 	Level *lv = als_get(levels_pool, i);
 	// 	Dimension *dim = find_dim_by_gid(lv->dim_gid);
-	// 	printf("% 40s    %u:%30s\n", dim->name, lv->level, lv->name);
+	// 	log_print("% 40s    %u:%30s\n", dim->name, lv->level, lv->name);
 	// }
-	// printf("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-	// printf("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+	// log_print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+	// log_print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
 
 	return md_result;
 }
@@ -998,9 +999,9 @@ static MddTuple *tuple__merge(MddTuple *ctx_tuple, MddTuple *tuple_frag)
 	// 	j = j;
 	// }
 
-	// printf("@@@@@@@@@@@@@@@@@@@@Tuple_print(tp);@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+	// log_print("@@@@@@@@@@@@@@@@@@@@Tuple_print(tp);@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
 	// Tuple_print(tp);
-	// printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+	// log_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
 	return tp;
 }
 
@@ -1165,7 +1166,7 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 		}
 		else
 		{
-			printf("[ error ] - ids_setdef__head_ref_tuple() obj_type_of(set_def->set_fn) = %d\n", obj_type_of(set_def->set_fn));
+			log_print("[ error ] - ids_setdef__head_ref_tuple() obj_type_of(set_def->set_fn) = %d\n", obj_type_of(set_def->set_fn));
 			exit(1);
 		}
 	}
@@ -1183,7 +1184,7 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 	}
 	else
 	{
-		printf("[ error ] - ids_setdef__head_ref_tuple() set_def->t_cons = %d\n", set_def->t_cons);
+		log_print("[ error ] - ids_setdef__head_ref_tuple() set_def->t_cons = %d\n", set_def->t_cons);
 		exit(1);
 	}
 }
@@ -1304,16 +1305,16 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 		}
 		else
 		{
-			printf("[ error ] - ids_mbrsdef__build() obj_type_of(m_def->member_fn)\n");
+			log_print("[ error ] - ids_mbrsdef__build() obj_type_of(m_def->member_fn)\n");
 			exit(1);
 		}
 	}
 	else
 	{
-		printf("[error] Unknown type about defining dimension member.\n");
+		log_print("[error] Unknown type about defining dimension member.\n");
 		exit(1);
 	}
-	printf("[ error ] Incorrect program execution path, causing the program to exit.\n");
+	log_print("[ error ] Incorrect program execution path, causing the program to exit.\n");
 	exit(1);
 }
 
@@ -1331,7 +1332,7 @@ DimensionRole *cube__dim_role(Cube *cube, char *dim_role_name)
 		if (strcmp(dr->name, dim_role_name) == 0)
 			return dr;
 	}
-	// printf("[warn] no DimensionRole that name is [%s]\n", dim_role_name);
+	// log_print("[warn] no DimensionRole that name is [%s]\n", dim_role_name);
 	return NULL;
 }
 
@@ -1431,7 +1432,7 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 		}
 		else
 		{
-			printf("[warn] - ids_setdef__build() obj_type_of(set_def->set_fn) = %d\n", obj_type_of(set_def->set_fn));
+			log_print("[warn] - ids_setdef__build() obj_type_of(set_def->set_fn) = %d\n", obj_type_of(set_def->set_fn));
 			exit(1);
 		}
 	}
@@ -1449,7 +1450,7 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 	}
 	else
 	{
-		printf("[warn] wrong SetDef::t_cons\n");
+		log_print("[warn] wrong SetDef::t_cons\n");
 		exit(1);
 	}
 }
@@ -1490,27 +1491,27 @@ ArrayList *Cube_find_date_dim_roles(Cube *cube)
 
 void Cube_print(Cube *c)
 {
-	printf(">>> [ Cube info ] @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ addr < %p >\n", c);
-	printf("\t     name - %s\n", c->name);
-	printf("\t      gid - %lu\n", c->gid);
+	log_print(">>> [ Cube info ] @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ addr < %p >\n", c);
+	log_print("\t     name - %s\n", c->name);
+	log_print("\t      gid - %lu\n", c->gid);
 }
 
 void Tuple_print(MddTuple *tuple)
 {
-	printf("{\n");
-	printf("\"type\": \"Tuple\",\n");
-	printf("\"mr_ls\": [\n");
+	log_print("{\n");
+	log_print("\"type\": \"Tuple\",\n");
+	log_print("\"mr_ls\": [\n");
 
 	unsigned int i, len = als_size(tuple->mr_ls);
 	for (i = 0; i < len; i++)
 	{
 		MemberRole_print(als_get(tuple->mr_ls, i));
 		if (i < len - 1)
-			printf(",\n");
+			log_print(",\n");
 	}
 
-	printf("]\n");
-	printf("}\n");
+	log_print("]\n");
+	log_print("}\n");
 }
 
 int MddMemberRole_cmp(void *mr, void *oth)
@@ -1537,42 +1538,42 @@ int MddMemberRole_cmp(void *mr, void *oth)
 
 void MemberRole_print(MddMemberRole *mr)
 {
-	printf("{\n");
-	printf("\"type\": \"MemberRole\",\n");
+	log_print("{\n");
+	log_print("\"type\": \"MemberRole\",\n");
 	if (mr->member)
 	{
-		printf("\"member\": ");
+		log_print("\"member\": ");
 		Member_print(mr->member);
 	}
 	else
 	{
-		printf("\"member_formula\": ");
+		log_print("\"member_formula\": ");
 		MemberFormula_print(mr->member_formula);
 	}
-	printf(",\n");
-	printf("\"dim_role\": ");
+	log_print(",\n");
+	log_print("\"dim_role\": ");
 	if (mr->dim_role)
 	{
 		DimensionRole_print(mr->dim_role);
 	}
 	else
 	{
-		printf("\"*** measure dimension role ***\"");
+		log_print("\"*** measure dimension role ***\"");
 	}
-	printf("}\n");
+	log_print("}\n");
 }
 
 void Member_print(Member *m)
 {
-	printf("{ \"type\": \"Member\", \"name\": \"%s\" }\n", m->name);
+	log_print("{ \"type\": \"Member\", \"name\": \"%s\" }\n", m->name);
 }
 
 void DimensionRole_print(DimensionRole *dr)
 {
 	if (dr)
-		printf("{ \"DimRole\": \"%s\", \"sn\": %d }\n", dr->name, dr->sn);
+		log_print("{ \"DimRole\": \"%s\", \"sn\": %d }\n", dr->name, dr->sn);
 	else
-		printf("null\n");
+		log_print("null\n");
 }
 
 void mdd__gen_mbr_abs_path(Member *m)
@@ -1744,13 +1745,13 @@ void Factory_evaluate(MDContext *md_ctx, Factory *fac, Cube *cube, MddTuple *ctx
 		}
 		else
 		{
-			printf("[ error ] - Factory_evaluate() - Unknown expression function type.\n");
+			log_print("[ error ] - Factory_evaluate() - Unknown expression function type.\n");
 			exit(1);
 		}
 	}
 	else
 	{
-		printf("[ error ] - Factory_evaluate() <program exit>\n");
+		log_print("[ error ] - Factory_evaluate() <program exit>\n");
 		exit(1);
 	}
 }
@@ -1997,7 +1998,7 @@ MddSet *SetFnOrder_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTupl
 		tuple = tuple__merge(ctx_tuple, tuple);
 		GridData data;
 		Expression_evaluate(md_ctx, order->exp, cube, tuple, &data);
-		printf("value = % 32lf, null_flag < %d >\n", data.val, data.null_flag);
+		log_print("value = % 32lf, null_flag < %d >\n", data.val, data.null_flag);
 		als_add(val_ls, *((void **)&(data.val)));
 	}
 
@@ -2248,7 +2249,7 @@ MddSet *SetFnDescendants_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, M
 					continue;
 				break;
 			default:
-				printf("[ error ] program exit, cause by: worry value of set function Descendants option flag < %c >\n", desc->flag);
+				log_print("[ error ] program exit, cause by: worry value of set function Descendants option flag < %c >\n", desc->flag);
 				exit(1);
 			}
 			MddTuple *tuple = mdd_tp__create();
@@ -2302,7 +2303,7 @@ MddSet *SetFnDescendants_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, M
 					continue;
 				break;
 			default:
-				printf("[ error ] program exit, cause by: worry value of set function Descendants option flag < %c >\n", desc->flag);
+				log_print("[ error ] program exit, cause by: worry value of set function Descendants option flag < %c >\n", desc->flag);
 				exit(1);
 			}
 			MddTuple *tuple = mdd_tp__create();
@@ -2503,7 +2504,7 @@ MddMemberRole *MemberFnCurrentMember_evolving(MDContext *md_ctx, MemberFnCurrent
 		dimRole = NULL;
 	}
 
-	printf("[ error ] - MemberFnCurrentMember do not matching DimensionRole - < %s >\n", dimRole_name);
+	log_print("[ error ] - MemberFnCurrentMember do not matching DimensionRole - < %s >\n", dimRole_name);
 	return NULL;
 
 point:
@@ -2517,7 +2518,7 @@ point:
 			return mbrRole;
 	}
 
-	printf("[ error ] - MemberFnCurrentMember do not matching DimensionRole - < %s >\n", dimRole_name);
+	log_print("[ error ] - MemberFnCurrentMember do not matching DimensionRole - < %s >\n", dimRole_name);
 	return NULL;
 }
 
@@ -2711,15 +2712,15 @@ MultiDimResult *MultiDimResult_creat()
 
 void MultiDimResult_print(MultiDimResult *md_rs)
 {
-	printf("\n\n\n");
-	printf("### !!! MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
+	log_print("\n\n\n");
+	log_print("### !!! MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
 
 	if (md_rs == NULL) {
-		printf("##################################################################\n");
-		printf("##################################################################\n");
-		printf("##                    MultiDimResult is NULL                    ##\n");
-		printf("##################################################################\n");
-		printf("##################################################################\n");
+		log_print("##################################################################\n");
+		log_print("##################################################################\n");
+		log_print("##                    MultiDimResult is NULL                    ##\n");
+		log_print("##################################################################\n");
+		log_print("##################################################################\n");
 		goto end;
 	}
 
@@ -2727,12 +2728,12 @@ void MultiDimResult_print(MultiDimResult *md_rs)
 	for (i = 0; i < x_sz; i++)
 	{
 		MddAxis *axis = als_get(md_rs->axes, i);
-		printf("axis->posi [ %u ]\n", axis->posi);
+		log_print("axis->posi [ %u ]\n", axis->posi);
 	}
 	if (x_sz != 2)
 	{
 		for (i = 0; i < 10; i++)
-			printf("***************************************************\n");
+			log_print("***************************************************\n");
 		goto end;
 	}
 
@@ -2761,14 +2762,14 @@ void MultiDimResult_print(MultiDimResult *md_rs)
 	}
 
 	int ri, ci;
-	printf("\n");
+	log_print("\n");
 	for (ri = 0; ri < col_thickness + row_len; ri++)
 	{
 		for (ci = 0; ci < row_thickness + col_len; ci++)
 		{
 			if (ri < col_thickness && ci < row_thickness)
 			{
-				printf("% 20s", "-");
+				log_print("% 20s", "-");
 			}
 			else if (ri < col_thickness && ci >= row_thickness)
 			{
@@ -2776,15 +2777,15 @@ void MultiDimResult_print(MultiDimResult *md_rs)
 
 				if (ri < (col_thickness - als_size(c_tuple->mr_ls)))
 				{
-					printf("% 20s", "[]");
+					log_print("% 20s", "[]");
 					continue;
 				}
 
 				MddMemberRole *c_mr = als_get(c_tuple->mr_ls, ri - (col_thickness - als_size(c_tuple->mr_ls)));
 				if (c_mr->member)
-					printf("% 20s", c_mr->member->name);
+					log_print("% 20s", c_mr->member->name);
 				else
-					printf("% 20s", als_get(c_mr->member_formula->path, als_size(c_mr->member_formula->path) - 1));
+					log_print("% 20s", als_get(c_mr->member_formula->path, als_size(c_mr->member_formula->path) - 1));
 			}
 			else if (ri >= col_thickness && ci < row_thickness)
 			{
@@ -2792,31 +2793,31 @@ void MultiDimResult_print(MultiDimResult *md_rs)
 
 				if (ci < (row_thickness - als_size(r_tuple->mr_ls)))
 				{
-					printf("% 20s", "[]");
+					log_print("% 20s", "[]");
 					continue;
 				}
 
 				MddMemberRole *r_mr = als_get(r_tuple->mr_ls, ci - (row_thickness - als_size(r_tuple->mr_ls)));
 				if (r_mr->member)
-					printf("% 20s", r_mr->member->name);
+					log_print("% 20s", r_mr->member->name);
 				else
-					printf("% 20s", als_get(r_mr->member_formula->path, als_size(r_mr->member_formula->path) - 1));
+					log_print("% 20s", als_get(r_mr->member_formula->path, als_size(r_mr->member_formula->path) - 1));
 			}
 			else if (ri >= col_thickness && ci >= row_thickness)
 			{
 				if (md_rs->null_flags[(ri - col_thickness) * col_len + (ci - row_thickness)])
-					printf("% 20c", '-');
+					log_print("% 20c", '-');
 				else
-					printf("% 20.2lf", md_rs->vals[(ri - col_thickness) * col_len + (ci - row_thickness)]);
+					log_print("% 20.2lf", md_rs->vals[(ri - col_thickness) * col_len + (ci - row_thickness)]);
 			}
 		}
-		printf("\n");
+		log_print("\n");
 	}
-	printf("\n");
+	log_print("\n");
 
 end:
-	printf("### ??? MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
-	printf("\n\n\n");
+	log_print("### ??? MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
+	log_print("\n\n\n");
 	fflush(stdout);
 }
 
@@ -2825,7 +2826,7 @@ int MddAxis_cmp(void *obj, void *other)
 	// Because of the aggregation priority, the one with the large position should be ranked before.
 	int obj_posi = ((MddAxis *)obj)->posi;
 	int oth_posi = ((MddAxis *)other)->posi;
-	printf("[ debug ] - ((MddAxis *)obj)->posi - ((MddAxis *)other)->posi = %d\n", obj_posi - oth_posi);
+	log_print("[ debug ] - ((MddAxis *)obj)->posi - ((MddAxis *)other)->posi = %d\n", obj_posi - oth_posi);
 	return obj_posi - oth_posi;
 }
 
