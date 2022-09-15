@@ -1,7 +1,13 @@
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
 #include <sys/stat.h>
+
+#include "utils.h"
+
+static char *log_file = NULL;
 
 static void __log_prt__(const char *fmt, va_list ap);
 
@@ -18,9 +24,25 @@ void log_print(const char *fmt, ...) {
 	va_end(ap);
 }
 
+void log__set_log_file(char *file) {
+	if (log_file) {
+		log_print("[ error ] exit. log__set_log_file().\n");
+		exit(EXIT_FAILURE);
+	}
+
+	log_file = obj_alloc(strlen(file) + 1, OBJ_TYPE__RAW_BYTES);
+	strcpy(log_file, file);
+}
+
 static void __log_prt__(const char *fmt, va_list ap) {
 
-	FILE *log_fd = fopen("log/euclid.log", "a");
+	if (log_file == NULL) {
+		vfprintf(stdout, fmt, ap);
+		fflush(stdout);
+		return;
+	}
+
+	FILE *log_fd = fopen(log_file, "a");
 
 	vfprintf(log_fd, fmt, ap);
 	// fprintf(log_fd, "\n");

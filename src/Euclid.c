@@ -1,6 +1,7 @@
 #include <stdlib.h>
 // #include <pthread.h>
 
+#include "log.h"
 #include "cfg.h"
 #include "net.h"
 #include "command.h"
@@ -11,6 +12,8 @@
 int main(int argc, char *argv[])
 {
 	// pthread_mutex_init(&mutex_AAA, NULL);
+
+	log__set_log_file("log/euclid.log");
 
 	init_cfg(argc, argv);
 
