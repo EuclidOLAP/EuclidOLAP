@@ -45,7 +45,6 @@ static void __log_prt__(const char *fmt, va_list ap) {
 	FILE *log_fd = fopen(log_file, "a");
 
 	vfprintf(log_fd, fmt, ap);
-	// fprintf(log_fd, "\n");
 	fflush(log_fd);
 
 	fclose(log_fd);

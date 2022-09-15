@@ -13,12 +13,10 @@ int yywrap(void);
 }
 
 create	{
-	//printf("-------> token yytext[%s] yyleng[%d]\n", yytext, yyleng);
 	return CREATE;
 }
 
 dimensions {
-	//printf("-------> token yytext[%s] yyleng[%d]\n", yytext, yyleng);
 	return DIMENSIONS;
 }
 
@@ -27,27 +25,22 @@ levels {
 }
 
 members {
-	//printf("-------> token yytext[%s] yyleng[%d]\n", yytext, yyleng);
 	return MEMBERS;
 }
 
 build	{
-	//printf("-------> token yytext[%s] yyleng[%d]\n", yytext, yyleng);
 	return BUILD;
 }
 
 cube	{
-	//printf("-------> token yytext[%s] yyleng[%d]\n", yytext, yyleng);
 	return CUBE;
 }
 
 measures	{
-	//printf("-------> token yytext[%s] yyleng[%d]\n", yytext, yyleng);
 	return MEASURES;
 }
 
 insert	{
-	//printf("-------> token yytext[%s] yyleng[%d]\n", yytext, yyleng);
 	return INSERT;
 }
 
@@ -244,7 +237,6 @@ coalesceEmpty {
 }
 
 [_a-zA-Z][_a-zA-Z0-9]*	{
-	//printf("-------> token yytext[%s] yyleng[%d]\n", yytext, yyleng);
 	return VAR;
 }
 
@@ -259,12 +251,10 @@ coalesceEmpty {
 }
 
 ","	{
-	//printf("-------> token yytext[%s] yyleng[%d]\n", yytext, yyleng);
 	return COMMA;
 }
 
 "." {
-	//printf("-------> token yytext[%s] yyleng[%d]\n", yytext, yyleng);
 	return DOT;
 }
 
@@ -331,7 +321,6 @@ coalesceEmpty {
 \x5B[^\x5B\x5D]+\x5D	{
 	// ASCII 0x5B is [
 	// ASCII 0x5D is ]
-	//printf("-------> token yytext[%s] yyleng[%d]\n", yytext, yyleng);
 	return BLOCK;
 }
 
@@ -340,8 +329,8 @@ coalesceEmpty {
 	return STRING;
 }
 
-.	{ 
-	//printf("<Characters that do not meet the rules> yytext[%s] yyleng[%d]\n", yytext, yyleng);
+.	{
+	// do nothing
 }
 
 %%
