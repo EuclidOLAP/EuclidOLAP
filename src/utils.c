@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
@@ -14,7 +15,12 @@ extern RedBlackTree *_thread_mam_pool;
 
 void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 
-	size_t required = (mam_mark ? sizeof(MemAllocMng *) : 0) + sizeof(short) + size;
+	assert(BYTES_ALIGNMENT >= sizeof(short));
+
+	size_t required = (mam_mark ? sizeof(MemAllocMng *) : 0) + BYTES_ALIGNMENT + size;
+	if (required % BYTES_ALIGNMENT != 0)
+		required = (required / BYTES_ALIGNMENT + 1) * BYTES_ALIGNMENT;
+
 	mam = mam ? mam : MemAllocMng_current_thread_mam();
 	void *obj_ins;
 
@@ -26,12 +32,15 @@ void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 		char *obj_hide_head = mam->big_block + sizeof(char *);
 		if (mam_mark) {
 			*((MemAllocMng **)obj_hide_head) = mam;
-			*((short *)(obj_hide_head + sizeof(MemAllocMng *))) = (0xC000) | type;
-			obj_ins = obj_hide_head + sizeof(MemAllocMng *) + sizeof(short);
+			*((short *)(obj_hide_head + sizeof(MemAllocMng *) + BYTES_ALIGNMENT - sizeof(short))) = (0xC000) | type;
+			obj_ins = obj_hide_head + sizeof(MemAllocMng *) + BYTES_ALIGNMENT;
 		} else {
-			*((short *)obj_hide_head) = (0x8000) | type;
-			obj_ins = obj_hide_head + sizeof(short);
+			*((short *)(obj_hide_head + BYTES_ALIGNMENT - sizeof(short))) = (0x8000) | type;
+			obj_ins = obj_hide_head + BYTES_ALIGNMENT;
 		}
+
+		assert((((unsigned long)obj_ins) & BYTES_ALIG_CHK_MASK) == 0);
+		assert(((unsigned long)obj_ins) % BYTES_ALIGNMENT == 0);
 		return obj_ins;
 	}
 
@@ -52,18 +61,20 @@ void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 		 * The memory allocation manager information and object type need to be recorded in the header hidden data.
 		 */
 		*((MemAllocMng **)(blk + index)) = mam;
-		*((short *)(blk + index + sizeof(MemAllocMng *))) = (0xC000) | type;
-		obj_ins = blk + index + sizeof(MemAllocMng *) + sizeof(short);
+		*((short *)(blk + index + sizeof(MemAllocMng *) + BYTES_ALIGNMENT - sizeof(short))) = (0xC000) | type;
+		obj_ins = blk + index + sizeof(MemAllocMng *) + BYTES_ALIGNMENT;
 	} else {
 		/**
 		 * The object type needs to be recorded in the header hidden data.
 		 */
-		*((short *)(blk + index)) = (0x8000) | type;
-		obj_ins = blk + index + sizeof(short);
+		*((short *)(blk + index + BYTES_ALIGNMENT - sizeof(short))) = (0x8000) | type;
+		obj_ins = blk + index + BYTES_ALIGNMENT;
 	}
 
 	*((unsigned long *)(blk + sizeof(char *))) = index + required;
 
+	assert((((unsigned long)obj_ins) & BYTES_ALIG_CHK_MASK) == 0);
+	assert(((unsigned long)obj_ins) % BYTES_ALIGNMENT == 0);
 	return obj_ins;
 }
 
@@ -125,10 +136,17 @@ MemAllocMng *MemAllocMng_new() {
 // TODO about to be deprecated, replaced by obj_info
 short obj_type_of(void *obj)
 {
+	assert((((unsigned long)obj) & BYTES_ALIG_CHK_MASK) == 0);
+	assert(((unsigned long)obj) % BYTES_ALIGNMENT == 0);
+
 	return (*(((short *)obj) - 1)) & 0x3FFF;
 }
 
 void obj_info(void *obj, short *type, enum obj_mem_alloc_strategy *strat, MemAllocMng **mp) {
+
+	assert((((unsigned long)obj) & BYTES_ALIG_CHK_MASK) == 0);
+	assert(((unsigned long)obj) % BYTES_ALIGNMENT == 0);
+
 	*type = (*(((short *)obj) - 1)) & 0x3FFF;
 	*mp = NULL;
 	switch ((*(((short *)obj) - 1)) & 0xC000)
@@ -137,7 +155,7 @@ void obj_info(void *obj, short *type, enum obj_mem_alloc_strategy *strat, MemAll
 			*strat = DIRECT;
 			break;
 		case 0xC000:
-			*mp = *((MemAllocMng **)(obj - sizeof(short) - sizeof(MemAllocMng *)));
+			*mp = *((MemAllocMng **)(obj - BYTES_ALIGNMENT - sizeof(MemAllocMng *)));
 		case 0x8000:
 			*strat = USED_MAM;
 			break;
@@ -156,20 +174,25 @@ MemAllocMng *obj_mam(void *obj) {
 }
 
 void *obj_alloc(size_t size, short type) {
-	size += sizeof(short);
-	short *obj_head = malloc(size);
+	size += BYTES_ALIGNMENT;
+	char *obj_head = malloc(size);
 	memset(obj_head, 0, size);
-	*obj_head = type;
-	return obj_head + 1;
+	// *obj_head = type;
+	*(short *)(obj_head + BYTES_ALIGNMENT - sizeof(short)) = type;
+	assert((((unsigned long)(obj_head + BYTES_ALIGNMENT)) & BYTES_ALIG_CHK_MASK) == 0);
+	assert(((unsigned long)(obj_head + BYTES_ALIGNMENT)) % BYTES_ALIGNMENT == 0);
+	return obj_head + BYTES_ALIGNMENT;
 }
 
 void obj_release(void *obj) {
+	assert((((unsigned long)obj) & BYTES_ALIG_CHK_MASK) == 0);
+	assert(((unsigned long)obj) % BYTES_ALIGNMENT == 0);
 
 	if ( *(((short *)obj)-1) < 0 ) {
 		log_print("[ error ] - Program exit! Cause by: this memory cannot be freed here.\n");
 		exit(1);
 	}
-	free(((short *)obj) - 1);
+	free(((char *)obj) - BYTES_ALIGNMENT);
 }
 
 ssize_t read_sock_pkg(int sock_fd, void **buf, size_t *buf_len)
