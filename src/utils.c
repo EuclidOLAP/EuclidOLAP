@@ -286,7 +286,8 @@ int sock_conn_to(int *sock_fd, char *ip, int port)
 	if (connect(*sock_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == 0)
 		return 0;
 
-	log_print("[utils] error. connect %s:%d\n", ip, port);
+	log_print("Failed to connect [ %s:%d ]\n", ip, port);
+
 	return -1;
 }
 

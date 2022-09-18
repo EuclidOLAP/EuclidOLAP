@@ -7,6 +7,7 @@
 
 #define MASTER_MODE 'm'
 #define WORKER_MODE 'w'
+#define CLIENT_MODE 'c'
 
 #define DEF_CONF "euclid.conf"
 #define DEF_CLI_CONF "euclid-cli.conf"

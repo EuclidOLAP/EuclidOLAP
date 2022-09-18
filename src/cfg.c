@@ -43,7 +43,18 @@ int init_cfg(int argc, char *argv[])
  	if (access("data", F_OK) != 0)
 		mkdir("data", S_IRWXU);
 
-	log_print("info - node mode [ %c ]\n", cfg.mode);
+	switch (cfg.mode)
+	{
+		case MASTER_MODE:
+		case WORKER_MODE:
+			log_print("info - node mode [ %c ]\n", cfg.mode);
+			break;
+		case CLIENT_MODE:
+			break;
+		default:
+			log_print("[ error ] Program exits. Caused by the wrong program startup mode.\n");
+			exit(EXIT_FAILURE);
+	}
 
 	return 0;
 }
@@ -72,6 +83,10 @@ int set_param(char *p_key, char *p_val)
 		else if (strcmp(p_val, "worker") == 0)
 		{
 			cfg.mode = WORKER_MODE;
+		}
+		else if (strcmp(p_val, "client") == 0)
+		{
+			cfg.mode = CLIENT_MODE;
 		}
 		else
 		{
@@ -137,6 +152,8 @@ static int load_conf_files()
 			break;
 	}
 
+	// TODO at once bug!
+	// The correct logic is to judge whether the server or client configuration file should be loaded according to the startup mode.
 	strcat(conf_path, DEF_CLI_CONF);
 
 	FILE *cli_conf_fp = fopen(conf_path, "r");
@@ -146,6 +163,12 @@ static int load_conf_files()
 
 	while (fgets(buf_arr, buf_len, cli_conf_fp) != NULL)
 	{
+		char *last_char = buf_arr + strlen(buf_arr) - 1;
+		while (*last_char == '\n') {
+			*last_char = 0;
+			--last_char;
+		}
+
 		fetch_param(buf_arr);
 		memset(buf_arr, 0, buf_len);
 	}

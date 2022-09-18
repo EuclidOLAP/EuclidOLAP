@@ -15,8 +15,10 @@
 
 int main(int argc, char *argv[])
 {
-	if (argc < 2)
-		return 1;
+	if (argc < 2) {
+		printf("Please enter the execution statement.\n");
+		return EXIT_SUCCESS;
+	}
 
 	int i, statement_len = 0;
 	for (i = 1; i < argc; i++)
@@ -33,16 +35,24 @@ int main(int argc, char *argv[])
 
 	// parse_mdx(statement);
 
+	char *args[2];
+	args[0] = argv[0];
+	args[1] = obj_alloc(16, OBJ_TYPE__RAW_BYTES);
+	strcpy(args[1], "--p:mode=client");
+
 	// init_cfg(argc, argv);
-	init_cfg(0, argv);
+	init_cfg(2, args);
 	/* TODO bug
 	 * If there is an '=' in the MDX script, it will cause a parameter parsing bug,
 	 * so currently no command line parameter parsing is performed.
 	 */
 
-	init_command_module();
-
 	EuclidConfig *cfg = get_cfg();
+
+	// The client tool does not need to start the task processing thread.
+	cfg->ec_threads_count = 0;
+
+	init_command_module();
 
 	int sock_fd;
 	sock_conn_to(&sock_fd, cfg->cli_ctrl_node_host, cfg->cli_ctrl_node_port);
