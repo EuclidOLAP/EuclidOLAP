@@ -56,6 +56,15 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
  */
 #define INTENT__INSERT_CUBE_MEARSURE_VALS 4
 
+/**
+ * (*) <-> (*)
+ * 
+ * 4 bytes - data package capacity
+ * 2 bytes - intention
+ * N bytes - A descriptive paragraph, include valid text and a trailing 0 character.
+ */
+#define INTENT__SUCCESSFUL 5
+
 #define INTENT__UNKNOWN 65535
 
 int init_command_module();

@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
@@ -17,6 +18,7 @@ extern Stack YC_STC;
 static EuclidCommand *CCI_ALLOW;
 static EuclidCommand *CCI_CHILD_NODE_JOIN;
 static EuclidCommand *CCI_TERML_CTRL;
+static EuclidCommand *CCI_GENERIC_SUCCESS;
 
 static LinkedQueue *_ec_pool;
 static pthread_mutex_t _ec_p_mtx;
@@ -38,6 +40,7 @@ extern void *parse_mdx(char *mdx);
 int init_command_module()
 {
 	// init CCI_ALLOW
+	// TODO at once - change type 'void *' to 'char *'
 	void *addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
 	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT;
 	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__ALLOW;
@@ -54,6 +57,13 @@ int init_command_module()
 	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT;
 	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__TERMINAL_CONTROL;
 	CCI_TERML_CTRL = create_command(addr);
+
+	// init CCI_GENERIC_SUCCESS
+	addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT + strlen("successful") + 1, OBJ_TYPE__RAW_BYTES);
+	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT + strlen("successful") + 1;
+	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__SUCCESSFUL;
+	strcpy(addr + SZOF_USG_INT + SZOF_USG_SHORT, "successful");
+	CCI_GENERIC_SUCCESS = create_command(addr);
 
 	// init EuclidCommand pool and mutex and cond
 	// init_LinkedList(&_ec_pool);
@@ -78,10 +88,10 @@ EuclidCommand *create_command(char *bytes)
 
 intent ec_get_intent(EuclidCommand *ec)
 {
-	if (ec == NULL || ec->bytes == NULL)
-		return INTENT__UNKNOWN;
+	assert(ec != NULL);
+	assert(ec->bytes != NULL);
 
-	return *((intent *)((ec->bytes) + sizeof(int)));
+	return *(intent *)(ec->bytes + sizeof(int));
 }
 
 // int ec_release(EuclidCommand *ec)
@@ -101,6 +111,9 @@ EuclidCommand *get_const_command_intent(intent inte)
 
 	if (inte == INTENT__TERMINAL_CONTROL)
 		return CCI_TERML_CTRL;
+
+	if (inte == INTENT__SUCCESSFUL)
+		return CCI_GENERIC_SUCCESS;
 
 	return NULL;
 }

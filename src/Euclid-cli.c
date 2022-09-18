@@ -80,8 +80,15 @@ int main(int argc, char *argv[])
 	if (access(statement, F_OK) != 0) {
 		EuclidCommand *mdx_ec = build_intent_command_mdx(statement);
 		send(sock_fd, mdx_ec->bytes, ec_get_capacity(mdx_ec), 0);
+
 		read_sock_pkg(sock_fd, &buf, &buf_len);
-		printf(">>>>>>>> client send task finished.\n");
+		EuclidCommand *result = create_command(buf);
+		if (ec_get_intent(result) == INTENT__SUCCESSFUL) {
+			printf("\n%s\n", result->bytes + SZOF_USG_INT + SZOF_USG_SHORT);
+		} else {
+			printf("\nfailure\n");
+		}
+
 		goto _exit_;
 	}
 
@@ -98,15 +105,42 @@ int main(int argc, char *argv[])
 	obj_release(content);
 
 	for (int i=0; i<scripts->length; i++) {
-		EuclidCommand *mdx_ec = build_intent_command_mdx(str_arr_get(scripts, i));
+
+		char *exe_stat = str_arr_get(scripts, i);
+		char *last_char = exe_stat + strlen(exe_stat) - 1;
+
+		while (*exe_stat == '\n')
+			exe_stat++;
+
+		while (*last_char == '\n') {
+			*last_char = 0;
+			--last_char;
+		}
+
+		EuclidCommand *mdx_ec = build_intent_command_mdx(exe_stat);
+
+		printf("-----------------------------------------------------------------------------------------------------------\n");
+		if (strlen(exe_stat) < 200) {
+			printf("%s\n", exe_stat);
+		} else {
+			exe_stat[199] = 0;
+			printf("%s ...\n", exe_stat);
+		}
+
 		send(sock_fd, mdx_ec->bytes, ec_get_capacity(mdx_ec), 0);
+
 		read_sock_pkg(sock_fd, &buf, &buf_len);
+		EuclidCommand *result = create_command(buf);
+		if (ec_get_intent(result) == INTENT__SUCCESSFUL) {
+			printf("\n%s\n", result->bytes + SZOF_USG_INT + SZOF_USG_SHORT);
+		} else {
+			printf("\nfailure\n");
+		}
 
 		obj_release(mdx_ec->bytes);
 		obj_release(mdx_ec);
-		obj_release(buf);
-
-		printf(">>>>>>>> client send task finished.\n");
+		obj_release(result->bytes);
+		obj_release(result);
 	}
 
 _exit_:
