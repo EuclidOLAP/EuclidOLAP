@@ -66,8 +66,38 @@ int main(int argc, char *argv[])
 		goto _exit_;
 	}
 
-	EuclidCommand *mdx_ec = build_intent_command_mdx(statement);
-	send(sock_fd, mdx_ec->bytes, ec_get_capacity(mdx_ec), 0);
+	// statement is not a file
+	if (access(statement, F_OK) != 0) {
+		EuclidCommand *mdx_ec = build_intent_command_mdx(statement);
+		send(sock_fd, mdx_ec->bytes, ec_get_capacity(mdx_ec), 0);
+		read_sock_pkg(sock_fd, &buf, &buf_len);
+		printf(">>>>>>>> client send task finished.\n");
+		goto _exit_;
+	}
+
+	// statement is a file name
+	FILE *fd = fopen(statement, "r");
+	fseek(fd,0,SEEK_END);
+	long fsize = ftell(fd);
+	rewind(fd);
+	char *content = obj_alloc(fsize + 1, OBJ_TYPE__RAW_BYTES);
+	fread(content,fsize,1,fd);
+	fclose(fd);
+
+	StrArr *scripts = str_split(content, "---");
+	obj_release(content);
+
+	for (int i=0; i<scripts->length; i++) {
+		EuclidCommand *mdx_ec = build_intent_command_mdx(str_arr_get(scripts, i));
+		send(sock_fd, mdx_ec->bytes, ec_get_capacity(mdx_ec), 0);
+		read_sock_pkg(sock_fd, &buf, &buf_len);
+
+		obj_release(mdx_ec->bytes);
+		obj_release(mdx_ec);
+		obj_release(buf);
+
+		printf(">>>>>>>> client send task finished.\n");
+	}
 
 _exit_:
 	close(sock_fd);

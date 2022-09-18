@@ -1,11 +1,15 @@
 #ifndef EUCLID__COMMAND_H
 #define EUCLID__COMMAND_H 1
 
+#include <semaphore.h>
+
 typedef unsigned short intent;
 
 typedef struct euclid_command
 {
 	char *bytes;
+	char *result;
+	sem_t sem;
 } EuclidCommand;
 
 /**

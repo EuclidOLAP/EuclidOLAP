@@ -158,22 +158,27 @@ static void *do_process_command(void *addr)
 
 		execute_command(ec);
 
-		obj_release(ec->bytes);
-		obj_release(ec);
+		sem_post(&(ec->sem));
+
+		// obj_release(ec->bytes);
+		// obj_release(ec);
 
 		MemAllocMng *mam = MemAllocMng_current_thread_mam();
 		if (mam) {
 			mam_reset(mam);
 		}
 
-		ec = NULL;
+		// ec = NULL;
 	}
 
 	return NULL;
 }
 
+static int __execute_command__count = 1;
+
 static int execute_command(EuclidCommand *ec)
 {
+	log_print("@@@@@@@@@@@@@@@@@@ execute command count = %d\n", __execute_command__count++);
 	intent inte = ec_get_intent(ec);
 	if (inte == INTENT__INSERT_CUBE_MEARSURE_VALS)
 	{
@@ -263,6 +268,9 @@ static int execute_command(EuclidCommand *ec)
 			log_print("[ error ] program exit(1), cause by: unknow ids_type < %p >\n", ids_type);
 			exit(1);
 		}
+	} else {
+		log_print("[ error ] program exit(1), unknown inte.\n");
+		exit(EXIT_FAILURE);
 	}
 	return 0;
 }
