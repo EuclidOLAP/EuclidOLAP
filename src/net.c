@@ -4,6 +4,7 @@
 #include <pthread.h> // for pthread_create
 #include <string.h> // for memset
 #include <unistd.h> // for close
+#include <semaphore.h>
 
 #include "log.h"
 #include "net.h"
@@ -188,8 +189,28 @@ static void receive_command_loop(SockIntentThread *sit)
 		log_print("INFO - receive_command_loop() ... read_sock_pkg, pkg_size = %ld\n", pkg_size);
 		if (pkg_size >= min_pkg_size)
 		{
-			// command module process command intention.
-			submit_command(create_command(buf));
+			EuclidCommand *task = create_command(buf);
+			sem_init(&(task->sem), 0, 0);
+
+			/**
+			 * Command module process command intention.
+			 * Submit the task object to another thread for processing, that thread will increment 
+			 * the value of the semaphore by 1 after execution is complete.
+			 */
+			submit_command(task);
+
+			sem_wait(&(task->sem));
+			sem_destroy(&(task->sem));
+
+			sit_send_command(sit, task->result ? task->result : get_const_command_intent(INTENT__SUCCESSFUL));
+
+			if (task->result) {
+				obj_release(task->result->bytes);
+				obj_release(task->result);
+			}
+			obj_release(task->bytes);
+			obj_release(task);
+
 			continue;
 		}
 		if (buf)

@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
@@ -17,6 +18,7 @@ extern Stack YC_STC;
 static EuclidCommand *CCI_ALLOW;
 static EuclidCommand *CCI_CHILD_NODE_JOIN;
 static EuclidCommand *CCI_TERML_CTRL;
+static EuclidCommand *CCI_GENERIC_SUCCESS;
 
 static LinkedQueue *_ec_pool;
 static pthread_mutex_t _ec_p_mtx;
@@ -38,7 +40,7 @@ extern void *parse_mdx(char *mdx);
 int init_command_module()
 {
 	// init CCI_ALLOW
-	void *addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
+	char *addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
 	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT;
 	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__ALLOW;
 	CCI_ALLOW = create_command(addr);
@@ -54,6 +56,13 @@ int init_command_module()
 	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT;
 	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__TERMINAL_CONTROL;
 	CCI_TERML_CTRL = create_command(addr);
+
+	// init CCI_GENERIC_SUCCESS
+	addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT + strlen("successful") + 1, OBJ_TYPE__RAW_BYTES);
+	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT + strlen("successful") + 1;
+	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__SUCCESSFUL;
+	strcpy(addr + SZOF_USG_INT + SZOF_USG_SHORT, "successful");
+	CCI_GENERIC_SUCCESS = create_command(addr);
 
 	// init EuclidCommand pool and mutex and cond
 	// init_LinkedList(&_ec_pool);
@@ -78,10 +87,10 @@ EuclidCommand *create_command(char *bytes)
 
 intent ec_get_intent(EuclidCommand *ec)
 {
-	if (ec == NULL || ec->bytes == NULL)
-		return INTENT__UNKNOWN;
+	assert(ec != NULL);
+	assert(ec->bytes != NULL);
 
-	return *((intent *)((ec->bytes) + sizeof(int)));
+	return *(intent *)(ec->bytes + sizeof(int));
 }
 
 // int ec_release(EuclidCommand *ec)
@@ -101,6 +110,9 @@ EuclidCommand *get_const_command_intent(intent inte)
 
 	if (inte == INTENT__TERMINAL_CONTROL)
 		return CCI_TERML_CTRL;
+
+	if (inte == INTENT__SUCCESSFUL)
+		return CCI_GENERIC_SUCCESS;
 
 	return NULL;
 }
@@ -156,24 +168,32 @@ static void *do_process_command(void *addr)
 		// }
 		pthread_mutex_unlock(&_ec_p_mtx);
 
-		execute_command(ec);
+		if (execute_command(ec) != 0) {
+			// task execution failed
+			ec->result = EuclidCommand_failure("Unrecognized statement.");
+		}
 
-		obj_release(ec->bytes);
-		obj_release(ec);
+		sem_post(&(ec->sem));
+
+		// obj_release(ec->bytes);
+		// obj_release(ec);
 
 		MemAllocMng *mam = MemAllocMng_current_thread_mam();
 		if (mam) {
 			mam_reset(mam);
 		}
 
-		ec = NULL;
+		// ec = NULL;
 	}
 
 	return NULL;
 }
 
+static int __execute_command__count = 1;
+
 static int execute_command(EuclidCommand *ec)
 {
+	log_print("@@@@@@@@@@@@@@@@@@ execute command count = %d\n", __execute_command__count++);
 	intent inte = ec_get_intent(ec);
 	if (inte == INTENT__INSERT_CUBE_MEARSURE_VALS)
 	{
@@ -181,9 +201,24 @@ static int execute_command(EuclidCommand *ec)
 	}
 	else if (inte == INTENT__MDX)
 	{
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		// Set the MDX parsing completion flag to 0.
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFE;
+
 		parse_mdx((ec->bytes) + 10);
+
+		if ((cur_thrd_mam->bin_flags & 0x0001) == 0) {
+			// The MDX expression was not parsed.
+			return -1;
+		}
+
 		void *ids_type;
-		stack_pop(&YC_STC, &ids_type);
+
+		if (stack_pop(&YC_STC, &ids_type) != 0) {
+			log_print("[ error ] Program exit. Impossible program execution location.\n");	
+			exit(EXIT_FAILURE);
+		}
+
 		if (ids_type == IDS_STRLS_CRTDIMS)
 		{
 			ArrayList *dim_names_ls;
@@ -263,6 +298,9 @@ static int execute_command(EuclidCommand *ec)
 			log_print("[ error ] program exit(1), cause by: unknow ids_type < %p >\n", ids_type);
 			exit(1);
 		}
+	} else {
+		log_print("[ error ] program exit(1), unknown inte.\n");
+		exit(EXIT_FAILURE);
 	}
 	return 0;
 }
@@ -284,4 +322,16 @@ EuclidCommand *build_intent_command_mdx(char *mdx)
 	ec->bytes = addr;
 
 	return ec;
+}
+
+EuclidCommand *EuclidCommand_failure(char *desc) {
+	assert(desc != NULL);
+	assert(strlen(desc) > 0);
+
+	int len = SZOF_INT + SZOF_SHORT + strlen(desc) + 1;
+	char *payload = obj_alloc(len, OBJ_TYPE__RAW_BYTES);
+	*(int *)payload = len;
+	*(intent *)(payload + SZOF_INT) = INTENT__FAILURE;
+	strcpy(payload + SZOF_INT + SZOF_SHORT, desc);
+	return create_command(payload);
 }

@@ -4621,5 +4621,3 @@ echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Data imported into cube
 " (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2019].[Q3].[M7], [completion date].[ALL].[2020].[Q2].[M4] measures quantity 333.333 income 222.222 cost 111.111 ) "
 
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Data imported into cube [logistics.test] is complete."
-
-sleep 1

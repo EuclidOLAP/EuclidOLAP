@@ -1,0 +1,102 @@
+create dimensions [Calendar] [Goods] [Store Type] [Payment Method] [Region] [Transport];
+
+---
+
+create levels [Calendar] (2:year, 3:quarter, 4:month), [Region] (2:[continent], 3:[country]);
+
+---
+
+create members
+[Calendar].[ALL].[2019].[Q1].[M1],
+[Calendar].[ALL].[2019].[Q1].[M2],
+[Calendar].[ALL].[2019].[Q1].[M3],
+[Calendar].[ALL].[2019].[Q2].[M4],
+[Calendar].[ALL].[2019].[Q2].[M5],
+[Calendar].[ALL].[2019].[Q2].[M6],
+[Calendar].[ALL].[2019].[Q3].[M7],
+[Calendar].[ALL].[2019].[Q3].[M8],
+[Calendar].[ALL].[2019].[Q3].[M9],
+[Calendar].[ALL].[2019].[Q4].[M10],
+[Calendar].[ALL].[2019].[Q4].[M11],
+[Calendar].[ALL].[2019].[Q4].[M12],
+[Calendar].[ALL].[2020].[Q1].[M1],
+[Calendar].[ALL].[2020].[Q1].[M2],
+[Calendar].[ALL].[2020].[Q1].[M3],
+[Calendar].[ALL].[2020].[Q2].[M4],
+[Calendar].[ALL].[2020].[Q2].[M5],
+[Calendar].[ALL].[2020].[Q2].[M6],
+[Calendar].[ALL].[2020].[Q3].[M7],
+[Calendar].[ALL].[2020].[Q3].[M8],
+[Calendar].[ALL].[2020].[Q3].[M9],
+[Calendar].[ALL].[2020].[Q4].[M10],
+[Calendar].[ALL].[2020].[Q4].[M11],
+[Calendar].[ALL].[2020].[Q4].[M12],
+[Calendar].[ALL].[2021].[Q1].[M1],
+[Calendar].[ALL].[2021].[Q1].[M2],
+[Calendar].[ALL].[2021].[Q1].[M3],
+[Calendar].[ALL].[2021].[Q2].[M4],
+[Calendar].[ALL].[2021].[Q2].[M5],
+[Calendar].[ALL].[2021].[Q2].[M6],
+[Calendar].[ALL].[2021].[Q3].[M7],
+[Calendar].[ALL].[2021].[Q3].[M8],
+[Calendar].[ALL].[2021].[Q3].[M9],
+[Calendar].[ALL].[2021].[Q4].[M10],
+[Calendar].[ALL].[2021].[Q4].[M11],
+[Calendar].[ALL].[2021].[Q4].[M12],
+[Goods].[ALL].[Kitchen & Dining].[Bento Boxes],
+[Goods].[ALL].[Kitchen & Dining].[Food Savers],
+[Goods].[ALL].[Kitchen & Dining].[Water Bottles],
+[Goods].[ALL].[Kitchen & Dining].[Rice Cookers],
+[Goods].[ALL].[Home Electronics].[LCD HDTVs],
+[Goods].[ALL].[Home Electronics].[LED HDTVs],
+[Goods].[ALL].[Home Electronics].[TV Boxes],
+[Goods].[ALL].[Home Electronics].[Video Games],
+[Goods].[ALL].[Cell Phones & Accessories].[iPhone],
+[Goods].[ALL].[Cell Phones & Accessories].[Android Phones],
+[Goods].[ALL].[Cell Phones & Accessories].[Headphones & Earphones],
+[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],
+[Goods].[ALL].[Computers & Cameras].[Tablet PCs],
+[Goods].[ALL].[Computers & Cameras].[Software],
+[Goods].[ALL].[Computers & Cameras].[Desktops],
+[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],
+[Goods].[ALL].[foods].[nut],
+[Goods].[ALL].[foods].[wine],
+[Goods].[ALL].[foods].[beef],
+[Goods].[ALL].[electronic product].[mobile phone],
+[Goods].[ALL].[electronic product].[computer],
+[Goods].[ALL].[electronic product].[smart watch],
+[Goods].[ALL].[household appliances].[washing machine],
+[Goods].[ALL].[household appliances].[refrigerator],
+[Goods].[ALL].[household appliances].[television],
+[Store Type].[ALL].[Platform Self-operated Store],
+[Store Type].[ALL].[Brand Flagship Store],
+[Store Type].[ALL].[Other],
+[Payment Method].[ALL].[Credit Card],
+[Payment Method].[ALL].[Debit Card],
+[Payment Method].[ALL].[Account Balance],
+[Payment Method].[ALL].Other,
+[Region].[ALL].[Asia].[China],
+[Region].[ALL].[Asia].[Japan],
+[Region].[ALL].[Asia].[South Korea],
+[Region].[ALL].[America].[U.S],
+[Region].[ALL].[America].[Mexico],
+[Region].[ALL].[America].[Chile],
+[Region].[ALL].[Europe].[Greece],
+[Region].[ALL].[Europe].[Italy],
+[Region].[ALL].[Europe].[UK],
+[Transport].[ALL].[railway],
+[Transport].[ALL].[highway],
+[Transport].[ALL].[aviation],
+[Transport].[ALL].[ocean freight];
+
+---
+
+build cube [Online Store]
+dimensions [Store Type] [Store Type] [Payment Method] [Payment Method] [Goods] [Goods] [Calendar] [Calendar]
+measures [sales amount] [sales quantity] [cash back];
+
+---
+
+build cube [logistics.test]
+dimensions Goods Goods Transport Transport Region [starting region] Region [ending region] Calendar [starting date] Calendar [completion date]
+measures cost income quantity;

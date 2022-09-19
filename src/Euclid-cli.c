@@ -15,8 +15,12 @@
 
 int main(int argc, char *argv[])
 {
-	if (argc < 2)
-		return 1;
+	set_program_mode(CLIENT_MODE);
+
+	if (argc < 2) {
+		printf("Please enter the execution statement.\n");
+		return EXIT_SUCCESS;
+	}
 
 	int i, statement_len = 0;
 	for (i = 1; i < argc; i++)
@@ -33,16 +37,24 @@ int main(int argc, char *argv[])
 
 	// parse_mdx(statement);
 
+	char *args[2];
+	args[0] = argv[0];
+	args[1] = obj_alloc(16, OBJ_TYPE__RAW_BYTES);
+	strcpy(args[1], "--p:mode=client");
+
 	// init_cfg(argc, argv);
-	init_cfg(0, argv);
+	init_cfg(2, args);
 	/* TODO bug
 	 * If there is an '=' in the MDX script, it will cause a parameter parsing bug,
 	 * so currently no command line parameter parsing is performed.
 	 */
 
-	init_command_module();
-
 	EuclidConfig *cfg = get_cfg();
+
+	// The client tool does not need to start the task processing thread.
+	cfg->ec_threads_count = 0;
+
+	init_command_module();
 
 	int sock_fd;
 	sock_conn_to(&sock_fd, cfg->cli_ctrl_node_host, cfg->cli_ctrl_node_port);
@@ -66,8 +78,82 @@ int main(int argc, char *argv[])
 		goto _exit_;
 	}
 
-	EuclidCommand *mdx_ec = build_intent_command_mdx(statement);
-	send(sock_fd, mdx_ec->bytes, ec_get_capacity(mdx_ec), 0);
+	// statement is not a file
+	if (access(statement, F_OK) != 0) {
+		EuclidCommand *mdx_ec = build_intent_command_mdx(statement);
+		send(sock_fd, mdx_ec->bytes, ec_get_capacity(mdx_ec), 0);
+
+		read_sock_pkg(sock_fd, &buf, &buf_len);
+		EuclidCommand *result = create_command(buf);
+
+		switch (ec_get_intent(result))
+		{
+			case INTENT__SUCCESSFUL:
+			case INTENT__FAILURE:
+				printf("\n%s\n", result->bytes + SZOF_USG_INT + SZOF_USG_SHORT);
+				break;
+			default:
+				printf("\nUnknown Information!\n");
+		}
+
+		goto _exit_;
+	}
+
+	// statement is a file name
+	FILE *fd = fopen(statement, "r");
+	fseek(fd,0,SEEK_END);
+	long fsize = ftell(fd);
+	rewind(fd);
+	char *content = obj_alloc(fsize + 1, OBJ_TYPE__RAW_BYTES);
+	fread(content,fsize,1,fd);
+	fclose(fd);
+
+	StrArr *scripts = str_split(content, "---");
+	obj_release(content);
+
+	for (int i=0; i<scripts->length; i++) {
+
+		char *exe_stat = str_arr_get(scripts, i);
+		char *last_char = exe_stat + strlen(exe_stat) - 1;
+
+		while (*exe_stat == '\n')
+			exe_stat++;
+
+		while (*last_char == '\n') {
+			*last_char = 0;
+			--last_char;
+		}
+
+		EuclidCommand *mdx_ec = build_intent_command_mdx(exe_stat);
+
+		printf("-----------------------------------------------------------------------------------------------------------\n");
+		if (strlen(exe_stat) < 200) {
+			printf("%s\n", exe_stat);
+		} else {
+			exe_stat[199] = 0;
+			printf("%s ...\n", exe_stat);
+		}
+
+		send(sock_fd, mdx_ec->bytes, ec_get_capacity(mdx_ec), 0);
+
+		read_sock_pkg(sock_fd, &buf, &buf_len);
+		EuclidCommand *result = create_command(buf);
+
+		switch (ec_get_intent(result))
+		{
+			case INTENT__SUCCESSFUL:
+			case INTENT__FAILURE:
+				printf("\n%s\n", result->bytes + SZOF_USG_INT + SZOF_USG_SHORT);
+				break;
+			default:
+				printf("\nUnknown Information!\n");
+		}
+
+		obj_release(mdx_ec->bytes);
+		obj_release(mdx_ec);
+		obj_release(result->bytes);
+		obj_release(result);
+	}
 
 _exit_:
 	close(sock_fd);

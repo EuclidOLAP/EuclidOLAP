@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +9,8 @@
 #include "cfg.h"
 #include "utils.h"
 
+static char __program_mode__ = 0;
+
 static EuclidConfig cfg;
 
 static int fetch_param(char *param);
@@ -16,12 +19,17 @@ static int set_param(char *p_key, char *p_val);
 
 static int load_conf_files();
 
+void set_program_mode(char mode) {
+	assert(mode == MASTER_MODE || mode == WORKER_MODE || mode == CLIENT_MODE);
+	__program_mode__ = mode;
+}
+
 int init_cfg(int argc, char *argv[])
 {
 	memset(&cfg, 0, sizeof(cfg));
 
 	// hard-coded default values
-	cfg.mode = MASTER_MODE;
+	cfg.mode = __program_mode__ ? __program_mode__ : MASTER_MODE;
 	cfg.port = 8760;
 	cfg.ec_threads_count = 1;
 	cfg.program_path = argv[0];
@@ -29,9 +37,11 @@ int init_cfg(int argc, char *argv[])
 	// values of configuration file
 	load_conf_files();
 
-	// program parameter values
-	int i;
-	for (i = 1; i < argc; i++)
+	/**
+	 * Parse the command line arguments, ignoring the 0th
+	 * because the 0th is the program execution path.
+	 */
+	for (int i = 1; i < argc; i++)
 	{
 		fetch_param(argv[i]);
 	}
@@ -43,7 +53,18 @@ int init_cfg(int argc, char *argv[])
  	if (access("data", F_OK) != 0)
 		mkdir("data", S_IRWXU);
 
-	log_print("info - node mode [ %c ]\n", cfg.mode);
+	switch (cfg.mode)
+	{
+		case MASTER_MODE:
+		case WORKER_MODE:
+			log_print("info - node mode [ %c ]\n", cfg.mode);
+			break;
+		case CLIENT_MODE:
+			break;
+		default:
+			log_print("[ error ] Program exits. Caused by the wrong program startup mode.\n");
+			exit(EXIT_FAILURE);
+	}
 
 	return 0;
 }
@@ -73,6 +94,10 @@ int set_param(char *p_key, char *p_val)
 		{
 			cfg.mode = WORKER_MODE;
 		}
+		else if (strcmp(p_val, "client") == 0)
+		{
+			cfg.mode = CLIENT_MODE;
+		}
 		else
 		{
 			log_print("Unknown mode %s.\n", p_val);
@@ -93,7 +118,7 @@ int set_param(char *p_key, char *p_val)
 		if (cfg.port < 0 || cfg.port > 65535)
 		{
 			log_print("Invalid port %d, valid port 0 ~ 65535\n", cfg.port);
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 	}
 	else if (strcmp(p_key, "--p:command-threads-count") == 0)
@@ -110,7 +135,7 @@ int set_param(char *p_key, char *p_val)
 	else
 	{
 		log_print("Unknown parameter type %s=%s.\n", p_key, p_val);
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 	return 0;
@@ -123,6 +148,14 @@ EuclidConfig *get_cfg()
 
 static int load_conf_files()
 {
+	char *cfg_file_name;
+	if (cfg.mode == CLIENT_MODE) {
+		cfg_file_name = DEF_CLI_CONF;
+	} else {
+		// No configuration files are currently required when running in server mode.
+		return 0;
+	}
+
 	int len = strlen(cfg.program_path) + 32;
 	char conf_path[len];
 	memset(conf_path, 0, len);
@@ -137,20 +170,26 @@ static int load_conf_files()
 			break;
 	}
 
-	strcat(conf_path, DEF_CLI_CONF);
+	strcat(conf_path, cfg_file_name);
 
-	FILE *cli_conf_fp = fopen(conf_path, "r");
+	FILE *conf_fp = fopen(conf_path, "r");
 
 	int buf_len = 256;
 	char buf_arr[buf_len];
 
-	while (fgets(buf_arr, buf_len, cli_conf_fp) != NULL)
+	while (fgets(buf_arr, buf_len, conf_fp) != NULL)
 	{
+		char *last_char = buf_arr + strlen(buf_arr) - 1;
+		while (*last_char == '\n') {
+			*last_char = 0;
+			--last_char;
+		}
+
 		fetch_param(buf_arr);
 		memset(buf_arr, 0, buf_len);
 	}
 
-	fclose(cli_conf_fp);
+	fclose(conf_fp);
 
 	return 0;
 }

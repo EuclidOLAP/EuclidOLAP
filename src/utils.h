@@ -53,6 +53,17 @@ struct memory_allocation_manager
 	 * Used to allocate data blocks that exceed MAM_BLOCK_MAX capacity.
 	 */
 	char *big_block;
+
+	/**
+	 * Because a MemAllocMng object is often associated with a thread, and some places in the
+	 * program need to record some information in the thread scope, the bin_flags variable is
+	 * added to record some thread global information.
+	 * 
+	 * bits from low to high:
+	 * 0th - 0 The MDX expression was not parsed.
+	 * 		 1 The MDX expression has been parsed.
+	 */
+	int bin_flags;
 };
 
 typedef struct memory_allocation_manager MemAllocMng;

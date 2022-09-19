@@ -597,12 +597,19 @@ int store_measure(EuclidCommand *ec)
 
 int distribute_store_measure(EuclidCommand *ec)
 {
-	if (d_nodes_count() < 1 || rand() % 2)
-	{
-		return store_measure(ec); // Store in the current node.
-	}
+	/**
+	 * TODO Distributed structures are currently not supported.
+	 */
 
-	return send(random_child_sock(), ec->bytes, *((int *)(ec->bytes)), 0) == (ssize_t)(*((int *)(ec->bytes)));
+	// Store in the current node.
+	return store_measure(ec);
+
+	// if (d_nodes_count() < 1 || rand() % 2)
+	// {
+	// 	return store_measure(ec); // Store in the current node.
+	// }
+
+	// return send(random_child_sock(), ec->bytes, *((int *)(ec->bytes)), 0) == (ssize_t)(*((int *)(ec->bytes)));
 }
 
 // TODO [ bug? ] When inserting duplicate data, the later data will not overwrite the previous data.

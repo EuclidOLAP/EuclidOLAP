@@ -89,6 +89,7 @@ Stack YC_STC = { 0 };
 %token COMMA				/* , */
 %token DOT					/* . */
 %token COLON				/* : */
+%token SEMICOLON			/* ; */
 
 %token ROUND_BRACKET_L		/* ( */
 %token ROUND_BRACKET_R		/* ) */
@@ -118,26 +119,54 @@ Stack YC_STC = { 0 };
 %%
 
 statement:
-	create_dimensions {
+	create_dimensions SEMICOLON {
 		stack_push(&YC_STC, IDS_STRLS_CRTDIMS);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
 	}
-  | create_levels {
+  | create_levels SEMICOLON {
 		stack_push(&YC_STC, IDS_ARRLS_DIMS_LVS_INFO);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
  	}
-  |	create_members {
+  |	create_members SEMICOLON {
 		stack_push(&YC_STC, IDS_STRLS_CRTMBRS);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
 	}
-  |	build_cube {
+  |	build_cube SEMICOLON {
 		stack_push(&YC_STC, IDS_OBJLS_BIUCUBE);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
 	}
-  | insert_cube_measures {
+  | insert_cube_measures SEMICOLON {
 	  	stack_push(&YC_STC, IDS_CXOBJ_ISRTCUBEMEARS);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
 	}
-  | multi_dim_query {
+  | multi_dim_query SEMICOLON {
 		stack_push(&YC_STC, IDS_MULTI_DIM_SELECT_DEF);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
 	}
   | FLAG_EXP expression {
 		// do nothing
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
 	}
 ;
 

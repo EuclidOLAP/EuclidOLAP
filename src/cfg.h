@@ -7,6 +7,7 @@
 
 #define MASTER_MODE 'm'
 #define WORKER_MODE 'w'
+#define CLIENT_MODE 'c'
 
 #define DEF_CONF "euclid.conf"
 #define DEF_CLI_CONF "euclid-cli.conf"
@@ -31,5 +32,7 @@ typedef struct euclid_cfg
 int init_cfg(int argc, char *argv[]);
 
 EuclidConfig *get_cfg();
+
+void set_program_mode(char mode);
 
 #endif

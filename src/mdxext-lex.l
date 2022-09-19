@@ -318,6 +318,10 @@ coalesceEmpty {
 	return COLON;
 }
 
+";" {
+	return SEMICOLON;
+}
+
 \x5B[^\x5B\x5D]+\x5D	{
 	// ASCII 0x5B is [
 	// ASCII 0x5D is ]

@@ -4,6 +4,9 @@
 // TODO Replace the logic in the header section of the program about object hiding with the type type_obj.
 typedef short type_obj;
 
+#define BYTES_ALIGNMENT (sizeof(void *))
+#define BYTES_ALIG_CHK_MASK (0x0000000000000007UL)
+
 #define OBJ_TYPE__MD_CONTEXT 1
 
 #define OBJ_TYPE__SET_FN_CHILDREN 2
