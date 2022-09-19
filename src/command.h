@@ -8,7 +8,7 @@ typedef unsigned short intent;
 typedef struct euclid_command
 {
 	char *bytes;
-	char *result;
+	struct euclid_command *result;
 	sem_t sem;
 } EuclidCommand;
 
@@ -65,6 +65,15 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
  */
 #define INTENT__SUCCESSFUL 5
 
+/**
+ * (*) <-> (*)
+ * 
+ * 4 bytes - data package capacity
+ * 2 bytes - intention
+ * N bytes - A descriptive paragraph, include valid text and a trailing 0 character.
+ */
+#define INTENT__FAILURE 6
+
 #define INTENT__UNKNOWN 65535
 
 int init_command_module();
@@ -80,5 +89,7 @@ intent ec_get_intent(EuclidCommand *ec);
 int ec_get_capacity(EuclidCommand *ec);
 
 int submit_command(EuclidCommand *ec);
+
+EuclidCommand *EuclidCommand_failure(char *desc);
 
 #endif

@@ -168,7 +168,10 @@ static void *do_process_command(void *addr)
 		// }
 		pthread_mutex_unlock(&_ec_p_mtx);
 
-		execute_command(ec);
+		if (execute_command(ec) != 0) {
+			// task execution failed
+			ec->result = EuclidCommand_failure("Unrecognized statement.");
+		}
 
 		sem_post(&(ec->sem));
 
@@ -200,7 +203,11 @@ static int execute_command(EuclidCommand *ec)
 	{
 		parse_mdx((ec->bytes) + 10);
 		void *ids_type;
-		stack_pop(&YC_STC, &ids_type);
+
+		if (stack_pop(&YC_STC, &ids_type) != 0) {
+			return -1;
+		}
+
 		if (ids_type == IDS_STRLS_CRTDIMS)
 		{
 			ArrayList *dim_names_ls;
@@ -304,4 +311,16 @@ EuclidCommand *build_intent_command_mdx(char *mdx)
 	ec->bytes = addr;
 
 	return ec;
+}
+
+EuclidCommand *EuclidCommand_failure(char *desc) {
+	assert(desc != NULL);
+	assert(strlen(desc) > 0);
+
+	int len = SZOF_INT + SZOF_SHORT + strlen(desc) + 1;
+	char *payload = obj_alloc(len, OBJ_TYPE__RAW_BYTES);
+	*(int *)payload = len;
+	*(intent *)(payload + SZOF_INT) = INTENT__FAILURE;
+	strcpy(payload + SZOF_INT + SZOF_SHORT, desc);
+	return create_command(payload);
 }

@@ -85,10 +85,15 @@ int main(int argc, char *argv[])
 
 		read_sock_pkg(sock_fd, &buf, &buf_len);
 		EuclidCommand *result = create_command(buf);
-		if (ec_get_intent(result) == INTENT__SUCCESSFUL) {
-			printf("\n%s\n", result->bytes + SZOF_USG_INT + SZOF_USG_SHORT);
-		} else {
-			printf("\nfailure\n");
+
+		switch (ec_get_intent(result))
+		{
+			case INTENT__SUCCESSFUL:
+			case INTENT__FAILURE:
+				printf("\n%s\n", result->bytes + SZOF_USG_INT + SZOF_USG_SHORT);
+				break;
+			default:
+				printf("\nUnknown Information!\n");
 		}
 
 		goto _exit_;
@@ -133,10 +138,15 @@ int main(int argc, char *argv[])
 
 		read_sock_pkg(sock_fd, &buf, &buf_len);
 		EuclidCommand *result = create_command(buf);
-		if (ec_get_intent(result) == INTENT__SUCCESSFUL) {
-			printf("\n%s\n", result->bytes + SZOF_USG_INT + SZOF_USG_SHORT);
-		} else {
-			printf("\nfailure\n");
+
+		switch (ec_get_intent(result))
+		{
+			case INTENT__SUCCESSFUL:
+			case INTENT__FAILURE:
+				printf("\n%s\n", result->bytes + SZOF_USG_INT + SZOF_USG_SHORT);
+				break;
+			default:
+				printf("\nUnknown Information!\n");
 		}
 
 		obj_release(mdx_ec->bytes);

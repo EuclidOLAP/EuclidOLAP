@@ -202,11 +202,13 @@ static void receive_command_loop(SockIntentThread *sit)
 			sem_wait(&(task->sem));
 			sem_destroy(&(task->sem));
 
-			sit_send_command(sit, get_const_command_intent(INTENT__SUCCESSFUL));
+			sit_send_command(sit, task->result ? task->result : get_const_command_intent(INTENT__SUCCESSFUL));
 
-			obj_release(task->bytes);
-			if (task->result)
+			if (task->result) {
+				obj_release(task->result->bytes);
 				obj_release(task->result);
+			}
+			obj_release(task->bytes);
 			obj_release(task);
 
 			continue;
