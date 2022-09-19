@@ -201,11 +201,22 @@ static int execute_command(EuclidCommand *ec)
 	}
 	else if (inte == INTENT__MDX)
 	{
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		// Set the MDX parsing completion flag to 0.
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFE;
+
 		parse_mdx((ec->bytes) + 10);
+
+		if ((cur_thrd_mam->bin_flags & 0x0001) == 0) {
+			// The MDX expression was not parsed.
+			return -1;
+		}
+
 		void *ids_type;
 
 		if (stack_pop(&YC_STC, &ids_type) != 0) {
-			return -1;
+			log_print("[ error ] Program exit. Impossible program execution location.\n");	
+			exit(EXIT_FAILURE);
 		}
 
 		if (ids_type == IDS_STRLS_CRTDIMS)

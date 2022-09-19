@@ -1,8 +1,8 @@
-create dimensions [Calendar] [Goods] [Store Type] [Payment Method] [Region] [Transport]
+create dimensions [Calendar] [Goods] [Store Type] [Payment Method] [Region] [Transport];
 
 ---
 
-create levels [Calendar] (2:year, 3:quarter, 4:month), [Region] (2:[continent], 3:[country])
+create levels [Calendar] (2:year, 3:quarter, 4:month), [Region] (2:[continent], 3:[country]);
 
 ---
 
@@ -87,16 +87,16 @@ create members
 [Transport].[ALL].[railway],
 [Transport].[ALL].[highway],
 [Transport].[ALL].[aviation],
-[Transport].[ALL].[ocean freight]
+[Transport].[ALL].[ocean freight];
 
 ---
 
 build cube [Online Store]
 dimensions [Store Type] [Store Type] [Payment Method] [Payment Method] [Goods] [Goods] [Calendar] [Calendar]
-measures [sales amount] [sales quantity] [cash back]
+measures [sales amount] [sales quantity] [cash back];
 
 ---
 
 build cube [logistics.test]
 dimensions Goods Goods Transport Transport Region [starting region] Region [ending region] Calendar [starting date] Calendar [completion date]
-measures cost income quantity
+measures cost income quantity;

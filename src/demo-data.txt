@@ -3454,7 +3454,7 @@ insert [Online Store]
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2021].[Q4].[M12] measures [sales amount] 70 [sales quantity] 95 ),
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2021].[Q4].[M12] measures [sales amount] 88 [sales quantity] 27 ),
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2021].[Q4].[M12] measures [sales amount] 92 [sales quantity] 3 ),
-([Store Type].[ALL].[Other],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2021].[Q4].[M12] measures [sales amount] 0 [sales quantity] 61 )
+([Store Type].[ALL].[Other],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2021].[Q4].[M12] measures [sales amount] 0 [sales quantity] 61 );
 
 ---
 
@@ -4511,4 +4511,4 @@ insert [logistics.test]
 (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[Italy], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2020].[Q1].[M1], [completion date].[ALL].[2020].[Q3].[M7] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[Italy], [ending region].[ALL].[Europe].[UK], [starting date].[ALL].[2019].[Q4].[M11], [completion date].[ALL].[2020].[Q2].[M6] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Asia].[South Korea], [starting date].[ALL].[2019].[Q3].[M9], [completion date].[ALL].[2020].[Q2].[M5] measures quantity 333.333 income 222.222 cost 111.111 ), 
-(Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2019].[Q3].[M7], [completion date].[ALL].[2020].[Q2].[M4] measures quantity 333.333 income 222.222 cost 111.111 )
+(Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2019].[Q3].[M7], [completion date].[ALL].[2020].[Q2].[M4] measures quantity 333.333 income 222.222 cost 111.111 );
