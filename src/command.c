@@ -40,8 +40,7 @@ extern void *parse_mdx(char *mdx);
 int init_command_module()
 {
 	// init CCI_ALLOW
-	// TODO at once - change type 'void *' to 'char *'
-	void *addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
+	char *addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
 	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT;
 	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__ALLOW;
 	CCI_ALLOW = create_command(addr);

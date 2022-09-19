@@ -33,4 +33,6 @@ int init_cfg(int argc, char *argv[]);
 
 EuclidConfig *get_cfg();
 
+void set_program_mode(char mode);
+
 #endif

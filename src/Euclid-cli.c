@@ -15,6 +15,8 @@
 
 int main(int argc, char *argv[])
 {
+	set_program_mode(CLIENT_MODE);
+
 	if (argc < 2) {
 		printf("Please enter the execution statement.\n");
 		return EXIT_SUCCESS;
