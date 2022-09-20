@@ -74,11 +74,25 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
  */
 #define INTENT__FAILURE 6
 
+/**
+ * (*) <-> (*)
+ * 
+ * 4 bytes - data package capacity
+ * 2 bytes - intention
+ * N bytes - A descriptive paragraph, include valid text and a trailing 0 character.
+ */
+#define INTENT__EXE_RESULT_DESC 7
+
 #define INTENT__UNKNOWN 65535
 
 int init_command_module();
 
 EuclidCommand *create_command(char *bytes);
+
+/**
+ * Create a command object and allocate payload memory.
+ */
+EuclidCommand *ec_new(intent inte, size_t payload_sz);
 
 EuclidCommand *get_const_command_intent(intent inte);
 

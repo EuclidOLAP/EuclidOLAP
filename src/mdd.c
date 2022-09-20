@@ -209,18 +209,48 @@ Dimension *create_dimension(char *dim_name)
 	mdd__use_level(rootLv);
 
 	als_add(dims_pool, dim);
-	// log_print("========================= dim->name %s\n", dim->name);
 	return dim;
 }
 
-int create_dims(ArrayList *dim_names)
+int create_dims(ArrayList *dim_names, EuclidCommand **result)
 {
 	__uint32_t i, sz = als_size(dim_names);
+	ArrayList *dimensions_exist = als_new(sz, "char *", THREAD_MAM, NULL);
+
 	for (i = 0; i < sz; i++)
 	{
 		char *dim_name = (char *)als_get(dim_names, i);
-		create_dimension(dim_name);
+
+		if (find_dim_by_name(dim_name) == NULL)
+			create_dimension(dim_name);
+		else
+			als_add(dimensions_exist, dim_name);
 	}
+
+	if (als_size(dimensions_exist) > 0) {
+		*result = ec_new(INTENT__EXE_RESULT_DESC, 128 + als_size(dimensions_exist) * 70);
+
+		char *desc = (*result)->bytes + SZOF_INT + SZOF_SHORT;
+		sprintf(desc, "Dimensions");
+		desc += strlen(desc);
+		for (int i = 0; i < als_size(dimensions_exist); i++) {
+			char *exist_dim_name = als_get(dimensions_exist, i);
+			if (strlen(exist_dim_name) > 64) {
+				*desc = ' ';
+				desc++;
+				memcpy(desc, exist_dim_name, 61);
+				desc += 61;
+				sprintf(desc, "...,");
+				desc += strlen(desc);
+			} else {
+				sprintf(desc, " %s,", exist_dim_name);
+				desc += strlen(desc);
+			}
+		}
+		desc--;
+		sprintf(desc, " are not created because dimensions with the same names already exist.");
+	}
+
 	return 0;
 }
 
@@ -822,17 +852,6 @@ MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 	md_result->vals = measure_vals;
 	md_result->rs_len = rs_len;
 
-	// log_print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-	// log_print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-	// int lv_count = als_size(levels_pool);
-	// for (i=0;i<lv_count;i++) {
-	// 	Level *lv = als_get(levels_pool, i);
-	// 	Dimension *dim = find_dim_by_gid(lv->dim_gid);
-	// 	log_print("% 40s    %u:%30s\n", dim->name, lv->level, lv->name);
-	// }
-	// log_print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-	// log_print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-
 	return md_result;
 }
 
@@ -1007,9 +1026,6 @@ static MddTuple *tuple__merge(MddTuple *ctx_tuple, MddTuple *tuple_frag)
 	// 	j = j;
 	// }
 
-	// log_print("@@@@@@@@@@@@@@@@@@@@Tuple_print(tp);@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-	// Tuple_print(tp);
-	// log_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
 	return tp;
 }
 
