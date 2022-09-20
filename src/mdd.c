@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 // #include <dirent.h>
@@ -2993,4 +2994,160 @@ ArrayList *mdd__lv_ancestor_peer_descendants(Level *ancestor_lv, Member *member)
 			als_add(peer_descendants, m);
 	}
 	return peer_descendants;
+}
+
+void mdrs_to_str(MultiDimResult *md_rs, char *_cont_buf, size_t buf_len)
+{
+
+	char *cont_buf = _cont_buf;
+
+	sprintf(cont_buf, "\n\n\n");
+	cont_buf += strlen(cont_buf);
+	sprintf(cont_buf, "### !!! MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
+	cont_buf += strlen(cont_buf);
+
+	if (md_rs == NULL)
+	{
+		sprintf(cont_buf, "##################################################################\n");
+		cont_buf += strlen(cont_buf);
+		sprintf(cont_buf, "##################################################################\n");
+		cont_buf += strlen(cont_buf);
+		sprintf(cont_buf, "##                    MultiDimResult is NULL                    ##\n");
+		cont_buf += strlen(cont_buf);
+		sprintf(cont_buf, "##################################################################\n");
+		cont_buf += strlen(cont_buf);
+		sprintf(cont_buf, "##################################################################\n");
+		cont_buf += strlen(cont_buf);
+		goto end;
+	}
+
+	int i, x_sz = als_size(md_rs->axes);
+	for (i = 0; i < x_sz; i++)
+	{
+		MddAxis *axis = als_get(md_rs->axes, i);
+		sprintf(cont_buf, "axis->posi [ %u ]\n", axis->posi);
+		cont_buf += strlen(cont_buf);
+	}
+	if (x_sz != 2)
+	{
+		for (i = 0; i < 10; i++)
+		{
+			sprintf(cont_buf, "***************************************************\n");
+			cont_buf += strlen(cont_buf);
+		}
+		goto end;
+	}
+
+	MddAxis *col_ax = als_get(md_rs->axes, 0);
+	MddAxis *row_ax = als_get(md_rs->axes, 1);
+	if (col_ax->posi > row_ax->posi)
+	{
+		MddAxis *x_tmp = col_ax;
+		col_ax = row_ax;
+		row_ax = x_tmp;
+	}
+
+	int col_len = als_size(col_ax->set->tuples);
+	int row_len = als_size(row_ax->set->tuples);
+	int col_thickness = als_size(((MddTuple *)als_get(col_ax->set->tuples, 0))->mr_ls);
+	for (i = 1; i < als_size(col_ax->set->tuples); i++)
+	{
+		if (als_size(((MddTuple *)als_get(col_ax->set->tuples, i))->mr_ls) > col_thickness)
+			col_thickness = als_size(((MddTuple *)als_get(col_ax->set->tuples, i))->mr_ls);
+	}
+	int row_thickness = als_size(((MddTuple *)als_get(row_ax->set->tuples, 0))->mr_ls);
+	for (i = 1; i < als_size(row_ax->set->tuples); i++)
+	{
+		if (als_size(((MddTuple *)als_get(row_ax->set->tuples, i))->mr_ls) > row_thickness)
+			row_thickness = als_size(((MddTuple *)als_get(row_ax->set->tuples, i))->mr_ls);
+	}
+
+	int ri, ci;
+	sprintf(cont_buf, "\n");
+	cont_buf += strlen(cont_buf);
+	for (ri = 0; ri < col_thickness + row_len; ri++)
+	{
+		for (ci = 0; ci < row_thickness + col_len; ci++)
+		{
+			if (ri < col_thickness && ci < row_thickness)
+			{
+				sprintf(cont_buf, "% 20s", "-");
+				cont_buf += strlen(cont_buf);
+			}
+			else if (ri < col_thickness && ci >= row_thickness)
+			{
+				MddTuple *c_tuple = als_get(col_ax->set->tuples, ci - row_thickness);
+
+				if (ri < (col_thickness - als_size(c_tuple->mr_ls)))
+				{
+					sprintf(cont_buf, "% 20s", "[]");
+					cont_buf += strlen(cont_buf);
+					continue;
+				}
+
+				MddMemberRole *c_mr = als_get(c_tuple->mr_ls, ri - (col_thickness - als_size(c_tuple->mr_ls)));
+				if (c_mr->member)
+				{
+					sprintf(cont_buf, "% 20s", c_mr->member->name);
+					cont_buf += strlen(cont_buf);
+				}
+				else
+				{
+					sprintf(cont_buf, "% 20s", als_get(c_mr->member_formula->path, als_size(c_mr->member_formula->path) - 1));
+					cont_buf += strlen(cont_buf);
+				}
+			}
+			else if (ri >= col_thickness && ci < row_thickness)
+			{
+				MddTuple *r_tuple = als_get(row_ax->set->tuples, ri - col_thickness);
+
+				if (ci < (row_thickness - als_size(r_tuple->mr_ls)))
+				{
+					sprintf(cont_buf, "% 20s", "[]");
+					cont_buf += strlen(cont_buf);
+					continue;
+				}
+
+				MddMemberRole *r_mr = als_get(r_tuple->mr_ls, ci - (row_thickness - als_size(r_tuple->mr_ls)));
+				if (r_mr->member)
+				{
+					sprintf(cont_buf, "% 20s", r_mr->member->name);
+					cont_buf += strlen(cont_buf);
+				}
+				else
+				{
+					sprintf(cont_buf, "% 20s", als_get(r_mr->member_formula->path, als_size(r_mr->member_formula->path) - 1));
+					cont_buf += strlen(cont_buf);
+				}
+			}
+			else if (ri >= col_thickness && ci >= row_thickness)
+			{
+				if (md_rs->null_flags[(ri - col_thickness) * col_len + (ci - row_thickness)])
+				{
+					sprintf(cont_buf, "% 20c", '-');
+					cont_buf += strlen(cont_buf);
+				}
+				else
+				{
+					sprintf(cont_buf, "% 20.2lf", md_rs->vals[(ri - col_thickness) * col_len + (ci - row_thickness)]);
+					cont_buf += strlen(cont_buf);
+				}
+			}
+		}
+		sprintf(cont_buf, "\n");
+		cont_buf += strlen(cont_buf);
+	}
+	sprintf(cont_buf, "\n");
+	cont_buf += strlen(cont_buf);
+
+end:
+	sprintf(cont_buf, "### ??? MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
+	cont_buf += strlen(cont_buf);
+	sprintf(cont_buf, "\n\n\n");
+	cont_buf += strlen(cont_buf);
+
+	assert(cont_buf < (_cont_buf + buf_len));
+
+	unsigned long used_len = (unsigned long)cont_buf - (unsigned long)_cont_buf;
+	log_print("[ info ] **************** mdrs_to_str(...) >>>>>>>>>>>>>>>>>>>>>  %lu  /  %lu  %f %%\n", used_len, buf_len, used_len * 100.0 / buf_len);
 }

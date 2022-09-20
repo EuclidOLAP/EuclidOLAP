@@ -168,7 +168,9 @@ static void *do_process_command(void *addr)
 		// }
 		pthread_mutex_unlock(&_ec_p_mtx);
 
-		if (execute_command(ec) != 0) {
+		int exe_result = execute_command(ec);
+
+		if (exe_result != 0 && ec->result == NULL) {
 			// task execution failed
 			ec->result = EuclidCommand_failure("Unrecognized statement.");
 		}
@@ -254,8 +256,16 @@ static int execute_command(EuclidCommand *ec)
 			SelectDef *select_def;
 			stack_pop(&YC_STC, (void **)&select_def);
 			MultiDimResult *md_rs = exe_multi_dim_queries(select_def);
+
 			log_print("// TODO ....................... %s:%d\n", __FILE__, __LINE__); // TODO should be return a multi-dim-result
 			MultiDimResult_print(md_rs);
+
+			char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL<<19, OBJ_TYPE__RAW_BYTES);
+			*((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL<<19;
+			*((unsigned short *)(payload + SZOF_INT)) = INTENT__SUCCESSFUL;
+			mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL<<19);
+			ec->result = create_command(payload);
+
 		}
 		else if (ids_type == IDS_ARRLS_DIMS_LVS_INFO)
 		{
