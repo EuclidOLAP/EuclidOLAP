@@ -225,7 +225,7 @@ static int execute_command(EuclidCommand *ec)
 		{
 			ArrayList *dim_names_ls;
 			stack_pop(&YC_STC, (void **)&dim_names_ls);
-			create_dims(dim_names_ls);
+			create_dims(dim_names_ls, &(ec->result));
 		}
 		else if (ids_type == IDS_STRLS_CRTMBRS)
 		{
@@ -344,4 +344,12 @@ EuclidCommand *EuclidCommand_failure(char *desc) {
 	*(intent *)(payload + SZOF_INT) = INTENT__FAILURE;
 	strcpy(payload + SZOF_INT + SZOF_SHORT, desc);
 	return create_command(payload);
+}
+
+EuclidCommand *ec_new(intent inte, size_t payload_sz) {
+	EuclidCommand *ec = obj_alloc(sizeof(EuclidCommand), OBJ_TYPE__EuclidCommand);
+	ec->bytes = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT + payload_sz, OBJ_TYPE__RAW_BYTES);
+	*((unsigned int *)ec->bytes) = SZOF_USG_INT + SZOF_USG_SHORT + payload_sz;
+	*((intent *)(ec->bytes + SZOF_USG_INT)) = inte;
+	return ec;
 }

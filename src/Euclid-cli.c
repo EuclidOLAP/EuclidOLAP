@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
 		switch (ec_get_intent(result))
 		{
 			case INTENT__SUCCESSFUL:
+			case INTENT__EXE_RESULT_DESC:
 			case INTENT__FAILURE:
 				printf("\n%s\n", result->bytes + SZOF_USG_INT + SZOF_USG_SHORT);
 				break;
@@ -142,6 +143,7 @@ int main(int argc, char *argv[])
 		switch (ec_get_intent(result))
 		{
 			case INTENT__SUCCESSFUL:
+			case INTENT__EXE_RESULT_DESC:
 			case INTENT__FAILURE:
 				printf("\n%s\n", result->bytes + SZOF_USG_INT + SZOF_USG_SHORT);
 				break;

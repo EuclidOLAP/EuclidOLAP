@@ -87,7 +87,11 @@ int mdd_mbr__is_leaf(Member *);
 
 void mdd_mbr__set_as_leaf(Member *);
 
-int create_dims(ArrayList *dim_names);
+/**
+ * @param dim_names A list of dimension names that need to be created.
+ * @param result    The execution result of the function, which can be NULL.
+ */
+int create_dims(ArrayList *dim_names, EuclidCommand **result);
 
 md_gid gen_md_gid();
 

@@ -213,14 +213,45 @@ Dimension *create_dimension(char *dim_name)
 	return dim;
 }
 
-int create_dims(ArrayList *dim_names)
+int create_dims(ArrayList *dim_names, EuclidCommand **result)
 {
 	__uint32_t i, sz = als_size(dim_names);
+	ArrayList *dimensions_exist = als_new(sz, "char *", THREAD_MAM, NULL);
+
 	for (i = 0; i < sz; i++)
 	{
 		char *dim_name = (char *)als_get(dim_names, i);
-		create_dimension(dim_name);
+
+		if (find_dim_by_name(dim_name) == NULL)
+			create_dimension(dim_name);
+		else
+			als_add(dimensions_exist, dim_name);
 	}
+
+	if (als_size(dimensions_exist) > 0) {
+		*result = ec_new(INTENT__EXE_RESULT_DESC, 128 + als_size(dimensions_exist) * 70);
+
+		char *desc = (*result)->bytes + SZOF_INT + SZOF_SHORT;
+		sprintf(desc, "Dimensions");
+		desc += strlen(desc);
+		for (int i = 0; i < als_size(dimensions_exist); i++) {
+			char *exist_dim_name = als_get(dimensions_exist, i);
+			if (strlen(exist_dim_name) > 64) {
+				*desc = ' ';
+				desc++;
+				memcpy(desc, exist_dim_name, 61);
+				desc += 61;
+				sprintf(desc, "...,");
+				desc += strlen(desc);
+			} else {
+				sprintf(desc, " %s,", exist_dim_name);
+				desc += strlen(desc);
+			}
+		}
+		desc--;
+		sprintf(desc, " are not created because dimensions with the same names already exist.");
+	}
+
 	return 0;
 }
 
