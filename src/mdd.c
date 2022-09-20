@@ -3001,10 +3001,10 @@ void mdrs_to_str(MultiDimResult *md_rs, char *_cont_buf, size_t buf_len)
 
 	char *cont_buf = _cont_buf;
 
-	sprintf(cont_buf, "\n\n\n");
-	cont_buf += strlen(cont_buf);
-	sprintf(cont_buf, "### !!! MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
-	cont_buf += strlen(cont_buf);
+	// sprintf(cont_buf, "\n\n\n");
+	// cont_buf += strlen(cont_buf);
+	// sprintf(cont_buf, "### !!! MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
+	// cont_buf += strlen(cont_buf);
 
 	if (md_rs == NULL)
 	{
@@ -3022,12 +3022,12 @@ void mdrs_to_str(MultiDimResult *md_rs, char *_cont_buf, size_t buf_len)
 	}
 
 	int i, x_sz = als_size(md_rs->axes);
-	for (i = 0; i < x_sz; i++)
-	{
-		MddAxis *axis = als_get(md_rs->axes, i);
-		sprintf(cont_buf, "axis->posi [ %u ]\n", axis->posi);
-		cont_buf += strlen(cont_buf);
-	}
+	// for (i = 0; i < x_sz; i++)
+	// {
+	// 	MddAxis *axis = als_get(md_rs->axes, i);
+	// 	sprintf(cont_buf, "axis->posi [ %u ]\n", axis->posi);
+	// 	cont_buf += strlen(cont_buf);
+	// }
 	if (x_sz != 2)
 	{
 		for (i = 0; i < 10; i++)
@@ -3063,8 +3063,8 @@ void mdrs_to_str(MultiDimResult *md_rs, char *_cont_buf, size_t buf_len)
 	}
 
 	int ri, ci;
-	sprintf(cont_buf, "\n");
-	cont_buf += strlen(cont_buf);
+	// sprintf(cont_buf, "\n");
+	// cont_buf += strlen(cont_buf);
 	for (ri = 0; ri < col_thickness + row_len; ri++)
 	{
 		for (ci = 0; ci < row_thickness + col_len; ci++)
@@ -3137,14 +3137,14 @@ void mdrs_to_str(MultiDimResult *md_rs, char *_cont_buf, size_t buf_len)
 		sprintf(cont_buf, "\n");
 		cont_buf += strlen(cont_buf);
 	}
-	sprintf(cont_buf, "\n");
-	cont_buf += strlen(cont_buf);
+	// sprintf(cont_buf, "\n");
+	// cont_buf += strlen(cont_buf);
 
 end:
-	sprintf(cont_buf, "### ??? MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
-	cont_buf += strlen(cont_buf);
-	sprintf(cont_buf, "\n\n\n");
-	cont_buf += strlen(cont_buf);
+	// sprintf(cont_buf, "### ??? MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
+	// cont_buf += strlen(cont_buf);
+	// sprintf(cont_buf, "\n\n\n");
+	// cont_buf += strlen(cont_buf);
 
 	assert(cont_buf < (_cont_buf + buf_len));
 
