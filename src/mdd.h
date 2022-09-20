@@ -147,7 +147,17 @@ typedef struct multidimensional_result
 	unsigned long rs_len;
 } MultiDimResult;
 MultiDimResult *MultiDimResult_creat();
+
 void MultiDimResult_print(MultiDimResult *);
+
+/**
+ * Assemble a multi-dimenisonal result set into a string.
+ * 
+ * @param md_rs
+ * @param _cont_buf
+ * @param buf_len
+ */
+void mdrs_to_str(MultiDimResult *md_rs, char *_cont_buf, size_t buf_len);
 
 MultiDimResult *exe_multi_dim_queries(SelectDef *);
 
