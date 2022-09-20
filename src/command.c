@@ -269,9 +269,6 @@ static int execute_command(EuclidCommand *ec)
 		}
 		else if (ids_type == IDS_ARRLS_DIMS_LVS_INFO)
 		{
-			// log_print("**********************************************************************************\n");
-			// log_print("**********************************************************************************\n");
-			// log_print("**********************************************************************************\n");
 			ArrayList *dim_lv_map_ls;
 			stack_pop(&YC_STC, (void **)&dim_lv_map_ls);
 			int i,j,map_len, map_count = als_size(dim_lv_map_ls);
@@ -300,9 +297,6 @@ static int execute_command(EuclidCommand *ec)
 				}
 				// log_print("\n");
 			}
-			// log_print("**********************************************************************************\n");
-			// log_print("**********************************************************************************\n");
-			// log_print("**********************************************************************************\n");
 		}
 		else {
 			log_print("[ error ] program exit(1), cause by: unknow ids_type < %p >\n", ids_type);

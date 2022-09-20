@@ -209,7 +209,6 @@ Dimension *create_dimension(char *dim_name)
 	mdd__use_level(rootLv);
 
 	als_add(dims_pool, dim);
-	// log_print("========================= dim->name %s\n", dim->name);
 	return dim;
 }
 
@@ -853,17 +852,6 @@ MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 	md_result->vals = measure_vals;
 	md_result->rs_len = rs_len;
 
-	// log_print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-	// log_print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-	// int lv_count = als_size(levels_pool);
-	// for (i=0;i<lv_count;i++) {
-	// 	Level *lv = als_get(levels_pool, i);
-	// 	Dimension *dim = find_dim_by_gid(lv->dim_gid);
-	// 	log_print("% 40s    %u:%30s\n", dim->name, lv->level, lv->name);
-	// }
-	// log_print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-	// log_print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-
 	return md_result;
 }
 
@@ -1038,9 +1026,6 @@ static MddTuple *tuple__merge(MddTuple *ctx_tuple, MddTuple *tuple_frag)
 	// 	j = j;
 	// }
 
-	// log_print("@@@@@@@@@@@@@@@@@@@@Tuple_print(tp);@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-	// Tuple_print(tp);
-	// log_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
 	return tp;
 }
 
