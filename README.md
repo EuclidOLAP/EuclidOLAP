@@ -79,8 +79,6 @@ $ yum -y install bison
 
 ### Compile and run
 
--------------------------------------
-
 Get the source code, compile the source code and give the binary execute permission.
 
 ```shell
