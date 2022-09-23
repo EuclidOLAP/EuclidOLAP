@@ -169,18 +169,28 @@ static void *do_process_command(void *addr)
 		pthread_mutex_unlock(&_ec_p_mtx);
 
 		int exe_result = execute_command(ec);
+		MemAllocMng *mam = MemAllocMng_current_thread_mam();
 
-		if (exe_result != 0 && ec->result == NULL) {
-			// task execution failed
-			ec->result = EuclidCommand_failure("Unrecognized statement.");
+		if (ec->result == NULL) {
+			if (mam->exception_desc) {
+				ec->result = ec_new(INTENT__EXE_RESULT_DESC, strlen(mam->exception_desc) + 1);
+				strcpy(ec->result->bytes + SZOF_INT + SZOF_SHORT, mam->exception_desc);
+			} else if (exe_result != 0) {
+				// task execution failed
+				ec->result = EuclidCommand_failure("Unrecognized statement.");
+			}
 		}
+
+		// if (exe_result != 0 && ec->result == NULL) {
+		// 	// task execution failed
+		// 	ec->result = EuclidCommand_failure("Unrecognized statement.");
+		// }
 
 		sem_post(&(ec->sem));
 
 		// obj_release(ec->bytes);
 		// obj_release(ec);
 
-		MemAllocMng *mam = MemAllocMng_current_thread_mam();
 		if (mam) {
 			mam_reset(mam);
 		}
@@ -267,15 +277,28 @@ static int execute_command(EuclidCommand *ec)
 				*((unsigned short *)(payload + SZOF_INT)) = INTENT__SUCCESSFUL;
 				mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL<<19);
 				ec->result = create_command(payload);
-			} else {
-				ec->result = ec_new(INTENT__EXE_RESULT_DESC, strlen(cur_thrd_mam->exception_desc) + 1);
-				strcpy(ec->result->bytes + SZOF_INT + SZOF_SHORT, cur_thrd_mam->exception_desc);
 			}
+			// else
+			// {
+			// 	ec->result = ec_new(INTENT__EXE_RESULT_DESC, strlen(cur_thrd_mam->exception_desc) + 1);
+			// 	strcpy(ec->result->bytes + SZOF_INT + SZOF_SHORT, cur_thrd_mam->exception_desc);
+			// }
 		}
 		else if (ids_type == IDS_ARRLS_DIMS_LVS_INFO)
 		{
 			ArrayList *dim_lv_map_ls;
 			stack_pop(&YC_STC, (void **)&dim_lv_map_ls);
+
+			// check for unknown dimensions
+			for (int i=0; i<als_size(dim_lv_map_ls); i++) {
+				ArrayList *map = als_get(dim_lv_map_ls, i);
+				char *dimension_name = als_get(map, 0);
+				if (find_dim_by_name(dimension_name))
+					continue;
+				cur_thrd_mam->exception_desc = "exception: nonexistent dimension.";
+				return 0;
+			}
+
 			int i,j,map_len, map_count = als_size(dim_lv_map_ls);
 			for (i = 0; i < map_count; i++) {
 				ArrayList *map = als_get(dim_lv_map_ls, i);
@@ -290,17 +313,7 @@ static int execute_command(EuclidCommand *ec)
 					Level *level = Level_creat(level_name, dim, *lv_p);
 					mdd__save_level(level);
 					mdd__use_level(level);
-
-					// create_level(dimension_name, *lv_p, level_name);
-
-					// if (j % 2 == 0) {
-					// 	log_print("[%s]    ",ele);
-					// } else {
-					// 	long *lv_p = (long *)&ele;
-					// 	log_print("%ld:",*lv_p);
-					// }
 				}
-				// log_print("\n");
 			}
 		}
 		else {
