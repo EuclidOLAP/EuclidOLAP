@@ -86,6 +86,8 @@ MemAllocMng *MemAllocMng_current_thread_mam() {
 }
 
 void mam_reset(MemAllocMng *mam) {
+	mam->exception_desc = NULL;
+
 	char *curr_blk = mam->current_block;
 	char *next_blk = *((void **)curr_blk);
 

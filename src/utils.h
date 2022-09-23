@@ -64,6 +64,12 @@ struct memory_allocation_manager
 	 * 		 1 The MDX expression has been parsed.
 	 */
 	int bin_flags;
+
+	/**
+	 * Pointer to a textual description of the exception encountered during execution of the current thread,
+	 * if it is NULL, it means that the thread task executes normally.
+	 */
+	char *exception_desc;
 };
 
 typedef struct memory_allocation_manager MemAllocMng;

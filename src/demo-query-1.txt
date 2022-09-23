@@ -8,6 +8,8 @@ select children([Goods].[Kitchen & Dining]) on 0, children([Calendar].[ALL].[202
 ---
 select members([Goods], NOT_LEAFS) on 10, members(Calendar, LEAFS) on 100 from [Online Store];
 ---
+select members([Goods], NOT_LEAFS) on 10, members(Calendar, LEAFS) on 100 from [OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO];
+---
 select { (measure.[sales amount]), (measure.[sales quantity]) } on 10, crossjoin(members([Store Type], LEAFS), members([Payment Method], ALL)) on 100 from [Online Store];
 ---
 select { (measure.[sales amount]), (measure.[sales quantity]) } on 10, crossjoin(members([Store Type], LEAFS), members([Payment Method], ALL), children([Calendar].[ALL].[2021].[Q4])) on 100 from [Online Store];
@@ -52,6 +54,8 @@ select children( [starting date].[2021].Q1 ) on 999, { (measure.income), (measur
 ---
 select members(Goods) on 0, crossJoin(members(measure), members([ending region])) on 1 from [logistics.test] ;
 ---
+select members(Goods) on 0, crossJoin(members(measure), members([ending region])) on 1 from [LLLLLLLLLLLLLLLLL];
+---
 with member [starting date].PPPPPP as ([starting date].[2021].Q1.M2) + ([starting date].[2021].Q1.M3) member [measure].MMMMMM as (measure.income) * (measure.cost) select { (measure.income), (measure.cost), ([measure].MMMMMM) } on 100, { ([starting date].[2021].Q1.M1), ([starting date].[2021].Q1.M2), ([starting date].[2021].Q1.M3), ([starting date].PPPPPP) } on 200 from [logistics.test] where ( [Goods].[electronic product].[computer] , Transport.railway, [starting region].[Europe].[UK], [ending region].[Europe].[Italy], [completion date].[2020].[Q1].[M3] );
 ---
 with member [starting date].PPPPPP as ([starting date].[2021].Q1.M2) + ([starting date].[2021].Q1.M3) member [measure].MMMMMM as (measure.income) * (measure.cost) select { (measure.income), (measure.cost), ([measure].MMMMMM) } on 1000, { ([starting date].[2021].Q1.M1), ([starting date].[2021].Q1.M2), ([starting date].[2021].Q1.M3), ([starting date].PPPPPP) } on 200 from [logistics.test] where ( [Goods].[electronic product].[computer] , Transport.railway, [starting region].[Europe].[UK], [ending region].[Europe].[Italy], [completion date].[2020].[Q1].[M3] );
@@ -87,6 +91,8 @@ WITH set QQQ as XXX set XXX as children( parent([Goods].[electronic product].com
 select { ([Store Type].[ALL]) } on 0, { (parent(Calendar.[ALL].[2020]), parent([Payment Method].[ALL])) } on 1 from [Online Store] ;
 ---
 with MEmber measure.XXX as ([measure].[sales amount]) / (paREnt(CurrentMember(Calendar)), [measure].[sales amount]) select { ([measure].[sales amount]), (measure.XXX) } ON 0, FIlter(members(Calendar), ([measure].[sales amount]) > 4000) on 1 from [Online Store] ;
+---
+with MEmber measure.XXX as ([measure].[sales amount]) / (paREnt(CurrentMember(Calendar)), [measure].[sales amount]) select { ([measure].[sales amount]), (measure.XXX) } ON 0, FIlter(members(Calendar), ([measure].[sales amount]) > 4000) on 1 from [SSSSSSSSSSSSSSSSSSSS];
 ---
 with member [starting date].PPPPPP as ([starting date].[2021].Q1.M2) + ([starting date].[2021].Q1.M3) member [measure].MMMMMM as (prevMember(currentMember([starting date])), measure.cost) select { (measure.cost), ([measure].MMMMMM) } on 1, filter(members([starting date]), (measure.cost) > 1) on 200 from [logistics.test] where ( [Goods].[ALL].[electronic product].[computer] , Transport.[ALL].railway, [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [completion date].[ALL].[2020].[Q1].[M3] );
 ---
@@ -131,6 +137,8 @@ select order(members(Calendar), (measure.[sales amount]), ASC) on 10, { (measure
 select order(members(Calendar), (measure.[sales amount]), DESC) on 10, { (measure.[sales amount]) } on 1 from [Online Store] ;
 ---
 select order(members(Calendar), (measure.[sales amount]), BASC) on 10, { (measure.[sales amount]) } on 1 from [Online Store] ;
+---
+select order(members(Calendar), (measure.[sales amount]), BASC) on 10, { (measure.[sales amount]) } on 1 from [MMMMMMMMMMMMMMMMMMMMMMMMM];
 ---
 select order(members(Calendar), (measure.[sales amount]), BDESC) on 10, { (measure.[sales amount]) } on 1 from [Online Store] ;
 ---

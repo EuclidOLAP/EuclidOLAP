@@ -258,14 +258,19 @@ static int execute_command(EuclidCommand *ec)
 			MultiDimResult *md_rs = exe_multi_dim_queries(select_def);
 
 			log_print("// TODO ....................... %s:%d\n", __FILE__, __LINE__); // TODO should be return a multi-dim-result
-			MultiDimResult_print(md_rs);
 
-			char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL<<19, OBJ_TYPE__RAW_BYTES);
-			*((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL<<19;
-			*((unsigned short *)(payload + SZOF_INT)) = INTENT__SUCCESSFUL;
-			mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL<<19);
-			ec->result = create_command(payload);
+			if (cur_thrd_mam->exception_desc == NULL) {
+				MultiDimResult_print(md_rs);
 
+				char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL<<19, OBJ_TYPE__RAW_BYTES);
+				*((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL<<19;
+				*((unsigned short *)(payload + SZOF_INT)) = INTENT__SUCCESSFUL;
+				mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL<<19);
+				ec->result = create_command(payload);
+			} else {
+				ec->result = ec_new(INTENT__EXE_RESULT_DESC, strlen(cur_thrd_mam->exception_desc) + 1);
+				strcpy(ec->result->bytes + SZOF_INT + SZOF_SHORT, cur_thrd_mam->exception_desc);
+			}
 		}
 		else if (ids_type == IDS_ARRLS_DIMS_LVS_INFO)
 		{
