@@ -1,0 +1,201 @@
+select { ([Calendar].[2020].[Q1]), ([Calendar].[2020].[Q2]), ([Calendar].[2020].[Q3]), ([Calendar].[2020].[Q4]) } on 0, { ([支付方式].[信用卡], measure.[销售额]), ([支付方式].[借记卡], measure.[销售额]), ([支付方式].[账户余额], measure.[销售额]) } on 1 from [在线商店];
+---
+with member Calendar.[First half 2020] as ([Calendar].[2020].[Q1]) + ([Calendar].[2020].[Q2]) member Calendar.[Second half 2020] as ([Calendar].[2020].[Q3]) + ([Calendar].[2020].[Q4]) select { ([Calendar].[2020].[Q1]), ([Calendar].[2020].[Q2]), ([Calendar].[2020].[Q3]), ([Calendar].[2020].[Q4]), (Calendar.[First half 2020]), (Calendar.[Second half 2020]) } on 0, { ([支付方式].[信用卡]), ([支付方式].[借记卡]), ([支付方式].[账户余额]) } on 1 from [在线商店];
+---
+with member [支付方式].PROPORTION as ([支付方式].[ALL].[信用卡]) / ([支付方式].[ALL]) select { ([Calendar].[2020].[Q1]), ([Calendar].[2020].[Q2]), ([Calendar].[2020].[Q3]), ([Calendar].[2020].[Q4]) } on 0, { ([支付方式].[ALL].[信用卡]), ([支付方式].[ALL]), ([支付方式].PROPORTION) } on 1 from [在线商店] where (measure.[销售额]);
+---
+select children([商品].[厨房和餐厅]) on 0, children([Calendar].[ALL].[2021].[Q4]) on 1 from [在线商店] where (measure.[销售额]);
+---
+select members([商品], NOT_LEAFS) on 10, members(Calendar, LEAFS) on 100 from [在线商店];
+---
+select { (measure.[销售额]), (measure.[销售数量]) } on 10, crossjoin(members([店铺类型], LEAFS), members([支付方式], ALL)) on 100 from [在线商店];
+---
+select { (measure.[销售额]), (measure.[销售数量]) } on 10, crossjoin(members([店铺类型], LEAFS), members([支付方式], ALL), children([Calendar].[ALL].[2021].[Q4])) on 100 from [在线商店];
+---
+select { (measure.[销售数量]), (measure.[销售额]) } on 10, crossjoin(members([店铺类型], LEAFS), members([支付方式], ALL), children([Calendar].[ALL].[2021].[Q4]), children([商品].[ALL])) on 100 from [在线商店];
+---
+select members(measure) on 0, crossjoin(children([店铺类型].[ALL]), members([支付方式])) on 1 from [在线商店];
+---
+select { ( [出发地区].[ALL].[亚洲].[中国], [运输].[ALL].[铁路] ), ( [出发地区].[ALL].[亚洲].[中国], [运输].[ALL].[铁路], [measure].[数量] ), ( [出发地区].[ALL].[亚洲].[中国], [运输].[ALL].[高速公路], [measure].[数量] ), ( [商品].[ALL].[食品].[坚果], [运输].[ALL].[铁路], [出发地区].[ALL].[亚洲].[中国] ) } on 0, { ( [开始日期].[ALL].[2019].[Q4].[M10], [商品].[ALL].[食品].[坚果], [measure].[收入] ), ( [开始日期].[ALL].[2019].[Q4].[M10], [商品].[ALL].[食品].[坚果] ), ( [开始日期].[ALL].[2019].[Q3].[M9], [商品].[ALL].[食品].[葡萄酒] ), ( [终点地区].[ALL].[亚洲].[中国], [开始日期].[ALL].[2019].[Q3].[M7], [完成日期].[ALL].[2019].[Q3].[M7] ) } on 1 from [物流测试] ;
+---
+select { ([商品].[食品],[运输].[铁路],[出发地区].[欧洲].[英国]), ([运输].[高速公路],[出发地区].[亚洲].[日本]) } on 0, { ([出发地区].[美洲].[智利],[终点地区].[亚洲].[中国]), ([终点地区].[亚洲].[韩国]), ([开始日期].[2019].[Q3].[M8],[完成日期].[2020].[Q2],[商品].[食品]) } on 1, { ([完成日期].[2020].[Q4],[商品].[食品],[运输].[海运]), ([商品].[食品],[运输].[铁路]), ([运输].[高速公路]), ([出发地区].[欧洲].[希腊]) } on 2 from [物流测试];
+---
+select { ( [商品].[食品].[坚果], [运输].[高速公路], [出发地区].[欧洲].[英国], [终点地区].[亚洲].[韩国], [开始日期].[2019].[Q3].[M8], [完成日期].[2020].[Q4] ), ( [终点地区].[亚洲].[韩国], [开始日期].[2019].[Q3].[M8], [完成日期].[2020].[Q4], [商品].[食品].[坚果], [运输].[高速公路], [出发地区].[欧洲].[英国] ) } on 0 from [物流测试] ;
+---
+select { ( [商品].[食品].[牛肉], [运输].[航空], [出发地区].[亚洲].[日本], [终点地区].[美洲].[美国], [开始日期].[2019].[Q3].[M7] ), ( [商品].[食品].[牛肉], [运输].[航空], [出发地区].[亚洲].[日本], [终点地区].[美洲].[美国], [开始日期].[2019].[Q3].[M7] ), ( [商品].[食品].[牛肉], [运输].[航空], [出发地区].[亚洲].[日本], [终点地区].[美洲].[美国], [开始日期].[2019].[Q3].[M7] ), ( [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利], [measure].[数量] ), ( [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利], [measure].[收入] ), ( [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利], [measure].[成本] ), ( [出发地区].[美洲].[智利], [终点地区].[欧洲].[英国], [开始日期].[2020].[Q4].[M11], [完成日期].[2020].[Q4].[M12], [measure].[数量] ), ( [商品].[家电].[电视机], [运输].[海运], [出发地区].[美洲].[智利], [终点地区].[欧洲].[英国] ), ( [商品].[家电].[电视机], [运输].[海运], [出发地区].[美洲].[智利], [终点地区].[欧洲].[英国], [开始日期].[2020].[Q4].[M11], [完成日期].[2020].[Q4].[M12] ) } on 0, { ( [完成日期].[2020].[Q1].[M1], [measure].[数量] ), ( [完成日期].[2020].[Q1].[M1], [measure].[收入] ), ( [完成日期].[2020].[Q1].[M1], [measure].[成本] ), ( [商品].[家电].[电视机], [运输].[海运], [开始日期].[2021].[Q2].[M5], [完成日期].[2020].[Q1].[M3] ), ( [商品].[家电].[电视机], [运输].[海运], [开始日期].[2021].[Q2].[M5], [完成日期].[2020].[Q1].[M3] ), ( [开始日期].[2021].[Q2].[M5], [完成日期].[2020].[Q1].[M3], [商品].[家电].[电视机], [运输].[海运] ), ( [商品].[家电].[电视机], [运输].[海运] ), ( [终点地区].[欧洲].[英国], [开始日期].[2020].[Q4].[M11], [完成日期].[2020].[Q4].[M12], [measure].[收入] ), ( [商品].[家电].[电视机], [运输].[海运], [出发地区].[美洲].[智利], [终点地区].[欧洲].[英国], [开始日期].[2020].[Q4].[M11], [完成日期].[2020].[Q4].[M12], [measure].[成本] ) } on 1 from [物流测试] ;
+---
+select { ([终点地区].[欧洲].[意大利], [完成日期].[2020].[Q1].[M3], measure.[成本] ) } on 0, { ([商品].[家电].[电视机], [运输].[海运], [出发地区].[欧洲].[英国] ) } on 1, { ( [开始日期].[2021].[Q2].[M5] ) } on 2 from [物流测试] ;
+---
+select { ([终点地区].[欧洲].[意大利], [完成日期].[2020].[Q1].[M3], measure.[成本] ) } on 0, { ([商品].[家电].[电视机], [运输].[海运], [出发地区].[欧洲].[英国] ) } on 1 from [物流测试] where ( [开始日期].[2021].[Q2].[M5] );
+---
+select { ( measure.[成本], [终点地区].[亚洲].[中国] ), ( measure.[成本], [终点地区].[亚洲].[日本] ), ( measure.[成本], [终点地区].[亚洲].[韩国] ), ( measure.[成本], [终点地区].[美洲].[美国] ), ( measure.[成本], [终点地区].[美洲].[墨西哥] ), ( measure.[成本], [终点地区].[美洲].[智利] ), ( measure.[成本], [终点地区].[欧洲].[希腊] ), ( measure.[成本], [终点地区].[欧洲].[意大利] ), ( measure.[成本], [终点地区].[欧洲].[英国] ), ( measure.[成本], [终点地区].[亚洲] ), ( measure.[成本], [终点地区].[美洲] ), ( measure.[成本], [终点地区].[欧洲] ) } on 0 from [物流测试] where ( [商品].[食品].[坚果], [运输].[铁路], [出发地区].[亚洲].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+with member [measure].[MM001] as (measure.[成本]) + (measure.[成本]) * (measure.[成本]) - (measure.[成本]) select { ( measure.[成本], [终点地区].[亚洲].[中国] ), ( measure.[成本], [终点地区].[亚洲].[日本] ), ( measure.[成本], [终点地区].[亚洲].[韩国] ), ( measure.[成本], [终点地区].[美洲].[美国] ), ( measure.[成本], [终点地区].[美洲].[墨西哥] ), ( measure.[成本], [终点地区].[美洲].[智利] ), ( measure.[成本], [终点地区].[欧洲].[希腊] ), ( measure.[成本], [终点地区].[欧洲].[意大利] ), ( measure.[成本], [终点地区].[欧洲].[英国] ), ( measure.[成本], [终点地区].[亚洲] ), ( measure.[成本], [终点地区].[美洲] ), ( measure.[成本], [终点地区].[欧洲] ), ( measure.MM001, [终点地区].[欧洲] ), ( measure.MM001, [终点地区].[亚洲] ) } on 0 from [物流测试] where ( [商品].[食品].[坚果], [运输].[铁路], [出发地区].[亚洲].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+with member [终点地区].CCCCCC as ([终点地区].[亚洲].[中国]) * ([终点地区].[美洲].[美国]) / ([终点地区].[欧洲].[希腊]) + ([终点地区].[欧洲].[意大利]) member [终点地区].AAAAAA as ([终点地区].[亚洲].[中国]) * 1000000000 + ([终点地区].[美洲].[美国]) member [终点地区].X as (([终点地区].[欧洲].[希腊]) * ((([终点地区].[亚洲].[中国]) * ([终点地区].[美洲].[美国]) / ([终点地区].[欧洲].[希腊]) + ([终点地区].[欧洲].[意大利])) + 1000) - ([终点地区].[欧洲].[意大利])) / 0.5 member [终点地区].XX as ((((((((((((((((((([终点地区].[亚洲]))))))))))))))))))) + ((([终点地区].[亚洲].[中国]))) * 10000 select { ( measure.[成本], [终点地区].[亚洲].[中国] ), ( measure.[成本], [终点地区].[美洲].[美国] ), ( measure.[成本], [终点地区].[欧洲].[希腊] ), ( measure.[成本], [终点地区].[欧洲].[意大利] ), ( measure.[成本], [终点地区].CCCCCC ), ( measure.[成本], [终点地区].AAAAAA ), ( measure.[成本], [终点地区].X ), ( measure.[成本], [终点地区].XX ) } on 0 from [物流测试] where ( [商品].[食品].[坚果], [运输].[铁路], [出发地区].[亚洲].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+with set SSSSSS as children( [终点地区].[亚洲] ) select SSSSSS on 999 from [物流测试] where ( [商品].[食品].[坚果], [运输].[铁路], [出发地区].[亚洲].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+with set QQQ as XXX set XXX as children( [商品].[电子产品] ) select children([开始日期].[2021]) on 0, QQQ on 111 from [物流测试] where ( [完成日期].[2020].[Q1].[M3], [运输].[铁路], [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利], measure.[成本] );
+---
+with set QQQ as XXX set XXX as children( parent([商品].[电子产品].[计算器]) ) select children( parent( parent( [开始日期].[2021].Q1.M3 ) ) ) on 0, QQQ on 111 from [物流测试] where ( [完成日期].[2020].[Q1].[M3], [运输].[铁路], [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利], measure.[收入] );
+---
+with member [measure].[FFFFFF] as sum( {(measure.[收入]), (measure.[成本])}, ([商品].[电子产品].[计算器]) ) select { (measure.[成本]), (measure.[收入]), ([measure].[FFFFFF]) } on 0, children( [开始日期].[2021].Q1 ) on 1 from [物流测试] where ( [商品].[电子产品].[移动电话], [完成日期].[2020].[Q1].[M3], [运输].[铁路], [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利] );
+---
+with member [measure].[FFFFFF] as sum( {(measure.[收入]), (measure.[成本])}, ([商品].[电子产品].[计算器]) ) member [开始日期].SSSSSS as sum( children( [开始日期].[2021] ), ([商品].[电子产品].[计算器]) ) select { (measure.[成本]), (measure.[收入]), ([measure].[FFFFFF]) } on 0, { ([开始日期].[2021].Q1.M1), ([开始日期].[2021].Q1.M2), ([开始日期].[2021].Q1.M3), ([开始日期].SSSSSS) } on 1 from [物流测试] where ( [商品].[电子产品].[移动电话], [完成日期].[2020].[Q1].[M3], [运输].[铁路], [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利] );
+---
+with member [开始日期].SSSSSS as sum( { ([开始日期].[2021].Q1), ([开始日期].[2021].Q2), ([开始日期].[2021].Q3), ([开始日期].[2021].Q4) } ) member [商品].GGGGGG as sum( { ([商品].[电子产品].[移动电话]), ([商品].[电子产品].[计算器]), ([商品].[电子产品].[智能手表]) } ) select { ([开始日期].[2021].Q1), ([开始日期].[2021].Q2), ([开始日期].[2021].Q3), ([开始日期].[2021].Q4), ([开始日期].SSSSSS) } on 0, { ([商品].[电子产品].[移动电话]), ([商品].[电子产品].[计算器]), ([商品].[电子产品].[智能手表]), ([商品].GGGGGG) } on 1 from [物流测试] where ( [运输].[铁路], [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利], [完成日期].[2020].[Q1].[M3], measure.[成本] );
+---
+select { ([开始日期].[2021].Q1), ([开始日期].[2021].Q2) } on 999, { (measure.[收入]), (measure.[成本]) } on 100 from [物流测试] where ( [商品].[电子产品].[计算器] , [运输].[铁路], [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利], [完成日期].[2020].[Q1].[M3] );
+---
+select children( [开始日期].[2021].Q1 ) on 999, { (measure.[收入]), (measure.[成本]) } on 100 from [物流测试] where ( [商品].[电子产品].[计算器] , [运输].[铁路], [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利], [完成日期].[2020].[Q1].[M3] );
+---
+select members([商品]) on 0, crossJoin(members(measure), members([终点地区])) on 1 from [物流测试] ;
+---
+with member [开始日期].PPPPPP as ([开始日期].[2021].Q1.M2) + ([开始日期].[2021].Q1.M3) member [measure].MMMMMM as (measure.[收入]) * (measure.[成本]) select { (measure.[收入]), (measure.[成本]), ([measure].MMMMMM) } on 100, { ([开始日期].[2021].Q1.M1), ([开始日期].[2021].Q1.M2), ([开始日期].[2021].Q1.M3), ([开始日期].PPPPPP) } on 200 from [物流测试] where ( [商品].[电子产品].[计算器] , [运输].[铁路], [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利], [完成日期].[2020].[Q1].[M3] );
+---
+with member [开始日期].PPPPPP as ([开始日期].[2021].Q1.M2) + ([开始日期].[2021].Q1.M3) member [measure].MMMMMM as (measure.[收入]) * (measure.[成本]) select { (measure.[收入]), (measure.[成本]), ([measure].MMMMMM) } on 1000, { ([开始日期].[2021].Q1.M1), ([开始日期].[2021].Q1.M2), ([开始日期].[2021].Q1.M3), ([开始日期].PPPPPP) } on 200 from [物流测试] where ( [商品].[电子产品].[计算器] , [运输].[铁路], [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利], [完成日期].[2020].[Q1].[M3] );
+---
+with member measure.SSSSSS as sum({ (measure.XXX), (measure.YYY), (measure.ZZZ) }) member measure.XXX as ([measure].[销售额]) * 10 member measure.YYY as ((measure.XXX) + 9900000000) member measure.ZZZ as (measure.YYY) / 8 - 222.22 select { ([measure].[销售额]), (measure.XXX), (measure.YYY), (measure.ZZZ), (measure.SSSSSS) } on 0, members(Calendar) on 1 from [在线商店] ;
+---
+with member measure.SSSSSS as sum({ (measure.XXX), (measure.YYY), (measure.ZZZ) }) member measure.XXX as ([measure].[销售额]) * 10 member measure.YYY as ((measure.XXX) + 9900000000) member measure.ZZZ as (measure.YYY) / 8 - 222.22 member measure.QQQ as sum({([measure].[销售额]), ([measure].[现金返还])}) member Calendar.VVV as sum({ ([Calendar].[ALL].[2020]), ([Calendar].[ALL].[2019]) }) select { ([measure].[销售额]), ([measure].[现金返还]), (measure.XXX), (measure.YYY), (measure.ZZZ), (measure.SSSSSS) } on 0, { ([Calendar].[ALL].[2019]), ([Calendar].[ALL].[2020]), (Calendar.VVV) } on 1 from [在线商店] ;
+---
+with member Calendar.SSSSSS as count(members(Calendar)) member Calendar.EEE as count(members(Calendar), EXCLUDEEMPTY) member Calendar.III as count(members(Calendar), INCLUDEEMPTY) select { ([measure].[销售额]), ([measure].[现金返还]) } on 0, { ([Calendar].[ALL].[2019]), ([Calendar].[ALL].[2020]), (Calendar.SSSSSS), (Calendar.EEE), (Calendar.III) } on 1 from [在线商店] ;
+---
+with member Calendar.SSSSSS as count(members(Calendar)) member Calendar.EEE as count(members(Calendar), EXCLUDEEMPTY) member Calendar.III as count(members(Calendar), INCLUDEEMPTY) select { ([measure].[销售额]), ([measure].[现金返还]) } on 0, members(Calendar) on 1 from [在线商店] ;
+---
+select {(measure.[销售额])} on 0, {(measure.[销售额])} on 1 from [在线商店];
+---
+select { ([measure].[销售额]) } on 0, filter({ ([Calendar].[ALL].[2020].[Q1]), ([Calendar].[ALL].[2020]) }, ([measure].[销售额]) > 29.999 ) on 1 from [在线商店] where ([店铺类型].[ALL].[平台自营],[支付方式].[ALL].[信用卡],[商品].[ALL].[厨房和餐厅].[便当盒]);
+---
+select members(measure) on 1, filter(members(Calendar), ((((([measure].[销售额]) < 240)))) ANd ((((([measure].[销售额]) >= 30)))) ) on 99999999 from [在线商店] where ([店铺类型].[ALL].[平台自营],[支付方式].[ALL].[信用卡],[商品].[ALL].[厨房和餐厅].[便当盒]) ;
+---
+select { ([店铺类型].[ALL]) } on 0, filter(members(Calendar), ([店铺类型].[ALL]) > 17279.999999999) on 1 from [在线商店] ;
+---
+select { ([店铺类型].[ALL]) } on 0, filter(members(Calendar), (([店铺类型].[ALL]) <= 2000) oR ([店铺类型].[ALL]) > 30000) on 1 from [在线商店] ;
+---
+select { ( [出发地区].[ALL].[亚洲].[中国], [运输].[ALL].[铁路] ) } on 0, filter({ ( [开始日期].[ALL].[2019].[Q4].[M10], [商品].[ALL].[食品].[坚果], [measure].[收入] ), ( [开始日期].[ALL].[2019].[Q4].[M10], [商品].[ALL].[食品].[坚果] ), ( [开始日期].[ALL].[2019].[Q3].[M9], [商品].[ALL].[食品].[葡萄酒] ), ( [终点地区].[ALL].[亚洲].[中国], [开始日期].[ALL].[2019].[Q3].[M7], [完成日期].[ALL].[2019].[Q3].[M7] ) }, (([运输].[ALL].[铁路]) > 0) OR (1 < 2)) on 1 from [物流测试] ;
+---
+with member [支付方式].PROPORTION as ([支付方式].[ALL].[信用卡]) / ([支付方式].[ALL]) select { ([Calendar].[2020].[Q4]) } on 10, filter( { ([支付方式].[ALL].[信用卡]), ([支付方式].[ALL]), ([支付方式].PROPORTION) }, (measure.[销售额]) <> 4320 ) on 1 from [在线商店] where (measure.[销售额]);
+---
+with member measure.SSSSSS as sum({ (measure.XXX), (measure.YYY), (measure.ZZZ) }) member measure.XXX as ([measure].[销售额]) * 10 member measure.YYY as ((measure.XXX) + 111) member measure.ZZZ as (measure.YYY) / 8 - 222.22 member measure.QQQ as sum({([measure].[销售额]), ([measure].[现金返还])}) member Calendar.VVV as sum({ ([Calendar].[ALL].[2020]), ([Calendar].[ALL].[2019]) }) select { (measure.SSSSSS), ([measure].[销售额]), ([measure].[现金返还]), (measure.XXX), (measure.YYY), (measure.ZZZ) } on 0, filter(members(Calendar), (((measure.SSSSSS) <= 30000) or ((measure.SSSSSS) >= 40000)) and (((measure.SSSSSS) <= 360000) or ((measure.SSSSSS) >= 370000))) on 1 from [在线商店] ;
+---
+with set QQQ as XXX set XXX as children( parent([商品].[电子产品].[计算器]) ) select children( parent( parent( [开始日期].[2021].Q1.M3 ) ) ) on 0, filter(QQQ, (parent( [开始日期].[2021].Q1.M3 )) <> 9003) on 111 from [物流测试] where ( [完成日期].[2020].[Q1].[M3], [运输].[铁路], [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利], measure.[收入] );
+---
+WITH set QQQ as XXX set XXX as children( parent([商品].[电子产品].[计算器]) ) SELECT chILDren( parent( parent( [开始日期].[2021].Q1.M3 ) ) ) On 0, filter(QQQ, (parent( [开始日期].[2021].Q1.M3 )) <> 9003) On 111 frOM [物流测试] whERE ( [完成日期].[2020].[Q1].[M3], [运输].[铁路], [出发地区].[欧洲].[英国], [终点地区].[欧洲].[意大利], measure.[收入] );
+---
+select { ([店铺类型].[ALL]) } on 0, { (parent(Calendar.[ALL].[2020]), parent([支付方式].[ALL])) } on 1 from [在线商店] ;
+---
+with MEmber measure.XXX as ([measure].[销售额]) / (paREnt(CurrentMember(Calendar)), [measure].[销售额]) select { ([measure].[销售额]), (measure.XXX) } ON 0, FIlter(members(Calendar), ([measure].[销售额]) > 4000) on 1 from [在线商店] ;
+---
+with member [开始日期].PPPPPP as ([开始日期].[2021].Q1.M2) + ([开始日期].[2021].Q1.M3) member [measure].MMMMMM as (prevMember(currentMember([开始日期])), measure.[成本]) select { (measure.[成本]), ([measure].MMMMMM) } on 1, filter(members([开始日期]), (measure.[成本]) > 1) on 200 from [物流测试] where ( [商品].[ALL].[电子产品].[计算器] , [运输].[ALL].[铁路], [出发地区].[ALL].[欧洲].[英国], [终点地区].[ALL].[欧洲].[意大利], [完成日期].[ALL].[2020].[Q1].[M3] );
+---
+with member [开始日期].XXX as (prevMember(currentMember([measure])), [开始日期].[2021]) select members(measure) on 1, { ( [开始日期].[2021] ), ([开始日期].XXX) } on 0 from [物流测试] where ([商品].[ALL].[家电].[电视机], [运输].[ALL].[海运], [出发地区].[ALL].[欧洲].[英国], [终点地区].[ALL].[欧洲].[意大利], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select { (Calendar.[ALL].[2021].Q2.M4), (Calendar.[ALL].[2021].Q3.M7) } on 0, { (measure.[销售额]) } on 1 from [在线商店] ;
+---
+select { (Calendar.[ALL].[2021].Q3.M7), (Calendar.[ALL].[2021].Q4.M10) } on 0, { (measure.[销售额]) } on 1 from [在线商店] ;
+---
+with member measure.XXX as (measure.[销售额], parallelPeriod()) select { (Calendar.[ALL].[2021].Q3.M7), (Calendar.[ALL].[2021].Q4.M10) } on 0, { (measure.XXX) } on 1 from [在线商店] ;
+---
+select { (Calendar.[ALL].[2020].Q4.M12), (Calendar.[ALL].[2021].Q4.M12) } on 0, { (measure.[销售额]) } on 1 from [在线商店] ;
+---
+with member measure.XXX as (measure.[销售额], parallelPeriod(Calendar.year)) select { (Calendar.[ALL].[2021].Q4.M12) } on 0, { (measure.XXX) } on 1 from [在线商店] ;
+---
+select { (Calendar.[ALL].[2021].Q4.M12) } on 1, { (measure.[销售额], parallelPeriod(Calendar.year)) } on 0 from [在线商店] ;
+---
+select { (Calendar.[ALL].[2021].Q1.M2), (Calendar.[ALL].[2021].Q3.M8), (Calendar.[ALL].[2021].Q4.M11) } on 0, { (measure.[销售额]) } on 1 from [在线商店] ;
+---
+with member measure.XXX as (measure.[销售额], parallelPeriod(Calendar.quarter, 3)) select { (Calendar.[ALL].[2021].Q4.M11) } on 0, { (measure.XXX) } on 1 from [在线商店] ;
+---
+with member measure.XXX as (measure.[销售额], parallelPeriod(Calendar.quarter, 0 - 2, Calendar.[ALL].[2021].Q1.M2)) select { (Calendar.[ALL].[2021].Q4.M11) } on 0, { (measure.XXX) } on 1 from [在线商店] ;
+---
+with member measure.XXX as (measure.[销售额], parallelPeriod(Calendar.year, 0 - 1)) select { (Calendar.[ALL].[2020].Q4.M11) } on 0, { (measure.XXX) } on 1 from [在线商店] ;
+---
+with member measure.XXX as (measure.[销售额], parallelPeriod(Calendar.year, 0 - 1)) select { (Calendar.[ALL].[2020].Q4.M11) } on 0, { (measure.[销售额]) } on 1 from [在线商店] ;
+---
+select { (Calendar.[ALL].[2021].Q4.M11) } on 0, { (measure.[销售额]) } on 1 from [在线商店] ;
+---
+with member measure.AAA as (measure.[销售额], parallelPeriod(Calendar.month, 0 - 3)) member measure.SSS as (measure.[销售数量], parallelPeriod(Calendar.month, 0)) member measure.DDD as (measure.[现金返还], parallelPeriod(Calendar.month, 0 - 5)) select { (Calendar.[ALL].[2021].[Q3].M7) } on 0, {(measure.AAA),(measure.SSS),(measure.DDD)} on 1 from [在线商店] ;
+---
+select LateralMembers(Calendar.[ALL].[2020].Q4) on 0, { (measure.[销售额]) } on 1 from [在线商店] ;
+---
+select LateralMembers(measure.[销售额]) on 1, LateralMembers(Calendar.[ALL].[2020].Q4) on 10 from [在线商店] ;
+---
+SELECT crossjoin(LATERALMEMBERS([出发地区].[ALL].[欧洲]), LATERALMEMBERS(measure.[收入])) On 10, LATERALMEMBERS([完成日期].[ALL]) On 1 frOM [物流测试] ;
+---
+select order(members(Calendar), (measure.[销售额])) on 10, { (measure.[销售额]) } on 1 from [在线商店] ;
+---
+select order(members(Calendar), (measure.[销售额]), ASC) on 10, { (measure.[销售额]) } on 1 from [在线商店] ;
+---
+select order(members(Calendar), (measure.[销售额]), DESC) on 10, { (measure.[销售额]) } on 1 from [在线商店] ;
+---
+select order(members(Calendar), (measure.[销售额]), BASC) on 10, { (measure.[销售额]) } on 1 from [在线商店] ;
+---
+select order(members(Calendar), (measure.[销售额]), BDESC) on 10, { (measure.[销售额]) } on 1 from [在线商店] ;
+---
+select { (measure.[销售额]) } on 0, order(members(Calendar), (measure.[销售额]), basc) on 1 from [在线商店] ;
+---
+select { ([Calendar].[ALL].[2021]) } on 0, topCount(crossjoin(members(measure), children([店铺类型].[ALL]), lateralMembers([支付方式].[ALL].[其他])), 10, ([Calendar].[ALL].[2021])) on 1 from [在线商店] ;
+---
+select members([商品]) on 0, crossJoin(members(measure), members([终点地区])) on 1 from [物流测试] ;
+---
+select except(members([商品]), children([商品].[食品])) on 1, { ( measure.[成本] ) } on 0 from [物流测试] where ( [商品].[食品].[坚果], [运输].[铁路], [出发地区].[亚洲].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+select except(members([商品]), children([商品].[食品])) on 1, except(members( measure ), {(measure.[成本]), (measure.[收入])}) on 0 from [物流测试] where ( [商品].[食品].[坚果], [运输].[铁路], [出发地区].[亚洲].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+select crossJoin(members(measure), lateralMembers([商品].[ALL].[食品])) on 1, {([开始日期].[ALL].[2020])} on 0 from [物流测试];
+---
+with set [~~~!!!@@@...] as crossJoin({(measure.[成本]), (measure.[数量])}, {([商品].[ALL].[手机及配件]), ([商品].[ALL].[家电])}) select except(crossJoin(members(measure), lateralMembers([商品].[ALL].[食品])), [~~~!!!@@@...]) on 1, {([开始日期].[ALL].[2020])} on 0 from [物流测试];
+---
+with member measure.SSSSSS as sum(Ytd(), (measure.[销售额])) select { (measure.[销售额]), (measure.SSSSSS)} on 1, YTD() on 10 from [在线商店] where (Calendar.[ALL].[2021].Q4.M12, [支付方式].[ALL].[信用卡]);
+---
+with member measure.SSSSSS as sum(Ytd(), (measure.[销售额])) select { (measure.[销售额]), (measure.SSSSSS)} on 1, YTD(Calendar.[ALL].[2021].Q2.M5) on 10 from [在线商店] where (Calendar.[ALL].[2021].Q4.M12, [支付方式].[ALL].[信用卡]);
+---
+select members(measure) on 1, Descendants([开始日期].[ALL].[2021], [开始日期].[quarter]) on 0 from [物流测试] where ([商品].[ALL].[家电].[电视机], [运输].[ALL].[海运], [出发地区].[ALL].[欧洲].[英国], [终点地区].[ALL].[欧洲].[意大利], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select members(measure) on 1, Descendants([开始日期].[ALL].[2021], [开始日期].[month]) on 0 from [物流测试] where ([商品].[ALL].[家电].[电视机], [运输].[ALL].[海运], [出发地区].[ALL].[欧洲].[英国], [终点地区].[ALL].[欧洲].[意大利], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select members(measure) on 1, Descendants([开始日期].[ALL].[2021], [开始日期].[month], BEFORE) on 0 from [物流测试] where ([商品].[ALL].[家电].[电视机], [运输].[ALL].[海运], [出发地区].[ALL].[欧洲].[英国], [终点地区].[ALL].[欧洲].[意大利], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select members(measure) on 1, Descendants([开始日期].[ALL], [开始日期].[quarter]) on 10 from [物流测试] where ([商品].[ALL].[家电].[电视机], [运输].[ALL].[海运], [出发地区].[ALL].[欧洲].[英国], [终点地区].[ALL].[欧洲].[意大利], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select members(measure) on 1, Descendants([开始日期].[ALL], [开始日期].[quarter], BEFORE_AND_AFTER) on 10 from [物流测试] where ([商品].[ALL].[家电].[电视机], [运输].[ALL].[海运], [出发地区].[ALL].[欧洲].[英国], [终点地区].[ALL].[欧洲].[意大利], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select members(measure) on 1, Descendants([开始日期].[ALL], 20, LEAVES) on 10 from [物流测试] where ([商品].[ALL].[家电].[电视机], [运输].[ALL].[海运], [出发地区].[ALL].[欧洲].[英国], [终点地区].[ALL].[欧洲].[意大利], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select members(measure) on 1, Descendants([开始日期].[ALL], 3) on 10 from [物流测试] ;
+---
+with set SSSSSS as tail( crossjoin(LATERALMEMBERS([出发地区].[ALL].[欧洲]), LATERALMEMBERS(measure.[收入])) ) SELECT SSSSSS On 10, LATERALMEMBERS([完成日期].[ALL]) On 1 frOM [物流测试] ;
+---
+with set SSSSSS as tail( crossjoin(LATERALMEMBERS([出发地区].[ALL].[欧洲]), LATERALMEMBERS(measure.[收入])), 8 ) SELECT SSSSSS On 10, LATERALMEMBERS([完成日期].[ALL]) On 1 frOM [物流测试] ;
+---
+with set SSSSSS as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measure.[销售额]) > 1) member measure.XXXXXX as (measure.[销售额]) - 20000 select topPercent(SSSSSS, 25, (measure.[销售额])) on 10, {(measure.XXXXXX)} on 1 from [在线商店] ;
+---
+with set SSSSSS as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measure.[销售额]) > 1) member measure.XXXXXX as (measure.[销售额]) - 20000 select bottomPercent(SSSSSS, 25, (measure.[销售额])) on 10, {(measure.[销售额])} on 1 from [在线商店] ;
+---
+with set SSSSSS as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measure.[销售额]) > 1) member measure.XXXXXX as (measure.[销售额]) - 20000 select topPercent(SSSSSS, 55, (measure.[销售额])) on 10, {(measure.[销售额])} on 1 from [在线商店] ;
+---
+with set SSSSSS as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measure.[销售额]) > 1) member measure.XXXXXX as (measure.[销售额]) - 18000 select bottomPercent(SSSSSS, 53, (measure.[XXXXXX])) on 10, {(measure.[XXXXXX])} on 1 from [在线商店] ;
+---
+with select members(measure) on 999, UNION(crossJoin(children([商品].[ALL].[食品]), children([出发地区].[ALL])), crossJoin(children([商品].[ALL].[食品]), children([出发地区].[ALL]))) on 111111 from [物流测试] where ( [商品].[食品].[坚果], [运输].[铁路], [出发地区].[亚洲].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+with select members(measure) on 999, UNION(crossJoin(children([商品].[ALL].[食品]), children([出发地区].[ALL])), crossJoin(children([商品].[ALL].[食品]), children([出发地区].[ALL])), All) on 111111 from [物流测试] where ( [商品].[食品].[坚果], [运输].[铁路], [出发地区].[亚洲].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+select members(measure) on 0, intersect(members(Calendar), children(Calendar.[ALL].[2021])) on 1 from [在线商店] ;
+---
+select members(measure) on 0, intersect(members(Calendar), UNION(children(Calendar.[ALL].[2021]), children(Calendar.[ALL].[2021].Q3))) on 1 from [在线商店] ;
+---
+select members(measure) on 0, intersect(members(Calendar), UNION(children(Calendar.[ALL].[2021]), children(Calendar.[ALL].[2021].Q1)), ALL) on 1 from [在线商店] ;
+---
+with member measure.SSSSSS as lookUpCube("物流测试", "(measure.[成本])") select { ( measure.[销售额] ), (measure.SSSSSS) } on 0, children(Calendar.[ALL].[2021]) on 1 from [在线商店] ;
+---
+with member measure.AAAAAA as LOOKUPCUBE("在线商店", "(measure.[销售额])") member measure.BBBBBB as LOOKUPCUBE("在线商店", (measure.[销售额], Calendar.[ALL].[2021].Q3)) member measure.CCCCCC as LOOKUPCUBE([在线商店], "(measure.[销售额], Calendar.[ALL].[2021].Q4) + (measure.[销售数量], Calendar.[ALL].[2021].Q3)") member measure.DDDDDD as LOOKUPCUBE([在线商店], (measure.[现金返还])) select { (measure.[成本]), (measure.AAAAAA), (measure.BBBBBB), (measure.CCCCCC), (measure.DDDDDD) } on 0, children([商品].[ALL]) on 1 from [物流测试] ;
+---
+with member measure.SSSSSS as sum({ (measure.XXX), (measure.YYY), (measure.ZZZ) }) member measure.XXX as ([measure].[销售额]) * 10 member measure.YYY as ((measure.XXX) + 111) member measure.ZZZ as (measure.YYY) / 8 - 222.22 member measure.QQQ as sum({([measure].[销售额]), ([measure].[现金返还])}) member Calendar.VVV as sum({ ([Calendar].[ALL].[2020]), ([Calendar].[ALL].[2019]) }) member measure.IIIIII as IIF( (measure.SSSSSS) > 2000000, 200, 404 ) select { (measure.SSSSSS), (measure.IIIIII) } on 0, filter(members(Calendar), (((measure.SSSSSS) <= 30000) or ((measure.SSSSSS) >= 40000)) and (((measure.SSSSSS) <= 360000) or ((measure.SSSSSS) >= 370000))) on 1 from [在线商店] ;
+---
+with member measure.SSSSSS as sum({ (measure.XXX), (measure.YYY), (measure.ZZZ) }) member measure.XXX as ([measure].[销售额]) * 10 member measure.YYY as ((measure.XXX) + 111) member measure.ZZZ as (measure.YYY) / 8 - 222.22 member measure.QQQ as sum({([measure].[销售额]), ([measure].[现金返还])}) member Calendar.VVV as sum({ ([Calendar].[ALL].[2020]), ([Calendar].[ALL].[2019]) }) member measure.IIIIII as IIF( (measure.SSSSSS) > 2000000, 200, 404 ) member measure.FFFFFF as IIF( (measure.IIIIII) = 200, 321, 900000000 ) select { (measure.SSSSSS), (measure.IIIIII), (measure.FFFFFF) } on 0, filter(members(Calendar), (((measure.SSSSSS) <= 30000) or ((measure.SSSSSS) >= 40000)) and (((measure.SSSSSS) <= 360000) or ((measure.SSSSSS) >= 370000))) on 1 from [在线商店] ;
+---
+with member measure.AAA as CoalesceEmpty((measure.[现金返还]), (measure.[销售数量])) select { (measure.[销售数量]), (measure.[现金返还]), (measure.AAA) } on 0, { (Calendar.[ALL]) } on 1 from [在线商店] ;
+---
+with member measure.AAA as CoalesceEmpty(CoalesceEmpty((measure.[现金返还]), (measure.[现金返还], [店铺类型].[ALL].[平台自营])), 8760.66) select { (measure.[销售额]), (measure.[现金返还]), (measure.AAA) } on 0, { (Calendar.[ALL]) } on 1 from [在线商店] ;
