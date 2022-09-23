@@ -565,6 +565,13 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 	for (i = 0; i < dr_sz; i += 2)
 	{
 		char *dim_name = als_get(dim_role_ls, i);
+
+		// Check if non-existing dimension is associated.
+		if (find_dim_by_name(dim_name) == NULL) {
+			MemAllocMng_current_thread_mam()->exception_desc = "This cube is associated with dimensions that do not exist.";
+			return -1;
+		}
+
 		char *dim_role_name = als_get(dim_role_ls, i + 1);
 		Dimension *dim = find_dim_by_name(dim_name);
 

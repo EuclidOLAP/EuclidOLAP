@@ -250,7 +250,7 @@ static int execute_command(EuclidCommand *ec)
 			stack_pop(&YC_STC, (void **)&measures_ls);
 			stack_pop(&YC_STC, (void **)&dims_roles_ls);
 			stack_pop(&YC_STC, (void **)&cube_name);
-			build_cube(cube_name, dims_roles_ls, measures_ls);
+			return build_cube(cube_name, dims_roles_ls, measures_ls);
 		}
 		else if (ids_type == IDS_CXOBJ_ISRTCUBEMEARS)
 		{
