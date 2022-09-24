@@ -1272,7 +1272,7 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 				member_role_ = mdd_mr__create(mbr, dr);
 				return member_role_;
 			}
-			else
+			else if (md_ctx->select_def->member_formulas)
 			{ // formula member
 				int f_sz = als_size(md_ctx->select_def->member_formulas);
 				for (i = 0; i < f_sz; i++)
@@ -1286,6 +1286,13 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 						return member_role_;
 					}
 				}
+				MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+				thrd_mam->exception_desc = "exception: Unrecognized dimension member.";
+				longjmp(thrd_mam->excep_ctx_env, -1);
+			} else {
+				MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+				thrd_mam->exception_desc = "exception: Unrecognized dimension member.";
+				longjmp(thrd_mam->excep_ctx_env, -1);
 			}
 		}
 		else
@@ -1388,8 +1395,11 @@ Member *dim__find_mbr(Dimension *dim, ArrayList *mbr_name_path)
 {
 	int i, len = als_size(mbr_name_path);
 	Member *m = find_member_lv1(dim, als_get(mbr_name_path, 0));
-	for (i = 1; i < len; i++)
+	for (i = 1; i < len; i++) {
+		if (!m)
+			break;
 		m = find_member_child(m, als_get(mbr_name_path, i));
+	}
 
 	return m;
 }
