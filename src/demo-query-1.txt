@@ -6,6 +6,8 @@ with member [Payment Method].PROPORTION as ([Payment Method].[ALL].[Credit Card]
 ---
 select children([Goods].[Kitchen & Dining]) on 0, children([Calendar].[ALL].[2021].[Q4]) on 1 from [Online Store] where (measure.[sales amount]);
 ---
+select children([GoodsXXXXXXXXXXXXXX].[Kitchen & Dining]) on 0, children([Calendar].[ALL].[2021].[Q4]) on 1 from [Online Store] where (measure.[sales amount]);
+---
 select members([Goods], NOT_LEAFS) on 10, members(Calendar, LEAFS) on 100 from [Online Store];
 ---
 select members([Goods], NOT_LEAFS) on 10, members(Calendar, LEAFS) on 100 from [OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO];
@@ -48,6 +50,8 @@ with member [measure].[FFFFFF] as sum( {(measure.income), (measure.cost)}, ([Goo
 ---
 with member [starting date].SSSSSS as sum( { ([starting date].[2021].Q1), ([starting date].[2021].Q2), ([starting date].[2021].Q3), ([starting date].[2021].Q4) } ) member Goods.GGGGGG as sum( { ([Goods].[electronic product].[mobile phone]), ([Goods].[electronic product].computer), ([Goods].[electronic product].[smart watch]) } ) select { ([starting date].[2021].Q1), ([starting date].[2021].Q2), ([starting date].[2021].Q3), ([starting date].[2021].Q4), ([starting date].SSSSSS) } on 0, { ([Goods].[electronic product].[mobile phone]), ([Goods].[electronic product].computer), ([Goods].[electronic product].[smart watch]), (Goods.GGGGGG) } on 1 from [logistics.test] where ( Transport.railway, [starting region].[Europe].[UK], [ending region].[Europe].[Italy], [completion date].[2020].[Q1].[M3], measure.cost );
 ---
+with member [starting date].SSSSSS as sum( { ([starting date].[2021].Q1), ([starting date].[2021].Q2), ([starting date].[2021].Q3), ([starting date].[2021].Q4) } ) member Goods.GGGGGG as sum( { ([Goods].[electronic product].[mobile phone]), ([Goods].[electronic product].computer), ([Goods].[electronic product].[smart watch]) } ) select { ([starting date].[2021].Q1), ([starting date].[2021].Q2), ([starting date].[2021].Q3), ([starting date].[2021].Q4), ([starting date].SSSSSS) } on 0, { ([Goods].[electronic product].[mobile phone]), ([Goods].[electronic product].computer), ([Goods].[electronic product].[smart watch]), (Goods.GGGGGG) } on 1 from [logistics.test] where ( Transport.railway, [starting region].[Europe].[UK], [ending region].[Europe].[Italy], [completion---date].[2020].[Q1].[M3], measure.cost );
+---
 select { ([starting date].[2021].Q1), ([starting date].[2021].Q2) } on 999, { (measure.income), (measure.cost) } on 100 from [logistics.test] where ( [Goods].[electronic product].[computer] , Transport.railway, [starting region].[Europe].[UK], [ending region].[Europe].[Italy], [completion date].[2020].[Q1].[M3] );
 ---
 select children( [starting date].[2021].Q1 ) on 999, { (measure.income), (measure.cost) } on 100 from [logistics.test] where ( [Goods].[electronic product].[computer] , Transport.railway, [starting region].[Europe].[UK], [ending region].[Europe].[Italy], [completion date].[2020].[Q1].[M3] );
@@ -89,6 +93,8 @@ with set QQQ as XXX set XXX as children( parent([Goods].[electronic product].com
 WITH set QQQ as XXX set XXX as children( parent([Goods].[electronic product].computer) ) SELECT chILDren( parent( parent( [starting date].[2021].Q1.M3 ) ) ) On 0, filter(QQQ, (parent( [starting date].[2021].Q1.M3 )) <> 9003) On 111 frOM [logistics.test] whERE ( [completion date].[2020].[Q1].[M3], Transport.[railway], [starting region].[Europe].[UK], [ending region].[Europe].[Italy], measure.income );
 ---
 select { ([Store Type].[ALL]) } on 0, { (parent(Calendar.[ALL].[2020]), parent([Payment Method].[ALL])) } on 1 from [Online Store] ;
+---
+select { ([Store Type].[ALL]) } on 0, { (parent(Calendar.[ALL].[2020]), parent([Payment.......................... Method].[ALL])) } on 1 from [Online Store];
 ---
 with MEmber measure.XXX as ([measure].[sales amount]) / (paREnt(CurrentMember(Calendar)), [measure].[sales amount]) select { ([measure].[sales amount]), (measure.XXX) } ON 0, FIlter(members(Calendar), ([measure].[sales amount]) > 4000) on 1 from [Online Store] ;
 ---
@@ -154,6 +160,8 @@ select except(members(Goods), children(Goods.[foods])) on 1, except(members( mea
 ---
 select crossJoin(members(measure), lateralMembers(Goods.[ALL].[foods])) on 1, {([starting date].[ALL].[2020])} on 0 from [logistics.test];
 ---
+select crossJoin(members(measure), lateralMembers(Goods00000000000000000000000000000.[ALL].[foods])) on 1, {([starting date].[ALL].[2020])} on 0 from [logistics.test];
+---
 with set [~~~!!!@@@...] as crossJoin({(measure.cost), (measure.quantity)}, {([Goods].[ALL].[Cell Phones & Accessories]), ([Goods].[ALL].[household appliances])}) select except(crossJoin(members(measure), lateralMembers(Goods.[ALL].[foods])), [~~~!!!@@@...]) on 1, {([starting date].[ALL].[2020])} on 0 from [logistics.test];
 ---
 with member measure.SSSSSS as sum(Ytd(), (measure.[sales amount])) select { (measure.[sales amount]), (measure.SSSSSS)} on 1, YTD() on 10 from [Online Store] where (Calendar.[ALL].[2021].Q4.M12, [Payment Method].[ALL].[Credit Card]);
@@ -201,6 +209,8 @@ with member measure.SSSSSS as lookUpCube("logistics.test", "(measure.cost)") sel
 with member measure.AAAAAA as LOOKUPCUBE("Online Store", "(measure.[sales amount])") member measure.BBBBBB as LOOKUPCUBE("Online Store", (measure.[sales amount], Calendar.[ALL].[2021].Q3)) member measure.CCCCCC as LOOKUPCUBE([Online Store], "(measure.[sales amount], Calendar.[ALL].[2021].Q4) + (measure.[sales quantity], Calendar.[ALL].[2021].Q3)") member measure.DDDDDD as LOOKUPCUBE([Online Store], (measure.[cash back])) select { (measure.cost), (measure.AAAAAA), (measure.BBBBBB), (measure.CCCCCC), (measure.DDDDDD) } on 0, children(Goods.[ALL]) on 1 from [logistics.test] ;
 ---
 with member measure.SSSSSS as sum({ (measure.XXX), (measure.YYY), (measure.ZZZ) }) member measure.XXX as ([measure].[sales amount]) * 10 member measure.YYY as ((measure.XXX) + 111) member measure.ZZZ as (measure.YYY) / 8 - 222.22 member measure.QQQ as sum({([measure].[sales amount]), ([measure].[cash back])}) member Calendar.VVV as sum({ ([Calendar].[ALL].[2020]), ([Calendar].[ALL].[2019]) }) member measure.IIIIII as IIF( (measure.SSSSSS) > 2000000, 200, 404 ) select { (measure.SSSSSS), (measure.IIIIII) } on 0, filter(members(Calendar), (((measure.SSSSSS) <= 30000) or ((measure.SSSSSS) >= 40000)) and (((measure.SSSSSS) <= 360000) or ((measure.SSSSSS) >= 370000))) on 1 from [Online Store] ;
+---
+with member measure.SSSSSS as sum({ (measure.XXX), (measure.YYY), (measure.ZZZ) }) member measure.XXX as ([measure].[sales amount]) * 10 member measure.YYY as ((measure.XXX) + 111) member measure.ZZZ as (measure.YYY) / 8 - 222.22 member measure.QQQ as sum({([measure].[sales amount]), ([measure].[cash back])}) member Calendar.VVV as sum({ ([CalendarCCCCCCCCCCCCCCCCCCCCC].[ALL].[2020]), ([Calendar].[ALL].[2019]) }) member measure.IIIIII as IIF( (measure.SSSSSS) > 2000000, 200, 404 ) select { (measure.SSSSSS), (measure.IIIIII) } on 0, filter(members(Calendar), (((measure.SSSSSS) <= 30000) or ((measure.SSSSSS) >= 40000)) and (((measure.SSSSSS) <= 360000) or ((measure.SSSSSS) >= 370000))) on 1 from [Online Store] ;
 ---
 with member measure.SSSSSS as sum({ (measure.XXX), (measure.YYY), (measure.ZZZ) }) member measure.XXX as ([measure].[sales amount]) * 10 member measure.YYY as ((measure.XXX) + 111) member measure.ZZZ as (measure.YYY) / 8 - 222.22 member measure.QQQ as sum({([measure].[sales amount]), ([measure].[cash back])}) member Calendar.VVV as sum({ ([Calendar].[ALL].[2020]), ([Calendar].[ALL].[2019]) }) member measure.IIIIII as IIF( (measure.SSSSSS) > 2000000, 200, 404 ) member measure.FFFFFF as IIF( (measure.IIIIII) = 200, 321, 900000000 ) select { (measure.SSSSSS), (measure.IIIIII), (measure.FFFFFF) } on 0, filter(members(Calendar), (((measure.SSSSSS) <= 30000) or ((measure.SSSSSS) >= 40000)) and (((measure.SSSSSS) <= 360000) or ((measure.SSSSSS) >= 370000))) on 1 from [Online Store] ;
 ---

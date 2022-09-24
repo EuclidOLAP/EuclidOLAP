@@ -168,18 +168,36 @@ static void *do_process_command(void *addr)
 		// }
 		pthread_mutex_unlock(&_ec_p_mtx);
 
-		int exe_result = execute_command(ec);
 		MemAllocMng *mam = MemAllocMng_current_thread_mam();
+		mam_reset(mam);
 
-		if (ec->result == NULL) {
-			if (mam->exception_desc) {
-				ec->result = ec_new(INTENT__EXE_RESULT_DESC, strlen(mam->exception_desc) + 1);
-				strcpy(ec->result->bytes + SZOF_INT + SZOF_SHORT, mam->exception_desc);
-			} else if (exe_result != 0) {
-				// task execution failed
-				ec->result = EuclidCommand_failure("Unrecognized statement.");
+		if (setjmp(mam->excep_ctx_env) == 0) {
+			int exe_result = execute_command(ec);
+			if (ec->result == NULL) {
+				if (mam->exception_desc) {
+					ec->result = ec_new(INTENT__EXE_RESULT_DESC, strlen(mam->exception_desc) + 1);
+					strcpy(ec->result->bytes + SZOF_INT + SZOF_SHORT, mam->exception_desc);
+				} else if (exe_result != 0) {
+					// task execution failed
+					ec->result = EuclidCommand_failure("Unrecognized statement.");
+				}
 			}
+		} else {
+			ec->result = ec_new(INTENT__EXE_RESULT_DESC, strlen(mam->exception_desc) + 1);
+			strcpy(ec->result->bytes + SZOF_INT + SZOF_SHORT, mam->exception_desc);
 		}
+
+		// int exe_result = execute_command(ec);
+
+		// if (ec->result == NULL) {
+		// 	if (mam->exception_desc) {
+		// 		ec->result = ec_new(INTENT__EXE_RESULT_DESC, strlen(mam->exception_desc) + 1);
+		// 		strcpy(ec->result->bytes + SZOF_INT + SZOF_SHORT, mam->exception_desc);
+		// 	} else if (exe_result != 0) {
+		// 		// task execution failed
+		// 		ec->result = EuclidCommand_failure("Unrecognized statement.");
+		// 	}
+		// }
 
 		// if (exe_result != 0 && ec->result == NULL) {
 		// 	// task execution failed
@@ -191,9 +209,9 @@ static void *do_process_command(void *addr)
 		// obj_release(ec->bytes);
 		// obj_release(ec);
 
-		if (mam) {
-			mam_reset(mam);
-		}
+		// if (mam) {
+		// 	mam_reset(mam);
+		// }
 
 		// ec = NULL;
 	}

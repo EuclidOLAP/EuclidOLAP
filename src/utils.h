@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 // #include <sys/stat.h>
+#include <setjmp.h> // for jmp_buf
 
 #include "obj-type-def.h"
 
@@ -64,6 +65,11 @@ struct memory_allocation_manager
 	 * 		 1 The MDX expression has been parsed.
 	 */
 	int bin_flags;
+
+	/**
+	 * exception exposure context environment
+	 */
+	jmp_buf excep_ctx_env;
 
 	/**
 	 * Pointer to a textual description of the exception encountered during execution of the current thread,

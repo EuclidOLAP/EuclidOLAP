@@ -1302,6 +1302,9 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 				}
 			}
 
+			if (md_ctx->select_def->member_formulas == NULL)
+				goto unknown_dim_role_exception;
+
 			// formula member
 			int f_sz = als_size(md_ctx->select_def->member_formulas);
 			for (i = 0; i < f_sz; i++)
@@ -1315,6 +1318,11 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 					return member_role_;
 				}
 			}
+
+			unknown_dim_role_exception:
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: An undefined dimension role was encountered.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
 		}
 	}
 	else if (m_def->t_cons == MEMBER_DEF__MBR_FUNCTION)
