@@ -588,7 +588,7 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 	}
 
 	// Create a measure dimension object.
-	Dimension *mear_dim = create_dimension(MEASURE_DIM_COMM_NAME);
+	Dimension *mear_dim = create_dimension(STANDARD_MEASURE_DIMENSION);
 
 	cube->measure_dim = mear_dim;
 
@@ -1289,25 +1289,29 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 			}
 		}
 		else
-		{ // measure dimension
-			char *mea_m_name = als_get(m_def->mbr_abs_path, 1);
-			int i, mea_m_count = als_size(cube->measure_mbrs);
-			for (i = 0; i < mea_m_count; i++)
-			{
-				Member *mbr = (Member *)als_get(cube->measure_mbrs, i);
-				if (strcmp(mbr->name, mea_m_name) == 0)
+		{
+			if (strcmp(dim_role_name, STANDARD_MEASURE_DIMENSION) == 0) {
+				// measure dimension
+				char *mea_m_name = als_get(m_def->mbr_abs_path, 1);
+				int i, mea_m_count = als_size(cube->measure_mbrs);
+				for (i = 0; i < mea_m_count; i++)
 				{
-					member_role_ = mdd_mr__create(mbr, dr);
-					return member_role_;
+					Member *mbr = (Member *)als_get(cube->measure_mbrs, i);
+					if (strcmp(mbr->name, mea_m_name) == 0)
+					{
+						member_role_ = mdd_mr__create(mbr, dr);
+						return member_role_;
+					}
 				}
 			}
+
 
 			if (md_ctx->select_def->member_formulas == NULL)
 				goto unknown_dim_role_exception;
 
 			// formula member
 			int f_sz = als_size(md_ctx->select_def->member_formulas);
-			for (i = 0; i < f_sz; i++)
+			for (int i = 0; i < f_sz; i++)
 			{
 				MemberFormula *f = als_get(md_ctx->select_def->member_formulas, i);
 				if ((strcmp(als_get(f->path, 0), als_get(m_def->mbr_abs_path, 0)) == 0) && (strcmp(als_get(f->path, 1), als_get(m_def->mbr_abs_path, 1)) == 0))
