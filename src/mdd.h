@@ -12,7 +12,7 @@
 #define META_DEF_LEVELS_FILE_PATH "/meta/levels"
 #define META_DEF_CUBES_FILE_PATH "/meta/cubes"
 
-#define MEASURE_DIM_COMM_NAME "measure"
+#define STANDARD_MEASURE_DIMENSION "measure"
 
 typedef long md_gid;
 

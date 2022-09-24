@@ -565,6 +565,13 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 	for (i = 0; i < dr_sz; i += 2)
 	{
 		char *dim_name = als_get(dim_role_ls, i);
+
+		// Check if non-existing dimension is associated.
+		if (find_dim_by_name(dim_name) == NULL) {
+			MemAllocMng_current_thread_mam()->exception_desc = "This cube is associated with dimensions that do not exist.";
+			return -1;
+		}
+
 		char *dim_role_name = als_get(dim_role_ls, i + 1);
 		Dimension *dim = find_dim_by_name(dim_name);
 
@@ -581,7 +588,7 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 	}
 
 	// Create a measure dimension object.
-	Dimension *mear_dim = create_dimension(MEASURE_DIM_COMM_NAME);
+	Dimension *mear_dim = create_dimension(STANDARD_MEASURE_DIMENSION);
 
 	cube->measure_dim = mear_dim;
 
@@ -779,6 +786,11 @@ static long query_times = 1;
 MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 {
 	log_print("\n[ debug ] >>>>>>>>>>>>>>>>>>>>>>> The number of times the query was executed: %ld\n\n", query_times++);
+
+	if (select_def__get_cube(select_def) == NULL) {
+		MemAllocMng_current_thread_mam()->exception_desc = "exception: nonexistent cube.";
+		return NULL;
+	}
 
 	MDContext *md_ctx = MDContext_creat();
 	md_ctx->select_def = select_def;
@@ -1260,7 +1272,7 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 				member_role_ = mdd_mr__create(mbr, dr);
 				return member_role_;
 			}
-			else
+			else if (md_ctx->select_def->member_formulas)
 			{ // formula member
 				int f_sz = als_size(md_ctx->select_def->member_formulas);
 				for (i = 0; i < f_sz; i++)
@@ -1274,25 +1286,39 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 						return member_role_;
 					}
 				}
+				MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+				thrd_mam->exception_desc = "exception: Unrecognized dimension member.";
+				longjmp(thrd_mam->excep_ctx_env, -1);
+			} else {
+				MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+				thrd_mam->exception_desc = "exception: Unrecognized dimension member.";
+				longjmp(thrd_mam->excep_ctx_env, -1);
 			}
 		}
 		else
-		{ // measure dimension
-			char *mea_m_name = als_get(m_def->mbr_abs_path, 1);
-			int i, mea_m_count = als_size(cube->measure_mbrs);
-			for (i = 0; i < mea_m_count; i++)
-			{
-				Member *mbr = (Member *)als_get(cube->measure_mbrs, i);
-				if (strcmp(mbr->name, mea_m_name) == 0)
+		{
+			if (strcmp(dim_role_name, STANDARD_MEASURE_DIMENSION) == 0) {
+				// measure dimension
+				char *mea_m_name = als_get(m_def->mbr_abs_path, 1);
+				int i, mea_m_count = als_size(cube->measure_mbrs);
+				for (i = 0; i < mea_m_count; i++)
 				{
-					member_role_ = mdd_mr__create(mbr, dr);
-					return member_role_;
+					Member *mbr = (Member *)als_get(cube->measure_mbrs, i);
+					if (strcmp(mbr->name, mea_m_name) == 0)
+					{
+						member_role_ = mdd_mr__create(mbr, dr);
+						return member_role_;
+					}
 				}
 			}
 
+
+			if (md_ctx->select_def->member_formulas == NULL)
+				goto unknown_dim_role_exception;
+
 			// formula member
 			int f_sz = als_size(md_ctx->select_def->member_formulas);
-			for (i = 0; i < f_sz; i++)
+			for (int i = 0; i < f_sz; i++)
 			{
 				MemberFormula *f = als_get(md_ctx->select_def->member_formulas, i);
 				if ((strcmp(als_get(f->path, 0), als_get(m_def->mbr_abs_path, 0)) == 0) && (strcmp(als_get(f->path, 1), als_get(m_def->mbr_abs_path, 1)) == 0))
@@ -1303,6 +1329,11 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 					return member_role_;
 				}
 			}
+
+			unknown_dim_role_exception:
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: An undefined dimension role was encountered.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
 		}
 	}
 	else if (m_def->t_cons == MEMBER_DEF__MBR_FUNCTION)
@@ -1364,8 +1395,11 @@ Member *dim__find_mbr(Dimension *dim, ArrayList *mbr_name_path)
 {
 	int i, len = als_size(mbr_name_path);
 	Member *m = find_member_lv1(dim, als_get(mbr_name_path, 0));
-	for (i = 1; i < len; i++)
+	for (i = 1; i < len; i++) {
+		if (!m)
+			break;
 		m = find_member_child(m, als_get(mbr_name_path, i));
+	}
 
 	return m;
 }
