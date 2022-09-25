@@ -658,6 +658,12 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 	*((__uint16_t *)(data + sizeof(__uint32_t))) = INTENT__INSERT_CUBE_MEARSURE_VALS;
 
 	Cube *cube = find_cube_by_name(cube_name);
+	if (cube == NULL) {
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: An undefined cube was encountered.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
+
 	*((md_gid *)(data + data_m_sz)) = cube->gid;
 	data_m_sz += sizeof(md_gid);
 
