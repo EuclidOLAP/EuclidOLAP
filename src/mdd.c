@@ -678,6 +678,14 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 	{
 		IDSVectorMears *ids_vm = als_get(ls_ids_vctr_mear, i);
 		__uint32_t vct_sz = als_size(ids_vm->ls_vector);
+
+		if (vct_sz != als_size(cube->dim_role_ls)) {
+			obj_release(data);
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: Insert statement does not match cube.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+
 		for (j = 0; j < vct_sz; j++)
 		{
 			ArrayList *mbr_path_str = als_get(ids_vm->ls_vector, j);
