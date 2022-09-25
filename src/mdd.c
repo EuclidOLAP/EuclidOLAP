@@ -1313,7 +1313,7 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 			}
 
 
-			if (md_ctx->select_def->member_formulas == NULL)
+			if (md_ctx == NULL || md_ctx->select_def->member_formulas == NULL)
 				goto unknown_dim_role_exception;
 
 			// formula member
