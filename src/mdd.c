@@ -793,9 +793,11 @@ MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 {
 	log_print("\n[ debug ] >>>>>>>>>>>>>>>>>>>>>>> The number of times the query was executed: %ld\n\n", query_times++);
 
+	MemAllocMng *th_mam = MemAllocMng_current_thread_mam();
+
 	if (select_def__get_cube(select_def) == NULL) {
-		MemAllocMng_current_thread_mam()->exception_desc = "exception: nonexistent cube.";
-		return NULL;
+		th_mam->exception_desc = "exception: nonexistent cube.";
+		longjmp(th_mam->excep_ctx_env, -1);
 	}
 
 	MDContext *md_ctx = MDContext_creat();
