@@ -1911,7 +1911,14 @@ MddSet *SetFnMembers_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTu
 	MddSet *set = mdd_set__create();
 
 	if (dr == NULL)
-	{ // measure dimension role
+	{
+		if (strcmp(STANDARD_MEASURE_DIMENSION, fn->dr_def->name)) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: An undefined dimension role was encountered.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+
+		// measure dimension role
 		int mm_sz = als_size(cube->measure_mbrs);
 		for (i = 0; i < mm_sz; i++)
 		{
