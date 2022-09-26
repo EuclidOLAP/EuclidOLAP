@@ -658,6 +658,12 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 	*((__uint16_t *)(data + sizeof(__uint32_t))) = INTENT__INSERT_CUBE_MEARSURE_VALS;
 
 	Cube *cube = find_cube_by_name(cube_name);
+	if (cube == NULL) {
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: An undefined cube was encountered.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
+
 	*((md_gid *)(data + data_m_sz)) = cube->gid;
 	data_m_sz += sizeof(md_gid);
 
@@ -672,6 +678,14 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 	{
 		IDSVectorMears *ids_vm = als_get(ls_ids_vctr_mear, i);
 		__uint32_t vct_sz = als_size(ids_vm->ls_vector);
+
+		if (vct_sz != als_size(cube->dim_role_ls)) {
+			obj_release(data);
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: Insert statement does not match cube.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+
 		for (j = 0; j < vct_sz; j++)
 		{
 			ArrayList *mbr_path_str = als_get(ids_vm->ls_vector, j);
@@ -787,9 +801,11 @@ MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 {
 	log_print("\n[ debug ] >>>>>>>>>>>>>>>>>>>>>>> The number of times the query was executed: %ld\n\n", query_times++);
 
+	MemAllocMng *th_mam = MemAllocMng_current_thread_mam();
+
 	if (select_def__get_cube(select_def) == NULL) {
-		MemAllocMng_current_thread_mam()->exception_desc = "exception: nonexistent cube.";
-		return NULL;
+		th_mam->exception_desc = "exception: nonexistent cube.";
+		longjmp(th_mam->excep_ctx_env, -1);
 	}
 
 	MDContext *md_ctx = MDContext_creat();
@@ -1313,7 +1329,7 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 			}
 
 
-			if (md_ctx->select_def->member_formulas == NULL)
+			if (md_ctx == NULL || md_ctx->select_def->member_formulas == NULL)
 				goto unknown_dim_role_exception;
 
 			// formula member
@@ -1911,7 +1927,14 @@ MddSet *SetFnMembers_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTu
 	MddSet *set = mdd_set__create();
 
 	if (dr == NULL)
-	{ // measure dimension role
+	{
+		if (strcmp(STANDARD_MEASURE_DIMENSION, fn->dr_def->name)) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: An undefined dimension role was encountered.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+
+		// measure dimension role
 		int mm_sz = als_size(cube->measure_mbrs);
 		for (i = 0; i < mm_sz; i++)
 		{

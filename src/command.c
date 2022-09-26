@@ -283,6 +283,19 @@ static int execute_command(EuclidCommand *ec)
 			log_print("[ INFO ] - MDX QUERY: %s\n", (ec->bytes) + 10);
 			SelectDef *select_def;
 			stack_pop(&YC_STC, (void **)&select_def);
+
+			// Check if the axes of the result set are repeatedly defined.
+			for (int i=0; i<als_size(select_def->ax_def_ls); i++) {
+				for (int j=0; j!=i && j<als_size(select_def->ax_def_ls); j++) {
+					AxisDef *axi = als_get(select_def->ax_def_ls, i);
+					AxisDef *axj = als_get(select_def->ax_def_ls, j);
+					if (axi->posi == axj->posi) {
+						cur_thrd_mam->exception_desc = "exception: There are multiple axes with duplicate positions in the query results.";
+						longjmp(cur_thrd_mam->excep_ctx_env, -1);
+					}
+				}
+			}			
+
 			MultiDimResult *md_rs = exe_multi_dim_queries(select_def);
 
 			log_print("// TODO ....................... %s:%d\n", __FILE__, __LINE__); // TODO should be return a multi-dim-result
