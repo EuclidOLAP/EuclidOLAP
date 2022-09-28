@@ -178,6 +178,7 @@ MemAllocMng *obj_mam(void *obj) {
 void *obj_alloc(size_t size, short type) {
 	size += BYTES_ALIGNMENT;
 	char *obj_head = malloc(size);
+	log_print("@@obj_alloc@@ << %p %lu\n", obj_head, size);
 	memset(obj_head, 0, size);
 	// *obj_head = type;
 	*(short *)(obj_head + BYTES_ALIGNMENT - sizeof(short)) = type;
@@ -194,7 +195,9 @@ void obj_release(void *obj) {
 		log_print("[ error ] - Program exit! Cause by: this memory cannot be freed here.\n");
 		exit(1);
 	}
-	free(((char *)obj) - BYTES_ALIGNMENT);
+	char *freed = ((char *)obj) - BYTES_ALIGNMENT;
+	log_print("@@obj_release@@ >> %p\n", freed);
+	free(freed);
 }
 
 ssize_t read_sock_pkg(int sock_fd, void **buf, size_t *buf_len)
