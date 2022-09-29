@@ -178,7 +178,7 @@ MemAllocMng *obj_mam(void *obj) {
 void *obj_alloc(size_t size, short type) {
 	size += BYTES_ALIGNMENT;
 	char *obj_head = malloc(size);
-	log_print("@@obj_alloc@@ << %p %lu\n", obj_head, size);
+	// log_print("@@obj_alloc@@ << %p %lu\n", obj_head, size);
 	memset(obj_head, 0, size);
 	// *obj_head = type;
 	*(short *)(obj_head + BYTES_ALIGNMENT - sizeof(short)) = type;
@@ -196,7 +196,7 @@ void obj_release(void *obj) {
 		exit(1);
 	}
 	char *freed = ((char *)obj) - BYTES_ALIGNMENT;
-	log_print("@@obj_release@@ >> %p\n", freed);
+	// log_print("@@obj_release@@ >> %p\n", freed);
 	free(freed);
 }
 
@@ -357,8 +357,10 @@ char *str_arr_get(StrArr *sa, unsigned int i)
 
 int stack_push(Stack *s, void *obj)
 {
-	if (s == NULL || s->top_idx == STACK_MAX_DEEP)
-		return -1;
+	assert(s != NULL && s->top_idx < STACK_MAX_DEEP);
+
+	// if (s == NULL || s->top_idx == STACK_MAX_DEEP)
+	// 	return -1;
 
 	(s->bucket)[(s->top_idx)++] = obj;
 
@@ -367,8 +369,10 @@ int stack_push(Stack *s, void *obj)
 
 int stack_pop(Stack *s, void **addr)
 {
-	if (s == NULL || s->top_idx == 0)
-		return -1;
+	assert(s != NULL && s->top_idx > 0);
+
+	// if (s == NULL || s->top_idx == 0)
+	// 	return -1;
 
 	*addr = (s->bucket)[--(s->top_idx)];
 
