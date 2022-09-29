@@ -238,6 +238,9 @@ static int execute_command(EuclidCommand *ec)
 		parse_mdx((ec->bytes) + 10);
 
 		if ((cur_thrd_mam->bin_flags & 0x0001) == 0) {
+			// Empty the stack to prevent stack overflow.
+			YC_STC.top_idx = 0;
+
 			// The MDX expression was not parsed.
 			return -1;
 		}
