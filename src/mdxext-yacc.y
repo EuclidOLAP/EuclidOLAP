@@ -40,6 +40,12 @@ Stack YC_STC = { 0 };
 %token AND			/* and */
 %token OR			/* or */
 
+%token COLUMNS		/* columns */
+%token ROWS			/* rows */
+%token PAGES		/* pages */
+%token CHAPTERS		/* chapters */
+%token SECTIONS		/* sections */
+
 /* set functions key words */
 %token SET			/* set */
 %token CHILDREN		/* children */
@@ -487,11 +493,34 @@ axes_statement:
 ;
 
 axis_statement:
-	set_statement ON DECIMAL {
+	set_statement ON axis_num {
+		void *ax_num;
+		stack_pop(&YC_STC, &ax_num);
 		SetDef *set_def;
 		stack_pop(&YC_STC, (void **) &set_def);
-		AxisDef *axis_def = ids_axisdef_new(set_def, atoi(yytext));
+		AxisDef *axis_def = ids_axisdef_new(set_def, (unsigned short)(*(long *)&ax_num));
 		stack_push(&YC_STC, axis_def);
+	}
+;
+
+axis_num:
+	DECIMAL {
+		stack_push(&YC_STC, (void *)(0x00UL | atoi(yytext)));
+	}
+  | COLUMNS {
+		stack_push(&YC_STC, (void *)0x00UL);
+	}
+  | ROWS {
+		stack_push(&YC_STC, (void *)0x01UL);
+	}
+  | PAGES {
+		stack_push(&YC_STC, (void *)0x02UL);
+	}
+  | CHAPTERS {
+		stack_push(&YC_STC, (void *)0x03UL);
+	}
+  | SECTIONS {
+		stack_push(&YC_STC, (void *)0x04UL);
 	}
 ;
 
