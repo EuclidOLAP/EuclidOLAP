@@ -11,8 +11,8 @@ int yyerror(const char *);
 extern int yylex();
 extern int yyparse();
 
-extern int my_scan_string(const char *s);
-extern void my_cleanup();
+extern int eucparser_scan_string(const char *s);
+extern void eucparser_cleanup();
 
 extern char *yytext;
 
@@ -1282,9 +1282,9 @@ var_or_block:
 
 void *parse_mdx(char *mdx)
 {
-	my_scan_string(mdx);
+	eucparser_scan_string(mdx);
 	yyparse();
-	my_cleanup();
+	eucparser_cleanup();
 
 	return NULL;
 }
