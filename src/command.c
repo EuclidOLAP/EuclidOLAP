@@ -301,8 +301,6 @@ static int execute_command(EuclidCommand *ec)
 
 			MultiDimResult *md_rs = exe_multi_dim_queries(select_def);
 
-			log_print("// TODO ....................... %s:%d\n", __FILE__, __LINE__); // TODO should be return a multi-dim-result
-
 			if (cur_thrd_mam->exception_desc == NULL) {
 				MultiDimResult_print(md_rs);
 

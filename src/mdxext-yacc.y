@@ -306,7 +306,7 @@ factory:
 	DECIMAL {
 		Factory *f = Factory_creat();
 		f->t_cons = FACTORY_DEF__DECIMAL;
-		f->decimal = strtod(yytext, NULL); // TODO Please understand the "strtod() function" carefully
+		f->decimal = strtod(yytext, NULL);
 		stack_push(&YC_STC, f);
 	}
   |	tuple_statement {
