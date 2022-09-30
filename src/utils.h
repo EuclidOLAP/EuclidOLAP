@@ -194,19 +194,6 @@ int append_file_data(char *file_path, char *data, size_t sz);
 
 int append_file_uint(char *file_path, __uint32_t val);
 
-// #define SIM_POOL_DESC_LEN 32
-
-// typedef struct _simple_pool_
-// {
-// 	unsigned int capacity;
-// 	void **handle;
-// 	char desc[SIM_POOL_DESC_LEN];
-// } SimplePool;
-
-// SimplePool *simpool_create(unsigned int capacity, char *desc);
-
-// int simpool_add(SimplePool *sp, void *obj);
-
 typedef struct _array_list_
 {
 	unsigned int idx;

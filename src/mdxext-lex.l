@@ -340,27 +340,25 @@ coalesceEmpty {
 %%
 // lex_f_003
 
-static YY_BUFFER_STATE my_string_buffer;
+static YY_BUFFER_STATE ecp_str_buf_stat;
 
-// TODO change the function name
-int my_scan_string(const char *s) {
+int eucparser_scan_string(const char *s) {
 
     // insist on cleaning up any existing buffer before setting up a new one
-	if (my_string_buffer != NULL)
+	if (ecp_str_buf_stat != NULL)
 		return -1;
 
     // Set up and switch to a buffer for scanning the contents of the
     // specified string.  A copy of the string will be made.
-    my_string_buffer = yy_scan_string(s);
-    return my_string_buffer == NULL ? -1 : 0;
+    ecp_str_buf_stat = yy_scan_string(s);
+    return ecp_str_buf_stat == NULL ? -1 : 0;
 }
 
-// TODO change the function name
-void my_cleanup() {
-    // No effect if my_string_buffer is NULL
-    yy_delete_buffer(my_string_buffer);
+void eucparser_cleanup() {
+    // No effect if ecp_str_buf_stat is NULL
+    yy_delete_buffer(ecp_str_buf_stat);
     // ... but avoid trying to free the same buffer twice
-    my_string_buffer = NULL;
+    ecp_str_buf_stat = NULL;
 }
 
 int yywrap(void)
