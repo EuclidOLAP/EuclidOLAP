@@ -1,0 +1,15 @@
+create dimensions [Calendar] [Goods] [Store Type] [Payment Method] [Region] [Transport];
+---
+create dimensions [商品] [店铺类型] [支付方式] [地区] [运输];
+---
+create levels [Calendar] (2:year, 3:quarter, 4:month), [Region] (2:[continent], 3:[country]);
+---
+create levels [地区] (2:[洲], 3:[国家]);
+---
+build cube [Online Store] dimensions [Store Type] [Store Type] [Payment Method] [Payment Method] [Goods] [Goods] [Calendar] [Calendar] measures [sales amount] [sales quantity] [cash back];
+---
+build cube [在线商店] dimensions [店铺类型] [店铺类型] [支付方式] [支付方式] [商品] [商品] [Calendar] [Calendar] measures [销售额] [销售数量] [现金返还];
+---
+build cube [logistics.test] dimensions Goods Goods Transport Transport Region [starting region] Region [ending region] Calendar [starting date] Calendar [completion date] measures cost income quantity;
+---
+build cube [物流测试] dimensions [商品] [商品] [运输] [运输] [地区] [出发地区] [地区] [终点地区] Calendar [开始日期] Calendar [完成日期] measures [成本] [收入] [数量];
