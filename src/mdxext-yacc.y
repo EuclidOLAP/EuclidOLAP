@@ -919,10 +919,18 @@ dimension_statement:
 ;
 
 tuples_statement:
-	tuple_statement {
+	general_chain {
+		GeneralChainExpression *gce;
+		stack_pop(&YC_STC, (void **) &gce);
+		gce->final_form = OBJ_TYPE__MddTuple;
+		ArrayList *t_def_ls = als_new(32, "TupleDef * | GeneralChainExpression *", THREAD_MAM, NULL);
+		als_add(t_def_ls, gce);
+		stack_push(&YC_STC, t_def_ls);
+	}
+  | tuple_statement {
 		TupleDef *t_def;
 		stack_pop(&YC_STC, (void **) &t_def);
-		ArrayList *t_def_ls = als_new(32, "TupleDef *", THREAD_MAM, NULL);
+		ArrayList *t_def_ls = als_new(32, "TupleDef * | GeneralChainExpression *", THREAD_MAM, NULL);
 		als_add(t_def_ls, t_def);
 		stack_push(&YC_STC, t_def_ls);
 	}
@@ -933,7 +941,16 @@ tuples_statement:
 		stack_pop(&YC_STC, (void **) &t_def_ls);
 		als_add(t_def_ls, t_def);
 		stack_push(&YC_STC, t_def_ls);
-  }
+	}
+  | tuples_statement COMMA general_chain {
+		GeneralChainExpression *gce;
+		stack_pop(&YC_STC, (void **) &gce);
+		gce->final_form = OBJ_TYPE__MddTuple;
+		ArrayList *t_def_ls;
+		stack_pop(&YC_STC, (void **) &t_def_ls);
+		als_add(t_def_ls, gce);
+		stack_push(&YC_STC, t_def_ls);
+	}
 ;
 
 tuple_statement:
@@ -1267,9 +1284,8 @@ dims_and_roles:
 
 str:
 	STRING {
-		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
+		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__STRING, NULL, 0);
 		memcpy(str, yytext + 1, strlen(yytext) - 2);
-
 		stack_push(&YC_STC, str);
 	}
 ;
@@ -1296,14 +1312,42 @@ vars:
 
 var_or_block:
 	VAR	{
-		char *str = mam_alloc(strlen(yytext) + 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
+		char *str = mam_alloc(strlen(yytext) + 1, OBJ_TYPE__STRING, NULL, 0);
 		memcpy(str, yytext, strlen(yytext));
 		stack_push(&YC_STC, str);
 	}
   |	BLOCK	{
-		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
+		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__STRING, NULL, 0);
 		memcpy(str, yytext + 1, strlen(yytext) - 2);
 		stack_push(&YC_STC, str);
+	}
+;
+
+chain_ring:
+	var_or_block {
+		// do nothing
+	}
+  | str {
+		// do nothing
+	}
+;
+
+general_chain:
+	chain_ring {
+		GeneralChainExpression *gce = mam_alloc(sizeof(GeneralChainExpression), OBJ_TYPE__GeneralChainExpression, NULL, 0);
+		gce->chain = als_new(8, "void *", THREAD_MAM, NULL);
+		void *ring;
+		stack_pop(&YC_STC, &ring);
+		als_add(gce->chain, ring);
+		stack_push(&YC_STC, gce);
+	}
+  | general_chain DOT chain_ring {
+		void *ring;
+		stack_pop(&YC_STC, &ring);
+		GeneralChainExpression *gce;
+		stack_pop(&YC_STC, (void **) &gce);
+		als_add(gce->chain, ring);
+		stack_push(&YC_STC, gce);
 	}
 
 %%

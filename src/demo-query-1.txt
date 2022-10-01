@@ -323,3 +323,95 @@ select
     ( [ending region].[ALL].[Asia].[China], [starting date].[ALL].[2019].[Q3].[M7], [completion date].[ALL].[2019].[Q3].[M7] ) 
 } on 1666 
 from [logistics.test] ;
+---
+select 
+{ [Store Type].[ALL] } on 0, 
+{ (parent(Calendar.[ALL].[2020]), parent([Payment Method].[ALL])) } on 1 
+from [Online Store] ;
+---
+select 
+{ 
+    [Calendar].[2020].[Q1], [Calendar].[2020].[Q2], [Calendar].[2020].[Q3], [Calendar].[2020].[Q4] 
+} on 0, 
+{ 
+    ([Payment Method].[Credit Card], measure.[sales amount]), 
+    ([Payment Method].[Debit Card], measure.[sales amount]), 
+    ([Payment Method].[Account Balance], measure.[sales amount]) 
+} on 1 from [Online Store];
+---
+select 
+{ 
+    ([Goods].[foods],[Transport].[railway],[starting region].[Europe].[UK]), 
+    ([Transport].[highway],[starting region].[Asia].[Japan]) 
+} on 0, 
+{ 
+    ([starting region].[America].[Chile],[ending region].[Asia].[China]), 
+    [ending region].[Asia].[South Korea], 
+    ([starting date].[2019].[Q3].[M8],[completion date].[2020].[Q2],[Goods].[foods]) 
+} on 1, 
+{ 
+    ([completion date].[2020].[Q4],[Goods].[foods],[Transport].[ocean freight]), 
+    ([Goods].[foods],[Transport].[railway]), 
+    [Transport].[highway], 
+    [starting region].[Europe].[Greece] 
+} on 2 
+from [logistics.test];
+---
+select 
+children( [starting date].[2021].Q1 ) on 999, 
+{ 
+    measure.income, measure.cost 
+} on 100 
+from [logistics.test] where ( [Goods].[electronic product].[computer] , Transport.railway, [starting region].[Europe].[UK], [ending region].[Europe].[Italy], [completion date].[2020].[Q1].[M3] );
+---
+select 
+{ 
+    [measure].[sales amount] 
+} on 0, 
+filter({ [Calendar].[ALL].[2020].[Q1], [Calendar].[ALL].[2020] }, ([measure].[sales amount]) > 29.999 ) on 1 
+from [Online Store] where ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Kitchen & Dining].[Bento Boxes]);
+---
+select { [Calendar].[ALL].[2021] } on 0, 
+topCount(crossjoin(members(measure), children([Store Type].[ALL]), lateralMembers([Payment Method].[___________________].Other)), 10, ([Calendar].[ALL].[2021])) on 1 from [Online Store] ;
+---
+with member [starting date].XXX as (prevMember(currentMember([measure])), [starting date].[2021]) 
+select 
+members(measure) on 1, 
+{ [starting date].[2021], [starting date].XXX } on 0 
+from [logistics.test] where (Goods.[ALL].[household appliances].[television], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2021].[Q2].[M4], [completion date].[ALL].[2020].[Q1].[M1]) ;
+---
+select 
+{ Calendar.[ALL].[2021].Q4.M12 } on 1, 
+{ (measure.[sales amount], parallelPeriod(Calendar.year)) } on 0 
+from [Online Store] ;
+---
+with member measure.XXX as (measure.[sales amount], parallelPeriod(Calendar.year, 0 - 1)) 
+select { Calendar.[ALL].[2020].Q4.M11 } on 0, 
+{ measure.[sales amount] } on 
+1 from [Online Store] ;
+---
+select 
+order(members(Calendar), (measure.[sales amount]), ASC) on 10, 
+{ measure.[sales amount] } on 1 
+from [Online Store] ;
+---
+select { Calendar.[ALL].[2021].Q1.M2, Calendar.[ALL].[2021].Q3.M8, Calendar.[ALL].[2021].Q4.M11 } on 0, 
+{ measure.[sales amount] } on 1 from [Online Store] ;
+---
+with 
+set SSSSSS as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measure.[sales amount]) > 1) 
+member measure.XXXXXX as (measure.[sales amount]) - 20000 
+select 
+bottomPercent(SSSSSS, 25, (measure.[sales amount])) on 10, 
+{measure.[sales amount]} on 1 
+from [Online Store] ;
+---
+select 
+crossJoin(members(measure), lateralMembers(Goods00000000000000000000000000000.[ALL].[foods])) on 10101, 
+{[starting date].[ALL].[2020]} on sectioNS
+from [logistics.test];
+---
+with member [Payment Method].PROPORTION as ([Payment Method].[ALL].[Credit Card]) / ([Payment Method].[ALL]) 
+select { [Calendar].[2020].[Q4] } on 10, filter( { [Payment Method].[ALL].[Credit Card], 
+[Payment Method].[ALL], [Payment Method].PROPORTION }, (measure.[sales amount]) <> 4320 ) on 1 
+from [Online Store] where (measure.[sales amount]);

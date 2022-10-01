@@ -1139,7 +1139,19 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 {
 	if (set_def->t_cons == SET_DEF__TUP_DEF_LS)
 	{
-		return ids_tupledef__build(md_ctx, als_get(set_def->tuple_def_ls, 0), context_tuple, cube);
+		void *obj = als_get(set_def->tuple_def_ls, 0);
+		switch (obj_type_of(obj))
+		{
+			case OBJ_TYPE__TupleDef:
+				return ids_tupledef__build(md_ctx, obj, context_tuple, cube);
+			case OBJ_TYPE__GeneralChainExpression:
+				MddTuple *tuple = gce_transform(md_ctx, obj, context_tuple, cube);
+				assert(obj_type_of(tuple) == OBJ_TYPE__MddTuple);
+				return tuple;
+			default:
+				log_print("[ error ] exit. Program logic error.\n");
+				exit(EXIT_FAILURE);
+		}
 	}
 	else if (set_def->t_cons == SET_DEF__SET_FUNCTION)
 	{
@@ -1440,8 +1452,14 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 		int i, sz = als_size(set_def->tuple_def_ls);
 		for (i = 0; i < sz; i++)
 		{
-			TupleDef *tp_def = als_get(set_def->tuple_def_ls, i);
-			MddTuple *tp = ids_tupledef__build(md_ctx, tp_def, ctx_tuple, cube);
+			void *obj = als_get(set_def->tuple_def_ls, i);
+			if (obj_type_of(obj) == OBJ_TYPE__TupleDef) {
+				mddset__add_tuple(set, ids_tupledef__build(md_ctx, obj, ctx_tuple, cube));
+				continue;
+			}
+			assert(obj_type_of(obj) == OBJ_TYPE__GeneralChainExpression);
+			MddTuple *tp = gce_transform(md_ctx, obj, ctx_tuple, cube);
+			assert(obj_type_of(tp) == OBJ_TYPE__MddTuple);
 			mddset__add_tuple(set, tp);
 		}
 		return set;
@@ -3223,4 +3241,22 @@ end:
 
 	unsigned long used_len = (unsigned long)cont_buf - (unsigned long)_cont_buf;
 	log_print("[ info ] **************** mdrs_to_str(...) >>>>>>>>>>>>>>>>>>>>>  %lu  /  %lu  %f %%\n", used_len, buf_len, used_len * 100.0 / buf_len);
+}
+
+void *gce_transform(MDContext *md_ctx, GeneralChainExpression *gce, MddTuple *context_tuple, Cube *cube) {
+
+	MemberDef *member_def = MemberDef_creat(MEMBER_DEF__MBR_ABS_PATH);
+	member_def->mbr_abs_path = gce->chain;
+	MddMemberRole *member_role = ids_mbrsdef__build(md_ctx, member_def, context_tuple, cube);
+
+	switch (gce->final_form)
+	{
+	case OBJ_TYPE__MddTuple:
+		MddTuple *tuple = mdd_tp__create();
+		mdd_tp__add_mbrole(tuple, member_role);
+		return tuple;
+	default:
+		log_print("[ error ] exit. The program logic error is in the gce_transform function.\n");
+		exit(EXIT_FAILURE);
+	}
 }
