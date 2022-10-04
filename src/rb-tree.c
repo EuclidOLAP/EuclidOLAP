@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 // #include <stdlib.h>
 #include <string.h>
@@ -55,7 +56,7 @@ void rbt_add(RedBlackTree *rbt, void *obj)
 	if (mount_p == NULL)
 		return;
 
-	int cmp_rs = rbt->comparison_func(obj, mount_p->obj);
+	int cmp_rs = rbt->comparison_func(mount_p->obj, obj);
 	if (cmp_rs < 0)
 	{
 		mount_p->child_left = node;
@@ -90,30 +91,30 @@ void rbt_add(RedBlackTree *rbt, void *obj)
 	else
 	{
 		// [3-2] u_node is Nil
-		int p_g__relp = rbt->comparison_func(_P->obj, _G->obj);
-		int n_p__relp = cmp_rs;
+		int gp__relp = rbt->comparison_func(_G->obj, _P->obj);
+		int pn__relp = cmp_rs;
 
-		if (p_g__relp < 0 && n_p__relp < 0)
+		if (gp__relp < 0 && pn__relp < 0)
 		{
 			rbt_set_node_color(_G, RED_NODE);
 			rbt_set_node_color(_P, BLACK_NODE);
 			rbt_rotate_right(rbt, _G);
 		}
-		else if (p_g__relp > 0 && n_p__relp < 0)
+		else if (gp__relp > 0 && pn__relp < 0)
 		{
 			rbt_set_node_color(_G, RED_NODE);
 			rbt_set_node_color(_N, BLACK_NODE);
 			rbt_rotate_right(rbt, _P);
 			rbt_rotate_left(rbt, _G);
 		}
-		else if (p_g__relp < 0 && n_p__relp > 0)
+		else if (gp__relp < 0 && pn__relp > 0)
 		{
 			rbt_set_node_color(_G, RED_NODE);
 			rbt_set_node_color(_N, BLACK_NODE);
 			rbt_rotate_left(rbt, _P);
 			rbt_rotate_right(rbt, _G);
 		}
-		else if (p_g__relp > 0 && n_p__relp > 0)
+		else if (gp__relp > 0 && pn__relp > 0)
 		{
 			rbt_set_node_color(_G, RED_NODE);
 			rbt_set_node_color(_P, BLACK_NODE);
@@ -147,7 +148,7 @@ RBNode *rbt_find_mount_point(RedBlackTree *rbt, RBNode *new_node)
 	RBNode *c_node = rbt->root;
 	while (1)
 	{
-		int cmp_rs = rbt->comparison_func(new_node->obj, c_node->obj);
+		int cmp_rs = rbt->comparison_func(c_node->obj, new_node->obj);
 		if (cmp_rs < 0)
 		{
 			if (c_node->child_left == NULL)
@@ -188,7 +189,7 @@ RBNode *rbt__find(RedBlackTree *t, void *obj)
 		if (cmp == 0)
 			return current_node;
 
-		current_node = cmp < 0 ? current_node->child_right : current_node->child_left;
+		current_node = cmp > 0 ? current_node->child_right : current_node->child_left;
 	}
 }
 
@@ -216,50 +217,62 @@ void rbt_set_node_color(RBNode *n, char color)
 
 void rbt_rotate_left(RedBlackTree *tree, RBNode *node)
 {
-	node->child_right->child_left = node;
+	assert(node->child_right != NULL);
 	if (node->parent)
 	{
-		if (tree->comparison_func(node->obj, node->parent->obj) < 0)
-		{
+		int cmp_po = tree->comparison_func(node->parent->obj, node->obj);
+		assert(cmp_po != 0);
+
+		if (cmp_po < 0)
 			node->parent->child_left = node->child_right;
-		}
 		else
-		{
 			node->parent->child_right = node->child_right;
-		}
+
 		node->child_right->parent = node->parent;
 	}
 	else
 	{
 		tree->root = node->child_right;
-		node->child_right->parent = NULL;
+		tree->root->parent = NULL;
 	}
+
 	node->parent = node->child_right;
-	node->child_right = NULL;
+	node->child_right = node->parent->child_left;
+	if (node->child_right)
+		node->child_right->parent = node;
+	node->parent->child_left = node;
 }
 
 void rbt_rotate_right(RedBlackTree *tree, RBNode *node)
 {
-	node->child_left->child_right = node;
+	// node->child_left->child_right = node;
+	assert(node->child_left != NULL);
 	if (node->parent)
 	{
-		if (tree->comparison_func(node->obj, node->parent->obj) < 0)
-		{
+		int cmp_po = tree->comparison_func(node->parent->obj, node->obj);
+		assert(cmp_po != 0);
+
+		if (cmp_po < 0)
 			node->parent->child_left = node->child_left;
-		}
 		else
-		{
 			node->parent->child_right = node->child_left;
-		}
+
 		node->child_left->parent = node->parent;
 	}
 	else
 	{
 		tree->root = node->child_left;
-		node->child_left->parent = NULL;
+		tree->root->parent = NULL;
 	}
+	// node->parent = node->child_left;
+	// node->child_left = NULL;
+
 	node->parent = node->child_left;
-	node->child_left = NULL;
+	node->child_left = node->parent->child_right;
+	if (node->child_left)
+		node->child_left->parent = node;
+	node->parent->child_right = node;
+
 }
 
 void rbt_adjust__sub_tree_red_top(RedBlackTree *tree, RBNode *top_node)
@@ -293,18 +306,18 @@ void rbt_adjust__sub_tree_red_top(RedBlackTree *tree, RBNode *top_node)
 	}
 
 	// [4-2-1-1] _U is black
-	int x_p__relp = tree->comparison_func(_X->obj, _P->obj);
-	int p_g__relp = tree->comparison_func(_P->obj, _G->obj);
+	int px__relp = tree->comparison_func(_P->obj, _X->obj);
+	int gp__relp = tree->comparison_func(_G->obj, _P->obj);
 
 	// [4-2-1-1-1]
-	if (x_p__relp < 0 && p_g__relp < 0)
+	if (px__relp < 0 && gp__relp < 0)
 	{
 		rbt_rotate_right(tree, _G);
 		rbt_set_node_color(_P, BLACK_NODE);
 		rbt_set_node_color(_G, RED_NODE);
 	}
 	// [4-2-1-1-2]
-	else if (x_p__relp > 0 && p_g__relp < 0)
+	else if (px__relp > 0 && gp__relp < 0)
 	{
 		rbt_rotate_left(tree, _P);
 		rbt_rotate_right(tree, _G);
@@ -312,7 +325,7 @@ void rbt_adjust__sub_tree_red_top(RedBlackTree *tree, RBNode *top_node)
 		rbt_set_node_color(_G, RED_NODE);
 	}
 	// [4-2-1-1-3]
-	else if (x_p__relp < 0 && p_g__relp > 0)
+	else if (px__relp < 0 && gp__relp > 0)
 	{
 		rbt_rotate_right(tree, _P);
 		rbt_rotate_left(tree, _G);
@@ -320,7 +333,7 @@ void rbt_adjust__sub_tree_red_top(RedBlackTree *tree, RBNode *top_node)
 		rbt_set_node_color(_G, RED_NODE);
 	}
 	// [4-2-1-1-4]
-	else if (x_p__relp > 0 && p_g__relp > 0)
+	else if (px__relp > 0 && gp__relp > 0)
 	{
 		rbt_rotate_left(tree, _G);
 		rbt_set_node_color(_P, BLACK_NODE);
