@@ -309,4 +309,6 @@ void ExpFnCoalesceEmpty_evolving(MDContext *md_ctx, ExpFnCoalesceEmpty *ce, Cube
 // Returns a list of peer members that have a same ancestor at the same level as the current member.
 ArrayList *mdd__lv_ancestor_peer_descendants(Level *, Member *);
 
+void *gce_transform(MDContext *md_ctx, GeneralChainExpression *gce, MddTuple *context_tuple, Cube *cube);
+
 #endif

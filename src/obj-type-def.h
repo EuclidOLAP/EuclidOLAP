@@ -143,6 +143,10 @@ typedef short type_obj;
 
 #define OBJ_TYPE__MemAllocMng 68
 
+#define OBJ_TYPE__STRING 69
+
+#define OBJ_TYPE__GeneralChainExpression 70
+
 #define OBJ_TYPE__RAW_BYTES 1024
 
 #endif

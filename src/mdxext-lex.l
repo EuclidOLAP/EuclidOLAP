@@ -60,6 +60,26 @@ on	{
 	return ON;
 }
 
+columns {
+	return COLUMNS;
+}
+
+rows {
+	return ROWS;
+}
+
+pages {
+	return PAGES;
+}
+
+chapters {
+	return CHAPTERS;
+}
+
+sections {
+	return SECTIONS;
+}
+
 where	{
 	return WHERE;
 }

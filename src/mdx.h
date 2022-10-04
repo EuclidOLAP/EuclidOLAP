@@ -11,6 +11,11 @@
 #define IDS_ARRLS_DIMS_LVS_INFO ((void *)0x05)
 #define IDS_STRLS_CRTDIMS ((void *)0x06)
 
+typedef struct general_chain_expression {
+    ArrayList *chain;
+    type_obj final_form;
+} GeneralChainExpression;
+
 typedef struct __vector_measures__
 {
     ArrayList *ls_vector;
