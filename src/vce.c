@@ -7,6 +7,8 @@
 #include "vce.h"
 #include "utils.h"
 
+#include "tools/elastic-byte-buffer.h"
+
 static MemAllocMng *vce_mam;
 static ArrayList *space_mam_ls;
 static ArrayList *coor_sys_ls;
@@ -102,8 +104,7 @@ static void *ScaleOffsetRange_print__rbt(RBNode *node, void *param) {
 void reload_space(unsigned long cs_id) {
     space_unload(cs_id);
 
-    // todo at once Do not use the allocated memory block directly, you need to define a ByteBuffer object.
-    unsigned char tmpbuf[0x01 << 13]; // 8k
+    ByteBuf *tmp_buf = buf__alloc(0x01UL << 10);
 
     char profile[128];
     sprintf(profile, "data/profile-%lu", cs_id);
@@ -112,7 +113,10 @@ void reload_space(unsigned long cs_id) {
     unsigned int vals_count;
 
     FILE *pfd = open_file(profile, "r");
-    fread(tmpbuf, sizeof(cs_id), 1, pfd);
+
+    // fread(tmpbuf, sizeof(cs_id), 1, pfd);
+    fread(buf_cutting(tmp_buf, sizeof(cs_id)), sizeof(cs_id), 1, pfd);
+
     fread(&axes_count, sizeof(axes_count), 1, pfd);
     fread(&vals_count, sizeof(vals_count), 1, pfd);
     fclose(pfd);
@@ -130,30 +134,46 @@ void reload_space(unsigned long cs_id) {
     int coor_pointer_len;
 
     while (fread(&coor_pointer_len, sizeof(int), 1, data_fd) > 0) {
-        fread(tmpbuf, coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
+
+        // fread(tmpbuf, coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
+        buf_clear(tmp_buf);
+        fread(buf_cutting(tmp_buf, coor_pointer_len * sizeof(__uint64_t)), coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
+
         // At the same time, hang the scale objects on the corresponding axis in the coordinate system object.
         Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
         scale->fragments_len = coor_pointer_len;
         scale->fragments = mam_alloc(coor_pointer_len * sizeof(__uint64_t), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
-        memcpy(scale->fragments, tmpbuf, coor_pointer_len * sizeof(__uint64_t));
+        
+        // memcpy(scale->fragments, tmpbuf, coor_pointer_len * sizeof(__uint64_t));
+        memcpy(scale->fragments, tmp_buf->buf_addr, coor_pointer_len * sizeof(__uint64_t));
 
         Axis *axis = cs_get_axis(cs, 0);
         ax_set_scale(axis, scale);
 
         for (i=1;i<axes_count;i++) {
+
             fread(&coor_pointer_len, sizeof(int), 1, data_fd);
-            fread(tmpbuf, coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
+
+            // fread(tmpbuf, coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
+            buf_clear(tmp_buf);
+            fread(buf_cutting(tmp_buf, coor_pointer_len * sizeof(__uint64_t)), coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
+
             Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
             scale->fragments_len = coor_pointer_len;
             scale->fragments = mam_alloc(coor_pointer_len * sizeof(__uint64_t), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
-            memcpy(scale->fragments, tmpbuf, coor_pointer_len * sizeof(__uint64_t));
+
+            // memcpy(scale->fragments, tmpbuf, coor_pointer_len * sizeof(__uint64_t));
+            memcpy(scale->fragments, tmp_buf->buf_addr, coor_pointer_len * sizeof(__uint64_t));
 
             Axis *axis = cs_get_axis(cs, i);
             ax_set_scale(axis, scale);
         }
 
         // skip some bytes
-        fread(tmpbuf, (sizeof(double) + sizeof(char)) * vals_count, 1, data_fd);
+        // fread(tmpbuf, (sizeof(double) + sizeof(char)) * vals_count, 1, data_fd);
+        unsigned long skip_bytes = (sizeof(double) + sizeof(char)) * vals_count;
+        buf_clear(tmp_buf);
+        fread(buf_cutting(tmp_buf, skip_bytes), skip_bytes, 1, data_fd);
     }
     fclose(data_fd);
 
@@ -190,18 +210,24 @@ void reload_space(unsigned long cs_id) {
         __uint64_t measure_space_idx = 0;
         for (i = 0; i < axes_count; i++)
         {
-            if (fread(tmpbuf, sizeof(int), 1, data_fd) < 1)
+            buf_clear(tmp_buf);
+            if (fread(buf_cutting(tmp_buf, sizeof(int)), sizeof(int), 1, data_fd) < 1)
                 goto finished;
 
-            int scale_len = *((int *)tmpbuf);
+            int scale_len = *((int *)tmp_buf->buf_addr);
 
-            fread(tmpbuf, sizeof(md_gid), scale_len, data_fd);
+            // fread(tmpbuf, sizeof(md_gid), scale_len, data_fd);
+            buf_clear(tmp_buf);
+            fread(buf_cutting(tmp_buf, sizeof(md_gid) * scale_len), sizeof(md_gid), scale_len, data_fd);
+
             Axis *axis = cs_get_axis(cs, i);
 
             Scale *__inl_s = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
             __inl_s->fragments_len = scale_len;
             __inl_s->fragments = mam_alloc(scale_len * sizeof(__uint64_t), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
-            memcpy(__inl_s->fragments, tmpbuf, scale_len * sizeof(__uint64_t));
+
+            // memcpy(__inl_s->fragments, tmpbuf, scale_len * sizeof(__uint64_t));
+            memcpy(__inl_s->fragments, tmp_buf->buf_addr, scale_len * sizeof(__uint64_t));
 
             RBNode *__inl_n = rbt__find(axis->rbtree, __inl_s);
             __uint64_t sc_posi = __inl_n->index;
@@ -216,6 +242,8 @@ void reload_space(unsigned long cs_id) {
 
         space_add_measure(space, measure_space_idx, cell);
     }
+
+    buf_release(tmp_buf);
 
 finished:
     fclose(data_fd);
