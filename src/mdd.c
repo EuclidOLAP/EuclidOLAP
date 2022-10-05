@@ -652,7 +652,7 @@ int distribute_store_measure(EuclidCommand *ec)
 
 int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 {
-	// TODO at once Do not use the allocated memory block directly, you need to define a ByteBuffer object.
+	// todo Do not use the allocated memory block directly, replace by ElasticByteBuffer.
 	size_t data_m_capacity = 4 * 1024 * 1024, data_m_sz = sizeof(__uint32_t) + sizeof(__uint16_t);
 	char *data = obj_alloc(data_m_capacity, OBJ_TYPE__RAW_BYTES);
 
