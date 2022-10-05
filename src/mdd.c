@@ -650,11 +650,12 @@ int distribute_store_measure(EuclidCommand *ec)
 	// return send(random_child_sock(), ec->bytes, *((int *)(ec->bytes)), 0) == (ssize_t)(*((int *)(ec->bytes)));
 }
 
-// TODO [ bug? ] When inserting duplicate data, the later data will not overwrite the previous data.
 int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 {
+	// TODO at once Do not use the allocated memory block directly, you need to define a ByteBuffer object.
 	size_t data_m_capacity = 4 * 1024 * 1024, data_m_sz = sizeof(__uint32_t) + sizeof(__uint16_t);
 	char *data = obj_alloc(data_m_capacity, OBJ_TYPE__RAW_BYTES);
+
 	*((__uint16_t *)(data + sizeof(__uint32_t))) = INTENT__INSERT_CUBE_MEARSURE_VALS;
 
 	Cube *cube = find_cube_by_name(cube_name);

@@ -297,7 +297,7 @@ static int execute_command(EuclidCommand *ec)
 						longjmp(cur_thrd_mam->excep_ctx_env, -1);
 					}
 				}
-			}			
+			}
 
 			MultiDimResult *md_rs = exe_multi_dim_queries(select_def);
 
