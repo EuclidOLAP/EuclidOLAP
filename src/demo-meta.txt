@@ -11,3 +11,7 @@ build cube [Online Store] dimensions [Store Type] [Store Type] [Payment Method] 
 ---
 
 build cube [logistics.test] dimensions Goods Goods Transport Transport Region [starting region] Region [ending region] Calendar [starting date] Calendar [completion date] measures cost income quantity;
+
+---
+
+build cube [nonexistent measure] dimensions Goods Goods Transport Transport Region [starting region] Region [ending region] Calendar [starting date] Calendar [completion date] measures cost income quantity;
