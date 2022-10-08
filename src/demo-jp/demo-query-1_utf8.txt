@@ -1,0 +1,201 @@
+select { ([Calendar].[2020].[Q1]), ([Calendar].[2020].[Q2]), ([Calendar].[2020].[Q3]), ([Calendar].[2020].[Q4]) } on 0, { ([支払い方法].[クレジットカード], measure.[売上高]), ([支払い方法].[デビットカード], measure.[売上高]), ([支払い方法].[口座残高], measure.[売上高]) } on 1 from [オンラインショップ];
+---
+with member Calendar.[First half 2020] as ([Calendar].[2020].[Q1]) + ([Calendar].[2020].[Q2]) member Calendar.[Second half 2020] as ([Calendar].[2020].[Q3]) + ([Calendar].[2020].[Q4]) select { ([Calendar].[2020].[Q1]), ([Calendar].[2020].[Q2]), ([Calendar].[2020].[Q3]), ([Calendar].[2020].[Q4]), (Calendar.[First half 2020]), (Calendar.[Second half 2020]) } on 0, { ([支払い方法].[クレジットカード]), ([支払い方法].[デビットカード]), ([支払い方法].[口座残高]) } on 1 from [オンラインショップ];
+---
+with member [支払い方法].PROPORTION as ([支払い方法].[ALL].[クレジットカード]) / ([支払い方法].[ALL]) select { ([Calendar].[2020].[Q1]), ([Calendar].[2020].[Q2]), ([Calendar].[2020].[Q3]), ([Calendar].[2020].[Q4]) } on 0, { ([支払い方法].[ALL].[クレジットカード]), ([支払い方法].[ALL]), ([支払い方法].PROPORTION) } on 1 from [オンラインショップ] where (measure.[売上高]);
+---
+select children([コモディティ].[キッチン・ダイニング]) on 0, children([Calendar].[ALL].[2021].[Q4]) on 1 from [オンラインショップ] where (measure.[売上高]);
+---
+select members([コモディティ], NOT_LEAFS) on 10, members(Calendar, LEAFS) on 100 from [オンラインショップ];
+---
+select { (measure.[売上高]), (measure.[販売台数]) } on 10, crossjoin(members([ショップタイプ], LEAFS), members([支払い方法], ALL)) on 100 from [オンラインショップ];
+---
+select { (measure.[売上高]), (measure.[販売台数]) } on 10, crossjoin(members([ショップタイプ], LEAFS), members([支払い方法], ALL), children([Calendar].[ALL].[2021].[Q4])) on 100 from [オンラインショップ];
+---
+select { (measure.[販売台数]), (measure.[売上高]) } on 10, crossjoin(members([ショップタイプ], LEAFS), members([支払い方法], ALL), children([Calendar].[ALL].[2021].[Q4]), children([コモディティ].[ALL])) on 100 from [オンラインショップ];
+---
+select members(measure) on 0, crossjoin(children([ショップタイプ].[ALL]), members([支払い方法])) on 1 from [オンラインショップ];
+---
+select { ( [出发地区].[ALL].[アジア].[中国], [出荷].[ALL].[鉄道] ), ( [出发地区].[ALL].[アジア].[中国], [出荷].[ALL].[鉄道], [measure].[番号] ), ( [出发地区].[ALL].[アジア].[中国], [出荷].[ALL].[高速道路], [measure].[番号] ), ( [コモディティ].[ALL].[食品].[坚果], [出荷].[ALL].[鉄道], [出发地区].[ALL].[アジア].[中国] ) } on 0, { ( [开始日期].[ALL].[2019].[Q4].[M10], [コモディティ].[ALL].[食品].[坚果], [measure].[収入] ), ( [开始日期].[ALL].[2019].[Q4].[M10], [コモディティ].[ALL].[食品].[坚果] ), ( [开始日期].[ALL].[2019].[Q3].[M9], [コモディティ].[ALL].[食品].[葡萄酒] ), ( [终点地区].[ALL].[アジア].[中国], [开始日期].[ALL].[2019].[Q3].[M7], [完成日期].[ALL].[2019].[Q3].[M7] ) } on 1 from [ロジスティクステスト] ;
+---
+select { ([コモディティ].[食品],[出荷].[鉄道],[出发地区].[ヨーロッパ].[イギリス]), ([出荷].[高速道路],[出发地区].[アジア].[日本]) } on 0, { ([出发地区].[アメリカ].[チリ],[终点地区].[アジア].[中国]), ([终点地区].[アジア].[韓国]), ([开始日期].[2019].[Q3].[M8],[完成日期].[2020].[Q2],[コモディティ].[食品]) } on 1, { ([完成日期].[2020].[Q4],[コモディティ].[食品],[出荷].[海上貨物]), ([コモディティ].[食品],[出荷].[鉄道]), ([出荷].[高速道路]), ([出发地区].[ヨーロッパ].[ギリシャ]) } on 2 from [ロジスティクステスト];
+---
+select { ( [コモディティ].[食品].[坚果], [出荷].[高速道路], [出发地区].[ヨーロッパ].[イギリス], [终点地区].[アジア].[韓国], [开始日期].[2019].[Q3].[M8], [完成日期].[2020].[Q4] ), ( [终点地区].[アジア].[韓国], [开始日期].[2019].[Q3].[M8], [完成日期].[2020].[Q4], [コモディティ].[食品].[坚果], [出荷].[高速道路], [出发地区].[ヨーロッパ].[イギリス] ) } on 0 from [ロジスティクステスト] ;
+---
+select { ( [コモディティ].[食品].[牛肉], [出荷].[航空], [出发地区].[アジア].[日本], [终点地区].[アメリカ].[米国], [开始日期].[2019].[Q3].[M7] ), ( [コモディティ].[食品].[牛肉], [出荷].[航空], [出发地区].[アジア].[日本], [终点地区].[アメリカ].[米国], [开始日期].[2019].[Q3].[M7] ), ( [コモディティ].[食品].[牛肉], [出荷].[航空], [出发地区].[アジア].[日本], [终点地区].[アメリカ].[米国], [开始日期].[2019].[Q3].[M7] ), ( [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア], [measure].[番号] ), ( [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア], [measure].[収入] ), ( [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア], [measure].[費用] ), ( [出发地区].[アメリカ].[チリ], [终点地区].[ヨーロッパ].[イギリス], [开始日期].[2020].[Q4].[M11], [完成日期].[2020].[Q4].[M12], [measure].[番号] ), ( [コモディティ].[家庭用電化製品].[电视机], [出荷].[海上貨物], [出发地区].[アメリカ].[チリ], [终点地区].[ヨーロッパ].[イギリス] ), ( [コモディティ].[家庭用電化製品].[电视机], [出荷].[海上貨物], [出发地区].[アメリカ].[チリ], [终点地区].[ヨーロッパ].[イギリス], [开始日期].[2020].[Q4].[M11], [完成日期].[2020].[Q4].[M12] ) } on 0, { ( [完成日期].[2020].[Q1].[M1], [measure].[番号] ), ( [完成日期].[2020].[Q1].[M1], [measure].[収入] ), ( [完成日期].[2020].[Q1].[M1], [measure].[費用] ), ( [コモディティ].[家庭用電化製品].[电视机], [出荷].[海上貨物], [开始日期].[2021].[Q2].[M5], [完成日期].[2020].[Q1].[M3] ), ( [コモディティ].[家庭用電化製品].[电视机], [出荷].[海上貨物], [开始日期].[2021].[Q2].[M5], [完成日期].[2020].[Q1].[M3] ), ( [开始日期].[2021].[Q2].[M5], [完成日期].[2020].[Q1].[M3], [コモディティ].[家庭用電化製品].[电视机], [出荷].[海上貨物] ), ( [コモディティ].[家庭用電化製品].[电视机], [出荷].[海上貨物] ), ( [终点地区].[ヨーロッパ].[イギリス], [开始日期].[2020].[Q4].[M11], [完成日期].[2020].[Q4].[M12], [measure].[収入] ), ( [コモディティ].[家庭用電化製品].[电视机], [出荷].[海上貨物], [出发地区].[アメリカ].[チリ], [终点地区].[ヨーロッパ].[イギリス], [开始日期].[2020].[Q4].[M11], [完成日期].[2020].[Q4].[M12], [measure].[費用] ) } on 1 from [ロジスティクステスト] ;
+---
+select { ([终点地区].[ヨーロッパ].[イタリア], [完成日期].[2020].[Q1].[M3], measure.[費用] ) } on 0, { ([コモディティ].[家庭用電化製品].[电视机], [出荷].[海上貨物], [出发地区].[ヨーロッパ].[イギリス] ) } on 1, { ( [开始日期].[2021].[Q2].[M5] ) } on 2 from [ロジスティクステスト] ;
+---
+select { ([终点地区].[ヨーロッパ].[イタリア], [完成日期].[2020].[Q1].[M3], measure.[費用] ) } on 0, { ([コモディティ].[家庭用電化製品].[电视机], [出荷].[海上貨物], [出发地区].[ヨーロッパ].[イギリス] ) } on 1 from [ロジスティクステスト] where ( [开始日期].[2021].[Q2].[M5] );
+---
+select { ( measure.[費用], [终点地区].[アジア].[中国] ), ( measure.[費用], [终点地区].[アジア].[日本] ), ( measure.[費用], [终点地区].[アジア].[韓国] ), ( measure.[費用], [终点地区].[アメリカ].[米国] ), ( measure.[費用], [终点地区].[アメリカ].[メキシコ] ), ( measure.[費用], [终点地区].[アメリカ].[チリ] ), ( measure.[費用], [终点地区].[ヨーロッパ].[ギリシャ] ), ( measure.[費用], [终点地区].[ヨーロッパ].[イタリア] ), ( measure.[費用], [终点地区].[ヨーロッパ].[イギリス] ), ( measure.[費用], [终点地区].[アジア] ), ( measure.[費用], [终点地区].[アメリカ] ), ( measure.[費用], [终点地区].[ヨーロッパ] ) } on 0 from [ロジスティクステスト] where ( [コモディティ].[食品].[坚果], [出荷].[鉄道], [出发地区].[アジア].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+with member [measure].[MM001] as (measure.[費用]) + (measure.[費用]) * (measure.[費用]) - (measure.[費用]) select { ( measure.[費用], [终点地区].[アジア].[中国] ), ( measure.[費用], [终点地区].[アジア].[日本] ), ( measure.[費用], [终点地区].[アジア].[韓国] ), ( measure.[費用], [终点地区].[アメリカ].[米国] ), ( measure.[費用], [终点地区].[アメリカ].[メキシコ] ), ( measure.[費用], [终点地区].[アメリカ].[チリ] ), ( measure.[費用], [终点地区].[ヨーロッパ].[ギリシャ] ), ( measure.[費用], [终点地区].[ヨーロッパ].[イタリア] ), ( measure.[費用], [终点地区].[ヨーロッパ].[イギリス] ), ( measure.[費用], [终点地区].[アジア] ), ( measure.[費用], [终点地区].[アメリカ] ), ( measure.[費用], [终点地区].[ヨーロッパ] ), ( measure.MM001, [终点地区].[ヨーロッパ] ), ( measure.MM001, [终点地区].[アジア] ) } on 0 from [ロジスティクステスト] where ( [コモディティ].[食品].[坚果], [出荷].[鉄道], [出发地区].[アジア].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+with member [终点地区].CCCCCC as ([终点地区].[アジア].[中国]) * ([终点地区].[アメリカ].[米国]) / ([终点地区].[ヨーロッパ].[ギリシャ]) + ([终点地区].[ヨーロッパ].[イタリア]) member [终点地区].AAAAAA as ([终点地区].[アジア].[中国]) * 1000000000 + ([终点地区].[アメリカ].[米国]) member [终点地区].X as (([终点地区].[ヨーロッパ].[ギリシャ]) * ((([终点地区].[アジア].[中国]) * ([终点地区].[アメリカ].[米国]) / ([终点地区].[ヨーロッパ].[ギリシャ]) + ([终点地区].[ヨーロッパ].[イタリア])) + 1000) - ([终点地区].[ヨーロッパ].[イタリア])) / 0.5 member [终点地区].XX as ((((((((((((((((((([终点地区].[アジア]))))))))))))))))))) + ((([终点地区].[アジア].[中国]))) * 10000 select { ( measure.[費用], [终点地区].[アジア].[中国] ), ( measure.[費用], [终点地区].[アメリカ].[米国] ), ( measure.[費用], [终点地区].[ヨーロッパ].[ギリシャ] ), ( measure.[費用], [终点地区].[ヨーロッパ].[イタリア] ), ( measure.[費用], [终点地区].CCCCCC ), ( measure.[費用], [终点地区].AAAAAA ), ( measure.[費用], [终点地区].X ), ( measure.[費用], [终点地区].XX ) } on 0 from [ロジスティクステスト] where ( [コモディティ].[食品].[坚果], [出荷].[鉄道], [出发地区].[アジア].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+with set SSSSSS as children( [终点地区].[アジア] ) select SSSSSS on 999 from [ロジスティクステスト] where ( [コモディティ].[食品].[坚果], [出荷].[鉄道], [出发地区].[アジア].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+with set QQQ as XXX set XXX as children( [コモディティ].[エレクトロニクス製品] ) select children([开始日期].[2021]) on 0, QQQ on 111 from [ロジスティクステスト] where ( [完成日期].[2020].[Q1].[M3], [出荷].[鉄道], [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア], measure.[費用] );
+---
+with set QQQ as XXX set XXX as children( parent([コモディティ].[エレクトロニクス製品].[计算器]) ) select children( parent( parent( [开始日期].[2021].Q1.M3 ) ) ) on 0, QQQ on 111 from [ロジスティクステスト] where ( [完成日期].[2020].[Q1].[M3], [出荷].[鉄道], [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア], measure.[収入] );
+---
+with member [measure].[FFFFFF] as sum( {(measure.[収入]), (measure.[費用])}, ([コモディティ].[エレクトロニクス製品].[计算器]) ) select { (measure.[費用]), (measure.[収入]), ([measure].[FFFFFF]) } on 0, children( [开始日期].[2021].Q1 ) on 1 from [ロジスティクステスト] where ( [コモディティ].[エレクトロニクス製品].[移动电话], [完成日期].[2020].[Q1].[M3], [出荷].[鉄道], [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア] );
+---
+with member [measure].[FFFFFF] as sum( {(measure.[収入]), (measure.[費用])}, ([コモディティ].[エレクトロニクス製品].[计算器]) ) member [开始日期].SSSSSS as sum( children( [开始日期].[2021] ), ([コモディティ].[エレクトロニクス製品].[计算器]) ) select { (measure.[費用]), (measure.[収入]), ([measure].[FFFFFF]) } on 0, { ([开始日期].[2021].Q1.M1), ([开始日期].[2021].Q1.M2), ([开始日期].[2021].Q1.M3), ([开始日期].SSSSSS) } on 1 from [ロジスティクステスト] where ( [コモディティ].[エレクトロニクス製品].[移动电话], [完成日期].[2020].[Q1].[M3], [出荷].[鉄道], [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア] );
+---
+with member [开始日期].SSSSSS as sum( { ([开始日期].[2021].Q1), ([开始日期].[2021].Q2), ([开始日期].[2021].Q3), ([开始日期].[2021].Q4) } ) member [コモディティ].GGGGGG as sum( { ([コモディティ].[エレクトロニクス製品].[移动电话]), ([コモディティ].[エレクトロニクス製品].[计算器]), ([コモディティ].[エレクトロニクス製品].[智能手表]) } ) select { ([开始日期].[2021].Q1), ([开始日期].[2021].Q2), ([开始日期].[2021].Q3), ([开始日期].[2021].Q4), ([开始日期].SSSSSS) } on 0, { ([コモディティ].[エレクトロニクス製品].[移动电话]), ([コモディティ].[エレクトロニクス製品].[计算器]), ([コモディティ].[エレクトロニクス製品].[智能手表]), ([コモディティ].GGGGGG) } on 1 from [ロジスティクステスト] where ( [出荷].[鉄道], [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア], [完成日期].[2020].[Q1].[M3], measure.[費用] );
+---
+select { ([开始日期].[2021].Q1), ([开始日期].[2021].Q2) } on 999, { (measure.[収入]), (measure.[費用]) } on 100 from [ロジスティクステスト] where ( [コモディティ].[エレクトロニクス製品].[计算器] , [出荷].[鉄道], [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア], [完成日期].[2020].[Q1].[M3] );
+---
+select children( [开始日期].[2021].Q1 ) on 999, { (measure.[収入]), (measure.[費用]) } on 100 from [ロジスティクステスト] where ( [コモディティ].[エレクトロニクス製品].[计算器] , [出荷].[鉄道], [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア], [完成日期].[2020].[Q1].[M3] );
+---
+select members([コモディティ]) on 0, crossJoin(members(measure), members([终点地区])) on 1 from [ロジスティクステスト] ;
+---
+with member [开始日期].PPPPPP as ([开始日期].[2021].Q1.M2) + ([开始日期].[2021].Q1.M3) member [measure].MMMMMM as (measure.[収入]) * (measure.[費用]) select { (measure.[収入]), (measure.[費用]), ([measure].MMMMMM) } on 100, { ([开始日期].[2021].Q1.M1), ([开始日期].[2021].Q1.M2), ([开始日期].[2021].Q1.M3), ([开始日期].PPPPPP) } on 200 from [ロジスティクステスト] where ( [コモディティ].[エレクトロニクス製品].[计算器] , [出荷].[鉄道], [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア], [完成日期].[2020].[Q1].[M3] );
+---
+with member [开始日期].PPPPPP as ([开始日期].[2021].Q1.M2) + ([开始日期].[2021].Q1.M3) member [measure].MMMMMM as (measure.[収入]) * (measure.[費用]) select { (measure.[収入]), (measure.[費用]), ([measure].MMMMMM) } on 1000, { ([开始日期].[2021].Q1.M1), ([开始日期].[2021].Q1.M2), ([开始日期].[2021].Q1.M3), ([开始日期].PPPPPP) } on 200 from [ロジスティクステスト] where ( [コモディティ].[エレクトロニクス製品].[计算器] , [出荷].[鉄道], [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア], [完成日期].[2020].[Q1].[M3] );
+---
+with member measure.SSSSSS as sum({ (measure.XXX), (measure.YYY), (measure.ZZZ) }) member measure.XXX as ([measure].[売上高]) * 10 member measure.YYY as ((measure.XXX) + 9900000000) member measure.ZZZ as (measure.YYY) / 8 - 222.22 select { ([measure].[売上高]), (measure.XXX), (measure.YYY), (measure.ZZZ), (measure.SSSSSS) } on 0, members(Calendar) on 1 from [オンラインショップ] ;
+---
+with member measure.SSSSSS as sum({ (measure.XXX), (measure.YYY), (measure.ZZZ) }) member measure.XXX as ([measure].[売上高]) * 10 member measure.YYY as ((measure.XXX) + 9900000000) member measure.ZZZ as (measure.YYY) / 8 - 222.22 member measure.QQQ as sum({([measure].[売上高]), ([measure].[キャッシュバック])}) member Calendar.VVV as sum({ ([Calendar].[ALL].[2020]), ([Calendar].[ALL].[2019]) }) select { ([measure].[売上高]), ([measure].[キャッシュバック]), (measure.XXX), (measure.YYY), (measure.ZZZ), (measure.SSSSSS) } on 0, { ([Calendar].[ALL].[2019]), ([Calendar].[ALL].[2020]), (Calendar.VVV) } on 1 from [オンラインショップ] ;
+---
+with member Calendar.SSSSSS as count(members(Calendar)) member Calendar.EEE as count(members(Calendar), EXCLUDEEMPTY) member Calendar.III as count(members(Calendar), INCLUDEEMPTY) select { ([measure].[売上高]), ([measure].[キャッシュバック]) } on 0, { ([Calendar].[ALL].[2019]), ([Calendar].[ALL].[2020]), (Calendar.SSSSSS), (Calendar.EEE), (Calendar.III) } on 1 from [オンラインショップ] ;
+---
+with member Calendar.SSSSSS as count(members(Calendar)) member Calendar.EEE as count(members(Calendar), EXCLUDEEMPTY) member Calendar.III as count(members(Calendar), INCLUDEEMPTY) select { ([measure].[売上高]), ([measure].[キャッシュバック]) } on 0, members(Calendar) on 1 from [オンラインショップ] ;
+---
+select {(measure.[売上高])} on 0, {(measure.[売上高])} on 1 from [オンラインショップ];
+---
+select { ([measure].[売上高]) } on 0, filter({ ([Calendar].[ALL].[2020].[Q1]), ([Calendar].[ALL].[2020]) }, ([measure].[売上高]) > 29.999 ) on 1 from [オンラインショップ] where ([ショップタイプ].[ALL].[プラットフォーム 自己支持型],[支払い方法].[ALL].[クレジットカード],[コモディティ].[ALL].[キッチン・ダイニング].[便当盒]);
+---
+select members(measure) on 1, filter(members(Calendar), ((((([measure].[売上高]) < 240)))) ANd ((((([measure].[売上高]) >= 30)))) ) on 99999999 from [オンラインショップ] where ([ショップタイプ].[ALL].[プラットフォーム 自己支持型],[支払い方法].[ALL].[クレジットカード],[コモディティ].[ALL].[キッチン・ダイニング].[便当盒]) ;
+---
+select { ([ショップタイプ].[ALL]) } on 0, filter(members(Calendar), ([ショップタイプ].[ALL]) > 17279.999999999) on 1 from [オンラインショップ] ;
+---
+select { ([ショップタイプ].[ALL]) } on 0, filter(members(Calendar), (([ショップタイプ].[ALL]) <= 2000) oR ([ショップタイプ].[ALL]) > 30000) on 1 from [オンラインショップ] ;
+---
+select { ( [出发地区].[ALL].[アジア].[中国], [出荷].[ALL].[鉄道] ) } on 0, filter({ ( [开始日期].[ALL].[2019].[Q4].[M10], [コモディティ].[ALL].[食品].[坚果], [measure].[収入] ), ( [开始日期].[ALL].[2019].[Q4].[M10], [コモディティ].[ALL].[食品].[坚果] ), ( [开始日期].[ALL].[2019].[Q3].[M9], [コモディティ].[ALL].[食品].[葡萄酒] ), ( [终点地区].[ALL].[アジア].[中国], [开始日期].[ALL].[2019].[Q3].[M7], [完成日期].[ALL].[2019].[Q3].[M7] ) }, (([出荷].[ALL].[鉄道]) > 0) OR (1 < 2)) on 1 from [ロジスティクステスト] ;
+---
+with member [支払い方法].PROPORTION as ([支払い方法].[ALL].[クレジットカード]) / ([支払い方法].[ALL]) select { ([Calendar].[2020].[Q4]) } on 10, filter( { ([支払い方法].[ALL].[クレジットカード]), ([支払い方法].[ALL]), ([支払い方法].PROPORTION) }, (measure.[売上高]) <> 4320 ) on 1 from [オンラインショップ] where (measure.[売上高]);
+---
+with member measure.SSSSSS as sum({ (measure.XXX), (measure.YYY), (measure.ZZZ) }) member measure.XXX as ([measure].[売上高]) * 10 member measure.YYY as ((measure.XXX) + 111) member measure.ZZZ as (measure.YYY) / 8 - 222.22 member measure.QQQ as sum({([measure].[売上高]), ([measure].[キャッシュバック])}) member Calendar.VVV as sum({ ([Calendar].[ALL].[2020]), ([Calendar].[ALL].[2019]) }) select { (measure.SSSSSS), ([measure].[売上高]), ([measure].[キャッシュバック]), (measure.XXX), (measure.YYY), (measure.ZZZ) } on 0, filter(members(Calendar), (((measure.SSSSSS) <= 30000) or ((measure.SSSSSS) >= 40000)) and (((measure.SSSSSS) <= 360000) or ((measure.SSSSSS) >= 370000))) on 1 from [オンラインショップ] ;
+---
+with set QQQ as XXX set XXX as children( parent([コモディティ].[エレクトロニクス製品].[计算器]) ) select children( parent( parent( [开始日期].[2021].Q1.M3 ) ) ) on 0, filter(QQQ, (parent( [开始日期].[2021].Q1.M3 )) <> 9003) on 111 from [ロジスティクステスト] where ( [完成日期].[2020].[Q1].[M3], [出荷].[鉄道], [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア], measure.[収入] );
+---
+WITH set QQQ as XXX set XXX as children( parent([コモディティ].[エレクトロニクス製品].[计算器]) ) SELECT chILDren( parent( parent( [开始日期].[2021].Q1.M3 ) ) ) On 0, filter(QQQ, (parent( [开始日期].[2021].Q1.M3 )) <> 9003) On 111 frOM [ロジスティクステスト] whERE ( [完成日期].[2020].[Q1].[M3], [出荷].[鉄道], [出发地区].[ヨーロッパ].[イギリス], [终点地区].[ヨーロッパ].[イタリア], measure.[収入] );
+---
+select { ([ショップタイプ].[ALL]) } on 0, { (parent(Calendar.[ALL].[2020]), parent([支払い方法].[ALL])) } on 1 from [オンラインショップ] ;
+---
+with MEmber measure.XXX as ([measure].[売上高]) / (paREnt(CurrentMember(Calendar)), [measure].[売上高]) select { ([measure].[売上高]), (measure.XXX) } ON 0, FIlter(members(Calendar), ([measure].[売上高]) > 4000) on 1 from [オンラインショップ] ;
+---
+with member [开始日期].PPPPPP as ([开始日期].[2021].Q1.M2) + ([开始日期].[2021].Q1.M3) member [measure].MMMMMM as (prevMember(currentMember([开始日期])), measure.[費用]) select { (measure.[費用]), ([measure].MMMMMM) } on 1, filter(members([开始日期]), (measure.[費用]) > 1) on 200 from [ロジスティクステスト] where ( [コモディティ].[ALL].[エレクトロニクス製品].[计算器] , [出荷].[ALL].[鉄道], [出发地区].[ALL].[ヨーロッパ].[イギリス], [终点地区].[ALL].[ヨーロッパ].[イタリア], [完成日期].[ALL].[2020].[Q1].[M3] );
+---
+with member [开始日期].XXX as (prevMember(currentMember([measure])), [开始日期].[2021]) select members(measure) on 1, { ( [开始日期].[2021] ), ([开始日期].XXX) } on 0 from [ロジスティクステスト] where ([コモディティ].[ALL].[家庭用電化製品].[电视机], [出荷].[ALL].[海上貨物], [出发地区].[ALL].[ヨーロッパ].[イギリス], [终点地区].[ALL].[ヨーロッパ].[イタリア], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select { (Calendar.[ALL].[2021].Q2.M4), (Calendar.[ALL].[2021].Q3.M7) } on 0, { (measure.[売上高]) } on 1 from [オンラインショップ] ;
+---
+select { (Calendar.[ALL].[2021].Q3.M7), (Calendar.[ALL].[2021].Q4.M10) } on 0, { (measure.[売上高]) } on 1 from [オンラインショップ] ;
+---
+with member measure.XXX as (measure.[売上高], parallelPeriod()) select { (Calendar.[ALL].[2021].Q3.M7), (Calendar.[ALL].[2021].Q4.M10) } on 0, { (measure.XXX) } on 1 from [オンラインショップ] ;
+---
+select { (Calendar.[ALL].[2020].Q4.M12), (Calendar.[ALL].[2021].Q4.M12) } on 0, { (measure.[売上高]) } on 1 from [オンラインショップ] ;
+---
+with member measure.XXX as (measure.[売上高], parallelPeriod(Calendar.year)) select { (Calendar.[ALL].[2021].Q4.M12) } on 0, { (measure.XXX) } on 1 from [オンラインショップ] ;
+---
+select { (Calendar.[ALL].[2021].Q4.M12) } on 1, { (measure.[売上高], parallelPeriod(Calendar.year)) } on 0 from [オンラインショップ] ;
+---
+select { (Calendar.[ALL].[2021].Q1.M2), (Calendar.[ALL].[2021].Q3.M8), (Calendar.[ALL].[2021].Q4.M11) } on 0, { (measure.[売上高]) } on 1 from [オンラインショップ] ;
+---
+with member measure.XXX as (measure.[売上高], parallelPeriod(Calendar.quarter, 3)) select { (Calendar.[ALL].[2021].Q4.M11) } on 0, { (measure.XXX) } on 1 from [オンラインショップ] ;
+---
+with member measure.XXX as (measure.[売上高], parallelPeriod(Calendar.quarter, 0 - 2, Calendar.[ALL].[2021].Q1.M2)) select { (Calendar.[ALL].[2021].Q4.M11) } on 0, { (measure.XXX) } on 1 from [オンラインショップ] ;
+---
+with member measure.XXX as (measure.[売上高], parallelPeriod(Calendar.year, 0 - 1)) select { (Calendar.[ALL].[2020].Q4.M11) } on 0, { (measure.XXX) } on 1 from [オンラインショップ] ;
+---
+with member measure.XXX as (measure.[売上高], parallelPeriod(Calendar.year, 0 - 1)) select { (Calendar.[ALL].[2020].Q4.M11) } on 0, { (measure.[売上高]) } on 1 from [オンラインショップ] ;
+---
+select { (Calendar.[ALL].[2021].Q4.M11) } on 0, { (measure.[売上高]) } on 1 from [オンラインショップ] ;
+---
+with member measure.AAA as (measure.[売上高], parallelPeriod(Calendar.month, 0 - 3)) member measure.SSS as (measure.[販売台数], parallelPeriod(Calendar.month, 0)) member measure.DDD as (measure.[キャッシュバック], parallelPeriod(Calendar.month, 0 - 5)) select { (Calendar.[ALL].[2021].[Q3].M7) } on 0, {(measure.AAA),(measure.SSS),(measure.DDD)} on 1 from [オンラインショップ] ;
+---
+select LateralMembers(Calendar.[ALL].[2020].Q4) on 0, { (measure.[売上高]) } on 1 from [オンラインショップ] ;
+---
+select LateralMembers(measure.[売上高]) on 1, LateralMembers(Calendar.[ALL].[2020].Q4) on 10 from [オンラインショップ] ;
+---
+SELECT crossjoin(LATERALMEMBERS([出发地区].[ALL].[ヨーロッパ]), LATERALMEMBERS(measure.[収入])) On 10, LATERALMEMBERS([完成日期].[ALL]) On 1 frOM [ロジスティクステスト] ;
+---
+select order(members(Calendar), (measure.[売上高])) on 10, { (measure.[売上高]) } on 1 from [オンラインショップ] ;
+---
+select order(members(Calendar), (measure.[売上高]), ASC) on 10, { (measure.[売上高]) } on 1 from [オンラインショップ] ;
+---
+select order(members(Calendar), (measure.[売上高]), DESC) on 10, { (measure.[売上高]) } on 1 from [オンラインショップ] ;
+---
+select order(members(Calendar), (measure.[売上高]), BASC) on 10, { (measure.[売上高]) } on 1 from [オンラインショップ] ;
+---
+select order(members(Calendar), (measure.[売上高]), BDESC) on 10, { (measure.[売上高]) } on 1 from [オンラインショップ] ;
+---
+select { (measure.[売上高]) } on 0, order(members(Calendar), (measure.[売上高]), basc) on 1 from [オンラインショップ] ;
+---
+select { ([Calendar].[ALL].[2021]) } on 0, topCount(crossjoin(members(measure), children([ショップタイプ].[ALL]), lateralMembers([支払い方法].[ALL].[その他])), 10, ([Calendar].[ALL].[2021])) on 1 from [オンラインショップ] ;
+---
+select members([コモディティ]) on 0, crossJoin(members(measure), members([终点地区])) on 1 from [ロジスティクステスト] ;
+---
+select except(members([コモディティ]), children([コモディティ].[食品])) on 1, { ( measure.[費用] ) } on 0 from [ロジスティクステスト] where ( [コモディティ].[食品].[坚果], [出荷].[鉄道], [出发地区].[アジア].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+select except(members([コモディティ]), children([コモディティ].[食品])) on 1, except(members( measure ), {(measure.[費用]), (measure.[収入])}) on 0 from [ロジスティクステスト] where ( [コモディティ].[食品].[坚果], [出荷].[鉄道], [出发地区].[アジア].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+select crossJoin(members(measure), lateralMembers([コモディティ].[ALL].[食品])) on 1, {([开始日期].[ALL].[2020])} on 0 from [ロジスティクステスト];
+---
+with set [~~~!!!@@@...] as crossJoin({(measure.[費用]), (measure.[番号])}, {([コモディティ].[ALL].[携帯電話・アクセサリー]), ([コモディティ].[ALL].[家庭用電化製品])}) select except(crossJoin(members(measure), lateralMembers([コモディティ].[ALL].[食品])), [~~~!!!@@@...]) on 1, {([开始日期].[ALL].[2020])} on 0 from [ロジスティクステスト];
+---
+with member measure.SSSSSS as sum(Ytd(), (measure.[売上高])) select { (measure.[売上高]), (measure.SSSSSS)} on 1, YTD() on 10 from [オンラインショップ] where (Calendar.[ALL].[2021].Q4.M12, [支払い方法].[ALL].[クレジットカード]);
+---
+with member measure.SSSSSS as sum(Ytd(), (measure.[売上高])) select { (measure.[売上高]), (measure.SSSSSS)} on 1, YTD(Calendar.[ALL].[2021].Q2.M5) on 10 from [オンラインショップ] where (Calendar.[ALL].[2021].Q4.M12, [支払い方法].[ALL].[クレジットカード]);
+---
+select members(measure) on 1, Descendants([开始日期].[ALL].[2021], [开始日期].[quarter]) on 0 from [ロジスティクステスト] where ([コモディティ].[ALL].[家庭用電化製品].[电视机], [出荷].[ALL].[海上貨物], [出发地区].[ALL].[ヨーロッパ].[イギリス], [终点地区].[ALL].[ヨーロッパ].[イタリア], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select members(measure) on 1, Descendants([开始日期].[ALL].[2021], [开始日期].[month]) on 0 from [ロジスティクステスト] where ([コモディティ].[ALL].[家庭用電化製品].[电视机], [出荷].[ALL].[海上貨物], [出发地区].[ALL].[ヨーロッパ].[イギリス], [终点地区].[ALL].[ヨーロッパ].[イタリア], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select members(measure) on 1, Descendants([开始日期].[ALL].[2021], [开始日期].[month], BEFORE) on 0 from [ロジスティクステスト] where ([コモディティ].[ALL].[家庭用電化製品].[电视机], [出荷].[ALL].[海上貨物], [出发地区].[ALL].[ヨーロッパ].[イギリス], [终点地区].[ALL].[ヨーロッパ].[イタリア], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select members(measure) on 1, Descendants([开始日期].[ALL], [开始日期].[quarter]) on 10 from [ロジスティクステスト] where ([コモディティ].[ALL].[家庭用電化製品].[电视机], [出荷].[ALL].[海上貨物], [出发地区].[ALL].[ヨーロッパ].[イギリス], [终点地区].[ALL].[ヨーロッパ].[イタリア], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select members(measure) on 1, Descendants([开始日期].[ALL], [开始日期].[quarter], BEFORE_AND_AFTER) on 10 from [ロジスティクステスト] where ([コモディティ].[ALL].[家庭用電化製品].[电视机], [出荷].[ALL].[海上貨物], [出发地区].[ALL].[ヨーロッパ].[イギリス], [终点地区].[ALL].[ヨーロッパ].[イタリア], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select members(measure) on 1, Descendants([开始日期].[ALL], 20, LEAVES) on 10 from [ロジスティクステスト] where ([コモディティ].[ALL].[家庭用電化製品].[电视机], [出荷].[ALL].[海上貨物], [出发地区].[ALL].[ヨーロッパ].[イギリス], [终点地区].[ALL].[ヨーロッパ].[イタリア], [开始日期].[ALL].[2021].[Q2].[M4], [完成日期].[ALL].[2020].[Q1].[M1]) ;
+---
+select members(measure) on 1, Descendants([开始日期].[ALL], 3) on 10 from [ロジスティクステスト] ;
+---
+with set SSSSSS as tail( crossjoin(LATERALMEMBERS([出发地区].[ALL].[ヨーロッパ]), LATERALMEMBERS(measure.[収入])) ) SELECT SSSSSS On 10, LATERALMEMBERS([完成日期].[ALL]) On 1 frOM [ロジスティクステスト] ;
+---
+with set SSSSSS as tail( crossjoin(LATERALMEMBERS([出发地区].[ALL].[ヨーロッパ]), LATERALMEMBERS(measure.[収入])), 8 ) SELECT SSSSSS On 10, LATERALMEMBERS([完成日期].[ALL]) On 1 frOM [ロジスティクステスト] ;
+---
+with set SSSSSS as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measure.[売上高]) > 1) member measure.XXXXXX as (measure.[売上高]) - 20000 select topPercent(SSSSSS, 25, (measure.[売上高])) on 10, {(measure.XXXXXX)} on 1 from [オンラインショップ] ;
+---
+with set SSSSSS as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measure.[売上高]) > 1) member measure.XXXXXX as (measure.[売上高]) - 20000 select bottomPercent(SSSSSS, 25, (measure.[売上高])) on 10, {(measure.[売上高])} on 1 from [オンラインショップ] ;
+---
+with set SSSSSS as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measure.[売上高]) > 1) member measure.XXXXXX as (measure.[売上高]) - 20000 select topPercent(SSSSSS, 55, (measure.[売上高])) on 10, {(measure.[売上高])} on 1 from [オンラインショップ] ;
+---
+with set SSSSSS as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measure.[売上高]) > 1) member measure.XXXXXX as (measure.[売上高]) - 18000 select bottomPercent(SSSSSS, 53, (measure.[XXXXXX])) on 10, {(measure.[XXXXXX])} on 1 from [オンラインショップ] ;
+---
+with select members(measure) on 999, UNION(crossJoin(children([コモディティ].[ALL].[食品]), children([出发地区].[ALL])), crossJoin(children([コモディティ].[ALL].[食品]), children([出发地区].[ALL]))) on 111111 from [ロジスティクステスト] where ( [コモディティ].[食品].[坚果], [出荷].[鉄道], [出发地区].[アジア].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+with select members(measure) on 999, UNION(crossJoin(children([コモディティ].[ALL].[食品]), children([出发地区].[ALL])), crossJoin(children([コモディティ].[ALL].[食品]), children([出发地区].[ALL])), All) on 111111 from [ロジスティクステスト] where ( [コモディティ].[食品].[坚果], [出荷].[鉄道], [出发地区].[アジア].[中国], [开始日期].[2019].[Q3].[M7], [完成日期].[2019].[Q3].[M7] );
+---
+select members(measure) on 0, intersect(members(Calendar), children(Calendar.[ALL].[2021])) on 1 from [オンラインショップ] ;
+---
+select members(measure) on 0, intersect(members(Calendar), UNION(children(Calendar.[ALL].[2021]), children(Calendar.[ALL].[2021].Q3))) on 1 from [オンラインショップ] ;
+---
+select members(measure) on 0, intersect(members(Calendar), UNION(children(Calendar.[ALL].[2021]), children(Calendar.[ALL].[2021].Q1)), ALL) on 1 from [オンラインショップ] ;
+---
+with member measure.SSSSSS as lookUpCube("ロジスティクステスト", "(measure.[費用])") select { ( measure.[売上高] ), (measure.SSSSSS) } on 0, children(Calendar.[ALL].[2021]) on 1 from [オンラインショップ] ;
+---
+with member measure.AAAAAA as LOOKUPCUBE("オンラインショップ", "(measure.[売上高])") member measure.BBBBBB as LOOKUPCUBE("オンラインショップ", (measure.[売上高], Calendar.[ALL].[2021].Q3)) member measure.CCCCCC as LOOKUPCUBE([オンラインショップ], "(measure.[売上高], Calendar.[ALL].[2021].Q4) + (measure.[販売台数], Calendar.[ALL].[2021].Q3)") member measure.DDDDDD as LOOKUPCUBE([オンラインショップ], (measure.[キャッシュバック])) select { (measure.[費用]), (measure.AAAAAA), (measure.BBBBBB), (measure.CCCCCC), (measure.DDDDDD) } on 0, children([コモディティ].[ALL]) on 1 from [ロジスティクステスト] ;
+---
+with member measure.SSSSSS as sum({ (measure.XXX), (measure.YYY), (measure.ZZZ) }) member measure.XXX as ([measure].[売上高]) * 10 member measure.YYY as ((measure.XXX) + 111) member measure.ZZZ as (measure.YYY) / 8 - 222.22 member measure.QQQ as sum({([measure].[売上高]), ([measure].[キャッシュバック])}) member Calendar.VVV as sum({ ([Calendar].[ALL].[2020]), ([Calendar].[ALL].[2019]) }) member measure.IIIIII as IIF( (measure.SSSSSS) > 2000000, 200, 404 ) select { (measure.SSSSSS), (measure.IIIIII) } on 0, filter(members(Calendar), (((measure.SSSSSS) <= 30000) or ((measure.SSSSSS) >= 40000)) and (((measure.SSSSSS) <= 360000) or ((measure.SSSSSS) >= 370000))) on 1 from [オンラインショップ] ;
+---
+with member measure.SSSSSS as sum({ (measure.XXX), (measure.YYY), (measure.ZZZ) }) member measure.XXX as ([measure].[売上高]) * 10 member measure.YYY as ((measure.XXX) + 111) member measure.ZZZ as (measure.YYY) / 8 - 222.22 member measure.QQQ as sum({([measure].[売上高]), ([measure].[キャッシュバック])}) member Calendar.VVV as sum({ ([Calendar].[ALL].[2020]), ([Calendar].[ALL].[2019]) }) member measure.IIIIII as IIF( (measure.SSSSSS) > 2000000, 200, 404 ) member measure.FFFFFF as IIF( (measure.IIIIII) = 200, 321, 900000000 ) select { (measure.SSSSSS), (measure.IIIIII), (measure.FFFFFF) } on 0, filter(members(Calendar), (((measure.SSSSSS) <= 30000) or ((measure.SSSSSS) >= 40000)) and (((measure.SSSSSS) <= 360000) or ((measure.SSSSSS) >= 370000))) on 1 from [オンラインショップ] ;
+---
+with member measure.AAA as CoalesceEmpty((measure.[キャッシュバック]), (measure.[販売台数])) select { (measure.[販売台数]), (measure.[キャッシュバック]), (measure.AAA) } on 0, { (Calendar.[ALL]) } on 1 from [オンラインショップ] ;
+---
+with member measure.AAA as CoalesceEmpty(CoalesceEmpty((measure.[キャッシュバック]), (measure.[キャッシュバック], [ショップタイプ].[ALL].[プラットフォーム 自己支持型])), 8760.66) select { (measure.[売上高]), (measure.[キャッシュバック]), (measure.AAA) } on 0, { (Calendar.[ALL]) } on 1 from [オンラインショップ] ;

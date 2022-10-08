@@ -1,0 +1,13 @@
+create dimensions [Calendar] [コモディティ] [ショップタイプ] [支払い方法] [地域] [出荷];
+
+---
+
+create levels [Calendar] (2:year, 3:quarter, 4:month), [地域] (2:[洲], 3:[国家]);
+
+---
+
+build cube [オンラインショップ] dimensions [ショップタイプ] [ショップタイプ] [支払い方法] [支払い方法] [コモディティ] [コモディティ] [Calendar] [Calendar] measures [売上高] [販売台数] [キャッシュバック];
+
+---
+
+build cube [ロジスティクステスト] dimensions [コモディティ] [コモディティ] [出荷] [出荷] [地域] [出发地区] [地域] [终点地区] Calendar [开始日期] Calendar [完成日期] measures [費用] [収入] [番号];
