@@ -3015,6 +3015,13 @@ void ExpFnLookUpCube_evolving(MDContext *md_ctx, ExpFnLookUpCube *luc, Cube *cub
 	}
 
 	Cube *cubeLinked = find_cube_by_name(luc->cube_name);
+
+	if (cubeLinked == NULL) {
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception at ExpFnLookUpCube_evolving: unknown cube.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
+
 	Expression_evaluate(NULL, luc->exp, cubeLinked, cube__basic_ref_vector(cubeLinked), grid_data);
 }
 
