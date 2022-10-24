@@ -286,12 +286,12 @@ int scal_cmp(void *_one, void *_other)
     __uint64_t *o_f = other->fragments;
     for (i = 0; i < len_c; i++)
     {
-        if (*(f + i) < *(o_f + i))
+        if (*(o_f + i) < *(f + i))
             return -1;
-        if (*(f + i) > *(o_f + i))
+        if (*(o_f + i) > *(f + i))
             return 1;
     }
-    return 0;
+    return one->fragments_len < other->fragments_len ? 1 : (one->fragments_len > other->fragments_len ? -1 : 0);
 }
 
 void space_unload(__uint64_t id)
@@ -344,16 +344,11 @@ int ax_size(Axis *axis)
  * )+
  *
  */
-// TODO [2022-5-17 19:43:32] There seems to be a problem with this code
 int cell_cmp(void *cell, void *other)
 {
     unsigned long c_posi = *((unsigned long *)cell);
     unsigned long o_posi = *((unsigned long *)other);
-    if (o_posi > c_posi)
-        return -1;
-    if (o_posi < c_posi)
-        return 1;
-    return 0;
+    return o_posi < c_posi ? -1 : (o_posi > c_posi ? 1 : 0);
 }
 
 static void *_cell__destory(void *cell)
