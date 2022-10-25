@@ -415,3 +415,14 @@ with member [Payment Method].PROPORTION as ([Payment Method].[ALL].[Credit Card]
 select { [Calendar].[2020].[Q4] } on 10, filter( { [Payment Method].[ALL].[Credit Card], 
 [Payment Method].[ALL], [Payment Method].PROPORTION }, (measure.[sales amount]) <> 4320 ) on 1 
 from [Online Store] where (measure.[sales amount]);
+---
+select
+{ measure.[sales amount], measure.[sales quantity], measure.[cash back] } on 0,
+{ [Calendar].[ALL].[2020].[Q1].[M1] } on ROWS
+from [Online Store]
+where
+(
+    [Store Type].[ALL].[Platform Self-operated Store],
+    [Payment Method].[ALL].[Credit Card],
+    [Goods].[ALL].[Kitchen & Dining].[Bento Boxes]
+);

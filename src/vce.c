@@ -102,7 +102,8 @@ static void *ScaleOffsetRange_print__rbt(RBNode *node, void *param) {
 void reload_space(unsigned long cs_id) {
     space_unload(cs_id);
 
-    unsigned char tmpbuf[0x01 << 10]; // 1024
+    // todo at once Do not use the allocated memory block directly, you need to define a ByteBuffer object.
+    unsigned char tmpbuf[0x01 << 13]; // 8k
 
     char profile[128];
     sprintf(profile, "data/profile-%lu", cs_id);

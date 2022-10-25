@@ -39,6 +39,21 @@ before_rt:
 	return t;
 }
 
+void _rbt_replace_node_obj(RedBlackTree *rbt, RBNode *new_node) {
+	RBNode *c_node = rbt->root;
+	while (1)
+	{
+		int cmp_rs = rbt->comparison_func(c_node->obj, new_node->obj);
+		if (cmp_rs < 0)
+			c_node = c_node->child_left;
+		else if (cmp_rs > 0)
+			c_node = c_node->child_right;
+		else
+			break;
+	}
+	c_node->obj = new_node->obj;
+}
+
 void rbt_add(RedBlackTree *rbt, void *obj)
 {
 	RBNode *node = rbt_create_node(obj, rbt, RED_NODE);
@@ -53,8 +68,10 @@ void rbt_add(RedBlackTree *rbt, void *obj)
 
 	// If the mount point is empty, the obj node already exists in the red-black tree.
 	RBNode *mount_p = rbt_find_mount_point(rbt, node);
-	if (mount_p == NULL)
+	if (mount_p == NULL) {
+		_rbt_replace_node_obj(rbt, node);
 		return;
+	}
 
 	int cmp_rs = rbt->comparison_func(mount_p->obj, obj);
 	if (cmp_rs < 0)
