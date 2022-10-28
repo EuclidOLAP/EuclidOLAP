@@ -426,3 +426,4 @@ where
     [Payment Method].[ALL].[Credit Card],
     [Goods].[ALL].[Kitchen & Dining].[Bento Boxes]
 );
+// todo at once If the 'demo-data.txt' script is not executed first, the process will crash when the 'demo-query-1.txt' script is executed.

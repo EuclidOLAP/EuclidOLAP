@@ -304,7 +304,9 @@ static int execute_command(EuclidCommand *ec)
 			if (cur_thrd_mam->exception_desc == NULL) {
 				MultiDimResult_print(md_rs);
 
+				// todo at once Do not use the allocated memory block directly, you need to define a ByteBuffer object.
 				char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL<<19, OBJ_TYPE__RAW_BYTES);
+
 				*((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL<<19;
 				*((unsigned short *)(payload + SZOF_INT)) = INTENT__SUCCESSFUL;
 				mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL<<19);

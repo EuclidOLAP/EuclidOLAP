@@ -1,5 +1,5 @@
-SRC_FILES = cfg.c net.c utils.c command.c mdxext-lex.yy.c mdxext-yacc.tab.c mdx.c mdd.c vce.c rb-tree.c log.c
-OBJ_FILES = cfg.o net.o utils.o command.o mdxext-lex.yy.o mdxext-yacc.tab.o mdx.o mdd.o vce.o rb-tree.o log.o
+SRC_FILES = cfg.c net.c utils.c command.c mdxext-lex.yy.c mdxext-yacc.tab.c mdx.c mdd.c vce.c rb-tree.c log.c tools/elastic-byte-buffer.c
+OBJ_FILES = cfg.o net.o utils.o command.o mdxext-lex.yy.o mdxext-yacc.tab.o mdx.o mdd.o vce.o rb-tree.o log.o tools/elastic-byte-buffer.o
 
 euclid : Euclid.c Euclid-cli.c $(SRC_FILES) Euclid.o Euclid-cli.o $(OBJ_FILES)
 	cc  -lpthread      $(OBJ_FILES)  Euclid.o      -o euclid
@@ -15,6 +15,7 @@ mdxext-yacc.tab.h mdxext-yacc.tab.c: mdxext-yacc.y
 
 clean :
 	rm -f *.o
+	rm -f tools/*.o
 	rm -f *.out
 	rm -f euclid
 	rm -f euclid-cli
