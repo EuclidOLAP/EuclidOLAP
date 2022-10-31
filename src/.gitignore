@@ -3,6 +3,7 @@ data/
 
 *.log
 
+server
 euclid
 euclid-cli
 mdxext-lex.yy.c
