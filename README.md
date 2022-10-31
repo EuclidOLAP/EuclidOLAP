@@ -88,9 +88,9 @@ $ cd EuclidOLAP/src
 
 $ make
 
-$ chmod +x euclid
+$ chmod +x server
 
-$ chmod +x euclid-cli
+$ chmod +x euclid
 ```
 
 
@@ -98,7 +98,7 @@ $ chmod +x euclid-cli
 Start up.
 
 ```shell
-$ ./euclid &
+$ ./server &
 
 $ cat log/euclid.log 
 info - node mode [ m ]
@@ -113,15 +113,15 @@ After starting the service, check the log file. If there is **`Net service start
 Create some metadata.
 
 ```shell
-$ ./euclid-cli "create dimensions [Calendar] [Goods] [Store Type] [Payment Method] [Region] [Transport];"
+$ ./euclid "create dimensions [Calendar] [Goods] [Store Type] [Payment Method] [Region] [Transport];"
 
-$ ./euclid-cli "create levels [Calendar] (2:year, 3:quarter, 4:month), [Region] (2:[continent], 3:[country]);"
+$ ./euclid "create levels [Calendar] (2:year, 3:quarter, 4:month), [Region] (2:[continent], 3:[country]);"
 
-$ ./euclid-cli "build cube [Online Store] dimensions [Store Type] [Store Type] [Payment Method] [Payment Method] [Goods] [Goods] [Calendar] [Calendar] measures [sales amount] [sales quantity] [cash back];"
+$ ./euclid "build cube [Online Store] dimensions [Store Type] [Store Type] [Payment Method] [Payment Method] [Goods] [Goods] [Calendar] [Calendar] measures [sales amount] [sales quantity] [cash back];"
 
-$ ./euclid-cli "build cube [logistics.test] dimensions Goods Goods Transport Transport Region [starting region] Region [ending region] Calendar [starting date] Calendar [completion date] measures cost income quantity;"
+$ ./euclid "build cube [logistics.test] dimensions Goods Goods Transport Transport Region [starting region] Region [ending region] Calendar [starting date] Calendar [completion date] measures cost income quantity;"
 
-$ ./euclid-cli demo-create-members.txt
+$ ./euclid demo-create-members.txt
 ```
 
 
@@ -129,7 +129,7 @@ $ ./euclid-cli demo-create-members.txt
 Import measure data of cubes.
 
 ```shell
-$ ./euclid-cli demo-data.txt
+$ ./euclid demo-data.txt
 ```
 
 
@@ -137,7 +137,7 @@ $ ./euclid-cli demo-data.txt
 Execute MDX query.
 
 ```shell
-$ ./euclid-cli 'with member measure.SSSSSS as lookUpCube("logistics.test", "(measure.cost)") select {(measure.[sales amount]), (measure.SSSSSS)} on 0, children(Calendar.[ALL].[2021]) on 1 from [Online Store] ;'
+$ ./euclid 'with member measure.SSSSSS as lookUpCube("logistics.test", "(measure.cost)") select {(measure.[sales amount]), (measure.SSSSSS)} on 0, children(Calendar.[ALL].[2021]) on 1 from [Online Store] ;'
 ```
 
 
