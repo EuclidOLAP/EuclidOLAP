@@ -636,7 +636,7 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
 
     int coor_count = als_size(coor_sys_ls);
 
-    CoordinateSystem *coor;
+    CoordinateSystem *coor = NULL;
 
     for (i = 0; i < coor_count; i++)
     {
@@ -649,6 +649,12 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
         {
             coor = NULL;
         }
+    }
+
+    if (coor == NULL) {
+        MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+        thrd_mam->exception_desc = "No measure data of cube.";
+        longjmp(thrd_mam->excep_ctx_env, -1);
     }
 
     ArrayList *sor_ls = als_new(64, "ScaleOffsetRange *", THREAD_MAM, NULL);
