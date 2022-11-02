@@ -46,6 +46,8 @@ Stack YC_STC = { 0 };
 %token CHAPTERS		/* chapters */
 %token SECTIONS		/* sections */
 
+%token NIL			/* null */
+
 /* set functions key words */
 %token SET			/* set */
 %token CHILDREN		/* children */
@@ -1110,6 +1112,16 @@ vector:
 ;
 
 measures_values:
+	NIL {
+		// ArrayList *mear_vals_ls = als_new(1, "This is an empty list.", THREAD_MAM, NULL);
+		stack_push(&YC_STC, als_new(1, "This is an empty list.", THREAD_MAM, NULL));
+	}
+  | measures_values_existing {
+		// need do nothing
+	}
+;
+
+measures_values_existing:
 	var_or_block DECIMAL {
 		char *mmbr_name;
 		stack_pop(&YC_STC, (void **) &mmbr_name);
