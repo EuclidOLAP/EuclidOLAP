@@ -80,6 +80,10 @@ sections {
 	return SECTIONS;
 }
 
+null {
+	return NIL;
+}
+
 where	{
 	return WHERE;
 }
