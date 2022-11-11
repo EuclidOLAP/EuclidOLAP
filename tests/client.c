@@ -4,8 +4,22 @@
 
 #include <readline/readline.h>
 
+// #include <stdio.h>
+// #include <pthread.h>
+// #include <unistd.h>
+#include <sys/wait.h>
+// #include <sys/types.h>
+
+void Stop(int signo)
+{
+	printf("oops! stop!!!\n");
+	// _exit(0);
+}
+
 int main(int argc, char *argv[])
 {
+	signal(SIGINT, Stop);
+
 	while (1)
 	{
 		char *input = readline("olapcli > ");

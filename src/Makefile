@@ -4,8 +4,8 @@ OBJ_FILES = cfg.o net.o utils.o command.o mdxext-lex.yy.o mdxext-yacc.tab.o mdx.
 euclid : Euclid.c Euclid-cli.c $(SRC_FILES) Euclid.o Euclid-cli.o $(OBJ_FILES)
 	cc  -lpthread      $(OBJ_FILES)  Euclid.o      -o server
 	cc  -lpthread  -g  $(SRC_FILES)  Euclid.c      -o server.out
-	cc  -lpthread      $(OBJ_FILES)  Euclid-cli.o  -o euclid
-	cc  -lpthread  -g  $(SRC_FILES)  Euclid-cli.c  -o euclid.out
+	cc  -lpthread  -lreadline      $(OBJ_FILES)  Euclid-cli.o  -o euclid
+	cc  -lpthread  -lreadline  -g  $(SRC_FILES)  Euclid-cli.c  -o euclid.out
 
 mdxext-lex.yy.c: mdxext-lex.l
 	flex -i -o mdxext-lex.yy.c mdxext-lex.l

@@ -113,15 +113,8 @@ After starting the service, check the log file. If there is **`Net service start
 Create some metadata.
 
 ```shell
-$ ./euclid "create dimensions [Calendar] [Goods] [Store Type] [Payment Method] [Region] [Transport];"
-
-$ ./euclid "create levels [Calendar] (2:year, 3:quarter, 4:month), [Region] (2:[continent], 3:[country]);"
-
-$ ./euclid "build cube [Online Store] dimensions [Store Type] [Store Type] [Payment Method] [Payment Method] [Goods] [Goods] [Calendar] [Calendar] measures [sales amount] [sales quantity] [cash back];"
-
-$ ./euclid "build cube [logistics.test] dimensions Goods Goods Transport Transport Region [starting region] Region [ending region] Calendar [starting date] Calendar [completion date] measures cost income quantity;"
-
-$ ./euclid demo-create-members.txt
+$ ./euclid --file=demo-meta.txt
+$ ./euclid --file=demo-create-members.txt
 ```
 
 
@@ -129,7 +122,7 @@ $ ./euclid demo-create-members.txt
 Import measure data of cubes.
 
 ```shell
-$ ./euclid demo-data.txt
+$ ./euclid --file=demo-data.txt
 ```
 
 
@@ -137,7 +130,11 @@ $ ./euclid demo-data.txt
 Execute MDX query.
 
 ```shell
-$ ./euclid 'with member measure.SSSSSS as lookUpCube("logistics.test", "(measure.cost)") select {(measure.[sales amount]), (measure.SSSSSS)} on 0, children(Calendar.[ALL].[2021]) on 1 from [Online Store] ;'
+$ ./euclid
+```
+
+```sh
+olapcli > with member measure.SSSSSS as lookUpCube("logistics.test", "(measure.cost)") select {(measure.[sales amount]), (measure.SSSSSS)} on 0, children(Calendar.[ALL].[2021]) on 1 from [Online Store] ;
 ```
 
 
