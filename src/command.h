@@ -54,7 +54,7 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
  *     (8 + 1 bytes) * {MeasureMbrs amount} - Measures values, and null-flag.
  * ) * V - 'V' represents the number of vectors inserted at one time. (V > 0)
  */
-#define INTENT__INSERT_CUBE_MEARSURE_VALS 4
+#define INTENT__INSERT_CUBE_MEASURE_VALS 4
 
 /**
  * (*) <-> (*)
