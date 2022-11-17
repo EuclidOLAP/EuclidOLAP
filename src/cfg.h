@@ -27,6 +27,9 @@ typedef struct euclid_cfg
 	int cli_ctrl_node_port;
 
 	char mode;
+
+	char *host; // the IP or domain of server, be used when client mode
+	char *file; // the file be executed, be used when client mode
 } EuclidConfig;
 
 int init_cfg(int argc, char *argv[]);

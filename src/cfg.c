@@ -112,7 +112,15 @@ int set_param(char *p_key, char *p_val)
 	{
 		cfg.cli_ctrl_node_port = atoi(p_val);
 	}
-	else if (strcmp(p_key, "--p:port") == 0)
+	else if (strcmp(p_key, "--host") == 0)
+	{
+		cfg.host = p_val;
+	}
+	else if (strcmp(p_key, "--file") == 0)
+	{
+		cfg.file = p_val;
+	}
+	else if (strcmp(p_key, "--p:port") == 0 || strcmp(p_key, "--port") == 0)
 	{
 		cfg.port = atoi(p_val);
 		if (cfg.port < 0 || cfg.port > 65535)
