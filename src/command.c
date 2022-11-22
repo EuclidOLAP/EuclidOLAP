@@ -225,7 +225,7 @@ static int execute_command(EuclidCommand *ec)
 {
 	log_print("@@@@@@@@@@@@@@@@@@ execute command count = %d\n", __execute_command__count++);
 	intent inte = ec_get_intent(ec);
-	if (inte == INTENT__INSERT_CUBE_MEARSURE_VALS)
+	if (inte == INTENT__INSERT_CUBE_MEASURE_VALS)
 	{
 		distribute_store_measure(ec);
 	}
