@@ -71,6 +71,7 @@ int net_service_startup()
 			continue;
 		}
 
+		// TODO at once - Memory leak risk.
 		int *skt_v_p = mam_alloc(sizeof(int), OBJ_TYPE__RAW_BYTES, net_mam, 0);
 		*skt_v_p = sock_fd;
 		als_add(downstream_sockets, skt_v_p);
