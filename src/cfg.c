@@ -19,7 +19,8 @@ static int set_param(char *p_key, char *p_val);
 
 static int load_conf_files();
 
-void set_program_mode(char mode) {
+void set_program_mode(char mode)
+{
 	assert(mode == MASTER_MODE || mode == WORKER_MODE || mode == CLIENT_MODE);
 	__program_mode__ = mode;
 }
@@ -47,23 +48,23 @@ int init_cfg(int argc, char *argv[])
 	}
 
 	// create meta and data folders
- 	if (access("meta", F_OK) != 0)
+	if (access("meta", F_OK) != 0)
 		mkdir("meta", S_IRWXU);
 
- 	if (access("data", F_OK) != 0)
+	if (access("data", F_OK) != 0)
 		mkdir("data", S_IRWXU);
 
 	switch (cfg.mode)
 	{
-		case MASTER_MODE:
-		case WORKER_MODE:
-			log_print("info - node mode [ %c ]\n", cfg.mode);
-			break;
-		case CLIENT_MODE:
-			break;
-		default:
-			log_print("[ error ] Program exits. Caused by the wrong program startup mode.\n");
-			exit(EXIT_FAILURE);
+	case MASTER_MODE:
+	case WORKER_MODE:
+		log_print("info - node mode [ %c ]\n", cfg.mode);
+		break;
+	case CLIENT_MODE:
+		break;
+	default:
+		log_print("[ error ] Program exits. Caused by the wrong program startup mode.\n");
+		exit(EXIT_FAILURE);
 	}
 
 	return 0;
@@ -157,9 +158,12 @@ EuclidConfig *get_cfg()
 static int load_conf_files()
 {
 	char *cfg_file_name;
-	if (cfg.mode == CLIENT_MODE) {
+	if (cfg.mode == CLIENT_MODE)
+	{
 		cfg_file_name = DEF_CLI_CONF;
-	} else {
+	}
+	else
+	{
 		// No configuration files are currently required when running in server mode.
 		return 0;
 	}
@@ -188,7 +192,8 @@ static int load_conf_files()
 	while (fgets(buf_arr, buf_len, conf_fp) != NULL)
 	{
 		char *last_char = buf_arr + strlen(buf_arr) - 1;
-		while (*last_char == '\n') {
+		while (*last_char == '\n')
+		{
 			*last_char = 0;
 			--last_char;
 		}
