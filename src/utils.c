@@ -25,6 +25,9 @@ void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 	void *obj_ins;
 
 	if ((required + sizeof(char *) + sizeof(unsigned long)) > MAM_BLOCK_MAX) {
+
+		log_print("@@MAM@@ -->> mam_alloc(%p) ... obj_alloc < %lu >\n", mam, sizeof(char *) + required);
+
 		char *big_blk = obj_alloc(sizeof(char *) + required, OBJ_TYPE__RAW_BYTES);
 		if (mam->big_block)
 			*((char **)big_blk) = mam->big_block;
@@ -48,6 +51,9 @@ void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 	unsigned long remaining_capacity = MAM_BLOCK_MAX - *((unsigned long *)(blk + sizeof(char *)));
 
 	if (required > remaining_capacity) {
+
+		log_print("@@MAM@@ -->> mam_alloc(%p) ... obj_alloc < %lu > MAM_BLOCK_MAX\n", mam, MAM_BLOCK_MAX);
+
 		blk = obj_alloc(MAM_BLOCK_MAX, OBJ_TYPE__RAW_BYTES);
 		*((unsigned long *)(blk + sizeof(char *))) = sizeof(char *) + sizeof(unsigned long);
 		*((char **)blk) = mam->current_block;
@@ -108,6 +114,8 @@ void mam_reset(MemAllocMng *mam) {
 		obj_release(curr_blk);
 		curr_blk = next_blk;
 	}
+
+	log_print("@@MAM@@ -->> mam_reset(%p)\n", mam);
 }
 
 int mam_comp(void *mam, void *other) {
@@ -132,6 +140,7 @@ MemAllocMng *MemAllocMng_new() {
 	MemAllocMng *mam = obj_alloc(sizeof(MemAllocMng), OBJ_TYPE__MemAllocMng);
 	mam->current_block = obj_alloc(MAM_BLOCK_MAX, OBJ_TYPE__RAW_BYTES);
 	*((unsigned long *)(mam->current_block + sizeof(char *))) = sizeof(char *) + sizeof(unsigned long);
+	log_print("@@MAM@@ -->> MemAllocMng_new() : %p\n", mam);
 	return mam;
 }
 

@@ -28,6 +28,7 @@ static void receive_command_loop(SockIntentThread *sit);
 
 void net_init() {
 	net_mam = MemAllocMng_new();
+	log_print("@@MAM@@ -->> net_mam = %p\n", net_mam);
 }
 
 int net_service_startup()
