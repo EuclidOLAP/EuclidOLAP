@@ -229,7 +229,7 @@ static int execute_command(EuclidCommand *ec)
 	{
 		distribute_store_measure(ec);
 	}
-	else if (inte == INTENT__MDX)
+	else if (inte == INTENT__MDX || inte == INTENT__MDX_EXPECT_RESULT_TXT)
 	{
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
 		// Set the MDX parsing completion flag to 0.
@@ -304,13 +304,30 @@ static int execute_command(EuclidCommand *ec)
 			if (cur_thrd_mam->exception_desc == NULL) {
 				MultiDimResult_print(md_rs);
 
-				// todo Do not use the allocated memory block directly, replace by ElasticByteBuffer.
-				char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL<<19, OBJ_TYPE__RAW_BYTES);
+				if (ec_get_intent(ec) == INTENT__MDX_EXPECT_RESULT_TXT) {
+					// todo Do not use the allocated memory block directly, replace by ElasticByteBuffer.
+					char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL<<19, OBJ_TYPE__RAW_BYTES);
 
-				*((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL<<19;
-				*((unsigned short *)(payload + SZOF_INT)) = INTENT__SUCCESSFUL;
-				mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL<<19);
-				ec->result = create_command(payload);
+					*((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL<<19;
+					*((unsigned short *)(payload + SZOF_INT)) = INTENT__SUCCESSFUL;
+					mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL<<19);
+					ec->result = create_command(payload);
+				} else {
+					// // todo Do not use the allocated memory block directly, replace by ElasticByteBuffer.
+					// char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL<<19, OBJ_TYPE__RAW_BYTES);
+
+					// *((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL<<19;
+					// *((unsigned short *)(payload + SZOF_INT)) = INTENT__SUCCESSFUL;
+					// mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL<<19);
+					// ec->result = create_command(payload);
+
+					ByteBuf *binuf = mdrs_to_bin(md_rs);
+					char *payload = obj_alloc(binuf->index, OBJ_TYPE__RAW_BYTES);
+					memcpy(payload, binuf->buf_addr, binuf->index);
+					buf_release(binuf);
+					ec->result = create_command(payload);
+				}
+				
 			}
 			// else
 			// {
@@ -398,4 +415,8 @@ EuclidCommand *ec_new(intent inte, size_t payload_sz) {
 	*((unsigned int *)ec->bytes) = SZOF_USG_INT + SZOF_USG_SHORT + payload_sz;
 	*((intent *)(ec->bytes + SZOF_USG_INT)) = inte;
 	return ec;
+}
+
+void ec_change_intent(EuclidCommand *ec, intent inte) {
+	*(intent *)(ec->bytes + sizeof(int)) = inte;
 }

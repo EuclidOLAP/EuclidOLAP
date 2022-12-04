@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "command.h"
 #include "mdx.h"
+#include "tools/elastic-byte-buffer.h"
 
 #define MD_ENTITY_NAME_BYTSZ 128
 
@@ -163,6 +164,11 @@ void MultiDimResult_print(MultiDimResult *);
  */
 void mdrs_to_str(MultiDimResult *md_rs, char *_cont_buf, size_t buf_len);
 
+/**
+ * Convert multidimensional query result to binary format.
+ */
+ByteBuf *mdrs_to_bin(MultiDimResult *md_rs);
+
 MultiDimResult *exe_multi_dim_queries(SelectDef *);
 
 typedef struct mdd_tuple
@@ -221,6 +227,8 @@ void mdd__save_level(Level *);
 void mdd__use_level(Level *);
 
 MddSet *mdd_set__create();
+
+unsigned int mdd_set__max_tuple_len(MddSet *set);
 
 MddAxis *mdd_ax__create();
 
