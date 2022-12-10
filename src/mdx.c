@@ -1,12 +1,12 @@
-//#include <arpa/inet.h>
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <string.h>
+// #include <arpa/inet.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <string.h>
 
-//#include "net.h"
-//#include "cfg.h"
-//#include "utils.h"
-//#include "command.h"
+// #include "net.h"
+// #include "cfg.h"
+// #include "utils.h"
+// #include "command.h"
 
 #include "log.h"
 #include "mdx.h"
@@ -27,7 +27,8 @@ MemberDef *MemberDef_creat(ids_ct t_cons)
     return mdef;
 }
 
-LevelRoleDef *LevelRoleDef_creat(ArrayList *lr_path) {
+LevelRoleDef *LevelRoleDef_creat(ArrayList *lr_path)
+{
     LevelRoleDef *lvr_def = mam_alloc(sizeof(LevelRoleDef), OBJ_TYPE__LevelRoleDef, NULL, 0);
     lvr_def->lr_path = lr_path;
     return lvr_def;
@@ -85,12 +86,14 @@ CubeDef *ids_cubedef_new(char *name)
     return def;
 }
 
-SelectDef *SelectDef_new(enum_oms strat, MemAllocMng *mam) {
+SelectDef *SelectDef_new(enum_oms strat, MemAllocMng *mam)
+{
 
-	if (strat == DIRECT)
+    if (strat == DIRECT)
         return obj_alloc(sizeof(SelectDef), OBJ_TYPE__SelectDef);
 
-    if (strat == USED_MAM) {
+    if (strat == USED_MAM)
+    {
         log_print("[ error ] exit! exception in SelectDef_new(..)\n");
         exit(1);
     }
@@ -220,7 +223,8 @@ ExpFnCount *ExpFnCount_creat()
     return count;
 }
 
-ExpFnLookUpCube *ExpFnLookUpCube_creat(char *cube_name, char *exp_str, Expression *exp) {
+ExpFnLookUpCube *ExpFnLookUpCube_creat(char *cube_name, char *exp_str, Expression *exp)
+{
     ExpFnLookUpCube *luc = mam_alloc(sizeof(ExpFnLookUpCube), OBJ_TYPE__ExpFnLookUpCube, NULL, 0);
     luc->cube_name = cube_name;
     luc->exp_str = exp_str;
@@ -228,7 +232,8 @@ ExpFnLookUpCube *ExpFnLookUpCube_creat(char *cube_name, char *exp_str, Expressio
     return luc;
 }
 
-ExpFnIif *ExpFnIif_creat(BooleanExpression *bool_exp, Expression *exp1, Expression *exp2) {
+ExpFnIif *ExpFnIif_creat(BooleanExpression *bool_exp, Expression *exp1, Expression *exp2)
+{
     ExpFnIif *iif = mam_alloc(sizeof(ExpFnIif), OBJ_TYPE__ExpFnIif, NULL, 0);
     iif->bool_exp = bool_exp;
     iif->exp1 = exp1;
@@ -236,7 +241,8 @@ ExpFnIif *ExpFnIif_creat(BooleanExpression *bool_exp, Expression *exp1, Expressi
     return iif;
 }
 
-ExpFnCoalesceEmpty *ExpFnCoalesceEmpty_creat(ArrayList *exp_ls) {
+ExpFnCoalesceEmpty *ExpFnCoalesceEmpty_creat(ArrayList *exp_ls)
+{
     ExpFnCoalesceEmpty *ce = mam_alloc(sizeof(ExpFnCoalesceEmpty), OBJ_TYPE__ExpFnCoalesceEmpty, NULL, 0);
     ce->exp_ls = exp_ls;
     return ce;
@@ -310,17 +316,20 @@ SetFnFilter *SetFnFilter_creat(SetDef *setDef, BooleanExpression *boolExp)
     return filter;
 }
 
-MemberFnCurrentMember *MemberFnCurrentMember_creat() {
+MemberFnCurrentMember *MemberFnCurrentMember_creat()
+{
     return mam_alloc(sizeof(MemberFnCurrentMember), OBJ_TYPE__MemberFnCurrentMember, NULL, 0);
 }
 
-MemberFnPrevMember *MemberFnPrevMember_creat(MemberDef *m_def) {
+MemberFnPrevMember *MemberFnPrevMember_creat(MemberDef *m_def)
+{
     MemberFnPrevMember *fn = mam_alloc(sizeof(MemberFnPrevMember), OBJ_TYPE__MemberFnPrevMember, NULL, 0);
-    fn->curr_mr=m_def;
+    fn->curr_mr = m_def;
     return fn;
 }
 
-MemberRoleFnParallelPeriod *MemberRoleFnParallelPeriod_creat(LevelRoleDef *lvDef, Expression *idx, MemberDef *mDef) {
+MemberRoleFnParallelPeriod *MemberRoleFnParallelPeriod_creat(LevelRoleDef *lvDef, Expression *idx, MemberDef *mDef)
+{
     MemberRoleFnParallelPeriod *pp = mam_alloc(sizeof(MemberRoleFnParallelPeriod), OBJ_TYPE__MemberRoleFnParallelPeriod, NULL, 0);
     pp->lvr_def = lvDef;
     pp->index = idx;
@@ -328,13 +337,15 @@ MemberRoleFnParallelPeriod *MemberRoleFnParallelPeriod_creat(LevelRoleDef *lvDef
     return pp;
 }
 
-SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *mdef) {
+SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *mdef)
+{
     SetFnLateralMembers *latmbr = mam_alloc(sizeof(SetFnLateralMembers), OBJ_TYPE__SetFnLateralMembers, NULL, 0);
     latmbr->mr_def = mdef;
     return latmbr;
 }
 
-SetFnOrder *SetFnOrder_creat(SetDef *set, Expression *exp, char opt) {
+SetFnOrder *SetFnOrder_creat(SetDef *set, Expression *exp, char opt)
+{
     SetFnOrder *order = mam_alloc(sizeof(SetFnOrder), OBJ_TYPE__SetFnOrder, NULL, 0);
     order->set = set;
     order->exp = exp;
@@ -342,7 +353,8 @@ SetFnOrder *SetFnOrder_creat(SetDef *set, Expression *exp, char opt) {
     return order;
 }
 
-SetFnTopCount *SetFnTopCount_creat(SetDef *set, Expression *count_exp, Expression *num_exp) {
+SetFnTopCount *SetFnTopCount_creat(SetDef *set, Expression *count_exp, Expression *num_exp)
+{
     SetFnTopCount *tc = mam_alloc(sizeof(SetFnTopCount), OBJ_TYPE__SetFnTopCount, NULL, 0);
     tc->set = set;
     tc->count_exp = count_exp;
@@ -350,7 +362,8 @@ SetFnTopCount *SetFnTopCount_creat(SetDef *set, Expression *count_exp, Expressio
     return tc;
 }
 
-SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option) {
+SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option)
+{
     SetFnExcept *except = mam_alloc(sizeof(SetFnExcept), OBJ_TYPE__SetFnExcept, NULL, 0);
     except->set_1 = set_1;
     except->set_2 = set_2;
@@ -358,13 +371,15 @@ SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option) {
     return except;
 }
 
-SetFnYTD *SetFnYTD_creat(MemberDef *mdef) {
+SetFnYTD *SetFnYTD_creat(MemberDef *mdef)
+{
     SetFnYTD *ytd = mam_alloc(sizeof(SetFnYTD), OBJ_TYPE__SetFnYTD, NULL, 0);
-    ytd->mbr_def=mdef;
+    ytd->mbr_def = mdef;
     return ytd;
 }
 
-SetFnDescendants *SetFnDescendants_creat(MemberDef *mbr_def, LevelRoleDef *lvr_def, Expression *distance, char flag) {
+SetFnDescendants *SetFnDescendants_creat(MemberDef *mbr_def, LevelRoleDef *lvr_def, Expression *distance, char flag)
+{
     SetFnDescendants *desc = mam_alloc(sizeof(SetFnDescendants), OBJ_TYPE__SetFnDescendants, NULL, 0);
     desc->mbr_def = mbr_def;
     desc->lvr_def = lvr_def;
@@ -373,14 +388,16 @@ SetFnDescendants *SetFnDescendants_creat(MemberDef *mbr_def, LevelRoleDef *lvr_d
     return desc;
 }
 
-SetFnTail *SetFnTail_creat(SetDef *set, Expression *count) {
+SetFnTail *SetFnTail_creat(SetDef *set, Expression *count)
+{
     SetFnTail *tail = mam_alloc(sizeof(SetFnTail), OBJ_TYPE__SetFnTail, NULL, 0);
     tail->set = set;
     tail->count = count;
     return tail;
 }
 
-SetFnBottomOrTopPercent *SetFnBottomOrTopPercent_creat(char type, SetDef *set, Expression *percentage, Expression *exp) {
+SetFnBottomOrTopPercent *SetFnBottomOrTopPercent_creat(char type, SetDef *set, Expression *percentage, Expression *exp)
+{
     SetFnBottomOrTopPercent *percent = mam_alloc(sizeof(SetFnBottomOrTopPercent), OBJ_TYPE__SetFnBottomOrTopPercent, NULL, 0);
     percent->type = type;
     percent->set = set;
@@ -389,16 +406,18 @@ SetFnBottomOrTopPercent *SetFnBottomOrTopPercent_creat(char type, SetDef *set, E
     return percent;
 }
 
-SetFnUnion *SetFnUnion_creat(ArrayList *setDefs, char opt) {
+SetFnUnion *SetFnUnion_creat(ArrayList *setDefs, char opt)
+{
     SetFnUnion *union_ = mam_alloc(sizeof(SetFnUnion), OBJ_TYPE__SetFnUnion, NULL, 0);
-    union_->set_def_ls=setDefs;
-    union_->option=opt;
+    union_->set_def_ls = setDefs;
+    union_->option = opt;
     return union_;
 }
 
-SetFnIntersect *SetFnIntersect_creat(ArrayList *set_def_ls, char option) {
+SetFnIntersect *SetFnIntersect_creat(ArrayList *set_def_ls, char option)
+{
     SetFnIntersect *intersect = mam_alloc(sizeof(SetFnIntersect), OBJ_TYPE__SetFnIntersect, NULL, 0);
-    intersect->set_def_ls=set_def_ls;
-    intersect->option=option;
+    intersect->set_def_ls = set_def_ls;
+    intersect->option = option;
     return intersect;
 }
