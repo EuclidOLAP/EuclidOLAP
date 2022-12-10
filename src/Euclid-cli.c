@@ -153,6 +153,8 @@ int main(int argc, char *argv[])
 				// printf("<<<[[[---%s---]]]>>>\n", statement);
 
 				EuclidCommand *mdx_ec = build_intent_command_mdx(statement);
+				ec_change_intent(mdx_ec, INTENT__MDX_EXPECT_RESULT_TXT);
+
 				send(sock_fd, mdx_ec->bytes, ec_get_capacity(mdx_ec), 0);
 
 				read_sock_pkg(sock_fd, &buf, &buf_len);
@@ -233,6 +235,7 @@ int main(int argc, char *argv[])
 		}
 
 		EuclidCommand *mdx_ec = build_intent_command_mdx(exe_stat);
+		ec_change_intent(mdx_ec, INTENT__MDX_EXPECT_RESULT_TXT);
 
 		printf("-----------------------------------------------------------------------------------------------------------\n");
 		if (strlen(exe_stat) < 200)

@@ -83,6 +83,39 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
  */
 #define INTENT__EXE_RESULT_DESC 7
 
+/**
+ * (euclid master node) -> (terminal client)
+ *
+ * 4 bytes - data package capacity
+ * 2 bytes - intention
+ * 4 bytes - AX_COUNT: the number of axes of multidimensional result
+ * (
+ *     4 bytes - S_LEN: lenght of set
+ *     4 bytes - T_LEN: lenght of tuple
+ *     (
+ *         8 bytes - member id (it's zero when formula member or no member)
+ *         N bytes - member name string that endwith '\0', can be an empty string containing only '\0'. (N > 0)
+ *     ) * S_LEN * T_LEN
+ * ) * AX_COUNT
+ * 8 bytes - RS_LEN: Length of the result measure array.
+ * 8 * RS_LEN bytes - measure values array
+ * RS_LEN bytes - null flags array
+ */
+#define INTENT__MULTIDIM_RESULT_BIN 8
+
+/**
+ * Execute MDX and expect the result to be returned in text format.
+ * 
+ * (terminal client) -> (euclid master node)
+ *
+ * 4 bytes - data package capacity
+ * 2 bytes - intention
+ * 4 bytes - The number of bytes occupied by the MDX statement
+ * N bytes - MDX statement bytes
+ *
+ */
+#define INTENT__MDX_EXPECT_RESULT_TXT 9
+
 #define INTENT__UNKNOWN 65535
 
 int init_command_module();
@@ -105,5 +138,8 @@ int ec_get_capacity(EuclidCommand *ec);
 int submit_command(EuclidCommand *ec);
 
 EuclidCommand *EuclidCommand_failure(char *desc);
+
+// Modifies the execution intent of the binary command to the specified value.
+void ec_change_intent(EuclidCommand *ec, intent inte);
 
 #endif
