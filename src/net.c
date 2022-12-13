@@ -14,7 +14,7 @@
 
 static MemAllocMng *net_mam;
 
-static ArrayList *downstream_sockets;
+// static ArrayList *downstream_sockets;
 
 static void *sit_startup(void *sit_addr);
 
@@ -59,7 +59,8 @@ int net_service_startup()
 
 	socklen_t cs_len = sizeof(struct sockaddr_in);
 
-	downstream_sockets = als_new(16, "downstream_sockets, int *", SPEC_MAM, net_mam);
+	// downstream_sockets = als_new(16, "downstream_sockets, int *", SPEC_MAM, net_mam);
+
 	while (1)
 	{
 		struct sockaddr_in sock;
@@ -72,10 +73,9 @@ int net_service_startup()
 			continue;
 		}
 
-		// TODO at once - Memory leak risk.
-		int *skt_v_p = mam_alloc(sizeof(int), OBJ_TYPE__RAW_BYTES, net_mam, 0);
-		*skt_v_p = sock_fd;
-		als_add(downstream_sockets, skt_v_p);
+		// int *skt_v_p = mam_alloc(sizeof(int), OBJ_TYPE__RAW_BYTES, net_mam, 0); // bug: Memory leak risk.
+		// *skt_v_p = sock_fd;
+		// als_add(downstream_sockets, skt_v_p);
 
 		SockIntentThread *sit = create_SockIntentThread(sock_fd);
 		pthread_create(&(sit->thread_id), NULL, sit_startup, sit);
@@ -219,7 +219,7 @@ static void receive_command_loop(SockIntentThread *sit)
 			obj_release(buf);
 
 		log_print("warning! receive intention: buf_len = %d\n", buf_len);
-		als_remove(downstream_sockets, &(sit->sock_fd));
+		// als_remove(downstream_sockets, &(sit->sock_fd));
 		int _c_ = close(sit->sock_fd);
 		log_print("-------------------------------------------------------  _c_ = %d\n", _c_);
 		break;
@@ -228,11 +228,17 @@ static void receive_command_loop(SockIntentThread *sit)
 
 int random_child_sock()
 {
-	__uint32_t r_idx = rand() % als_size(downstream_sockets);
-	return *((int *)als_get(downstream_sockets, r_idx));
+	// __uint32_t r_idx = rand() % als_size(downstream_sockets);
+	// return *((int *)als_get(downstream_sockets, r_idx));
+	log_print("[ error ] Process end: caused by an incorrect function call.\n");
+	exit(EXIT_FAILURE);
+	return 0;
 }
 
 __uint32_t d_nodes_count()
 {
-	return als_size(downstream_sockets);
+	// return als_size(downstream_sockets);
+	log_print("[ error ] Process end: caused by an incorrect function call.\n");
+	exit(EXIT_FAILURE);
+	return 0;
 }
