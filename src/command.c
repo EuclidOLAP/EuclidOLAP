@@ -313,14 +313,6 @@ static int execute_command(EuclidCommand *ec)
 					mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL<<19);
 					ec->result = create_command(payload);
 				} else {
-					// // todo Do not use the allocated memory block directly, replace by ElasticByteBuffer.
-					// char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL<<19, OBJ_TYPE__RAW_BYTES);
-
-					// *((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL<<19;
-					// *((unsigned short *)(payload + SZOF_INT)) = INTENT__SUCCESSFUL;
-					// mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL<<19);
-					// ec->result = create_command(payload);
-
 					ByteBuf *binuf = mdrs_to_bin(md_rs);
 					char *payload = obj_alloc(binuf->index, OBJ_TYPE__RAW_BYTES);
 					memcpy(payload, binuf->buf_addr, binuf->index);
