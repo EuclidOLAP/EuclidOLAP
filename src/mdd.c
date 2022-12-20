@@ -57,42 +57,45 @@ int mdd_init()
 	levels_pool = als_new(128, "Level *", SPEC_MAM, meta_mam);
 }
 
-static int load_dimensions() {
+static int load_dimensions()
+{
 
-    FILE *dims_file = open_file(META_DEF_DIMS_FILE_PATH, "r");
+	FILE *dims_file = open_file(META_DEF_DIMS_FILE_PATH, "r");
 	Dimension dim;
-    while (1)
-    {
+	while (1)
+	{
 		if (fread(&dim, sizeof(Dimension), 1, dims_file) < 1)
 			break;
 
 		Dimension *dimension = mam_alloc(sizeof(Dimension), OBJ_TYPE__Dimension, meta_mam, 0);
 		memcpy(dimension, &dim, sizeof(Dimension));
 		als_add(dims_pool, dimension);
-    }
-    return fclose(dims_file);
+	}
+	return fclose(dims_file);
 }
 
-static int load_levels() {
-    FILE *levels_file = open_file(META_DEF_LEVELS_FILE_PATH, "r");
+static int load_levels()
+{
+	FILE *levels_file = open_file(META_DEF_LEVELS_FILE_PATH, "r");
 	Level level;
-    while (1)
-    {
+	while (1)
+	{
 		if (fread(&level, sizeof(Level), 1, levels_file) < 1)
 			break;
 
 		Level *lv = mam_alloc(sizeof(Level), OBJ_TYPE__Level, meta_mam, 0);
 		memcpy(lv, &level, sizeof(Level));
 		als_add(levels_pool, lv);
-    }
-    return fclose(levels_file);
+	}
+	return fclose(levels_file);
 }
 
-static int load_members() {
-    FILE *members_file = open_file(META_DEF_MBRS_FILE_PATH, "r");
+static int load_members()
+{
+	FILE *members_file = open_file(META_DEF_MBRS_FILE_PATH, "r");
 	Member memb;
-    while (1)
-    {
+	while (1)
+	{
 		if (fread(&memb, sizeof(Member), 1, members_file) < 1)
 			break;
 
@@ -104,28 +107,31 @@ static int load_members() {
 		 * which needs to be solved in the subsequent optimization.
 		 */
 		int i;
-		for (i=0;i<als_size(member_pool);i++) {
+		for (i = 0; i < als_size(member_pool); i++)
+		{
 			Member *m_existed = als_get(member_pool, i);
-			if (m_existed->gid == member->gid) {
+			if (m_existed->gid == member->gid)
+			{
 				ArrayList_set(member_pool, i, member);
 				goto goto_flag;
 			}
 		}
 		als_add(member_pool, member);
-		goto_flag:
+	goto_flag:
 		member = member;
-    }
+	}
 
-    fclose(members_file);
+	fclose(members_file);
 
 	int i, sz = als_size(member_pool);
-	for (i=0;i<sz;i++)
+	for (i = 0; i < sz; i++)
 		mdd__gen_mbr_abs_path(als_get(member_pool, i));
 
 	return 0;
 }
 
-static int load_cubes() {
+static int load_cubes()
+{
 
 	// char c_file[128];
 	// memset(c_file, 0, 128);
@@ -137,7 +143,8 @@ static int load_cubes() {
 	char cube_stru_file[128];
 	md_gid cube_id;
 
-	while (fread((void *)&cube_id, sizeof(md_gid), 1, cubes_fd) > 0) {
+	while (fread((void *)&cube_id, sizeof(md_gid), 1, cubes_fd) > 0)
+	{
 		// als_add(cube_id_arr, *((void **)&cube_id));
 		memset(cube_stru_file, 0, 128);
 		sprintf(cube_stru_file, "/meta/cube_%lu", cube_id);
@@ -151,7 +158,8 @@ static int load_cubes() {
 
 		int i, dr_count;
 		fread(&dr_count, sizeof(unsigned int), 1, cube_fd);
-		for (i=0;i<dr_count;i++) {
+		for (i = 0; i < dr_count; i++)
+		{
 			DimensionRole *dim_role = mam_alloc(sizeof(DimensionRole), OBJ_TYPE__DimensionRole, meta_mam, 0);
 			fread(dim_role, sizeof(DimensionRole), 1, cube_fd);
 			als_add(cube->dim_role_ls, dim_role);
@@ -163,7 +171,8 @@ static int load_cubes() {
 
 		int mea_mbrs_count;
 		fread(&mea_mbrs_count, sizeof(unsigned int), 1, cube_fd);
-		for (i=0;i<mea_mbrs_count;i++) {
+		for (i = 0; i < mea_mbrs_count; i++)
+		{
 			Member *mea_mbr = mam_alloc(sizeof(Member), OBJ_TYPE__Member, meta_mam, 0);
 			fread(mea_mbr, sizeof(Member), 1, cube_fd);
 			mdd__gen_mbr_abs_path(mea_mbr);
@@ -172,12 +181,13 @@ static int load_cubes() {
 
 		als_add(cubes_pool, cube);
 
-    	fclose(cube_fd);
+		fclose(cube_fd);
 	}
 	fclose(cubes_fd);
 }
 
-int mdd_load() {
+int mdd_load()
+{
 	load_dimensions();
 	load_levels();
 	load_members();
@@ -227,22 +237,27 @@ int create_dims(ArrayList *dim_names, EuclidCommand **result)
 			als_add(dimensions_exist, dim_name);
 	}
 
-	if (als_size(dimensions_exist) > 0) {
+	if (als_size(dimensions_exist) > 0)
+	{
 		*result = ec_new(INTENT__EXE_RESULT_DESC, 128 + als_size(dimensions_exist) * 70);
 
 		char *desc = (*result)->bytes + SZOF_INT + SZOF_SHORT;
 		sprintf(desc, "Dimensions");
 		desc += strlen(desc);
-		for (int i = 0; i < als_size(dimensions_exist); i++) {
+		for (int i = 0; i < als_size(dimensions_exist); i++)
+		{
 			char *exist_dim_name = als_get(dimensions_exist, i);
-			if (strlen(exist_dim_name) > 64) {
+			if (strlen(exist_dim_name) > 64)
+			{
 				*desc = ' ';
 				desc++;
 				memcpy(desc, exist_dim_name, 61);
 				desc += 61;
 				sprintf(desc, "...,");
 				desc += strlen(desc);
-			} else {
+			}
+			else
+			{
 				sprintf(desc, " %s,", exist_dim_name);
 				desc += strlen(desc);
 			}
@@ -567,7 +582,8 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 		char *dim_name = als_get(dim_role_ls, i);
 
 		// Check if non-existing dimension is associated.
-		if (find_dim_by_name(dim_name) == NULL) {
+		if (find_dim_by_name(dim_name) == NULL)
+		{
 			MemAllocMng_current_thread_mam()->exception_desc = "This cube is associated with dimensions that do not exist.";
 			return -1;
 		}
@@ -582,7 +598,7 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 		d_role->cube_gid = cube->gid;
 		d_role->dim_gid = dim->gid;
 		log_print("[INFO] new DimensionRole - Cube [ %ld % 16s ] Dim [ %ld % 16s ] DR [ %ld % 16s ]\n",
-			   cube->gid, cube->name, dim->gid, dim->name, d_role->gid, d_role->name);
+				  cube->gid, cube->name, dim->gid, dim->name, d_role->gid, d_role->name);
 
 		als_add(cube->dim_role_ls, d_role);
 	}
@@ -659,7 +675,8 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 	*((__uint16_t *)(data + sizeof(__uint32_t))) = INTENT__INSERT_CUBE_MEASURE_VALS;
 
 	Cube *cube = find_cube_by_name(cube_name);
-	if (cube == NULL) {
+	if (cube == NULL)
+	{
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 		thrd_mam->exception_desc = "exception: An undefined cube was encountered.";
 		longjmp(thrd_mam->excep_ctx_env, -1);
@@ -680,7 +697,8 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 		IDSVectorMears *ids_vm = als_get(ls_ids_vctr_mear, i);
 		__uint32_t vct_sz = als_size(ids_vm->ls_vector);
 
-		if (vct_sz != als_size(cube->dim_role_ls)) {
+		if (vct_sz != als_size(cube->dim_role_ls))
+		{
 			obj_release(data);
 			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 			thrd_mam->exception_desc = "exception: Insert statement does not match cube.";
@@ -691,7 +709,8 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 		{
 			ArrayList *mbr_path_str = als_get(ids_vm->ls_vector, j);
 			size_t ap_bsz = sizeof(int) + sizeof(md_gid) * (als_size(mbr_path_str) - 1);
-			if ((data_m_sz + ap_bsz) > data_m_capacity) {
+			if ((data_m_sz + ap_bsz) > data_m_capacity)
+			{
 				log_print("[ error ] exit, cause by: Too much data inserted.\n");
 				exit(EXIT_FAILURE);
 			}
@@ -701,7 +720,8 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 
 		__uint32_t cube_mmbrs_sz = als_size(cube->measure_mbrs);
 
-		if ((data_m_sz + (sizeof(double) + sizeof(char)) * cube_mmbrs_sz) > data_m_capacity) {
+		if ((data_m_sz + (sizeof(double) + sizeof(char)) * cube_mmbrs_sz) > data_m_capacity)
+		{
 			log_print("[ error ] exit, cause by: Too much data inserted.\n");
 			exit(EXIT_FAILURE);
 		}
@@ -793,7 +813,6 @@ void gen_member_gid_abs_path(Cube *cube, ArrayList *mbr_path_str, char *abs_path
 		mbr = find_member_child(mbr, als_get(mbr_path_str, i));
 		*((md_gid *)(abs_path + sizeof(__uint32_t) + sizeof(md_gid) * (i - 1))) = mbr->gid;
 	}
-
 }
 
 static long query_times = 1;
@@ -804,7 +823,8 @@ MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 
 	MemAllocMng *th_mam = MemAllocMng_current_thread_mam();
 
-	if (select_def__get_cube(select_def) == NULL) {
+	if (select_def__get_cube(select_def) == NULL)
+	{
 		th_mam->exception_desc = "exception: nonexistent cube.";
 		longjmp(th_mam->excep_ctx_env, -1);
 	}
@@ -816,7 +836,8 @@ MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 	ArrayList *axes = select_def__build_axes(md_ctx, select_def);
 
 	int i;
-	for (i=0;i<als_size(axes);i++) {
+	for (i = 0; i < als_size(axes); i++)
+	{
 		MddAxis *ax = als_get(axes, i);
 		if (als_size(ax->set->tuples) == 0)
 			return NULL;
@@ -1143,15 +1164,15 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 		void *obj = als_get(set_def->tuple_def_ls, 0);
 		switch (obj_type_of(obj))
 		{
-			case OBJ_TYPE__TupleDef:
-				return ids_tupledef__build(md_ctx, obj, context_tuple, cube);
-			case OBJ_TYPE__GeneralChainExpression:
-				MddTuple *tuple = gce_transform(md_ctx, obj, context_tuple, cube);
-				assert(obj_type_of(tuple) == OBJ_TYPE__MddTuple);
-				return tuple;
-			default:
-				log_print("[ error ] exit. Program logic error.\n");
-				exit(EXIT_FAILURE);
+		case OBJ_TYPE__TupleDef:
+			return ids_tupledef__build(md_ctx, obj, context_tuple, cube);
+		case OBJ_TYPE__GeneralChainExpression:
+			MddTuple *tuple = gce_transform(md_ctx, obj, context_tuple, cube);
+			assert(obj_type_of(tuple) == OBJ_TYPE__MddTuple);
+			return tuple;
+		default:
+			log_print("[ error ] exit. Program logic error.\n");
+			exit(EXIT_FAILURE);
 		}
 	}
 	else if (set_def->t_cons == SET_DEF__SET_FUNCTION)
@@ -1318,7 +1339,9 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 				MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 				thrd_mam->exception_desc = "exception: Unrecognized dimension member.";
 				longjmp(thrd_mam->excep_ctx_env, -1);
-			} else {
+			}
+			else
+			{
 				MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 				thrd_mam->exception_desc = "exception: Unrecognized dimension member.";
 				longjmp(thrd_mam->excep_ctx_env, -1);
@@ -1326,7 +1349,8 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 		}
 		else
 		{
-			if (strcmp(dim_role_name, STANDARD_MEASURE_DIMENSION) == 0) {
+			if (strcmp(dim_role_name, STANDARD_MEASURE_DIMENSION) == 0)
+			{
 				// measure dimension
 				char *mea_m_name = als_get(m_def->mbr_abs_path, 1);
 				int i, mea_m_count = als_size(cube->measure_mbrs);
@@ -1340,7 +1364,6 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 					}
 				}
 			}
-
 
 			if (md_ctx == NULL || md_ctx->select_def->member_formulas == NULL)
 				goto unknown_dim_role_exception;
@@ -1359,7 +1382,7 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 				}
 			}
 
-			unknown_dim_role_exception:
+		unknown_dim_role_exception:
 			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 			thrd_mam->exception_desc = "exception: An undefined dimension role was encountered.";
 			longjmp(thrd_mam->excep_ctx_env, -1);
@@ -1424,7 +1447,8 @@ Member *dim__find_mbr(Dimension *dim, ArrayList *mbr_name_path)
 {
 	int i, len = als_size(mbr_name_path);
 	Member *m = find_member_lv1(dim, als_get(mbr_name_path, 0));
-	for (i = 1; i < len; i++) {
+	for (i = 1; i < len; i++)
+	{
 		if (!m)
 			break;
 		m = find_member_child(m, als_get(mbr_name_path, i));
@@ -1440,7 +1464,8 @@ MddSet *mdd_set__create()
 	return set;
 }
 
-unsigned int mdd_set__max_tuple_len(MddSet *set) {
+unsigned int mdd_set__max_tuple_len(MddSet *set)
+{
 	unsigned int max = als_size(((MddTuple *)als_get(set->tuples, 0))->mr_ls);
 	for (int i = 1; i < als_size(set->tuples); i++)
 	{
@@ -1464,7 +1489,8 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 		for (i = 0; i < sz; i++)
 		{
 			void *obj = als_get(set_def->tuple_def_ls, i);
-			if (obj_type_of(obj) == OBJ_TYPE__TupleDef) {
+			if (obj_type_of(obj) == OBJ_TYPE__TupleDef)
+			{
 				mddset__add_tuple(set, ids_tupledef__build(md_ctx, obj, ctx_tuple, cube));
 				continue;
 			}
@@ -1957,7 +1983,8 @@ MddSet *SetFnMembers_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTu
 
 	if (dr == NULL)
 	{
-		if (strcmp(STANDARD_MEASURE_DIMENSION, fn->dr_def->name)) {
+		if (strcmp(STANDARD_MEASURE_DIMENSION, fn->dr_def->name))
+		{
 			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 			thrd_mam->exception_desc = "exception: An undefined dimension role was encountered.";
 			longjmp(thrd_mam->excep_ctx_env, -1);
@@ -2825,7 +2852,8 @@ void MultiDimResult_print(MultiDimResult *md_rs)
 	log_print("\n\n\n");
 	log_print("### !!! MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
 
-	if (md_rs == NULL) {
+	if (md_rs == NULL)
+	{
 		log_print("##################################################################\n");
 		log_print("##################################################################\n");
 		log_print("##                    MultiDimResult is NULL                    ##\n");
@@ -3027,7 +3055,8 @@ void ExpFnLookUpCube_evolving(MDContext *md_ctx, ExpFnLookUpCube *luc, Cube *cub
 
 	Cube *cubeLinked = find_cube_by_name(luc->cube_name);
 
-	if (cubeLinked == NULL) {
+	if (cubeLinked == NULL)
+	{
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 		thrd_mam->exception_desc = "exception at ExpFnLookUpCube_evolving: unknown cube.";
 		longjmp(thrd_mam->excep_ctx_env, -1);
@@ -3173,7 +3202,6 @@ void mdrs_to_str(MultiDimResult *md_rs, char *_cont_buf, size_t buf_len)
 
 	int col_thickness = mdd_set__max_tuple_len(col_ax->set);
 	int row_thickness = mdd_set__max_tuple_len(row_ax->set);
-	
 
 	int ri, ci;
 	// sprintf(cont_buf, "\n");
@@ -3265,32 +3293,37 @@ end:
 	log_print("[ info ] **************** mdrs_to_str(...) >>>>>>>>>>>>>>>>>>>>>  %lu  /  %lu  %f %%\n", used_len, buf_len, used_len * 100.0 / buf_len);
 }
 
-ByteBuf *mdrs_to_bin(MultiDimResult *md_rs) {
+ByteBuf *mdrs_to_bin(MultiDimResult *md_rs)
+{
 
 	ByteBuf *buf = buf__alloc(128 * 1024); // 128k
 	unsigned int *capacity = buf_cutting(buf, sizeof(int));
-	* (unsigned short *) buf_cutting(buf, sizeof(short)) = INTENT__MULTIDIM_RESULT_BIN;
-	* (int *) buf_cutting(buf, sizeof(int)) = als_size(md_rs->axes); // AX_COUNT
+	*(unsigned short *)buf_cutting(buf, sizeof(short)) = INTENT__MULTIDIM_RESULT_BIN;
+	*(int *)buf_cutting(buf, sizeof(int)) = als_size(md_rs->axes); // AX_COUNT
 
-	for (int i=0; i<als_size(md_rs->axes); i++) {
+	for (int i = 0; i < als_size(md_rs->axes); i++)
+	{
 		MddAxis *mdd_ax = als_get(md_rs->axes, i);
 
 		int s_len = mdd_set__len(mdd_ax->set); // S_LEN
-		* (int *) buf_cutting(buf, sizeof(int)) = s_len;
+		*(int *)buf_cutting(buf, sizeof(int)) = s_len;
 		int t_len = mdd_set__max_tuple_len(mdd_ax->set); // T_LEN
-		* (int *) buf_cutting(buf, sizeof(int)) = t_len;
+		*(int *)buf_cutting(buf, sizeof(int)) = t_len;
 
-		for (int s=0; s<s_len; s++) {
+		for (int s = 0; s < s_len; s++)
+		{
 			MddTuple *tuple = als_get(mdd_ax->set->tuples, s);
 
-			for (int j=0; j<t_len - als_size(tuple->mr_ls); j++) {
-				* (md_gid *) buf_cutting(buf, sizeof(md_gid)) = 0;
-				* (char *) buf_cutting(buf, sizeof(char)) = 0;
+			for (int j = 0; j < t_len - als_size(tuple->mr_ls); j++)
+			{
+				*(md_gid *)buf_cutting(buf, sizeof(md_gid)) = 0;
+				*(char *)buf_cutting(buf, sizeof(char)) = 0;
 			}
 
-			for (int t=0; t<als_size(tuple->mr_ls); t++) {
+			for (int t = 0; t < als_size(tuple->mr_ls); t++)
+			{
 				MddMemberRole *mr = als_get(tuple->mr_ls, t);
-				* (md_gid *) buf_cutting(buf, sizeof(md_gid)) = mr->member ? mr->member->gid : 0;
+				*(md_gid *)buf_cutting(buf, sizeof(md_gid)) = mr->member ? mr->member->gid : 0;
 				char *mbr_name = mr->member ? mr->member->name : als_get(mr->member_formula->path, als_size(mr->member_formula->path) - 1);
 				char *_m_name = buf_cutting(buf, strlen(mbr_name) + 1);
 				memcpy(_m_name, mbr_name, strlen(mbr_name) + 1);
@@ -3298,7 +3331,7 @@ ByteBuf *mdrs_to_bin(MultiDimResult *md_rs) {
 		}
 	}
 
-	* (long *) buf_cutting(buf, sizeof(long)) = md_rs->rs_len; // RS_LEN
+	*(long *)buf_cutting(buf, sizeof(long)) = md_rs->rs_len; // RS_LEN
 
 	double *_vals_ = buf_cutting(buf, sizeof(double) * md_rs->rs_len);
 	memcpy(_vals_, md_rs->vals, sizeof(double) * md_rs->rs_len);
@@ -3311,7 +3344,8 @@ ByteBuf *mdrs_to_bin(MultiDimResult *md_rs) {
 	return buf;
 }
 
-void *gce_transform(MDContext *md_ctx, GeneralChainExpression *gce, MddTuple *context_tuple, Cube *cube) {
+void *gce_transform(MDContext *md_ctx, GeneralChainExpression *gce, MddTuple *context_tuple, Cube *cube)
+{
 
 	MemberDef *member_def = MemberDef_creat(MEMBER_DEF__MBR_ABS_PATH);
 	member_def->mbr_abs_path = gce->chain;
