@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h> // for pthread_create
-#include <string.h> // for memset
-#include <unistd.h> // for close
+#include <string.h>	 // for memset
+#include <unistd.h>	 // for close
 #include <semaphore.h>
 
 #include "log.h"
@@ -26,7 +26,8 @@ static void *command_receiving_thread(void *addr);
 
 static void receive_command_loop(SockIntentThread *sit);
 
-void net_init() {
+void net_init()
+{
 	net_mam = MemAllocMng_new();
 	log_print("@@MAM@@ -->> net_mam = %p\n", net_mam);
 }
@@ -196,7 +197,7 @@ static void receive_command_loop(SockIntentThread *sit)
 
 			/**
 			 * Command module process command intention.
-			 * Submit the task object to another thread for processing, that thread will increment 
+			 * Submit the task object to another thread for processing, that thread will increment
 			 * the value of the semaphore by 1 after execution is complete.
 			 */
 			submit_command(task);
@@ -206,7 +207,8 @@ static void receive_command_loop(SockIntentThread *sit)
 
 			sit_send_command(sit, task->result ? task->result : get_const_command_intent(INTENT__SUCCESSFUL));
 
-			if (task->result) {
+			if (task->result)
+			{
 				obj_release(task->result->bytes);
 				obj_release(task->result);
 			}
