@@ -1,0 +1,13 @@
+Class naming convention: hump nomenclature.
+example:
+typedef struct _redblack_tree_
+{
+	// some attributes
+} RedBlackTree;
+'RedBlackTree' is the class name.
+
+
+Function naming convention: the first '_' has the class abbreviation on the left and the function name on the right.
+example:
+void rbt_add(RedBlackTree *rbt, void *obj);
+'rbt_add' is the function name of class.
