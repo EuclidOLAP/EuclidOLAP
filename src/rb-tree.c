@@ -73,16 +73,15 @@ void rbt_add(RedBlackTree *rbt, void *obj)
 		return;
 	}
 
+	node->parent = mount_p;
 	int cmp_rs = rbt->comparison_func(mount_p->obj, obj);
 	if (cmp_rs < 0)
 	{
 		mount_p->child_left = node;
-		node->parent = mount_p->child_left;
 	}
 	else
 	{
 		mount_p->child_right = node;
-		node->parent = mount_p->child_right;
 	}
 
 	// [2] The parent node(mount_p) of the new node is black
