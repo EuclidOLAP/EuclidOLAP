@@ -137,36 +137,45 @@ void reload_space(unsigned long cs_id) {
 
         // fread(tmpbuf, coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
         buf_clear(tmp_buf);
-        fread(buf_cutting(tmp_buf, coor_pointer_len * sizeof(__uint64_t)), coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
 
         // At the same time, hang the scale objects on the corresponding axis in the coordinate system object.
-        Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
-        scale->fragments_len = coor_pointer_len;
-        scale->fragments = mam_alloc(coor_pointer_len * sizeof(__uint64_t), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
-        
-        // memcpy(scale->fragments, tmpbuf, coor_pointer_len * sizeof(__uint64_t));
-        memcpy(scale->fragments, tmp_buf->buf_addr, coor_pointer_len * sizeof(__uint64_t));
+        Scale *sample = buf_cutting(tmp_buf, sizeof(Scale));
+        scal_init(sample);
+        sample->fragments_len = coor_pointer_len;
 
+        sample->fragments = buf_cutting(tmp_buf, coor_pointer_len * sizeof(md_gid));
+        fread(sample->fragments, coor_pointer_len * sizeof(md_gid), 1, data_fd);
+        
         Axis *axis = cs_get_axis(cs, 0);
-        ax_set_scale(axis, scale);
+        if (ax_find_scale(axis, sample) == NULL) {
+            Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
+            scale->fragments = mam_alloc(coor_pointer_len * sizeof(md_gid), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
+            scale->fragments_len = sample->fragments_len;
+            memcpy(scale->fragments, sample->fragments, coor_pointer_len * sizeof(md_gid));
+            ax_set_scale(axis, scale);
+        }
 
         for (i=1;i<axes_count;i++) {
 
             fread(&coor_pointer_len, sizeof(int), 1, data_fd);
 
-            // fread(tmpbuf, coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
             buf_clear(tmp_buf);
-            fread(buf_cutting(tmp_buf, coor_pointer_len * sizeof(__uint64_t)), coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
 
-            Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
-            scale->fragments_len = coor_pointer_len;
-            scale->fragments = mam_alloc(coor_pointer_len * sizeof(__uint64_t), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
+            sample = buf_cutting(tmp_buf, sizeof(Scale));
+            scal_init(sample);
+            sample->fragments_len = coor_pointer_len;
 
-            // memcpy(scale->fragments, tmpbuf, coor_pointer_len * sizeof(__uint64_t));
-            memcpy(scale->fragments, tmp_buf->buf_addr, coor_pointer_len * sizeof(__uint64_t));
+            sample->fragments = buf_cutting(tmp_buf, coor_pointer_len * sizeof(md_gid));
+            fread(sample->fragments, coor_pointer_len * sizeof(md_gid), 1, data_fd);
 
-            Axis *axis = cs_get_axis(cs, i);
-            ax_set_scale(axis, scale);
+            axis = cs_get_axis(cs, i);
+            if (ax_find_scale(axis, sample) == NULL) {
+                Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
+                scale->fragments = mam_alloc(coor_pointer_len * sizeof(md_gid), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
+                scale->fragments_len = sample->fragments_len;
+                memcpy(scale->fragments, sample->fragments, coor_pointer_len * sizeof(md_gid));
+                ax_set_scale(axis, scale);
+            }
         }
 
         // skip some bytes
@@ -175,6 +184,7 @@ void reload_space(unsigned long cs_id) {
         buf_clear(tmp_buf);
         fread(buf_cutting(tmp_buf, skip_bytes), skip_bytes, 1, data_fd);
     }
+
     fclose(data_fd);
 
     // Calculate the actual size of the multidimensional array corresponding to the coordinate system.
@@ -211,25 +221,20 @@ void reload_space(unsigned long cs_id) {
         for (i = 0; i < axes_count; i++)
         {
             buf_clear(tmp_buf);
-            if (fread(buf_cutting(tmp_buf, sizeof(int)), sizeof(int), 1, data_fd) < 1)
+
+            Scale *sample = buf_cutting(tmp_buf, sizeof(Scale));
+            scal_init(sample);
+
+            if (fread(&(sample->fragments_len), sizeof(int), 1, data_fd) < 1)
                 goto finished;
 
-            int scale_len = *((int *)tmp_buf->buf_addr);
-
-            // fread(tmpbuf, sizeof(md_gid), scale_len, data_fd);
-            buf_clear(tmp_buf);
-            fread(buf_cutting(tmp_buf, sizeof(md_gid) * scale_len), sizeof(md_gid), scale_len, data_fd);
+            sample->fragments = buf_cutting(tmp_buf, sample->fragments_len * sizeof(md_gid));
+            // fread(sample->fragments, coor_pointer_len * sizeof(md_gid), 1, data_fd);
+            fread(sample->fragments, sizeof(md_gid), sample->fragments_len, data_fd);
 
             Axis *axis = cs_get_axis(cs, i);
 
-            Scale *__inl_s = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
-            __inl_s->fragments_len = scale_len;
-            __inl_s->fragments = mam_alloc(scale_len * sizeof(__uint64_t), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
-
-            // memcpy(__inl_s->fragments, tmpbuf, scale_len * sizeof(__uint64_t));
-            memcpy(__inl_s->fragments, tmp_buf->buf_addr, scale_len * sizeof(__uint64_t));
-
-            RBNode *__inl_n = rbt__find(axis->rbtree, __inl_s);
+            RBNode *__inl_n = rbt__find(axis->rbtree, sample);
             __uint64_t sc_posi = __inl_n->index;
 
             __uint64_t ax_span = cs_axis_span(cs, i);
@@ -243,9 +248,10 @@ void reload_space(unsigned long cs_id) {
         space_add_measure(space, measure_space_idx, cell);
     }
 
+finished:
+
     buf_release(tmp_buf);
 
-finished:
     fclose(data_fd);
 
     space_plan(space);
@@ -899,4 +905,18 @@ void MeasureSpace_print(MeasureSpace *space) {
     log_print(">>>>>>>>>>>>>>>>>>>>>>>>\n");
     log_print(">>>>>>>>>>>>>>>>\n");
     log_print(">>>>>>>>\n");
+}
+
+
+// Axis(struct _coordinate_axis) functions
+Scale *ax_find_scale(Axis *axis, Scale *sample) {
+    RBNode *node = rbt__find(axis->rbtree, sample);
+    return node ? node->obj : NULL;
+}
+
+
+// Scale(struct _axis_scale) functions
+void scal_init(Scale *scale) {
+    scale->fragments_len=0;
+    scale->fragments = NULL;
 }
