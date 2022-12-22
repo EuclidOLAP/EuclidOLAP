@@ -13,9 +13,10 @@
 
 extern RedBlackTree *_thread_mam_pool;
 
+// todo modify 'short' to 'type_obj'
 void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 
-	assert(BYTES_ALIGNMENT >= sizeof(short));
+	assert(BYTES_ALIGNMENT > sizeof(short));
 
 	size_t required = (mam_mark ? sizeof(MemAllocMng *) : 0) + BYTES_ALIGNMENT + size;
 	if (required % BYTES_ALIGNMENT != 0)

@@ -111,4 +111,12 @@ double *vce_vactors_values(MDContext *md_ctx, MddTuple **tuples_matrix_h, unsign
 
 void do_calculate_measure_value(MDContext *md_ctx, Cube *, MddTuple *, GridData *grid_data);
 
+
+// Axis(struct _coordinate_axis) functions
+Scale *ax_find_scale(Axis *axis, Scale *sample);
+
+
+// Scale(struct _axis_scale) functions
+void scal_init(Scale *scale);
+
 #endif
