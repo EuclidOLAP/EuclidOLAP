@@ -241,7 +241,10 @@ void reload_space(unsigned long cs_id) {
             measure_space_idx += sc_posi * ax_span;
         }
         size_t cell_mem_sz = vals_count * (sizeof(double) + sizeof(char));
+
+        // todo at once, modify it be use a temp memory allocation manager
         void *cell = mam_alloc(sizeof(measure_space_idx) + cell_mem_sz, OBJ_TYPE__RAW_BYTES, cs_mam, 0);
+
         *((unsigned long *)cell) = measure_space_idx;
         fread(cell + sizeof(measure_space_idx), cell_mem_sz, 1, data_fd);
 
