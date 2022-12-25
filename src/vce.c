@@ -215,6 +215,8 @@ void reload_space(unsigned long cs_id) {
     // Traverse the data file and insert all measure data into the logical multidimensional array.
     data_fd = open_file(data_file, "r");
 
+    unsigned long load_meval_count = 0;
+
     while (1)
     {
         __uint64_t measure_space_idx = 0;
@@ -249,6 +251,9 @@ void reload_space(unsigned long cs_id) {
         fread(cell + sizeof(measure_space_idx), cell_mem_sz, 1, data_fd);
 
         space_add_measure(space, measure_space_idx, cell);
+
+        if (++load_meval_count % 10000 == 0)
+            log_print(":::::::::::::::::::::::::::::::::::::::: load_meval_count = %lu\n", load_meval_count);
     }
 
 finished:
