@@ -8,7 +8,7 @@
 
 typedef struct _redblack_tree_node_
 {
-	struct _redblack_tree_ *tree;
+	// struct _redblack_tree_ *tree;
 
 	struct _redblack_tree_node_ *parent;
 	struct _redblack_tree_node_ *child_left;

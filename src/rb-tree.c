@@ -155,7 +155,6 @@ RBNode *rbt_create_node(void *obj, RedBlackTree *tree, char _attrs)
 
 	n->obj = obj;
 	n->attrs = _attrs;
-	n->tree = tree;
 	return n;
 }
 
@@ -388,16 +387,16 @@ int rbt__size(RedBlackTree *t)
 	return t->size;
 }
 
-static void _release_rbt_node(RBNode *n)
+static void _release_rbt_node(RedBlackTree *t, RBNode *n)
 {
 	if (n->child_left)
-		_release_rbt_node(n->child_left);
+		_release_rbt_node(t, n->child_left);
 
 	if (n->child_right)
-		_release_rbt_node(n->child_right);
+		_release_rbt_node(t, n->child_right);
 
 	if (n->obj)
-		n->tree->release_obj_func(n->obj);
+		t->release_obj_func(n->obj);
 
 	rbt__destory_node(n);
 }
@@ -405,7 +404,7 @@ static void _release_rbt_node(RBNode *n)
 void rbt__clear(RedBlackTree *t)
 {
 	if (t->root)
-		_release_rbt_node(t->root);
+		_release_rbt_node(t, t->root);
 
 	t->root = NULL;
 }

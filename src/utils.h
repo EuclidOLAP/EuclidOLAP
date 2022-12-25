@@ -80,13 +80,6 @@ struct memory_allocation_manager
 
 typedef struct memory_allocation_manager MemAllocMng;
 
-/**
- * @param mam If mam is NULL, use the memory allocation manager of current thread.
- * @param mam_mark When it is not 0, the address of the memory allocation manager is recorded in
- * 				   the object header information, and when it is 0, it is not recorded.
- */
-void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark);
-
 /*
 +--------------------------------+---------------------------------------+
 |                                |                 other                 |
@@ -234,5 +227,19 @@ void *slide_over_mem(void *addr, ssize_t range, size_t *idx);
 FILE *open_file(char *r_path, char *modes);
 
 // void file_stat(char *data_file, struct stat *f_stat);
+
+
+// MemAllocMng(struct memory_allocation_manager) functions
+/**
+ * @param mam If mam is NULL, use the memory allocation manager of current thread.
+ * @param mam_mark When it is not 0, the address of the memory allocation manager is recorded in
+ * 				   the object header information, and when it is 0, it is not recorded.
+ */
+void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark);
+
+/**
+ * @param mam not be NULL
+ */
+void *mam_hlloc(MemAllocMng *mam, size_t size);
 
 #endif

@@ -85,6 +85,12 @@ void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 	return obj_ins;
 }
 
+void *mam_hlloc(MemAllocMng *mam, size_t size) {
+	assert(mam != NULL);
+	size = size > BYTES_ALIGNMENT ? size - BYTES_ALIGNMENT : 0;
+	return ((char *)mam_alloc(size, OBJ_TYPE__RAW_BYTES, mam, 0)) - BYTES_ALIGNMENT;
+}
+
 MemAllocMng *MemAllocMng_current_thread_mam() {
 	MemAllocMng key;
 	memset(&key, 0, sizeof(MemAllocMng));
