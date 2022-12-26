@@ -216,6 +216,7 @@ void reload_space(unsigned long cs_id) {
     data_fd = open_file(data_file, "r");
 
     unsigned long load_meval_count = 0;
+    char *cellcm = NULL;
 
     while (1)
     {
@@ -246,14 +247,19 @@ void reload_space(unsigned long cs_id) {
 
         // todo at once, modify it be use a temp memory allocation manager
         // void *cell = mam_alloc(sizeof(measure_space_idx) + cell_mem_sz, OBJ_TYPE__RAW_BYTES, cs_mam, 0);
-        void *cell = mam_hlloc(cs_mam, sizeof(measure_space_idx) + cell_mem_sz);
+        if (load_meval_count % BYTES_ALIGNMENT == 0) {
+            cellcm = mam_hlloc(cs_mam, (sizeof(measure_space_idx) + cell_mem_sz) * BYTES_ALIGNMENT);
+        }
+        // void *cell = mam_hlloc(cs_mam, sizeof(measure_space_idx) + cell_mem_sz);
+        void *cell = cellcm + (sizeof(measure_space_idx) + cell_mem_sz) * (load_meval_count % BYTES_ALIGNMENT);
 
         *((unsigned long *)cell) = measure_space_idx;
         fread(cell + sizeof(measure_space_idx), cell_mem_sz, 1, data_fd);
 
         space_add_measure(space, measure_space_idx, cell);
+        ++load_meval_count;
 
-        if (++load_meval_count % 10000 == 0)
+        if (load_meval_count % 10000 == 0)
             log_print(":::::::::::::::::::::::::::::::::::::::: load_meval_count = %lu\n", load_meval_count);
     }
 
