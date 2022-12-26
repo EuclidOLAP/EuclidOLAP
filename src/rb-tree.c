@@ -150,7 +150,8 @@ RBNode *rbt_create_node(void *obj, RedBlackTree *tree, char _attrs)
 	if (strat == DIRECT) {
 		n = obj_alloc(sizeof(RBNode), OBJ_TYPE__RBNode);
 	} else {
-		n = mam_alloc(sizeof(RBNode), OBJ_TYPE__RBNode, mam, 0);
+		// n = mam_alloc(sizeof(RBNode), OBJ_TYPE__RBNode, mam, 0);
+		n = mam_hlloc(mam, sizeof(RBNode));
 	}
 
 	n->obj = obj;
