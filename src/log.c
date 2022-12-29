@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <time.h>
 
 #include "utils.h"
 
@@ -48,10 +49,15 @@ static void __log_prt__(const char *fmt, va_list ap)
 		return;
 	}
 
+	time_t time_p;
+	time(&time_p);
+	struct tm *tmins = gmtime(&time_p);
+
 	FILE *log_fd = fopen(def_log_file, "a");
 
+	fprintf(log_fd, "%d-%d-%d %d:%d:%d ", tmins->tm_mon + 1, tmins->tm_mday, tmins->tm_year + 1900, tmins->tm_hour, tmins->tm_min, tmins->tm_sec);
 	vfprintf(log_fd, fmt, ap);
-	fflush(log_fd);
 
+	fflush(log_fd);
 	fclose(log_fd);
 }
