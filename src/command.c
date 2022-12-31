@@ -302,7 +302,7 @@ static int execute_command(EuclidCommand *ec)
 			MultiDimResult *md_rs = exe_multi_dim_queries(select_def);
 
 			if (cur_thrd_mam->exception_desc == NULL) {
-				MultiDimResult_print(md_rs);
+				// MultiDimResult_print(md_rs);
 
 				if (ec_get_intent(ec) == INTENT__MDX_EXPECT_RESULT_TXT) {
 					// todo Do not use the allocated memory block directly, replace by ElasticByteBuffer.
