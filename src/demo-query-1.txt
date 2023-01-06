@@ -430,7 +430,12 @@ where
 select { ( [starting region].[ALL].[Asia].[China], Transport.[ALL].railway ) } on 0, filter({ ( [starting date].[ALL].[2019].[Q4].[M10], Goods.[ALL].[foods].[nut], [measure].[income] ), ( [starting date].[ALL].[2019].[Q4].[M10], Goods.[ALL].[foods].[nut] ), ( [starting date].[ALL].[2019].[Q3].[M9], Goods.[ALL].[foods].[wine] ), ( [ending region].[ALL].[Asia].[China], [starting date].[ALL].[2019].[Q3].[M7], [completion date].[ALL].[2019].[Q3].[M7] ) }, ((Transport.[ALL].railway) > 0) OR (1 < 2)) on 1 from [nonexistent measure];
 ---
 select members([Payment Method], LEAFS) on 1, members([Store Type], LEAFS) on 2 from [Online Store];
-
+---
+select
+members([Transport], LEAFS) on 12220,
+members([starting date], LEAFS) on 111
+from [logistics.test]
+where ([Goods].[ALL].[electronic product].[computer], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[Europe].[Italy], [completion date].[ALL].[2021].[Q2].[M4]);
 
 
 
