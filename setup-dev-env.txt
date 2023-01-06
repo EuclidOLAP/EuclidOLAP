@@ -1,0 +1,53 @@
+########################################################################
+##                              CentOS 7                              ##
+########################################################################
+
+# Uninstall the old version
+rpm -q gcc 
+rpm -e [The version number found in the previous step]
+
+
+# Executing the above command may report an error and the uninstall fails:
+error: Failed dependencies:
+
+gcc = 4.4.7-23.el6 is needed by (installed) gcc-c++-4.4.7-23.el6.x86_64
+gcc = 4.4.4 is needed by (installed) libtool-2.2.6-15.5.el6.x86_64
+
+# Indicates that the program to be uninstalled is already dependent on another program
+# Uninstall programs that depend on gcc:
+
+rpm -e gcc-c++-4.4.7-23.el6.x86_64
+rpm -e libtool-2.2.6-15.5.el6.x86_64
+
+# Then, execute the command to uninstall gcc again:
+rpm -e [The version number found in the previous step]
+
+
+yum -y install centos-release-scl
+
+yum install -y devtoolset-11-gcc devtoolset-11-gcc-c++ devtoolset-11-gdb
+
+scl enable devtoolset-11 bash
+
+which gcc
+which cc
+which g++
+which gdb
+
+
+cat >> /etc/profile << EOF
+export PATH=\$PATH:/opt/rh/devtoolset-11/root/usr/bin
+EOF
+
+
+source /etc/profile
+
+
+yum -y install flex
+yum -y install flex-devel
+yum -y install bison
+
+
+yum -y install ncurses-devel
+
+yum -y install readline-devel
