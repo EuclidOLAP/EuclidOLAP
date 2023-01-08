@@ -51,3 +51,26 @@ yum -y install bison
 yum -y install ncurses-devel
 
 yum -y install readline-devel
+
+########################################################################
+##                              Ubuntu 20                             ##
+########################################################################
+
+apt -y remove g++
+apt -y remove gcc
+
+apt update
+apt -y install software-properties-common
+add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
+apt -y install gcc-11
+apt -y install g++-11
+apt -y install gdb
+
+ln -s /usr/bin/gcc-11 /usr/bin/gcc
+ln -s /usr/bin/gcc-11 /usr/bin/cc
+
+apt -y install flex
+apt -y install bison
+
+apt -y install libreadline-dev
