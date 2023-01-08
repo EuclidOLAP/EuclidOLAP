@@ -184,6 +184,18 @@ static int load_conf_files()
 
 	strcat(conf_path, cfg_file_name);
 
+	if (access(conf_path, F_OK) != 0) {
+		// the config file was not existed.
+
+		if (cfg.mode == CLIENT_MODE) {
+			// set the default ip and port of euclid-olap server, when it's client mode.
+			cfg.cli_ctrl_node_port = 8760;
+			strcpy(cfg.cli_ctrl_node_host, "127.0.0.1");
+		}
+
+		return 0;
+	}
+
 	FILE *conf_fp = fopen(conf_path, "r");
 
 	int buf_len = 256;
