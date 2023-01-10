@@ -2,37 +2,15 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h> // for close
-#include <readline/readline.h>
 #include <sys/wait.h>
 
 #include "cfg.h"
-// #include "net.h"
 #include "command.h"
 #include "utils.h"
 
-static char cls_flag = 0;
-
-// defined in <sys/socket.h>
-// extern ssize_t send (int __fd, const void *__buf, size_t __n, int __flags);
-
-// extern void *parse_mdx(char *mdx);
 static void ctrl_c_act(int sig_no)
 {
-	// char c;
-	// while (1) {
-	// 	c = getchar();
-	// 	printf("----------------- %c\n", c);
-	// }
-
-	// fprintf(stdin, "\n");
-
-	// fflush(stdin);
-
-	cls_flag = 1;
-
 	printf("\n");
-
-	// char *input = readline("\nolapcli > ");
 }
 
 /**
@@ -42,33 +20,7 @@ int main(int argc, char *argv[])
 {
 	set_program_mode(CLIENT_MODE);
 
-	// if (argc < 2) {
-	// 	printf("Please enter the execution statement.\n");
-	// 	return EXIT_SUCCESS;
-	// }
-
-	// int i, statement_len = 0;
-	// for (i = 1; i < argc; i++)
-	// {
-	// 	statement_len += strlen(argv[i]) + 1;
-	// }
-	// char *statement = obj_alloc(statement_len, OBJ_TYPE__RAW_BYTES);
-	// for (i = 1; i < argc; i++)
-	// {
-	// 	strncat(statement, argv[i], strlen(argv[i]));
-	// 	if (i < argc - 1)
-	// 		strcat(statement, " ");
-	// }
-
-	// parse_mdx(statement);
-
-	// char *args[2];
-	// args[0] = argv[0];
-	// args[1] = obj_alloc(16, OBJ_TYPE__RAW_BYTES);
-	// strcpy(args[1], "--p:mode=client");
-
 	init_cfg(argc, argv);
-	// init_cfg(2, args);
 
 	EuclidConfig *cfg = get_cfg();
 
@@ -88,8 +40,6 @@ int main(int argc, char *argv[])
 	size_t buf_len;
 	if (read_sock_pkg(sock_fd, &buf, &buf_len) < 0)
 	{
-		// if (buf)
-		// 	_release_mem_(buf);
 		goto _exit_;
 	}
 
@@ -107,50 +57,44 @@ int main(int argc, char *argv[])
 
 		ArrayList *input_ls = als_new(32, "char *", DIRECT, NULL);
 
+		size_t line_len = 1024 * 2;
+		char *input_line = obj_alloc(line_len, OBJ_TYPE__RAW_BYTES);
+		MemAllocMng *mam = MemAllocMng_new();
+
 		while (1)
 		{
-			char *input = readline("olapcli > ");
-			// printf("<<<<<<--%s-->>>>>>\t\t\t%lu\n", input, strlen(input));
-			als_add(input_ls, input);
+			printf("olapcli > ");
+			fgets(input_line, line_len, stdin);
 
-			if (cls_flag)
-			{
-				for (int i = als_size(input_ls) - 1; i >= 0; i--)
-				{
-					free(als_rm_index(input_ls, i));
-				}
-				cls_flag = 0;
-				continue;
+			if (strlen(input_line) >= line_len - 1) {
+				printf("There are too many characters entered in one line, restart the client and use line breaks.\n");
+				goto _exit_;
 			}
 
-			// if (als_size(input_ls) == 1)
-			// {
-			// 	if (strcmp(input, "q") == 0 || strcmp(input, "exit") == 0 || strcmp(input, "quit") == 0)
-			// 		goto _exit_;
-			// }
-			if (strcmp(input, "q") == 0 || strcmp(input, "exit") == 0 || strcmp(input, "quit") == 0)
+			if (strcmp(input_line, "q\n") == 0 || strcmp(input_line, "exit\n") == 0 || strcmp(input_line, "quit\n") == 0)
 				goto _exit_;
 
-			if (strlen(input) > 0 && input[strlen(input) - 1] == ';')
-			{
-				// printf("................................................ exe MDX ................................................\n");
+			char *replica_line = mam_hlloc(mam, strlen(input_line) + 1);
+			strcpy(replica_line, input_line);
 
-				int statement_len = als_size(input_ls);
+			als_add(input_ls, replica_line);
+
+			if (strlen(replica_line) > 1 && replica_line[strlen(replica_line) - 2] == ';')
+			{
+				int statement_len = 1; // als_size(input_ls);
 
 				for (int i = 0; i < als_size(input_ls); i++)
 				{
 					statement_len += strlen(als_get(input_ls, i));
 				}
 
-				char *statement = obj_alloc(statement_len, OBJ_TYPE__RAW_BYTES);
+				char *statement = mam_hlloc(mam, statement_len);
+				
 
 				for (int i = 0; i < als_size(input_ls); i++)
 				{
 					strcat(statement, als_get(input_ls, i));
-					strcat(statement, "\n");
 				}
-
-				// printf("<<<[[[---%s---]]]>>>\n", statement);
 
 				EuclidCommand *mdx_ec = build_intent_command_mdx(statement);
 				ec_change_intent(mdx_ec, INTENT__MDX_EXPECT_RESULT_TXT);
@@ -176,33 +120,13 @@ int main(int argc, char *argv[])
 				obj_release(result->bytes);
 				obj_release(result);
 
-				obj_release(statement);
+				for (int i = als_size(input_ls) - 1; i >= 0; i--) {
+					als_rm_index(input_ls, i);
+				}
 
-				for (int i = als_size(input_ls) - 1; i >= 0; i--)
-					free(als_rm_index(input_ls, i));
+				mam_reset(mam);
 			}
-
-			// input[strlen(input) - 1]
-
-			// free(input);
 		}
-
-		// EuclidCommand *mdx_ec = build_intent_command_mdx(statement);
-		// send(sock_fd, mdx_ec->bytes, ec_get_capacity(mdx_ec), 0);
-
-		// read_sock_pkg(sock_fd, &buf, &buf_len);
-		// EuclidCommand *result = create_command(buf);
-
-		// switch (ec_get_intent(result))
-		// {
-		// case INTENT__SUCCESSFUL:
-		// case INTENT__EXE_RESULT_DESC:
-		// case INTENT__FAILURE:
-		// 	printf("\n%s\n", result->bytes + SZOF_USG_INT + SZOF_USG_SHORT);
-		// 	break;
-		// default:
-		// 	printf("\nUnknown Information!\n");
-		// }
 
 		goto _exit_;
 	}
