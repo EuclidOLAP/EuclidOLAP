@@ -12,7 +12,7 @@
 #include "mdd.h"
 #include "rb-tree.h"
 
-extern Stack YC_STC;
+extern Stack AST_STACK;
 
 // CCI - constant command intention
 static EuclidCommand *CCI_ALLOW;
@@ -239,7 +239,7 @@ static int execute_command(EuclidCommand *ec)
 
 		if ((cur_thrd_mam->bin_flags & 0x0001) == 0) {
 			// Empty the stack to prevent stack overflow.
-			YC_STC.top_idx = 0;
+			AST_STACK.top_idx = 0;
 
 			// The MDX expression was not parsed.
 			return -1;
@@ -247,7 +247,7 @@ static int execute_command(EuclidCommand *ec)
 
 		void *ids_type;
 
-		if (stack_pop(&YC_STC, &ids_type) != 0) {
+		if (stack_pop(&AST_STACK, &ids_type) != 0) {
 			log_print("[ error ] Program exit. Impossible program execution location.\n");	
 			exit(EXIT_FAILURE);
 		}
@@ -255,37 +255,37 @@ static int execute_command(EuclidCommand *ec)
 		if (ids_type == IDS_STRLS_CRTDIMS)
 		{
 			ArrayList *dim_names_ls;
-			stack_pop(&YC_STC, (void **)&dim_names_ls);
+			stack_pop(&AST_STACK, (void **)&dim_names_ls);
 			create_dims(dim_names_ls, &(ec->result));
 		}
 		else if (ids_type == IDS_STRLS_CRTMBRS)
 		{
 			ArrayList *mbrs_info_als;
-			stack_pop(&YC_STC, (void **)&mbrs_info_als);
+			stack_pop(&AST_STACK, (void **)&mbrs_info_als);
 			create_members(mbrs_info_als);
 		}
 		else if (ids_type == IDS_OBJLS_BIUCUBE)
 		{
 			ArrayList *measures_ls, *dims_roles_ls;
 			char *cube_name;
-			stack_pop(&YC_STC, (void **)&measures_ls);
-			stack_pop(&YC_STC, (void **)&dims_roles_ls);
-			stack_pop(&YC_STC, (void **)&cube_name);
+			stack_pop(&AST_STACK, (void **)&measures_ls);
+			stack_pop(&AST_STACK, (void **)&dims_roles_ls);
+			stack_pop(&AST_STACK, (void **)&cube_name);
 			return build_cube(cube_name, dims_roles_ls, measures_ls);
 		}
 		else if (ids_type == IDS_CXOBJ_ISRTCUBEMEARS)
 		{
 			ArrayList *ls_vms;
 			char *cube_name;
-			stack_pop(&YC_STC, (void **)&ls_vms);
-			stack_pop(&YC_STC, (void **)&cube_name);
+			stack_pop(&AST_STACK, (void **)&ls_vms);
+			stack_pop(&AST_STACK, (void **)&cube_name);
 			insert_cube_measure_vals(cube_name, ls_vms);
 		}
 		else if (ids_type == IDS_MULTI_DIM_SELECT_DEF)
 		{
 			log_print("[ INFO ] - MDX QUERY: %s\n", (ec->bytes) + 10);
 			SelectDef *select_def;
-			stack_pop(&YC_STC, (void **)&select_def);
+			stack_pop(&AST_STACK, (void **)&select_def);
 
 			// Check if the axes of the result set are repeatedly defined.
 			for (int i=0; i<als_size(select_def->ax_def_ls); i++) {
@@ -330,7 +330,7 @@ static int execute_command(EuclidCommand *ec)
 		else if (ids_type == IDS_ARRLS_DIMS_LVS_INFO)
 		{
 			ArrayList *dim_lv_map_ls;
-			stack_pop(&YC_STC, (void **)&dim_lv_map_ls);
+			stack_pop(&AST_STACK, (void **)&dim_lv_map_ls);
 
 			// check for unknown dimensions
 			for (int i=0; i<als_size(dim_lv_map_ls); i++) {
