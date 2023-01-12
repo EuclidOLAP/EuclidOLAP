@@ -668,11 +668,10 @@ int distribute_store_measure(EuclidCommand *ec)
 
 int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 {
-	// todo Do not use the allocated memory block directly, replace by ElasticByteBuffer.
-	size_t data_m_capacity = 4 * 1024 * 1024, data_m_sz = sizeof(__uint32_t) + sizeof(__uint16_t);
-	char *data = obj_alloc(data_m_capacity, OBJ_TYPE__RAW_BYTES);
+	ByteBuf *buf = buf__alloc(64 * 1024);
 
-	*((__uint16_t *)(data + sizeof(__uint32_t))) = INTENT__INSERT_CUBE_MEASURE_VALS;
+	buf_cutting(buf, sizeof(int));
+	*((unsigned short *)buf_cutting(buf, sizeof(short))) = INTENT__INSERT_CUBE_MEASURE_VALS;
 
 	Cube *cube = find_cube_by_name(cube_name);
 	if (cube == NULL)
@@ -682,24 +681,22 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 		longjmp(thrd_mam->excep_ctx_env, -1);
 	}
 
-	*((md_gid *)(data + data_m_sz)) = cube->gid;
-	data_m_sz += sizeof(md_gid);
+	*(md_gid *)buf_cutting(buf, sizeof(md_gid)) = cube->gid;
 
-	*((__uint32_t *)(data + data_m_sz)) = als_size(cube->dim_role_ls);
-	data_m_sz += sizeof(__uint32_t);
+	*(unsigned int *)buf_cutting(buf, sizeof(int)) = als_size(cube->dim_role_ls);
 
-	*((__uint32_t *)(data + data_m_sz)) = als_size(cube->measure_mbrs);
-	data_m_sz += sizeof(__uint32_t);
+	*(unsigned int *)buf_cutting(buf, sizeof(int)) = als_size(cube->measure_mbrs);
 
-	__uint32_t i, j, k, sz = als_size(ls_ids_vctr_mear);
-	for (i = 0; i < sz; i++)
+	unsigned int j, k, sz = als_size(ls_ids_vctr_mear);
+
+	for (unsigned int i = 0; i < sz; i++)
 	{
 		IDSVectorMears *ids_vm = als_get(ls_ids_vctr_mear, i);
-		__uint32_t vct_sz = als_size(ids_vm->ls_vector);
+		unsigned int vct_sz = als_size(ids_vm->ls_vector);
 
 		if (vct_sz != als_size(cube->dim_role_ls))
 		{
-			obj_release(data);
+			buf_release(buf);
 			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 			thrd_mam->exception_desc = "exception: Insert statement does not match cube.";
 			longjmp(thrd_mam->excep_ctx_env, -1);
@@ -709,30 +706,27 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 		{
 			ArrayList *mbr_path_str = als_get(ids_vm->ls_vector, j);
 			size_t ap_bsz = sizeof(int) + sizeof(md_gid) * (als_size(mbr_path_str) - 1);
-			if ((data_m_sz + ap_bsz) > data_m_capacity)
-			{
-				log_print("[ error ] exit, cause by: Too much data inserted.\n");
-				exit(EXIT_FAILURE);
+
+			// gen_member_gid_abs_path(cube, mbr_path_str, buf_cutting(buf, ap_bsz));
+			if (gen_member_gid_abs_path(cube, mbr_path_str, buf_cutting(buf, ap_bsz)) != 0) {
+				buf_release(buf);
+				MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+				thrd_mam->exception_desc = "exception: A member name found cannot be matched.";
+				longjmp(thrd_mam->excep_ctx_env, -1);
 			}
-			gen_member_gid_abs_path(cube, mbr_path_str, data + data_m_sz);
-			data_m_sz += ap_bsz;
 		}
 
-		__uint32_t cube_mmbrs_sz = als_size(cube->measure_mbrs);
+		unsigned int cube_mmbrs_sz = als_size(cube->measure_mbrs);
 
-		if ((data_m_sz + (sizeof(double) + sizeof(char)) * cube_mmbrs_sz) > data_m_capacity)
-		{
-			log_print("[ error ] exit, cause by: Too much data inserted.\n");
-			exit(EXIT_FAILURE);
-		}
+		unsigned int mv_sz = als_size(ids_vm->ls_mears_vals);
 
-		__uint32_t mv_sz = als_size(ids_vm->ls_mears_vals);
 		for (j = 0; j < cube_mmbrs_sz; j++)
 		{
 			Member *mm = als_get(cube->measure_mbrs, j);
 
 			// Set the null-value flag bit, 1 means the measure-value is null.
-			*(data + data_m_sz + sizeof(double)) = 1;
+			buf_cutting(buf, sizeof(double));
+			*(char *)buf_cutting(buf, sizeof(char)) = 1;
 
 			for (k = 0; k < mv_sz; k++)
 			{
@@ -740,18 +734,25 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 				if (strcmp(mm_name, mm->name) != 0)
 					continue;
 
-				*((double *)(data + data_m_sz)) = *((double *)(als_get(ids_vm->ls_mears_vals, k + 1)));
-				*(data + data_m_sz + sizeof(double)) = 0;
+				char *cursor = buf_cursor(buf);
+				cursor -= sizeof(char);
+				*cursor = 0;
+				cursor -= sizeof(double);
+				*(double *)cursor = *(double *)(als_get(ids_vm->ls_mears_vals, k + 1));
+
 				break;
 			}
-			data_m_sz += sizeof(double) + sizeof(char);
 		}
 	}
 
 	// set data package capacity
-	*((__uint32_t *)data) = data_m_sz;
+	*(unsigned int *)buf_starting(buf) = buf_size(buf);
 
-	EuclidCommand *_ec_ = create_command(data);
+	char *payload = obj_alloc(buf_size(buf), OBJ_TYPE__RAW_BYTES);
+	memcpy(payload, buf_starting(buf), buf_size(buf));
+	buf_release(buf);
+
+	EuclidCommand *_ec_ = create_command(payload);
 
 	// Store measure values locally or distribute it to downstream nodes for processing
 	int res = distribute_store_measure(_ec_);
@@ -786,13 +787,16 @@ Cube *find_cube_by_gid(md_gid id)
 	return NULL;
 }
 
-void gen_member_gid_abs_path(Cube *cube, ArrayList *mbr_path_str, char *abs_path)
+/**
+ * @return 0 - normal; not 0 - mistake
+ */
+int gen_member_gid_abs_path(Cube *cube, ArrayList *mbr_path_str, char *abs_path)
 {
 	char *dim_role_name = als_get(mbr_path_str, 0);
 	DimensionRole *dr;
 	Dimension *dim;
 	Member *lv1_mbr, *mbr;
-	__uint32_t i, num_drs = als_size(cube->dim_role_ls);
+	unsigned int i, num_drs = als_size(cube->dim_role_ls);
 	for (i = 0; i < num_drs; i++)
 	{
 		dr = als_get(cube->dim_role_ls, i);
@@ -803,16 +807,24 @@ void gen_member_gid_abs_path(Cube *cube, ArrayList *mbr_path_str, char *abs_path
 		break;
 	}
 
-	__uint32_t sz = als_size(mbr_path_str);
+	if (lv1_mbr == NULL)
+		return -1;
 
-	*((__uint32_t *)abs_path) = sz - 1;
-	*((md_gid *)(abs_path + sizeof(__uint32_t))) = lv1_mbr->gid;
+	unsigned int sz = als_size(mbr_path_str);
+
+	*((unsigned int *)abs_path) = sz - 1;
+	*((md_gid *)(abs_path + sizeof(unsigned int))) = lv1_mbr->gid;
 
 	for (i = 2; i < sz; i++)
 	{
 		mbr = find_member_child(mbr, als_get(mbr_path_str, i));
-		*((md_gid *)(abs_path + sizeof(__uint32_t) + sizeof(md_gid) * (i - 1))) = mbr->gid;
+		if (mbr == NULL)
+			return -1;
+
+		*((md_gid *)(abs_path + sizeof(unsigned int) + sizeof(md_gid) * (i - 1))) = mbr->gid;
 	}
+
+	return 0;
 }
 
 static long query_times = 1;

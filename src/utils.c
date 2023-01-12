@@ -198,7 +198,7 @@ MemAllocMng *obj_mam(void *obj) {
 
 void *obj_alloc(size_t size, short type) {
 	size += BYTES_ALIGNMENT;
-	char *obj_head = malloc(size);
+	char *obj_head = bytes_alloc(size);
 	// log_print("@@obj_alloc@@ << %p %lu\n", obj_head, size);
 	memset(obj_head, 0, size);
 	// *obj_head = type;
@@ -218,7 +218,7 @@ void obj_release(void *obj) {
 	}
 	char *freed = ((char *)obj) - BYTES_ALIGNMENT;
 	// log_print("@@obj_release@@ >> %p\n", freed);
-	free(freed);
+	bytes_free(freed);
 }
 
 ssize_t read_sock_pkg(int sock_fd, void **buf, size_t *buf_len)
@@ -637,4 +637,12 @@ void ArrayList_sort(ArrayList *ls, int (*obj_cmp_fn)(void *obj, void *other))
 			}
 		}
 	}
+}
+
+char *bytes_alloc(size_t size) {
+	return malloc(size);
+}
+
+void bytes_free(void *freed) {
+	free(freed);
 }
