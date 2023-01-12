@@ -48,10 +48,6 @@ yum -y install flex-devel
 yum -y install bison
 
 
-yum -y install ncurses-devel
-
-yum -y install readline-devel
-
 ########################################################################
 ##                              Ubuntu 20                             ##
 ########################################################################
@@ -72,5 +68,3 @@ ln -s /usr/bin/gcc-11 /usr/bin/cc
 
 apt -y install flex
 apt -y install bison
-
-apt -y install libreadline-dev
