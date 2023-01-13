@@ -19,7 +19,8 @@ ByteBuf *buf__alloc(size_t capacity) {
 	ByteBuf *byte_buf = obj_alloc(sizeof(ByteBuf), OBJ_TYPE__ByteBuf);
 	byte_buf->capacity = capacity;
 	byte_buf->index = 0;
-	byte_buf->buf_addr = obj_alloc(capacity, OBJ_TYPE__RAW_BYTES);
+	// byte_buf->buf_addr = obj_alloc(capacity, OBJ_TYPE__RAW_BYTES);
+	byte_buf->buf_addr = bytes_alloc(capacity);
 
 	return byte_buf;
 }
@@ -29,7 +30,8 @@ void buf_clear(ByteBuf *byte_buf) {
 }
 
 void buf_release(ByteBuf *byte_buf) {
-	obj_release(byte_buf->buf_addr);
+	// obj_release(byte_buf->buf_addr);
+	bytes_free(byte_buf->buf_addr);
 	obj_release(byte_buf);
 }
 
@@ -42,4 +44,16 @@ void *buf_cutting(ByteBuf *byte_buf, size_t count) {
 	void *next_addr = ((char *)byte_buf->buf_addr) + byte_buf->index;
 	byte_buf->index += count;
 	return next_addr;
+}
+
+char *buf_cursor(ByteBuf *byte_buf) {
+	return buf_cutting(byte_buf, 0);
+}
+
+char *buf_starting(ByteBuf *byte_buf) {
+	return byte_buf->buf_addr;
+}
+
+size_t buf_size(ByteBuf *byte_buf) {
+	return byte_buf->index;
 }
