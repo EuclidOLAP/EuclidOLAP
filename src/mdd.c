@@ -13,9 +13,9 @@
 #include "vce.h"
 #include "obj-type-def.h"
 
-extern Stack YC_STC;
+// extern Stack AST_STACK;
 
-extern void *parse_mdx(char *mdx);
+// extern void *parse_mdx(char *mdx);
 
 static md_gid lastest_md_gid = -1;
 
@@ -3059,10 +3059,11 @@ void ExpFnLookUpCube_evolving(MDContext *md_ctx, ExpFnLookUpCube *luc, Cube *cub
 {
 	if (luc->exp_str)
 	{
+		Stack stk;
 		char *flag_exp = mam_alloc(strlen(luc->exp_str) + strlen("@@EXP ") + 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
 		sprintf(flag_exp, "@@EXP %s", luc->exp_str);
-		parse_mdx(flag_exp);
-		stack_pop(&YC_STC, (void **)&(luc->exp));
+		parse_mdx(flag_exp, &stk);
+		stack_pop(&stk, (void **)&(luc->exp));
 	}
 
 	Cube *cubeLinked = find_cube_by_name(luc->cube_name);

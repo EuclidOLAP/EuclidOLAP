@@ -1,16 +1,40 @@
 // #include <arpa/inet.h>
 // #include <stdio.h>
 // #include <stdlib.h>
-// #include <string.h>
+#include <string.h>
 
 // #include "net.h"
 // #include "cfg.h"
 // #include "utils.h"
 // #include "command.h"
+#include <pthread.h>
 
 #include "log.h"
 #include "mdx.h"
 #include "obj-type-def.h"
+
+extern Stack AST_STACK;
+
+extern void do_parse_mdx(char *mdx);
+
+// for synchronize the function parse_mdx
+static pthread_mutex_t sync_parse_mtx;
+
+void mdx_init() {
+    pthread_mutex_init(&sync_parse_mtx, NULL);
+}
+
+void parse_mdx(char *mdx, Stack *stk) {
+
+    pthread_mutex_lock(&sync_parse_mtx);
+
+    do_parse_mdx(mdx);
+
+	memcpy(stk, &AST_STACK, sizeof(Stack));
+	stack_reset(&AST_STACK);
+
+	pthread_mutex_unlock(&sync_parse_mtx);
+}
 
 MemberDef *ids_mbrdef_new__mbr_abs_path(ArrayList *mbr_abs_path)
 {

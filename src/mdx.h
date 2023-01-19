@@ -3,6 +3,10 @@
 
 #include "utils.h"
 
+void mdx_init();
+
+void parse_mdx(char *mdx, Stack *stk);
+
 // IDS - Intermediate Data Structure
 #define IDS_STRLS_CRTMBRS ((void *)0x01)
 #define IDS_OBJLS_BIUCUBE ((void *)0x02)

@@ -155,7 +155,7 @@ typedef struct string_array
 	unsigned int length;
 } StrArr;
 
-#define STACK_MAX_DEEP 256
+#define STACK_MAX_DEEP 128
 
 typedef struct _struct_stack_
 {
@@ -164,6 +164,8 @@ typedef struct _struct_stack_
 } Stack;
 int stack_push(Stack *s, void *obj);
 int stack_pop(Stack *s, void **addr);
+
+void stack_reset(Stack *stk);
 
 StrArr *str_split(char *orig_str, char *deli_str);
 
