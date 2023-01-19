@@ -400,6 +400,10 @@ int stack_pop(Stack *s, void **addr)
 	return 0;
 }
 
+void stack_reset(Stack *stk) {
+	stk->top_idx = 0;
+}
+
 // char *str_clone(char *str)
 // {
 // 	if (str == NULL)

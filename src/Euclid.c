@@ -17,6 +17,8 @@ int main(int argc, char *argv[])
 
 	init_cfg(argc, argv);
 
+	mdx_init();
+
 	mdd_init();
 
 	mdd_load();

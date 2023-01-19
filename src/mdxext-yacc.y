@@ -1365,13 +1365,11 @@ general_chain:
 %%
 // yacc_f_003
 
-void *parse_mdx(char *mdx)
+void do_parse_mdx(char *mdx)
 {
 	eucparser_scan_string(mdx);
 	yyparse();
 	eucparser_cleanup();
-
-	return NULL;
 }
 
 int yyerror(const char *s)
