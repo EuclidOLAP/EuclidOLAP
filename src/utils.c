@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include <malloc.h>
+
 #include "log.h"
 #include "utils.h"
 #include "rb-tree.h"
@@ -643,10 +645,36 @@ void ArrayList_sort(ArrayList *ls, int (*obj_cmp_fn)(void *obj, void *other))
 	}
 }
 
+extern pthread_mutex_t gloc__mem_counter_mtx;
+static size_t used_mem_size = 0;
+
 char *bytes_alloc(size_t size) {
-	return malloc(size);
+	char *mem_addr = malloc(size);
+
+	size_t muz = malloc_usable_size(mem_addr);
+
+	// todo replaced by __sync_bool_compare_and_swap or __sync_val_compare_and_swap
+	pthread_mutex_lock(&gloc__mem_counter_mtx);
+	size_t ums_snapshoot = used_mem_size;
+	used_mem_size += muz;
+	pthread_mutex_unlock(&gloc__mem_counter_mtx);
+
+	log_print("[ Mem statistics + ] %lu ... +%lu<%p> ... %lu\n", ums_snapshoot, muz, mem_addr, ums_snapshoot + muz);
+
+	return mem_addr;
 }
 
 void bytes_free(void *freed) {
+
+	size_t muz = malloc_usable_size(freed);
+
+	// todo replaced by __sync_bool_compare_and_swap or __sync_val_compare_and_swap
+	pthread_mutex_lock(&gloc__mem_counter_mtx);
+	size_t ums_snapshoot = used_mem_size;
+	used_mem_size -= muz;
+	pthread_mutex_unlock(&gloc__mem_counter_mtx);
+
+	log_print("[ Mem statistics - ] %lu ... -%lu<%p> ... %lu\n", ums_snapshoot, muz, freed, ums_snapshoot - muz);
+
 	free(freed);
 }
