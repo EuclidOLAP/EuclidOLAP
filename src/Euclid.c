@@ -7,11 +7,14 @@
 #include "command.h"
 #include "vce.h"
 
+#include "locks/global-locks.h"
+
 // extern pthread_mutex_t mutex_AAA;
 
 int main(int argc, char *argv[])
 {
 	// pthread_mutex_init(&mutex_AAA, NULL);
+	global_locks_init();
 
 	log__set_log_file("log/euclid.log");
 
