@@ -225,7 +225,7 @@ static int execute_command(EuclidCommand *ec)
 {
 	Stack stk;
 
-	log_print("@@@@@@@@@@@@@@@@@@ execute command count = %d\n", __execute_command__count++);
+	log_print("@@@@@@ __execute_command__count = %d\n", __execute_command__count++);
 	intent inte = ec_get_intent(ec);
 	if (inte == INTENT__INSERT_CUBE_MEASURE_VALS)
 	{
@@ -285,7 +285,7 @@ static int execute_command(EuclidCommand *ec)
 		}
 		else if (ids_type == IDS_MULTI_DIM_SELECT_DEF)
 		{
-			log_print("[ INFO ] - MDX QUERY: %s\n", (ec->bytes) + 10);
+			// log_print("[ INFO ] - MDX QUERY: %s\n", (ec->bytes) + 10);
 			SelectDef *select_def;
 			stack_pop(&stk, (void **)&select_def);
 

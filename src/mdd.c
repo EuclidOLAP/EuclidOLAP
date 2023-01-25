@@ -831,7 +831,7 @@ static long query_times = 1;
 
 MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 {
-	log_print("\n[ debug ] >>>>>>>>>>>>>>>>>>>>>>> The number of times the query was executed: %ld\n\n", query_times++);
+	// log_print("\n[ debug ] >>>>>>>>>>>>>>>>>>>>>>> The number of times the query was executed: %ld\n\n", query_times++);
 
 	MemAllocMng *th_mam = MemAllocMng_current_thread_mam();
 
@@ -2147,7 +2147,7 @@ MddSet *SetFnOrder_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTupl
 		tuple = tuple__merge(ctx_tuple, tuple);
 		GridData data;
 		Expression_evaluate(md_ctx, order->exp, cube, tuple, &data);
-		log_print("value = % 32lf, null_flag < %d >\n", data.val, data.null_flag);
+		// log_print("value = % 32lf, null_flag < %d >\n", data.val, data.null_flag);
 		als_add(val_ls, *((void **)&(data.val)));
 	}
 
@@ -2976,7 +2976,7 @@ int MddAxis_cmp(void *obj, void *other)
 	// Because of the aggregation priority, the one with the large position should be ranked before.
 	int obj_posi = ((MddAxis *)obj)->posi;
 	int oth_posi = ((MddAxis *)other)->posi;
-	log_print("[ debug ] - ((MddAxis *)obj)->posi - ((MddAxis *)other)->posi = %d\n", obj_posi - oth_posi);
+	// log_print("[ debug ] - ((MddAxis *)obj)->posi - ((MddAxis *)other)->posi = %d\n", obj_posi - oth_posi);
 	return obj_posi - oth_posi;
 }
 
