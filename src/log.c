@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <time.h>
+// #include <errno.h>
 
 #include "utils.h"
 
@@ -54,6 +55,15 @@ static void __log_prt__(const char *fmt, va_list ap)
 	struct tm *tmins = gmtime(&time_p);
 
 	FILE *log_fd = fopen(def_log_file, "a");
+	for (int i=0; i<5 && log_fd==NULL; i++) {
+		usleep(10000);
+		log_fd = fopen(def_log_file, "a");
+	}
+
+	if (log_fd == NULL) {
+		fprintf(stderr, "Can't open the log file<%s>.\n", def_log_file);
+		return;
+	}
 
 	fprintf(log_fd, "%02d-%02d-%d %02d:%02d:%02d ", tmins->tm_mon + 1, tmins->tm_mday, tmins->tm_year + 1900, tmins->tm_hour, tmins->tm_min, tmins->tm_sec);
 	vfprintf(log_fd, fmt, ap);

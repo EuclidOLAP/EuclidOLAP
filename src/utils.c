@@ -29,7 +29,7 @@ void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 
 	if ((required + sizeof(char *) + sizeof(unsigned long)) > MAM_BLOCK_MAX) {
 
-		log_print("@@MAM@@ -->> mam_alloc(%p) ... obj_alloc < %lu >\n", mam, sizeof(char *) + required);
+		// log_print("@@MAM@@ -->> mam_alloc(%p) ... obj_alloc < %lu >\n", mam, sizeof(char *) + required);
 
 		char *big_blk = obj_alloc(sizeof(char *) + required, OBJ_TYPE__RAW_BYTES);
 		if (mam->big_block)
@@ -55,7 +55,7 @@ void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark) {
 
 	if (required > remaining_capacity) {
 
-		log_print("@@MAM@@ -->> mam_alloc(%p) ... obj_alloc < %lu > MAM_BLOCK_MAX\n", mam, MAM_BLOCK_MAX);
+		// log_print("@@MAM@@ -->> mam_alloc(%p) ... obj_alloc < %lu > MAM_BLOCK_MAX\n", mam, MAM_BLOCK_MAX);
 
 		blk = obj_alloc(MAM_BLOCK_MAX, OBJ_TYPE__RAW_BYTES);
 		*((unsigned long *)(blk + sizeof(char *))) = sizeof(char *) + sizeof(unsigned long);
@@ -129,7 +129,7 @@ void mam_reset(MemAllocMng *mam) {
 		curr_blk = next_blk;
 	}
 
-	log_print("@@MAM@@ -->> mam_reset(%p)\n", mam);
+	// log_print("@@MAM@@ -->> mam_reset(%p)\n", mam);
 }
 
 int mam_comp(void *mam, void *other) {
@@ -154,7 +154,7 @@ MemAllocMng *MemAllocMng_new() {
 	MemAllocMng *mam = obj_alloc(sizeof(MemAllocMng), OBJ_TYPE__MemAllocMng);
 	mam->current_block = obj_alloc(MAM_BLOCK_MAX, OBJ_TYPE__RAW_BYTES);
 	*((unsigned long *)(mam->current_block + sizeof(char *))) = sizeof(char *) + sizeof(unsigned long);
-	log_print("@@MAM@@ -->> MemAllocMng_new() : %p\n", mam);
+	// log_print("@@MAM@@ -->> MemAllocMng_new() : %p\n", mam);
 	return mam;
 }
 
@@ -649,32 +649,35 @@ extern pthread_mutex_t gloc__mem_counter_mtx;
 static size_t used_mem_size = 0;
 
 char *bytes_alloc(size_t size) {
-	char *mem_addr = malloc(size);
 
-	size_t muz = malloc_usable_size(mem_addr);
+	return malloc(size);
 
-	// todo replaced by __sync_bool_compare_and_swap or __sync_val_compare_and_swap
-	pthread_mutex_lock(&gloc__mem_counter_mtx);
-	size_t ums_snapshoot = used_mem_size;
-	used_mem_size += muz;
-	pthread_mutex_unlock(&gloc__mem_counter_mtx);
+	// char *mem_addr = malloc(size);
 
-	log_print("[ Mem statistics + ] %lu ... +%lu<%p> ... %lu\n", ums_snapshoot, muz, mem_addr, ums_snapshoot + muz);
+	// size_t muz = malloc_usable_size(mem_addr);
 
-	return mem_addr;
+	// // todo replaced by __sync_bool_compare_and_swap or __sync_val_compare_and_swap
+	// pthread_mutex_lock(&gloc__mem_counter_mtx);
+	// size_t ums_snapshoot = used_mem_size;
+	// used_mem_size += muz;
+	// pthread_mutex_unlock(&gloc__mem_counter_mtx);
+
+	// log_print("[ Mem statistics + ] %lu ... +%lu<%p> ... %lu\n", ums_snapshoot, muz, mem_addr, ums_snapshoot + muz);
+
+	// return mem_addr;
 }
 
 void bytes_free(void *freed) {
 
-	size_t muz = malloc_usable_size(freed);
+	// size_t muz = malloc_usable_size(freed);
 
-	// todo replaced by __sync_bool_compare_and_swap or __sync_val_compare_and_swap
-	pthread_mutex_lock(&gloc__mem_counter_mtx);
-	size_t ums_snapshoot = used_mem_size;
-	used_mem_size -= muz;
-	pthread_mutex_unlock(&gloc__mem_counter_mtx);
+	// // todo replaced by __sync_bool_compare_and_swap or __sync_val_compare_and_swap
+	// pthread_mutex_lock(&gloc__mem_counter_mtx);
+	// size_t ums_snapshoot = used_mem_size;
+	// used_mem_size -= muz;
+	// pthread_mutex_unlock(&gloc__mem_counter_mtx);
 
-	log_print("[ Mem statistics - ] %lu ... -%lu<%p> ... %lu\n", ums_snapshoot, muz, freed, ums_snapshoot - muz);
+	// log_print("[ Mem statistics - ] %lu ... -%lu<%p> ... %lu\n", ums_snapshoot, muz, freed, ums_snapshoot - muz);
 
 	free(freed);
 }
