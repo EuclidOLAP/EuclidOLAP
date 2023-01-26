@@ -3,11 +3,11 @@ tools/elastic-byte-buffer.c locks/global-locks.c
 OBJ_FILES = cfg.o net.o utils.o command.o mdxext-lex.yy.o mdxext-yacc.tab.o mdx.o mdd.o vce.o rb-tree.o log.o \
 tools/elastic-byte-buffer.o locks/global-locks.o
 
-euclid : Euclid.c Euclid-cli.c $(SRC_FILES) Euclid.o Euclid-cli.o $(OBJ_FILES)
-	cc      $(OBJ_FILES)  Euclid.o      -o server      -lpthread
-	cc  -g  $(SRC_FILES)  Euclid.c      -o server.out  -lpthread
-	cc      $(OBJ_FILES)  Euclid-cli.o  -o euclid      -lpthread
-	cc  -g  $(SRC_FILES)  Euclid-cli.c  -o euclid.out  -lpthread
+euclid : euclid-svr.c euclid-cli.c $(SRC_FILES) euclid-svr.o euclid-cli.o $(OBJ_FILES)
+	cc      $(OBJ_FILES)  euclid-svr.o  -o euclid-svr      -lpthread
+	cc  -g  $(SRC_FILES)  euclid-svr.c  -o euclid-svr.out  -lpthread
+	cc      $(OBJ_FILES)  euclid-cli.o  -o euclid-cli      -lpthread
+	cc  -g  $(SRC_FILES)  euclid-cli.c  -o euclid-cli.out  -lpthread
 
 mdxext-lex.yy.c: mdxext-lex.l
 	flex -i -o mdxext-lex.yy.c mdxext-lex.l
@@ -18,8 +18,8 @@ mdxext-yacc.tab.h mdxext-yacc.tab.c: mdxext-yacc.y
 clean :
 	rm -f *.o
 	rm -f tools/*.o
+	rm -f locks/*.o
 	rm -f *.out
-	rm -f server
-	rm -f euclid
+	rm -f euclid-svr
 	rm -f euclid-cli
 	rm -f *yacc.tab.h *yacc.tab.c *lex.yy.c
