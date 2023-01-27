@@ -1,5 +1,7 @@
 # docker build -t euclidolap:<version> .
 # docker run -d -p 8760:8760 -p 8761:8761 --name euclidolap euclidolap:<version>
+# docker run -d -p 8760:8760 -p 8761:8761 --name euclidolap euclidolap/euclidolap:v0.1.2-beta
+
 FROM centos:7.9.2009
 
 RUN mkdir -p /usr/local/olap/data/
@@ -13,7 +15,7 @@ COPY data/* /usr/local/olap/data/
 COPY meta/* /usr/local/olap/meta/
 
 COPY docker-depending/jdk-17_linux-x64_bin.tar.gz /usr/local/
-COPY docker-depending/olapweb-0.0.1-SNAPSHOT.jar /usr/local/
+COPY docker-depending/olapweb-v0.1.2-beta.jar /usr/local/
 
 WORKDIR /usr/local/olap/
 
@@ -27,8 +29,9 @@ CMD tar zxf /usr/local/jdk-17_linux-x64_bin.tar.gz -C /usr/local/ \
 && export JRE_HOME=${JAVA_HOME}/jre \
 && export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib \
 && export PATH=${JAVA_HOME}/bin:$PATH \
-&& echo '#!/bin/bash' > /usr/local/olapweb-startd.sh \
-&& echo 'java -jar /usr/local/olapweb-0.0.1-SNAPSHOT.jar --server.port=8761 > /usr/local/olapweb.log 2> /usr/local/olapweb-err.log &' >> /usr/local/olapweb-startd.sh \
-&& chmod +x /usr/local/olapweb-startd.sh \
-&& /usr/local/olapweb-startd.sh \
-&& /usr/local/olap/euclid-svr
+&& echo '#!/bin/bash' > /usr/local/euclidolap-server-startd.sh \
+&& echo '/usr/local/olap/euclid-svr > /usr/local/olap/euclid-svr-stdout.log 2> /usr/local/olap/euclid-svr-stderr.log &' >> /usr/local/euclidolap-server-startd.sh \
+&& chmod +x /usr/local/euclidolap-server-startd.sh \
+&& /usr/local/euclidolap-server-startd.sh \
+&& sleep 3 \
+&& java -jar /usr/local/olapweb-v0.1.2-beta.jar --server.port=8761 --euclidolap.server=127.0.0.1:8760 > /usr/local/olapweb.log 2> /usr/local/olapweb-err.log
