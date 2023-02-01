@@ -18,7 +18,7 @@ static void ctrl_c_act(int sig_no)
  */
 int main(int argc, char *argv[])
 {
-	set_program_mode(CLIENT_MODE);
+	set_program_mode(MODE_CLIENT);
 
 	init_cfg(argc, argv);
 

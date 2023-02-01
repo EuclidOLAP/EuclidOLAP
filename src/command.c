@@ -225,7 +225,9 @@ static int execute_command(EuclidCommand *ec)
 {
 	Stack stk;
 
+	// todo try use the CAS function __atomic_add_fetch
 	log_print("@@@@@@ __execute_command__count = %d\n", __execute_command__count++);
+
 	intent inte = ec_get_intent(ec);
 	if (inte == INTENT__INSERT_CUBE_MEASURE_VALS)
 	{

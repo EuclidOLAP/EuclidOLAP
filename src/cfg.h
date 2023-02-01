@@ -5,9 +5,25 @@
 // #define PARAM_KEY__PORT "--p:port"
 // #define PARAM_KEY__JOIN "--p:join"
 
-#define MASTER_MODE 'm'
-#define WORKER_MODE 'w'
-#define CLIENT_MODE 'c'
+/*
+ * stand-alone
+ */
+#define MODE_STAND_ALONE 's'
+
+/*
+ * master
+ */
+#define MODE_MASTER 'm'
+
+/*
+ * worker
+ */
+#define MODE_WORKER 'w'
+
+/*
+ * client
+ */
+#define MODE_CLIENT 'c'
 
 #define DEF_CONF "euclid.conf"
 #define DEF_CLI_CONF "euclid-cli.conf"

@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 
 	net_init();
 
-	if (get_cfg()->mode == WORKER_MODE)
+	if (get_cfg()->mode == MODE_WORKER)
 		join_cluster();
 
 	net_service_startup();
