@@ -21,7 +21,7 @@ static int load_conf_files();
 
 void set_program_mode(char mode)
 {
-	assert(mode == MASTER_MODE || mode == WORKER_MODE || mode == CLIENT_MODE);
+	assert(mode == MODE_STAND_ALONE || mode == MODE_MASTER || mode == MODE_WORKER || mode == MODE_CLIENT);
 	__program_mode__ = mode;
 }
 
@@ -30,7 +30,7 @@ int init_cfg(int argc, char *argv[])
 	memset(&cfg, 0, sizeof(cfg));
 
 	// hard-coded default values
-	cfg.mode = __program_mode__ ? __program_mode__ : MASTER_MODE;
+	cfg.mode = __program_mode__ ? __program_mode__ : MODE_STAND_ALONE;
 	cfg.port = 8760;
 	cfg.ec_threads_count = 1;
 	cfg.program_path = argv[0];
@@ -56,11 +56,12 @@ int init_cfg(int argc, char *argv[])
 
 	switch (cfg.mode)
 	{
-	case MASTER_MODE:
-	case WORKER_MODE:
+	case MODE_STAND_ALONE:
+	case MODE_MASTER:
+	case MODE_WORKER:
 		log_print("info - node mode [ %c ]\n", cfg.mode);
 		break;
-	case CLIENT_MODE:
+	case MODE_CLIENT:
 		break;
 	default:
 		log_print("[ error ] Program exits. Caused by the wrong program startup mode.\n");
@@ -87,17 +88,21 @@ int set_param(char *p_key, char *p_val)
 {
 	if (strcmp(p_key, "--p:mode") == 0)
 	{
-		if (strcmp(p_val, "master") == 0)
+		if (strcmp(p_val, "stand-alone") == 0)
 		{
-			cfg.mode = MASTER_MODE;
+			cfg.mode = MODE_STAND_ALONE;
+		}
+		else if (strcmp(p_val, "master") == 0)
+		{
+			cfg.mode = MODE_MASTER;
 		}
 		else if (strcmp(p_val, "worker") == 0)
 		{
-			cfg.mode = WORKER_MODE;
+			cfg.mode = MODE_WORKER;
 		}
 		else if (strcmp(p_val, "client") == 0)
 		{
-			cfg.mode = CLIENT_MODE;
+			cfg.mode = MODE_CLIENT;
 		}
 		else
 		{
@@ -158,13 +163,13 @@ EuclidConfig *get_cfg()
 static int load_conf_files()
 {
 	char *cfg_file_name;
-	if (cfg.mode == CLIENT_MODE)
+	if (cfg.mode == MODE_CLIENT)
 	{
 		cfg_file_name = DEF_CLI_CONF;
 	}
 	else
 	{
-		// No configuration files are currently required when running in server mode.
+		// No configuration files are currently required when running in other modes (stand-alone, master, worker).
 		return 0;
 	}
 
@@ -187,7 +192,7 @@ static int load_conf_files()
 	if (access(conf_path, F_OK) != 0) {
 		// the config file was not existed.
 
-		if (cfg.mode == CLIENT_MODE) {
+		if (cfg.mode == MODE_CLIENT) {
 			// set the default ip and port of euclid-olap server, when it's client mode.
 			cfg.cli_ctrl_node_port = 8760;
 			strcpy(cfg.cli_ctrl_node_host, "127.0.0.1");
