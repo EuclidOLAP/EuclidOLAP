@@ -12,9 +12,11 @@
 #include "utils.h"
 #include "command.h"
 
-static MemAllocMng *net_mam;
+// static MemAllocMng *net_mam;
 
 // static ArrayList *downstream_sockets;
+
+static ArrayList *worker_sits;
 
 static void *sit_startup(void *sit_addr);
 
@@ -28,7 +30,7 @@ static void receive_command_loop(SockIntentThread *sit);
 
 void net_init()
 {
-	net_mam = MemAllocMng_new();
+	// net_mam = MemAllocMng_new();
 	// log_print("@@MAM@@ -->> net_mam = %p\n", net_mam);
 }
 
@@ -61,6 +63,8 @@ int net_service_startup()
 	socklen_t cs_len = sizeof(struct sockaddr_in);
 
 	// downstream_sockets = als_new(16, "downstream_sockets, int *", SPEC_MAM, net_mam);
+	worker_sits = als_new(16, "SockIntentThread *", DIRECT, NULL);
+	als_sync(worker_sits);
 
 	while (1)
 	{
@@ -78,7 +82,9 @@ int net_service_startup()
 		// *skt_v_p = sock_fd;
 		// als_add(downstream_sockets, skt_v_p);
 
-		SockIntentThread *sit = create_SockIntentThread(sock_fd);
+		// SockIntentThread *sit = create_SockIntentThread(sock_fd);
+		SockIntentThread *sit = sit_alloc(sock_fd);
+
 		pthread_create(&(sit->thread_id), NULL, sit_startup, sit);
 		pthread_detach(sit->thread_id);
 	}
@@ -87,11 +93,22 @@ int net_service_startup()
 	return 0;
 }
 
-SockIntentThread *create_SockIntentThread(int sock_fd)
-{
-	SockIntentThread *sit_p = (SockIntentThread *)mam_alloc(sizeof(SockIntentThread), OBJ_TYPE__SockIntentThread, net_mam, 0);
-	sit_p->sock_fd = sock_fd;
-	return sit_p;
+// SockIntentThread *create_SockIntentThread(int sock_fd)
+// {
+// 	SockIntentThread *sit_p = (SockIntentThread *)mam_alloc(sizeof(SockIntentThread), OBJ_TYPE__SockIntentThread, net_mam, 0);
+// 	sit_p->sock_fd = sock_fd;
+// 	return sit_p;
+// }
+
+SockIntentThread *sit_alloc(int sock_fd) {
+	SockIntentThread *sit = obj_alloc(sizeof(SockIntentThread), OBJ_TYPE__SockIntentThread);
+	sit->sock_fd = sock_fd;
+	sit->inte = INTENT__UNKNOWN;
+	return sit;
+}
+
+void sit_release(SockIntentThread *sit) {
+	obj_release(sit);
 }
 
 static void *sit_startup(void *sit_addr)
@@ -117,14 +134,33 @@ static void *sit_startup(void *sit_addr)
 	obj_release(command->bytes);
 	obj_release(command);
 
-	if ((!inte != INTENT__TERMINAL_CONTROL) && (!inte != INTENT__CHILD_NODE_JOIN))
-		goto _exit_;
+	if (inte == INTENT__TERMINAL_CONTROL) {
+		log_print("[ info ] A terminal was connected < sock_fd : %d >\n", sit->sock_fd);
+		sit->inte = INTENT__TERMINAL_CONTROL;
+	} else if (inte == INTENT__CHILD_NODE_JOIN) {
+		log_print("[ info ] A worker service was connected < sock_fd : %d >\n", sit->sock_fd);
+		sit->inte = INTENT__CHILD_NODE_JOIN;
+		als_add_sync(worker_sits, sit);
+	} else {
+		// goto _exit_;
+
+		// fail fast
+		log_print("[ error] <Fail fast!!!> Process was killed cause by unknown command intent.\n");
+		exit(EXIT_FAILURE);
+	}
+
 	// send allow intention to terminal or child.
 	sit_send_command(sit, get_const_command_intent(INTENT__ALLOW));
 	receive_command_loop(sit);
 
 _exit_:
+
+	if (sit->inte == INTENT__CHILD_NODE_JOIN)
+		als_remove_sync(worker_sits, sit);
+
 	sit_close(sit); // close sit -> sock_fd, and release sit memory.
+	sit_release(sit);
+
 	return NULL;
 }
 
@@ -151,8 +187,28 @@ int join_cluster()
 		return -1;
 	}
 
-	SockIntentThread *worker_up_sit = create_SockIntentThread(to_parent_sock_fd);
+	SockIntentThread *worker_up_sit = sit_alloc(to_parent_sock_fd);
 	sit_send_command(worker_up_sit, get_const_command_intent(INTENT__CHILD_NODE_JOIN));
+
+	void *buf = NULL;
+	size_t buf_len;
+	if (read_sock_pkg(to_parent_sock_fd, &buf, &buf_len) < 0)
+	{
+		// fail fast
+		log_print("<Fail fast!!!> Lost connection to master server.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	EuclidCommand *allow_f_serv = create_command(buf);
+	if (ec_get_intent(allow_f_serv) != INTENT__ALLOW)
+	{
+		// fail fast
+		log_print("<Fail fast!!!> Master rejects the current worker from joining the cluster.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	obj_release(allow_f_serv->bytes);
+	obj_release(allow_f_serv);
 
 	pthread_create(&(worker_up_sit->thread_id), NULL, command_receiving_thread, worker_up_sit);
 	pthread_detach(worker_up_sit->thread_id);

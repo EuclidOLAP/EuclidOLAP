@@ -487,7 +487,7 @@ int append_file_uint(char *file_path, __uint32_t val)
 	return append_file_data(file_path, (char *)&val, sizeof(val));
 }
 
-ArrayList *als_new(unsigned int init_capacity, char *desc, enum obj_mem_alloc_strategy strat, MemAllocMng *mam) {
+ArrayList *als_new(unsigned int init_capacity, char *desc, enum_oms strat, MemAllocMng *mam) {
 
 	ArrayList *als;
 
@@ -513,19 +513,46 @@ ArrayList *als_new(unsigned int init_capacity, char *desc, enum obj_mem_alloc_st
 	return als;
 }
 
-void als_destroy(ArrayList *al) {
+void als_sync(ArrayList *als) {
+	assert(als != NULL && als->sync_lock == NULL);
+
 	short type;
 	enum_oms strat;
 	MemAllocMng *mam;
-	obj_info(al, &type, &strat, &mam);
+	obj_info(als, &type, &strat, &mam);
 
 	if (strat == DIRECT) {
-		obj_release(al->elements_arr_p);
-		obj_release(al);
+		als->sync_lock = obj_alloc(sizeof(pthread_mutex_t), OBJ_TYPE__RAW_BYTES);
+	} else if (mam) {
+		als->sync_lock = mam_alloc(sizeof(pthread_mutex_t), OBJ_TYPE__RAW_BYTES, mam, 0);
+	} else {
+		log_print("[ error ] <Fail fast!!!> Mistake in function 'void als_sync(ArrayList *als)'.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	pthread_mutex_init(als->sync_lock, NULL);
+}
+
+void als_release(ArrayList *arr_ls) {
+
+	short type;
+	enum_oms strat;
+	MemAllocMng *mam;
+	obj_info(arr_ls, &type, &strat, &mam);
+
+	if (arr_ls->sync_lock)
+		pthread_mutex_destroy(arr_ls->sync_lock);
+
+	if (strat == DIRECT) {
+		if (arr_ls->sync_lock)
+			obj_release(arr_ls->sync_lock);
+
+		obj_release(arr_ls->elements_arr_p);
+		obj_release(arr_ls);
 		return;
 	}
 
-	log_print("[ error ] exit. als_destroy.\n");
+	log_print("[ error ] <Fail fast!!!> Mistake in function 'void als_release(ArrayList *arr_ls)'.\n");
 	exit(EXIT_FAILURE);
 }
 
@@ -573,6 +600,13 @@ int als_add(ArrayList *als, void *obj)
 	return 0;
 }
 
+int als_add_sync(ArrayList *als, void *obj) {
+	pthread_mutex_lock(als->sync_lock);
+	int res = als_add(als, obj);
+	pthread_mutex_unlock(als->sync_lock);
+	return res;
+}
+
 void *als_get(ArrayList *als, unsigned int position)
 {
 	return position < als->idx ? als->elements_arr_p[position] : NULL;
@@ -600,6 +634,13 @@ int als_remove(ArrayList *als, void *obj)
 	}
 	log_print("INFO - als_remove ... no object < %p >\n", obj);
 	return 0;
+}
+
+int als_remove_sync(ArrayList *als, void *obj) {
+	pthread_mutex_lock(als->sync_lock);
+	int res = als_remove(als, obj);
+	pthread_mutex_unlock(als->sync_lock);
+	return res;
 }
 
 void *als_rm_index(ArrayList *als, unsigned int idx) {
