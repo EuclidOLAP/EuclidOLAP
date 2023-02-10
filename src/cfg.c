@@ -73,6 +73,9 @@ int init_cfg(int argc, char *argv[])
 
 int fetch_param(char *param)
 {
+	if (*param == '#')
+		return 1;
+
 	char *param_key = param;
 	char *param_val = strchr(param, '=');
 
@@ -86,7 +89,7 @@ int fetch_param(char *param)
 
 int set_param(char *p_key, char *p_val)
 {
-	if (strcmp(p_key, "--p:mode") == 0)
+	if (strcmp(p_key, "--p:mode") == 0 || strcmp(p_key, "mode") == 0)
 	{
 		if (strcmp(p_val, "stand-alone") == 0)
 		{
@@ -126,7 +129,7 @@ int set_param(char *p_key, char *p_val)
 	{
 		cfg.file = p_val;
 	}
-	else if (strcmp(p_key, "--p:port") == 0 || strcmp(p_key, "--port") == 0)
+	else if (strcmp(p_key, "--p:port") == 0 || strcmp(p_key, "--port") == 0 || strcmp(p_key, "port") == 0)
 	{
 		cfg.port = atoi(p_val);
 		if (cfg.port < 0 || cfg.port > 65535)
@@ -139,14 +142,16 @@ int set_param(char *p_key, char *p_val)
 	{
 		cfg.ec_threads_count = atoi(p_val);
 	}
-	else if (strcmp(p_key, "--p:join") == 0)
+	else if (strcmp(p_key, "--p:join") == 0 || strcmp(p_key, "master") == 0)
 	{
 		StrArr *arr = str_split(p_val, ":");
 		strcpy(cfg.parent_node_ip, str_arr_get(arr, 0));
 		cfg.parent_node_port = atoi(str_arr_get(arr, 1));
 		destory_StrArr(arr);
-	}
-	else
+	} else if (strcmp(p_key, "worker.id") == 0) {
+		assert(strlen(p_val) < CFG_WORKERID_LEN_LIMIT);
+		strcpy(cfg.worker_id, p_val);
+	} else
 	{
 		log_print("Unknown parameter type %s=%s.\n", p_key, p_val);
 		exit(EXIT_FAILURE);
@@ -169,8 +174,7 @@ static int load_conf_files()
 	}
 	else
 	{
-		// No configuration files are currently required when running in other modes (stand-alone, master, worker).
-		return 0;
+		cfg_file_name = DEF_CONF;
 	}
 
 	int len = strlen(cfg.program_path) + 32;

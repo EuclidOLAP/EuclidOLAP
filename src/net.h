@@ -9,13 +9,12 @@ void net_init();
 
 typedef struct sock_intent_thread
 {
-	int sock_fd;
 	pthread_t thread_id;
+	int sock_fd;
+	intent inte;
 } SockIntentThread;
 
 int net_service_startup();
-
-SockIntentThread *create_SockIntentThread(int sock_fd);
 
 // int sit_startup(SockIntentThread *sit);
 
@@ -28,5 +27,17 @@ int random_child_sock();
 
 // get the count of children-nodes in same cluster
 __uint32_t d_nodes_count();
+
+
+
+
+/*************************************************************************************
+ * SockIntentThread(struct sock_intent_thread) functions                             *
+ *************************************************************************************/
+
+// SockIntentThread *create_SockIntentThread(int sock_fd);
+SockIntentThread *sit_alloc(int sock_fd);
+
+void sit_release(SockIntentThread *sit);
 
 #endif

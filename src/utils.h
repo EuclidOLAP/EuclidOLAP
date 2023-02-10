@@ -194,16 +194,9 @@ typedef struct _array_list_
 	unsigned int idx;
 	unsigned int ele_arr_capacity;
 	void **elements_arr_p;
+	pthread_mutex_t *sync_lock;
 	char desc[COMMON_OBJ_DESC_LEN];
 } ArrayList;
-
-/**
- * @param strat Memory allocation strategy.
- * @param mam When the strat parameter is SPEC_MAM, mam cannot be NULL.
- */
-ArrayList *als_new(unsigned int init_capacity, char *desc, enum obj_mem_alloc_strategy strat, MemAllocMng *mam);
-
-void als_destroy(ArrayList *al);
 
 void *ArrayList_set(ArrayList *, unsigned int, void *);
 
@@ -247,5 +240,27 @@ void *mam_hlloc(MemAllocMng *mam, size_t size);
 char *bytes_alloc(size_t size);
 
 void bytes_free(void *freed);
+
+
+/*************************************************************************************
+ * ArrayList(struct _array_list_) functions                                          *
+ *************************************************************************************/
+/**
+ * @param strat Memory allocation strategy.
+ * @param mam When the 'strat' parameter is SPEC_MAM, mam cannot be NULL.
+ */
+ArrayList *als_new(unsigned int init_capacity, char *desc, enum_oms strat, MemAllocMng *mam);
+
+/**
+ * make als become synchronized
+ */
+void als_sync(ArrayList *als);
+
+// void als_destroy(ArrayList *al);
+void als_release(ArrayList *arr_ls);
+
+int als_add_sync(ArrayList *als, void *obj);
+
+int als_remove_sync(ArrayList *als, void *obj);
 
 #endif

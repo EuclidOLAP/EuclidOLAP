@@ -422,7 +422,7 @@ Member *Member_same_lv_m(Member *member, int offset)
 	if (sibling_idx >= 0 && sibling_idx < als_size(same_lv_ms))
 		result = als_get(same_lv_ms, sibling_idx);
 
-	als_destroy(same_lv_ms);
+	als_release(same_lv_ms);
 
 	return result;
 }
@@ -442,7 +442,7 @@ Member *Member_get_posi_child(Member *parent, int child_posi)
 
 	Member *_child_ = child_posi >= 0 && child_posi < als_size(children) ? als_get(children, child_posi) : NULL;
 
-	als_destroy(children);
+	als_release(children);
 
 	return _child_;
 }
