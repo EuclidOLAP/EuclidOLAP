@@ -1,0 +1,17 @@
+select
+{[Date].[ALL].[2020], [Date].[ALL].[2021], [Date].[ALL].[2022]} on rows,
+{
+    [Aircraft Type].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 787 Dreamliner]
+} on columns
+from [Airline Turnover];
+
+---
+
+with member [measure].proportion as ([measure].Turnover) / ([Service Type].[ALL], [measure].Turnover)
+select
+{Date.[ALL].[2020],Date.[ALL].[2021],Date.[ALL].[2022]} on 1,
+members([Service Type], LEAFS) on 0
+from [Airline Turnover]
+where ([measure].proportion, [Aircraft Type].[ALL].[Airbus].[Airbus A380]);
