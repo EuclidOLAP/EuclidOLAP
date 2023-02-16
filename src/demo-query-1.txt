@@ -436,6 +436,35 @@ members([Transport], LEAFS) on 12220,
 members([starting date], LEAFS) on 111
 from [logistics.test]
 where ([Goods].[ALL].[electronic product].[computer], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[Europe].[Italy], [completion date].[ALL].[2021].[Q2].[M4]);
+---
+select Members([Aircraft Type]) on 1, members([Service Type]) on 0 from [Airline Turnover];
+---
+select
+{[Date].[ALL].[2020], [Date].[ALL].[2021], [Date].[ALL].[2022]} on columns,
+{
+    [Aircraft Type].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 787 Dreamliner]
+} on rows
+from [Airline Turnover];
+---
+with member [measure].proportion as ([measure].Turnover) / ([Service Type].[ALL], [measure].Turnover)
+select
+{Date.[ALL].[2020],Date.[ALL].[2021],Date.[ALL].[2022]} on 1,
+members([Service Type], LEAFS) on 0
+from [Airline Turnover]
+where ([measure].proportion, [Aircraft Type].[ALL].[Airbus].[Airbus A380]);
+---
+select members(Date) on 1, members([Aircraft Type]) on 2 from [Airline Cost Of Flight];
+---
+select members([Aircraft Type]) on 1, members(Destination) on 2 from [Flight Passengers Statistics];
+
+
+
+
+
+
+
 
 
 

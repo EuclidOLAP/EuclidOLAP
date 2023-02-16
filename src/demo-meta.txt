@@ -1,8 +1,31 @@
-create dimensions [Calendar] [Goods] [Store Type] [Payment Method] [Region] [Transport];
+create dimensions [Calendar] [Goods] [Store Type] [Payment Method] [Region] [Transport] [Date] [Aircraft Type] [Service Type] [Area];
 
 ---
 
-create levels [Calendar] (2:year, 3:quarter, 4:month), [Region] (2:[continent], 3:[country]);
+create levels [Calendar] (2:year, 3:quarter, 4:month), [Region] (2:[continent], 3:[country]), [Date] (2:Year, 3:Quarter, 4:Month);
+
+---
+
+build cube [Airline Turnover] dimensions [Date] [Date] [Aircraft Type] [Aircraft Type] [Service Type] [Service Type] measures [Turnover];
+
+---
+
+build cube [Airline Cost Of Flight] 
+dimensions  [Date] [Date] [Aircraft Type] [Aircraft Type]
+measures [Fuel costs]
+[Crew costs]
+[Maintenance and repair costs]
+[Airport fees]
+[Insurance costs]
+[Administrative and overhead costs]
+[Taxes]
+[Catering and other in-flight services];
+
+---
+
+build cube [Flight Passengers Statistics] 
+dimensions [Area] [Starting Point] [Area] Destination [Date] [Date] [Aircraft Type] [Aircraft Type]
+measures [Number of Passengers];
 
 ---
 
