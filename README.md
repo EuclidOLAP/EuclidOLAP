@@ -1,154 +1,95 @@
 # EuclidOLAP
 
-EuclidOLAP is an in-memory multi-dimensional database that presents data in a logical multi-dimensional data model and provides insight into the intelligence information within the data.
-
-- EuclidOLAP has the ability to perform real-time aggregation operations without pre-aggregation of data in advance.
-- One cube has the ability to repeatedly associate the same dimension, the dimension plays different dimensional roles.
-- A query can be associated with multiple cubes, and queries associated with multiple cubes will not cause a significant drop in query performance.
-- Support for MDX(Mutil Dimensional Expressions), which is more suitable for querying multi-dimensional data models than SQL.
-
-## Basic Concept
-
-Dimensions and cubes are core concepts in multidimensional domain models.
-
-A dimension is similar to a coordinate axis, and any two different dimensions are perpendicular to each other, a cube is similar to a multidimensional space.
-
-One cube is associated with at least one dimension, the dimensions associated with the cube indicate the business modeling of the cube, and the cube itself stores quantifiable data, such as sales amount, cost, profit, etc.
-
-![dim_dimrole_cube](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/images/dim_dimrole_cube.png)
-
-There are two cubes **`Online Store`** and **`Logistics.test`** in the image above.
-
-**`Online Store`** associates four dimensions **`Store Type`**, **`Payment Method`**, **`Goods`** and **`Calendar`**.
-
-The cube **`Logistics.test`** is somewhat special. The two dimensions **`Region`** and **`Calendar`** are each associated with **`Logistics.test`** twice. In EuclidOLAP, the same dimension can be associated with the same cube multiple times, which means that this dimension play different roles in the business modeling of the cube.
+www.euclidolap.com
 
 
 
-A dimension includes all members of the business direction it describes. On a cube, select a specific member in each dimension, and the combination of these members will point to a specific measure value.
+## Introduce
 
-![modeling](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/images/modeling.png)
+EuclidOLAP is a multidimensional database product that enables users to easily analyze data in real-time. With its in-memory technology, EuclidOLAP provides fast query performance, making it an ideal solution for organizations that require quick access to their data.
 
-All the measure values of a cube can be imagined as being stored in a huge multi-dimensional array. This huge multi-dimensional array will be compressed first and then stored in memory. EuclidOLAP uses this data structure to provide external query capabilities for logical multidimensional data.
+![olap](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/img/olap.png)
 
-In EuclidOLAP, 1G memory can store 60 millions to 100 millions leaf measure values.
+One of the key benefits of EuclidOLAP is its ability to present data in a true multidimensional model, this allows users to view data from multiple angles. Additionally, EuclidOLAP offers a range of analysis capacities, including roll-up, drill-down, pivot, slicing, and dicing, which make it easy for users to query and analyze data in any way they want.
+
+EuclidOLAP also helps users dig deeper into the valuable information hidden in their data. With its advanced analytical capabilities, EuclidOLAP allows users to uncover trends, patterns, and insights that would be difficult or impossible to detect using traditional methods.
 
 
 
 ## Hello World
 
-### Requirements for environment
-
-1. 64-bit Linux operating system is recommended, preferably **CentOS-7** or Redhat.
-2. gcc compilation tool, preferably **gcc11**, some syntaxes may not be supported by lower versions of gcc compiler.
-3. **flex**(lex in Linux), Lexical analysis tool.
-4. **bison**(yacc in Linux), Syntax analysis tool.
-
-
-
-If you are using CentOS-7, you can follow the steps below to prepare your program's compilation environment.
-
-```shell
-$ yum -y install centos-release-scl
-
-$ yum -y install devtoolset-11-gcc
-
-$ scl enable devtoolset-11 bash
+Run the following command, quickly launch a Docker container of EuclidOLAP server.
+```
+docker run -d -p 8760:8760 -p 8761:8761 --name olap euclidolap/euclidolap:v0.1.3-beta
 ```
 
-Set the path of the gcc command into an environment variable.
+The container hosting two services, the **EuclidOLAP** service and the **OLAP Web** service, is now operational.
+**EuclidOLAP** occupies port 8760, is a multidimensional database server-side process.
+**OLAP Web** occupies port 8761, is a web management console for the EuclidOLAP.
 
-```shell
-$ which gcc
-/opt/rh/devtoolset-11/root/usr/bin/gcc
+A demo data model of airline turnover has been built in, which correlates three dimensions: Date, Aircraft Type and Service Type, and a Turnover measure that represents detailed turnover value.
 
-$ cat >> /etc/profile << EOF
-export PATH=/opt/rh/devtoolset-11/root/usr/bin:\$PATH
-EOF
+Here are two MDX (Multidimensional Expressions) query statements that are used to query the demo data model.
 
-$ source /etc/profile
 ```
-
-```shell
-$ yum -y install flex
-
-$ yum -y install bison
+select
+{[Date].[ALL].[2020], [Date].[ALL].[2021], [Date].[ALL].[2022]} on rows,
+{
+    [Aircraft Type].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 787 Dreamliner]
+} on columns
+from [Airline Turnover];
 ```
+The first MDX statement queries the annual turnover of each Boeing aircraft type, aircraft types was displayed on rows, and years was displayed on columns, since the cube has only one measure that is Turnover, it is displayed by default.
 
 
 
-### Compile and run
-
-Get the source code, compile the source code and give the binary execute permission.
-
-```shell
-$ git clone https://github.com/EuclidOLAP/EuclidOLAP.git
-
-$ cd EuclidOLAP/src
-
-$ make
-
-$ chmod +x server
-
-$ chmod +x euclid
 ```
-
-
-
-Start up.
-
-```shell
-$ ./server &
-
-$ cat log/euclid.log 
-info - node mode [ m ]
-EuclidCommand processor thread [140300922853120] <0>.
-Net service startup on port 8760
+with member [measure].proportion as ([measure].Turnover) / ([Service Type].[ALL], [measure].Turnover)
+select
+{Date.[ALL].[2020],Date.[ALL].[2021],Date.[ALL].[2022]} on 1,
+members([Service Type], LEAFS) on 0
+from [Airline Turnover]
+where ([measure].proportion, [Aircraft Type].[ALL].[Airbus].[Airbus A380]);
 ```
-
-After starting the service, check the log file. If there is **`Net service startup on port 8760`**, the startup is successful.
-
+The second MDX statement will calculate the percentage of total turnover that comes from each service type, broken down by year. This will be done using a custom formula, the formula will be defined as a member in the query language.
 
 
-Create some metadata.
+Next, you can execute the MDX statements above in two ways.
 
-```shell
-$ ./euclid --file=demo-meta.txt
-$ ./euclid --file=demo-create-members.txt
+### Use a browser to access the OLAP Web.
+Use a browser to access the 192.168.66.236:8761
+
+> **note:** You need to change the IP to the address of your server that running the EuclidOLAP docker container.
+
+
+
+Click the connect button directly.
+![olapweb-idx](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/github-readme/olapweb-idx.png)
+
+
+
+Enter the MDX statements and click the exec button to execute the query.
+![olapweb-demo-q1](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/github-readme/olapweb-demo-q1.png)
+![olapweb-demo-q2](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/github-readme/olapweb-demo-q2.png)
+
+
+
+### Go inside the container and using the EuclidOLAP client tool.
+
+Go inside the container.
+```
+docker exec -it olap /bin/bash
 ```
 
 
 
-Import measure data of cubes.
-
-```shell
-$ ./euclid --file=demo-data.txt
-```
-
-
-
-Execute MDX query.
-
-```shell
-$ ./euclid
-```
-
-```sh
-olapcli > with member measure.SSSSSS as lookUpCube("logistics.test", "(measure.cost)") select {(measure.[sales amount]), (measure.SSSSSS)} on 0, children(Calendar.[ALL].[2021]) on 1 from [Online Store] ;
-```
-
-
-
-If the query executes successfully, the following information will be displayed on the console.
+Execute the following command, demo MDX statements above has been written to the demo-airline.txt file.
 
 ```
-	 -        sales amount              SSSSSS
-	Q1             4320.00        123718276.77
-	Q2             4320.00        123718276.77
-	Q3            22088.00        123718276.77
-	Q4            21231.00        123718276.77
+./euclid-cli --file=demo-airline.txt
 ```
 
-<video id="video" controls="" preload="none" poster="">
-      <source id="mp4" src="https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/videos/olapweb.mp4" type="video/mp4">
-</videos>
+The query results are displayed as shown below.
+![demo-result.png](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/github-readme/demo-result.png)
