@@ -8,7 +8,7 @@ www.euclidolap.com
 
 EuclidOLAP is a multidimensional database product that enables users to easily analyze data in real-time. With its in-memory technology, EuclidOLAP provides fast query performance, making it an ideal solution for organizations that require quick access to their data.
 
-![olap](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/img/olap.png){width=400px}
+![olap](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/img/olap.png)
 
 One of the key benefits of EuclidOLAP is its ability to present data in a true multidimensional model, this allows users to view data from multiple angles. Additionally, EuclidOLAP offers a range of analysis capacities, including roll-up, drill-down, pivot, slicing, and dicing, which make it easy for users to query and analyze data in any way they want.
 
