@@ -35,7 +35,7 @@ typedef struct euclid_cfg
 	char *program_path;
 	char *host; // the IP or domain of server, be used when client mode
 	char *file; // the file be executed, be used when client mode
-	
+
 	char parent_node_ip[16];
 	char cli_ctrl_node_host[16];
 
