@@ -11,6 +11,8 @@
 #include "mdx.h"
 #include "mdd.h"
 #include "rb-tree.h"
+#include "vce.h"
+#include "net.h"
 
 // extern Stack AST_STACK;
 
@@ -221,17 +223,17 @@ static void *do_process_command(void *addr)
 
 static int __execute_command__count = 1;
 
-static int execute_command(EuclidCommand *ec)
+static int execute_command(EuclidCommand *action)
 {
 	Stack stk;
 
 	// todo try use the CAS function __atomic_add_fetch
-	log_print("@@@@@@ __execute_command__count = %d\n", __execute_command__count++);
+	// log_print("@@@@@@ __execute_command__count = %d\n", __execute_command__count++);
 
-	intent inte = ec_get_intent(ec);
+	intent inte = ec_get_intent(action);
 	if (inte == INTENT__INSERT_CUBE_MEASURE_VALS)
 	{
-		distribute_store_measure(ec);
+		distribute_store_measure(action);
 	}
 	else if (inte == INTENT__MDX || inte == INTENT__MDX_EXPECT_RESULT_TXT)
 	{
@@ -239,7 +241,7 @@ static int execute_command(EuclidCommand *ec)
 		// Set the MDX parsing completion flag to 0.
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFE;
 
-		parse_mdx((ec->bytes) + 10, &stk);
+		parse_mdx((action->bytes) + 10, &stk);
 
 		if ((cur_thrd_mam->bin_flags & 0x0001) == 0) {
 			// Empty the stack to prevent stack overflow.
@@ -260,7 +262,7 @@ static int execute_command(EuclidCommand *ec)
 		{
 			ArrayList *dim_names_ls;
 			stack_pop(&stk, (void **)&dim_names_ls);
-			create_dims(dim_names_ls, &(ec->result));
+			create_dims(dim_names_ls, &(action->result));
 		}
 		else if (ids_type == IDS_STRLS_CRTMBRS)
 		{
@@ -308,20 +310,20 @@ static int execute_command(EuclidCommand *ec)
 			if (cur_thrd_mam->exception_desc == NULL) {
 				// MultiDimResult_print(md_rs);
 
-				if (ec_get_intent(ec) == INTENT__MDX_EXPECT_RESULT_TXT) {
+				if (ec_get_intent(action) == INTENT__MDX_EXPECT_RESULT_TXT) {
 					// todo Do not use the allocated memory block directly, replace by ElasticByteBuffer.
 					char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL<<19, OBJ_TYPE__RAW_BYTES);
 
 					*((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL<<19;
 					*((unsigned short *)(payload + SZOF_INT)) = INTENT__SUCCESSFUL;
 					mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL<<19);
-					ec->result = create_command(payload);
+					action->result = create_command(payload);
 				} else {
 					ByteBuf *binuf = mdrs_to_bin(md_rs);
 					char *payload = obj_alloc(binuf->index, OBJ_TYPE__RAW_BYTES);
 					memcpy(payload, binuf->buf_addr, binuf->index);
 					buf_release(binuf);
-					ec->result = create_command(payload);
+					action->result = create_command(payload);
 				}
 				
 			}
@@ -367,8 +369,55 @@ static int execute_command(EuclidCommand *ec)
 			log_print("[ error ] program exit(1), cause by: unknow ids_type < %p >\n", ids_type);
 			exit(1);
 		}
+	} else if (inte == INTENT__VECTOR_AGGREGATION) {
+
+		ArrayList *grids = worker_aggregate_measure(action);
+
+		long len = grids ? als_size(grids) : 0;
+
+		int payload_capacity = 4+2+8+8+4+4+8;
+		payload_capacity += len * (sizeof(double) + sizeof(char));
+
+		char *payload = obj_alloc(payload_capacity, OBJ_TYPE__RAW_BYTES);
+		char *idx = payload;
+
+		*((int *)idx) = payload_capacity;
+		idx+=sizeof(payload_capacity);
+
+		short inte = INTENT__AGGREGATE_TASK_RESULT;
+		*((short *)idx) = inte;
+		idx+=sizeof(inte);
+
+		memcpy(idx, action->bytes + sizeof(int) + sizeof(short), 8+8+4+4);
+		idx += 8+8+4+4;
+		*((long *)idx) = len;
+		idx+=sizeof(len);
+
+		for (int i=0;i<len;i++) {
+			GridData *gd = als_get(grids, i);
+
+			if (gd != NULL)
+				*((double *)idx) = gd->val;
+
+			idx+=sizeof(double);
+		}
+
+		for (int i=0;i<len;i++) {
+			GridData *gd = als_get(grids, i);
+
+			*idx = gd ? gd->null_flag : 1;
+			idx+=sizeof(char);
+		}
+
+		assert(action->result == NULL);
+
+		action->result = create_command(payload);
+	} else if (inte == INTENT__AGGREGATE_TASK_RESULT) {
+		log_print("// todo at once ............................ INTENT__AGGREGATE_TASK_RESULT\n");
+	} else if (inte == INTENT__SUCCESSFUL) {
+		log_print("// todo at once ............................ INTENT__SUCCESSFUL\n");
 	} else {
-		log_print("[ error ] program exit(1), unknown inte.\n");
+		log_print("[ error ] program exit(1), unknown inte < %d >\n", inte);
 		exit(EXIT_FAILURE);
 	}
 	return 0;

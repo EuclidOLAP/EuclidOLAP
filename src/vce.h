@@ -55,7 +55,7 @@ int scal_cmp(void *_one, void *_other);
 
 typedef struct _scale_offset_range
 {
-    md_gid gid; // The ID of the detail or fee detail dimension member
+    md_gid gid; // ID of the non-measure dimension member (can be a leaf member or a non-leaf member)
 
     unsigned long start_position;
     unsigned long end_position;
@@ -109,6 +109,8 @@ void space__destory(MeasureSpace *);
 
 double *vce_vactors_values(MDContext *md_ctx, MddTuple **tuples_matrix_h, unsigned long v_len, char **null_flags);
 
+void dispatchAggregateMeasure(/*MDContext *md_context,*/ Cube *cube, ArrayList *direct_vectors, double **_measures_, char **_null_flags_, unsigned long *_len_);
+
 void do_calculate_measure_value(MDContext *md_ctx, Cube *, MddTuple *, GridData *grid_data);
 
 
@@ -118,5 +120,10 @@ Scale *ax_find_scale(Axis *axis, Scale *sample);
 
 // Scale(struct _axis_scale) functions
 void scal_init(Scale *scale);
+
+
+/************************************************************************
+ ************************************************************************/
+ArrayList *worker_aggregate_measure(EuclidCommand *ec);
 
 #endif

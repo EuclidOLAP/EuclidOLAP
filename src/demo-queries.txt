@@ -111,8 +111,19 @@ with member [starting date].XXX as (prevMember(currentMember([measure])), [start
 select { (Calendar.[ALL].[2021].Q2.M4), (Calendar.[ALL].[2021].Q3.M7) } on 0, { (measure.[sales amount]) } on 1 from [Online Store] ;
 ---
 select { (Calendar.[ALL].[2021].Q3.M7), (Calendar.[ALL].[2021].Q4.M10) } on 0, { (measure.[sales amount]) } on 1 from [Online Store] ;
+
 ---
-with member measure.XXX as (measure.[sales amount], parallelPeriod()) select { (Calendar.[ALL].[2021].Q3.M7), (Calendar.[ALL].[2021].Q4.M10) } on 0, { (measure.XXX) } on 1 from [Online Store] ;
+with 
+    member measure.XXX as (measure.[sales amount], parallelPeriod()) 
+select 
+
+    { (Calendar.[ALL].[2021].Q3.M7), (Calendar.[ALL].[2021].Q4.M10) } 
+on 0, 
+
+    { (measure.XXX) } 
+on 1 
+
+from [Online Store] ;
 ---
 select { (Calendar.[ALL].[2020].Q4.M12), (Calendar.[ALL].[2021].Q4.M12) } on 0, { (measure.[sales amount]) } on 1 from [Online Store] ;
 ---
@@ -212,7 +223,12 @@ select members(measure) on 0, intersect(members(Calendar), UNION(children(Calend
 ---
 select members(measure) on 0, intersect(members(Calendar), UNION(children(Calendar.[ALL].[2021]), children(Calendar.[ALL].[2021].Q1)), ALL) on 1 from [Online Store] ;
 ---
-with member measure.SSSSSS as lookUpCube("logistics.test", "(measure.cost)") select { ( measure.[sales amount] ), (measure.SSSSSS) } on 0, children(Calendar.[ALL].[2021]) on 1 from [Online Store] ;
+with 
+member measure.SSSSSS as lookUpCube("logistics.test", "(measure.cost)") 
+select 
+{ ( measure.[sales amount] ), (measure.SSSSSS) } on 0, 
+children(Calendar.[ALL].[2021]) on 1 
+from [Online Store] ;
 ---
 with member measure.AAAAAA as LOOKUPCUBE("Online Store", "(measure.[sales amount])") member measure.BBBBBB as LOOKUPCUBE("Online Store", (measure.[sales amount], Calendar.[ALL].[2021].Q3)) member measure.CCCCCC as LOOKUPCUBE([Online Store], "(measure.[sales amount], Calendar.[ALL].[2021].Q4) + (measure.[sales quantity], Calendar.[ALL].[2021].Q3)") member measure.DDDDDD as LOOKUPCUBE([Online Store], (measure.[cash back])) select { (measure.cost), (measure.AAAAAA), (measure.BBBBBB), (measure.CCCCCC), (measure.DDDDDD) } on 0, children(Goods.[ALL]) on 1 from [logistics.test] ;
 ---
@@ -458,6 +474,95 @@ where ([measure].proportion, [Aircraft Type].[ALL].[Airbus].[Airbus A380]);
 select members(Date) on 1, members([Aircraft Type]) on 2 from [Airline Cost Of Flight];
 ---
 select members([Aircraft Type]) on 1, members(Destination) on 2 from [Flight Passengers Statistics];
+---
+select
+{[Date].[ALL].[2020], [Date].[ALL].[2021], [Date].[ALL].[2022]} on rows,
+{
+    [Aircraft Type].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 787 Dreamliner]
+} on columns
+from [Airline Turnover];
+
+---
+
+with member [measure].proportion as ([measure].Turnover) / ([Service Type].[ALL], [measure].Turnover)
+select
+{Date.[ALL].[2020],Date.[ALL].[2021],Date.[ALL].[2022]} on 1,
+members([Service Type], LEAFS) on 0
+from [Airline Turnover]
+where ([measure].proportion, [Aircraft Type].[ALL].[Airbus].[Airbus A380]);
+
+---
+
+select 
+{
+    ([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes])
+} on 0, 
+crossJoin( { ( [Payment Method].[ALL].[Credit Card] ) } , members([Calendar], LEAFS)) on 1
+from [Online Store];
+
+---
+
+select 
+{
+    ([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes])
+} on 0, 
+crossJoin( { ( [Payment Method].[ALL].[Credit Card] ) } , Descendants([Calendar].[ALL].[2021], [Calendar].[month])) on 1
+from [Online Store];
+
+---
+
+select 
+{ 
+    ([Calendar].[ALL].[2020].[Q1]), 
+    ([Calendar].[ALL].[2020].[Q2])
+} on 0, 
+{ 
+    ([Payment Method].[ALL].[Credit Card], measure.[sales amount])
+} on 1 
+from [Online Store];
+
+---
+
+select 
+crossJoin(members([Store Type], LEAFS), members([Goods], LEAFS)) on 0, 
+crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)) on 1
+from [Online Store];
+
+---
+
+select
+{
+    ([Payment Method].[ALL].[Credit Card], [Calendar].[ALL].[2019].[Q1].[M1])
+} on 0,
+{
+    ([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes])
+} on 1
+from [Online Store]
+where (measure.[sales amount]);
+
+---
+
+select
+{
+    ([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes])
+} on 0,
+crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)) on 1
+from [Online Store]
+where (measure.[sales amount]);
+
+---
+
+select 
+    { ( [starting date].[2021].Q1.M3 ) }  on 0, 
+    {([Goods].[electronic product].computer)}  on 1 
+from [logistics.test] 
+where ( [completion date].[2020].[Q1].[M3], Transport.[railway], [starting region].[Europe].[UK], [ending region].[Europe].[Italy], measure.cost );
+
+
+
+
 
 
 

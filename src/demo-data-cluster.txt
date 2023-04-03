@@ -105,7 +105,11 @@ insert [Online Store]
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M1] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M1] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M1] measures [sales amount] 10 [sales quantity] 1 ),
-([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M1] measures [sales amount] 10 [sales quantity] 1 ),
+([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M1] measures [sales amount] 10 [sales quantity] 1 );
+
+---
+
+insert [Online Store]
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M1] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Computers & Cameras].[Tablet PCs],[Calendar].[ALL].[2020].[Q1].[M1] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Computers & Cameras].[Tablet PCs],[Calendar].[ALL].[2020].[Q1].[M1] measures [sales amount] 10 [sales quantity] 1 ),
@@ -249,7 +253,11 @@ insert [Online Store]
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M2] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M2] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M2] measures [sales amount] 10 [sales quantity] 1 ),
-([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M2] measures [sales amount] 10 [sales quantity] 1 ),
+([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M2] measures [sales amount] 10 [sales quantity] 1 );
+
+---
+
+insert [Online Store]
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M2] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Computers & Cameras].[Tablet PCs],[Calendar].[ALL].[2020].[Q1].[M2] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Computers & Cameras].[Tablet PCs],[Calendar].[ALL].[2020].[Q1].[M2] measures [sales amount] 10 [sales quantity] 1 ),
@@ -393,7 +401,11 @@ insert [Online Store]
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M3] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M3] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M3] measures [sales amount] 10 [sales quantity] 1 ),
-([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M3] measures [sales amount] 10 [sales quantity] 1 ),
+([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M3] measures [sales amount] 10 [sales quantity] 1 );
+
+---
+
+insert [Online Store]
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q1].[M3] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Computers & Cameras].[Tablet PCs],[Calendar].[ALL].[2020].[Q1].[M3] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Computers & Cameras].[Tablet PCs],[Calendar].[ALL].[2020].[Q1].[M3] measures [sales amount] 10 [sales quantity] 1 ),
@@ -501,7 +513,11 @@ insert [Online Store]
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q2].[M4] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q2].[M4] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q2].[M4] measures [sales amount] 10 [sales quantity] 1 ),
-([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q2].[M4] measures [sales amount] 10 [sales quantity] 1 ),
+([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q2].[M4] measures [sales amount] 10 [sales quantity] 1 );
+
+---
+
+insert [Online Store]
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q2].[M4] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Cell Phones & Accessories].[iPhone],[Calendar].[ALL].[2020].[Q2].[M4] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[iPhone],[Calendar].[ALL].[2020].[Q2].[M4] measures [sales amount] 10 [sales quantity] 1 ),
@@ -609,7 +625,11 @@ insert [Online Store]
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Kitchen & Dining].[Rice Cookers],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Kitchen & Dining].[Rice Cookers],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Kitchen & Dining].[Rice Cookers],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 ),
-([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Kitchen & Dining].[Rice Cookers],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 ),
+([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Kitchen & Dining].[Rice Cookers],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 );
+
+---
+
+insert [Online Store]
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Kitchen & Dining].[Rice Cookers],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Home Electronics].[LCD HDTVs],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Home Electronics].[LCD HDTVs],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 ),
@@ -717,7 +737,11 @@ insert [Online Store]
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 ),
-([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 ),
+([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 );
+
+---
+
+insert [Online Store]
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Computers & Cameras].[Laptops & Netbooks],[Calendar].[ALL].[2020].[Q2].[M5] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Kitchen & Dining].[Bento Boxes],[Calendar].[ALL].[2020].[Q2].[M6] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Kitchen & Dining].[Bento Boxes],[Calendar].[ALL].[2020].[Q2].[M6] measures [sales amount] 10 [sales quantity] 1 ),
@@ -825,7 +849,11 @@ insert [Online Store]
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q2].[M6] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q2].[M6] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q2].[M6] measures [sales amount] 10 [sales quantity] 1 ),
-([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q2].[M6] measures [sales amount] 10 [sales quantity] 1 ),
+([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q2].[M6] measures [sales amount] 10 [sales quantity] 1 );
+
+---
+
+insert [Online Store]
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Cell Phones & Accessories].[Cell Phone Parts],[Calendar].[ALL].[2020].[Q2].[M6] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Computers & Cameras].[Tablet PCs],[Calendar].[ALL].[2020].[Q2].[M6] measures [sales amount] 10 [sales quantity] 1 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Computers & Cameras].[Tablet PCs],[Calendar].[ALL].[2020].[Q2].[M6] measures [sales amount] 10 [sales quantity] 1 ),
@@ -933,7 +961,11 @@ insert [Online Store]
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q3].[M7] measures [sales amount] 10000 [sales quantity] 1000 ),
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q3].[M7] measures [sales amount] 10000 [sales quantity] 1000 ),
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q3].[M7] measures [sales amount] 10000 [sales quantity] 1000 ),
-([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q3].[M7] measures [sales amount] 10000 [sales quantity] 1000 ),
+([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q3].[M7] measures [sales amount] 10000 [sales quantity] 1000 );
+
+---
+
+insert [Online Store]
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q3].[M7] measures [sales amount] 10000 [sales quantity] 1000 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Cell Phones & Accessories].[iPhone],[Calendar].[ALL].[2020].[Q3].[M7] measures [sales amount] 10000 [sales quantity] 1000 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[iPhone],[Calendar].[ALL].[2020].[Q3].[M7] measures [sales amount] 10000 [sales quantity] 1000 ),
@@ -1077,7 +1109,11 @@ insert [Online Store]
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q3].[M8] measures [sales amount] 10000 [sales quantity] 1000 ),
 ([Store Type].[ALL].[Brand Flagship Store],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q3].[M8] measures [sales amount] 10000 [sales quantity] 1000 ),
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q3].[M8] measures [sales amount] 10000 [sales quantity] 1000 ),
-([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q3].[M8] measures [sales amount] 10000 [sales quantity] 1000 ),
+([Store Type].[ALL].[Other],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q3].[M8] measures [sales amount] 10000 [sales quantity] 1000 );
+
+---
+
+insert [Online Store]
 ([Store Type].[ALL].[Other],[Payment Method].[ALL].[Account Balance],[Goods].[ALL].[Home Electronics].[Video Games],[Calendar].[ALL].[2020].[Q3].[M8] measures [sales amount] 10000 [sales quantity] 1000 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Credit Card],[Goods].[ALL].[Cell Phones & Accessories].[iPhone],[Calendar].[ALL].[2020].[Q3].[M8] measures [sales amount] 10000 [sales quantity] 1000 ),
 ([Store Type].[ALL].[Platform Self-operated Store],[Payment Method].[ALL].[Debit Card],[Goods].[ALL].[Cell Phones & Accessories].[iPhone],[Calendar].[ALL].[2020].[Q3].[M8] measures [sales amount] 10000 [sales quantity] 1000 ),
@@ -3615,7 +3651,11 @@ insert [logistics.test]
 (Goods.[ALL].[foods].[nut], Transport.[ALL].[ocean freight], [starting region].[ALL].[America].[Chile], [ending region].[ALL].[Europe].[Greece], [starting date].[ALL].[2020].[Q2].[M4], [completion date].[ALL].[2021].[Q1].[M2] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[foods].[nut], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[Greece], [ending region].[ALL].[Asia].[China], [starting date].[ALL].[2020].[Q1].[M2], [completion date].[ALL].[2021].[Q1].[M1] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[foods].[nut], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[Greece], [ending region].[ALL].[America].[U.S], [starting date].[ALL].[2019].[Q4].[M12], [completion date].[ALL].[2020].[Q4].[M12] measures quantity 333.333 income 222.222 cost 111.111 ), 
-(Goods.[ALL].[foods].[nut], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[Greece], [ending region].[ALL].[Europe].[Greece], [starting date].[ALL].[2019].[Q4].[M10], [completion date].[ALL].[2020].[Q4].[M11] measures quantity 333.333 income 222.222 cost 111.111 ), 
+(Goods.[ALL].[foods].[nut], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[Greece], [ending region].[ALL].[Europe].[Greece], [starting date].[ALL].[2019].[Q4].[M10], [completion date].[ALL].[2020].[Q4].[M11] measures quantity 333.333 income 222.222 cost 111.111 );
+
+---
+
+insert [logistics.test]
 (Goods.[ALL].[foods].[nut], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[Italy], [ending region].[ALL].[Asia].[China], [starting date].[ALL].[2019].[Q3].[M8], [completion date].[ALL].[2020].[Q4].[M10] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[foods].[nut], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[Italy], [ending region].[ALL].[Asia].[South Korea], [starting date].[ALL].[2021].[Q2].[M6], [completion date].[ALL].[2020].[Q3].[M9] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[foods].[nut], Transport.[ALL].[ocean freight], [starting region].[ALL].[Europe].[Italy], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2021].[Q2].[M4], [completion date].[ALL].[2020].[Q3].[M8] measures quantity 333.333 income 222.222 cost 111.111 ), 
@@ -3759,7 +3799,11 @@ insert [logistics.test]
 (Goods.[ALL].[foods].[beef], Transport.[ALL].[railway], [starting region].[ALL].[Europe].[Italy], [ending region].[ALL].[America].[U.S], [starting date].[ALL].[2019].[Q4].[M10], [completion date].[ALL].[2021].[Q1].[M2] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[foods].[beef], Transport.[ALL].[railway], [starting region].[ALL].[Europe].[Italy], [ending region].[ALL].[Europe].[Greece], [starting date].[ALL].[2019].[Q3].[M8], [completion date].[ALL].[2021].[Q1].[M1] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[foods].[beef], Transport.[ALL].[railway], [starting region].[ALL].[Europe].[Italy], [ending region].[ALL].[Europe].[UK], [starting date].[ALL].[2021].[Q2].[M6], [completion date].[ALL].[2020].[Q4].[M12] measures quantity 333.333 income 222.222 cost 111.111 ), 
-(Goods.[ALL].[foods].[beef], Transport.[ALL].[railway], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Asia].[South Korea], [starting date].[ALL].[2021].[Q2].[M4], [completion date].[ALL].[2020].[Q4].[M11] measures quantity 333.333 income 222.222 cost 111.111 ), 
+(Goods.[ALL].[foods].[beef], Transport.[ALL].[railway], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Asia].[South Korea], [starting date].[ALL].[2021].[Q2].[M4], [completion date].[ALL].[2020].[Q4].[M11] measures quantity 333.333 income 222.222 cost 111.111 );
+
+---
+
+insert [logistics.test]
 (Goods.[ALL].[foods].[beef], Transport.[ALL].[railway], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2021].[Q1].[M2], [completion date].[ALL].[2020].[Q4].[M10] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[foods].[beef], Transport.[ALL].[railway], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[UK], [starting date].[ALL].[2020].[Q4].[M12], [completion date].[ALL].[2020].[Q3].[M9] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[foods].[beef], Transport.[ALL].[highway], [starting region].[ALL].[Asia].[China], [ending region].[ALL].[Asia].[South Korea], [starting date].[ALL].[2020].[Q4].[M10], [completion date].[ALL].[2020].[Q3].[M8] measures quantity 333.333 income 222.222 cost 111.111 ), 
@@ -3939,7 +3983,11 @@ insert [logistics.test]
 (Goods.[ALL].[electronic product].[mobile phone], Transport.[ALL].[ocean freight], [starting region].[ALL].[Asia].[South Korea], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2021].[Q1].[M3], [completion date].[ALL].[2020].[Q1].[M2] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[electronic product].[mobile phone], Transport.[ALL].[ocean freight], [starting region].[ALL].[Asia].[South Korea], [ending region].[ALL].[Europe].[UK], [starting date].[ALL].[2021].[Q1].[M1], [completion date].[ALL].[2020].[Q1].[M1] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[electronic product].[mobile phone], Transport.[ALL].[ocean freight], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[Asia].[South Korea], [starting date].[ALL].[2020].[Q4].[M11], [completion date].[ALL].[2019].[Q4].[M12] measures quantity 333.333 income 222.222 cost 111.111 ), 
-(Goods.[ALL].[electronic product].[mobile phone], Transport.[ALL].[ocean freight], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2020].[Q3].[M9], [completion date].[ALL].[2019].[Q4].[M11] measures quantity 333.333 income 222.222 cost 111.111 ), 
+(Goods.[ALL].[electronic product].[mobile phone], Transport.[ALL].[ocean freight], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2020].[Q3].[M9], [completion date].[ALL].[2019].[Q4].[M11] measures quantity 333.333 income 222.222 cost 111.111 );
+
+---
+
+insert [logistics.test]
 (Goods.[ALL].[electronic product].[mobile phone], Transport.[ALL].[ocean freight], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[Europe].[UK], [starting date].[ALL].[2020].[Q3].[M7], [completion date].[ALL].[2019].[Q4].[M10] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[electronic product].[mobile phone], Transport.[ALL].[ocean freight], [starting region].[ALL].[America].[Mexico], [ending region].[ALL].[Asia].[South Korea], [starting date].[ALL].[2020].[Q2].[M5], [completion date].[ALL].[2019].[Q3].[M9] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[electronic product].[mobile phone], Transport.[ALL].[ocean freight], [starting region].[ALL].[America].[Mexico], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2020].[Q1].[M3], [completion date].[ALL].[2019].[Q3].[M8] measures quantity 333.333 income 222.222 cost 111.111 ), 
@@ -4155,7 +4203,11 @@ insert [logistics.test]
 (Goods.[ALL].[electronic product].[smart watch], Transport.[ALL].[ocean freight], [starting region].[ALL].[Asia].[China], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2020].[Q2].[M6], [completion date].[ALL].[2020].[Q1].[M2] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[electronic product].[smart watch], Transport.[ALL].[ocean freight], [starting region].[ALL].[Asia].[China], [ending region].[ALL].[Europe].[UK], [starting date].[ALL].[2020].[Q2].[M4], [completion date].[ALL].[2020].[Q1].[M1] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[electronic product].[smart watch], Transport.[ALL].[ocean freight], [starting region].[ALL].[Asia].[Japan], [ending region].[ALL].[Asia].[South Korea], [starting date].[ALL].[2020].[Q1].[M2], [completion date].[ALL].[2019].[Q4].[M12] measures quantity 333.333 income 222.222 cost 111.111 ), 
-(Goods.[ALL].[electronic product].[smart watch], Transport.[ALL].[ocean freight], [starting region].[ALL].[Asia].[Japan], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2019].[Q4].[M12], [completion date].[ALL].[2019].[Q4].[M11] measures quantity 333.333 income 222.222 cost 111.111 ), 
+(Goods.[ALL].[electronic product].[smart watch], Transport.[ALL].[ocean freight], [starting region].[ALL].[Asia].[Japan], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2019].[Q4].[M12], [completion date].[ALL].[2019].[Q4].[M11] measures quantity 333.333 income 222.222 cost 111.111 );
+
+---
+
+insert [logistics.test]
 (Goods.[ALL].[electronic product].[smart watch], Transport.[ALL].[ocean freight], [starting region].[ALL].[Asia].[Japan], [ending region].[ALL].[Europe].[UK], [starting date].[ALL].[2019].[Q4].[M10], [completion date].[ALL].[2019].[Q4].[M10] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[electronic product].[smart watch], Transport.[ALL].[ocean freight], [starting region].[ALL].[Asia].[South Korea], [ending region].[ALL].[Asia].[South Korea], [starting date].[ALL].[2019].[Q3].[M8], [completion date].[ALL].[2019].[Q3].[M9] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[electronic product].[smart watch], Transport.[ALL].[ocean freight], [starting region].[ALL].[Asia].[South Korea], [ending region].[ALL].[America].[Mexico], [starting date].[ALL].[2021].[Q2].[M6], [completion date].[ALL].[2019].[Q3].[M8] measures quantity 333.333 income 222.222 cost 111.111 ), 
@@ -4371,7 +4423,11 @@ insert [logistics.test]
 (Goods.[ALL].[household appliances].[refrigerator], Transport.[ALL].[aviation], [starting region].[ALL].[Europe].[Italy], [ending region].[ALL].[America].[Chile], [starting date].[ALL].[2019].[Q3].[M9], [completion date].[ALL].[2020].[Q1].[M2] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[household appliances].[refrigerator], Transport.[ALL].[aviation], [starting region].[ALL].[Europe].[Italy], [ending region].[ALL].[Europe].[UK], [starting date].[ALL].[2019].[Q3].[M7], [completion date].[ALL].[2020].[Q1].[M1] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[household appliances].[refrigerator], Transport.[ALL].[aviation], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Asia].[Japan], [starting date].[ALL].[2021].[Q2].[M5], [completion date].[ALL].[2019].[Q4].[M12] measures quantity 333.333 income 222.222 cost 111.111 ), 
-(Goods.[ALL].[household appliances].[refrigerator], Transport.[ALL].[aviation], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[America].[Mexico], [starting date].[ALL].[2021].[Q1].[M3], [completion date].[ALL].[2019].[Q4].[M11] measures quantity 333.333 income 222.222 cost 111.111 ), 
+(Goods.[ALL].[household appliances].[refrigerator], Transport.[ALL].[aviation], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[America].[Mexico], [starting date].[ALL].[2021].[Q1].[M3], [completion date].[ALL].[2019].[Q4].[M11] measures quantity 333.333 income 222.222 cost 111.111 );
+
+---
+
+insert [logistics.test]
 (Goods.[ALL].[household appliances].[refrigerator], Transport.[ALL].[aviation], [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2021].[Q1].[M1], [completion date].[ALL].[2019].[Q4].[M10] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[household appliances].[refrigerator], Transport.[ALL].[ocean freight], [starting region].[ALL].[Asia].[China], [ending region].[ALL].[Asia].[Japan], [starting date].[ALL].[2020].[Q4].[M11], [completion date].[ALL].[2019].[Q3].[M9] measures quantity 333.333 income 222.222 cost 111.111 ), 
 (Goods.[ALL].[household appliances].[refrigerator], Transport.[ALL].[ocean freight], [starting region].[ALL].[Asia].[China], [ending region].[ALL].[America].[Mexico], [starting date].[ALL].[2020].[Q3].[M9], [completion date].[ALL].[2019].[Q3].[M8] measures quantity 333.333 income 222.222 cost 111.111 ), 
@@ -4587,7 +4643,11 @@ insert [logistics.test]
 ([Goods].[ALL].[electronic product].[computer], [Transport].[ALL].[aviation], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2019].[Q1].[M2], [completion date].[ALL].[2021].[Q2].[M4] measures quantity 1 income 1 cost 69.866447),
 ([Goods].[ALL].[electronic product].[computer], [Transport].[ALL].[aviation], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2019].[Q1].[M3], [completion date].[ALL].[2021].[Q2].[M4] measures quantity 1 income 1 cost 15.336612),
 ([Goods].[ALL].[electronic product].[computer], [Transport].[ALL].[aviation], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2019].[Q2].[M4], [completion date].[ALL].[2021].[Q2].[M4] measures quantity 1 income 1 cost 79.127618),
-([Goods].[ALL].[electronic product].[computer], [Transport].[ALL].[aviation], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2019].[Q2].[M5], [completion date].[ALL].[2021].[Q2].[M4] measures quantity 1 income 1 cost 9.198132),
+([Goods].[ALL].[electronic product].[computer], [Transport].[ALL].[aviation], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2019].[Q2].[M5], [completion date].[ALL].[2021].[Q2].[M4] measures quantity 1 income 1 cost 9.198132);
+
+---
+
+insert [logistics.test]
 ([Goods].[ALL].[electronic product].[computer], [Transport].[ALL].[aviation], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2019].[Q2].[M6], [completion date].[ALL].[2021].[Q2].[M4] measures quantity 1 income 1 cost 69.156545),
 ([Goods].[ALL].[electronic product].[computer], [Transport].[ALL].[aviation], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2019].[Q3].[M7], [completion date].[ALL].[2021].[Q2].[M4] measures quantity 1 income 1 cost 19.023639),
 ([Goods].[ALL].[electronic product].[computer], [Transport].[ALL].[aviation], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[Europe].[Italy], [starting date].[ALL].[2019].[Q3].[M8], [completion date].[ALL].[2021].[Q2].[M4] measures quantity 1 income 1 cost 33.164692),
@@ -4765,7 +4825,11 @@ insert [Airline Turnover]
 ([Date].[ALL].[2020].[Q1].[February], [Aircraft Type].[ALL].[Airbus].[Airbus A330], [Service Type].[ALL].[First Class Suite] measures [Turnover] 2040460),
 ([Date].[ALL].[2020].[Q1].[February], [Aircraft Type].[ALL].[Airbus].[Airbus A330], [Service Type].[ALL].[Private Jet Charter] measures [Turnover] 1014992),
 ([Date].[ALL].[2020].[Q1].[February], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets], [Service Type].[ALL].[Premium Economy Class] measures [Turnover] 10858237),
-([Date].[ALL].[2020].[Q1].[February], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets], [Service Type].[ALL].[Basic Economy Class] measures [Turnover] 16785085),
+([Date].[ALL].[2020].[Q1].[February], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets], [Service Type].[ALL].[Basic Economy Class] measures [Turnover] 16785085);
+
+---
+
+insert [Airline Turnover]
 ([Date].[ALL].[2020].[Q1].[February], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets], [Service Type].[ALL].[Economy Plus] measures [Turnover] 12943008),
 ([Date].[ALL].[2020].[Q1].[February], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets], [Service Type].[ALL].[Business Suite] measures [Turnover] 6249146),
 ([Date].[ALL].[2020].[Q1].[February], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets], [Service Type].[ALL].[Premium Business] measures [Turnover] 3453461),
@@ -4873,7 +4937,11 @@ insert [Airline Turnover]
 ([Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[Basic Economy Class] measures [Turnover] 24011763),
 ([Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[Economy Plus] measures [Turnover] 20865867),
 ([Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[Business Suite] measures [Turnover] 7789862),
-([Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[Premium Business] measures [Turnover] 5408691),
+([Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[Premium Business] measures [Turnover] 5408691);
+
+---
+
+insert [Airline Turnover]
 ([Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[First Class Suite] measures [Turnover] 4739652),
 ([Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[Private Jet Charter] measures [Turnover] 2426388),
 ([Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A350], [Service Type].[ALL].[Premium Economy Class] measures [Turnover] 9268786),
@@ -4981,7 +5049,11 @@ insert [Airline Turnover]
 ([Date].[ALL].[2020].[Q2].[June], [Aircraft Type].[ALL].[Boeing].[Boeing 747], [Service Type].[ALL].[Premium Business] measures [Turnover] 2614678),
 ([Date].[ALL].[2020].[Q2].[June], [Aircraft Type].[ALL].[Boeing].[Boeing 747], [Service Type].[ALL].[First Class Suite] measures [Turnover] 2499747),
 ([Date].[ALL].[2020].[Q2].[June], [Aircraft Type].[ALL].[Boeing].[Boeing 747], [Service Type].[ALL].[Private Jet Charter] measures [Turnover] 1005585),
-([Date].[ALL].[2020].[Q2].[June], [Aircraft Type].[ALL].[Boeing].[Boeing 777], [Service Type].[ALL].[Premium Economy Class] measures [Turnover] 12287325),
+([Date].[ALL].[2020].[Q2].[June], [Aircraft Type].[ALL].[Boeing].[Boeing 777], [Service Type].[ALL].[Premium Economy Class] measures [Turnover] 12287325);
+
+---
+
+insert [Airline Turnover]
 ([Date].[ALL].[2020].[Q2].[June], [Aircraft Type].[ALL].[Boeing].[Boeing 777], [Service Type].[ALL].[Basic Economy Class] measures [Turnover] 15317094),
 ([Date].[ALL].[2020].[Q2].[June], [Aircraft Type].[ALL].[Boeing].[Boeing 777], [Service Type].[ALL].[Economy Plus] measures [Turnover] 13550334),
 ([Date].[ALL].[2020].[Q2].[June], [Aircraft Type].[ALL].[Boeing].[Boeing 777], [Service Type].[ALL].[Business Suite] measures [Turnover] 7133772),
@@ -5089,7 +5161,11 @@ insert [Airline Turnover]
 ([Date].[ALL].[2020].[Q3].[July], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Premium Economy Class] measures [Turnover] 6605891),
 ([Date].[ALL].[2020].[Q3].[July], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Basic Economy Class] measures [Turnover] 11963047),
 ([Date].[ALL].[2020].[Q3].[July], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Economy Plus] measures [Turnover] 9007779),
-([Date].[ALL].[2020].[Q3].[July], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Business Suite] measures [Turnover] 3732672),
+([Date].[ALL].[2020].[Q3].[July], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Business Suite] measures [Turnover] 3732672);
+
+---
+
+insert [Airline Turnover]
 ([Date].[ALL].[2020].[Q3].[July], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Premium Business] measures [Turnover] 2702186),
 ([Date].[ALL].[2020].[Q3].[July], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[First Class Suite] measures [Turnover] 2293790),
 ([Date].[ALL].[2020].[Q3].[July], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Private Jet Charter] measures [Turnover] 1077484),
@@ -5197,7 +5273,11 @@ insert [Airline Turnover]
 ([Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Airbus].[Airbus A350], [Service Type].[ALL].[Business Suite] measures [Turnover] 5412673),
 ([Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Airbus].[Airbus A350], [Service Type].[ALL].[Premium Business] measures [Turnover] 4169910),
 ([Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Airbus].[Airbus A350], [Service Type].[ALL].[First Class Suite] measures [Turnover] 2672357),
-([Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Airbus].[Airbus A350], [Service Type].[ALL].[Private Jet Charter] measures [Turnover] 1501954),
+([Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Airbus].[Airbus A350], [Service Type].[ALL].[Private Jet Charter] measures [Turnover] 1501954);
+
+---
+
+insert [Airline Turnover]
 ([Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Airbus].[Airbus A330], [Service Type].[ALL].[Premium Economy Class] measures [Turnover] 7072771),
 ([Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Airbus].[Airbus A330], [Service Type].[ALL].[Basic Economy Class] measures [Turnover] 11506730),
 ([Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Airbus].[Airbus A330], [Service Type].[ALL].[Economy Plus] measures [Turnover] 8339309),
@@ -5341,7 +5421,11 @@ insert [Airline Turnover]
 ([Date].[ALL].[2020].[Q4].[November], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Premium Economy Class] measures [Turnover] 8644112),
 ([Date].[ALL].[2020].[Q4].[November], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Basic Economy Class] measures [Turnover] 11586968),
 ([Date].[ALL].[2020].[Q4].[November], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Economy Plus] measures [Turnover] 9188758),
-([Date].[ALL].[2020].[Q4].[November], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Business Suite] measures [Turnover] 3944850),
+([Date].[ALL].[2020].[Q4].[November], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Business Suite] measures [Turnover] 3944850);
+
+---
+
+insert [Airline Turnover]
 ([Date].[ALL].[2020].[Q4].[November], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Premium Business] measures [Turnover] 2893430),
 ([Date].[ALL].[2020].[Q4].[November], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[First Class Suite] measures [Turnover] 2021039),
 ([Date].[ALL].[2020].[Q4].[November], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ], [Service Type].[ALL].[Private Jet Charter] measures [Turnover] 1073364),
@@ -5485,7 +5569,11 @@ insert [Airline Turnover]
 ([Date].[ALL].[2021].[Q1].[February], [Aircraft Type].[ALL].[Boeing].[Boeing 747], [Service Type].[ALL].[Premium Business] measures [Turnover] 3431939),
 ([Date].[ALL].[2021].[Q1].[February], [Aircraft Type].[ALL].[Boeing].[Boeing 747], [Service Type].[ALL].[First Class Suite] measures [Turnover] 3137818),
 ([Date].[ALL].[2021].[Q1].[February], [Aircraft Type].[ALL].[Boeing].[Boeing 747], [Service Type].[ALL].[Private Jet Charter] measures [Turnover] 1223128),
-([Date].[ALL].[2021].[Q1].[February], [Aircraft Type].[ALL].[Boeing].[Boeing 777], [Service Type].[ALL].[Premium Economy Class] measures [Turnover] 16149917),
+([Date].[ALL].[2021].[Q1].[February], [Aircraft Type].[ALL].[Boeing].[Boeing 777], [Service Type].[ALL].[Premium Economy Class] measures [Turnover] 16149917);
+
+---
+
+insert [Airline Turnover]
 ([Date].[ALL].[2021].[Q1].[February], [Aircraft Type].[ALL].[Boeing].[Boeing 777], [Service Type].[ALL].[Basic Economy Class] measures [Turnover] 23203172),
 ([Date].[ALL].[2021].[Q1].[February], [Aircraft Type].[ALL].[Boeing].[Boeing 777], [Service Type].[ALL].[Economy Plus] measures [Turnover] 16967194),
 ([Date].[ALL].[2021].[Q1].[February], [Aircraft Type].[ALL].[Boeing].[Boeing 777], [Service Type].[ALL].[Business Suite] measures [Turnover] 7820098),
@@ -5629,7 +5717,11 @@ insert [Airline Turnover]
 ([Date].[ALL].[2021].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[Basic Economy Class] measures [Turnover] 27881149),
 ([Date].[ALL].[2021].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[Economy Plus] measures [Turnover] 22223188),
 ([Date].[ALL].[2021].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[Business Suite] measures [Turnover] 9317386),
-([Date].[ALL].[2021].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[Premium Business] measures [Turnover] 6278239),
+([Date].[ALL].[2021].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[Premium Business] measures [Turnover] 6278239);
+
+---
+
+insert [Airline Turnover]
 ([Date].[ALL].[2021].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[First Class Suite] measures [Turnover] 4368383),
 ([Date].[ALL].[2021].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A380], [Service Type].[ALL].[Private Jet Charter] measures [Turnover] 2869786),
 ([Date].[ALL].[2021].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A350], [Service Type].[ALL].[Premium Economy Class] measures [Turnover] 11676164),
@@ -5809,7 +5901,11 @@ insert [Airline Turnover]
 ([Date].[ALL].[2021].[Q3].[July], [Aircraft Type].[ALL].[Boeing].[Boeing 777], [Service Type].[ALL].[Private Jet Charter] measures [Turnover] 2100720),
 ([Date].[ALL].[2021].[Q3].[July], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner], [Service Type].[ALL].[Premium Economy Class] measures [Turnover] 17819102),
 ([Date].[ALL].[2021].[Q3].[July], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner], [Service Type].[ALL].[Basic Economy Class] measures [Turnover] 27296701),
-([Date].[ALL].[2021].[Q3].[July], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner], [Service Type].[ALL].[Economy Plus] measures [Turnover] 24808382),
+([Date].[ALL].[2021].[Q3].[July], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner], [Service Type].[ALL].[Economy Plus] measures [Turnover] 24808382);
+
+---
+
+insert [Airline Turnover]
 ([Date].[ALL].[2021].[Q3].[July], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner], [Service Type].[ALL].[Business Suite] measures [Turnover] 10645877),
 ([Date].[ALL].[2021].[Q3].[July], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner], [Service Type].[ALL].[Premium Business] measures [Turnover] 6610072),
 ([Date].[ALL].[2021].[Q3].[July], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner], [Service Type].[ALL].[First Class Suite] measures [Turnover] 4296192),
@@ -7037,7 +7133,12 @@ insert [Flight Passengers Statistics]
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2020].[Q4].[December], [Aircraft Type].[ALL].[Airbus].[Airbus A350] measures [Number of Passengers] 461),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2020].[Q4].[December], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Number of Passengers] 140),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2020].[Q4].[December], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Number of Passengers] 145),
-([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2020].[Q4].[December], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 166),
+([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2020].[Q4].[December], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 166);
+
+---
+
+insert [Flight Passengers Statistics]
+
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2020].[Q4].[December], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Number of Passengers] 244),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2021].[Q1].[January], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Number of Passengers] 40),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2021].[Q1].[January], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Number of Passengers] 351),
@@ -7181,7 +7282,12 @@ insert [Flight Passengers Statistics]
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A350] measures [Number of Passengers] 209),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Number of Passengers] 314),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Number of Passengers] 198),
-([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 213),
+([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 213);
+
+---
+
+insert [Flight Passengers Statistics]
+
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Number of Passengers] 118),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2022].[Q2].[May], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Number of Passengers] 152),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Asia], [Date].[ALL].[2022].[Q2].[May], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Number of Passengers] 163),
@@ -7325,7 +7431,12 @@ insert [Flight Passengers Statistics]
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Airbus].[Airbus A350] measures [Number of Passengers] 120),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Number of Passengers] 29),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Number of Passengers] 153),
-([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 155),
+([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 155);
+
+---
+
+insert [Flight Passengers Statistics]
+
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Number of Passengers] 329),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Number of Passengers] 115),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Number of Passengers] 33),
@@ -7505,7 +7616,12 @@ insert [Flight Passengers Statistics]
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A350] measures [Number of Passengers] 325),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Number of Passengers] 102),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Number of Passengers] 119),
-([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 250),
+([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 250);
+
+---
+
+insert [Flight Passengers Statistics]
+
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Number of Passengers] 192),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2022].[Q2].[May], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Number of Passengers] 365),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Europe], [Date].[ALL].[2022].[Q2].[May], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Number of Passengers] 90),
@@ -7613,7 +7729,12 @@ insert [Flight Passengers Statistics]
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A350] measures [Number of Passengers] 213),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Number of Passengers] 213),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Number of Passengers] 229),
-([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 98),
+([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 98);
+
+---
+
+insert [Flight Passengers Statistics]
+
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2020].[Q2].[April], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Number of Passengers] 248),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2020].[Q2].[May], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Number of Passengers] 285),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2020].[Q2].[May], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Number of Passengers] 249),
@@ -7829,7 +7950,12 @@ insert [Flight Passengers Statistics]
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A350] measures [Number of Passengers] 271),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Number of Passengers] 27),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Number of Passengers] 60),
-([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 132),
+([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 132);
+
+---
+
+insert [Flight Passengers Statistics]
+
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2022].[Q2].[April], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Number of Passengers] 270),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2022].[Q2].[May], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Number of Passengers] 339),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[North America], [Date].[ALL].[2022].[Q2].[May], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Number of Passengers] 141),
@@ -8081,7 +8207,12 @@ insert [Flight Passengers Statistics]
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[South America], [Date].[ALL].[2021].[Q3].[August], [Aircraft Type].[ALL].[Airbus].[Airbus A350] measures [Number of Passengers] 255),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[South America], [Date].[ALL].[2021].[Q3].[August], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Number of Passengers] 303),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[South America], [Date].[ALL].[2021].[Q3].[August], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Number of Passengers] 158),
-([Starting Point].[ALL].[Asia], [Destination].[ALL].[South America], [Date].[ALL].[2021].[Q3].[August], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 92),
+([Starting Point].[ALL].[Asia], [Destination].[ALL].[South America], [Date].[ALL].[2021].[Q3].[August], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 92);
+
+---
+
+insert [Flight Passengers Statistics]
+
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[South America], [Date].[ALL].[2021].[Q3].[August], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Number of Passengers] 157),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[South America], [Date].[ALL].[2021].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Number of Passengers] 145),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[South America], [Date].[ALL].[2021].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Number of Passengers] 228),
@@ -8297,7 +8428,12 @@ insert [Flight Passengers Statistics]
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Airbus].[Airbus A350] measures [Number of Passengers] 339),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Number of Passengers] 128),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Number of Passengers] 191),
-([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 68),
+([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 68);
+
+---
+
+insert [Flight Passengers Statistics]
+
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Number of Passengers] 340),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Number of Passengers] 29),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Number of Passengers] 41),
@@ -8513,7 +8649,12 @@ insert [Flight Passengers Statistics]
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2022].[Q3].[August], [Aircraft Type].[ALL].[Airbus].[Airbus A350] measures [Number of Passengers] 327),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2022].[Q3].[August], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Number of Passengers] 245),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2022].[Q3].[August], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Number of Passengers] 129),
-([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2022].[Q3].[August], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 224),
+([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2022].[Q3].[August], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Number of Passengers] 224);
+
+---
+
+insert [Flight Passengers Statistics]
+
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2022].[Q3].[August], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Number of Passengers] 100),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2022].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Number of Passengers] 195),
 ([Starting Point].[ALL].[Asia], [Destination].[ALL].[Africa], [Date].[ALL].[2022].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Number of Passengers] 180),
@@ -18670,7 +18811,11 @@ insert [Airline Cost Of Flight]
 ([Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Fuel costs] 764481 [Crew costs] 444736 [Maintenance and repair costs] 348505 [Airport fees] 258246 [Insurance costs] 405055 [Administrative and overhead costs] 132034 [Taxes] 243874 [Catering and other in-flight services] 303358),
 ([Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Fuel costs] 895153 [Crew costs] 474723 [Maintenance and repair costs] 401213 [Airport fees] 298870 [Insurance costs] 432538 [Administrative and overhead costs] 148994 [Taxes] 283615 [Catering and other in-flight services] 361086),
 ([Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Fuel costs] 810463 [Crew costs] 418197 [Maintenance and repair costs] 343911 [Airport fees] 255624 [Insurance costs] 388194 [Administrative and overhead costs] 129077 [Taxes] 235026 [Catering and other in-flight services] 295553),
-([Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Fuel costs] 873007 [Crew costs] 468600 [Maintenance and repair costs] 370383 [Airport fees] 278133 [Insurance costs] 399716 [Administrative and overhead costs] 139880 [Taxes] 244406 [Catering and other in-flight services] 335541),
+([Date].[ALL].[2020].[Q3].[August], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Fuel costs] 873007 [Crew costs] 468600 [Maintenance and repair costs] 370383 [Airport fees] 278133 [Insurance costs] 399716 [Administrative and overhead costs] 139880 [Taxes] 244406 [Catering and other in-flight services] 335541);
+
+---
+
+insert [Airline Cost Of Flight]
 ([Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Fuel costs] 577647 [Crew costs] 338302 [Maintenance and repair costs] 258734 [Airport fees] 203251 [Insurance costs] 309614 [Administrative and overhead costs] 98962 [Taxes] 179248 [Catering and other in-flight services] 231135),
 ([Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Fuel costs] 1262956 [Crew costs] 656729 [Maintenance and repair costs] 512766 [Airport fees] 415950 [Insurance costs] 623399 [Administrative and overhead costs] 208907 [Taxes] 385094 [Catering and other in-flight services] 485624),
 ([Date].[ALL].[2020].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner] measures [Fuel costs] 2103521 [Crew costs] 1082427 [Maintenance and repair costs] 898040 [Airport fees] 659634 [Insurance costs] 969954 [Administrative and overhead costs] 326874 [Taxes] 642949 [Catering and other in-flight services] 754207),
@@ -18778,7 +18923,11 @@ insert [Airline Cost Of Flight]
 ([Date].[ALL].[2021].[Q3].[August], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Fuel costs] 754062 [Crew costs] 425581 [Maintenance and repair costs] 327671 [Airport fees] 246952 [Insurance costs] 383899 [Administrative and overhead costs] 123352 [Taxes] 222885 [Catering and other in-flight services] 293141),
 ([Date].[ALL].[2021].[Q3].[August], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Fuel costs] 872094 [Crew costs] 487159 [Maintenance and repair costs] 365065 [Airport fees] 279577 [Insurance costs] 432589 [Administrative and overhead costs] 141190 [Taxes] 261242 [Catering and other in-flight services] 328322),
 ([Date].[ALL].[2021].[Q3].[August], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Fuel costs] 730508 [Crew costs] 433184 [Maintenance and repair costs] 315437 [Airport fees] 247940 [Insurance costs] 383105 [Administrative and overhead costs] 126705 [Taxes] 229937 [Catering and other in-flight services] 296427),
-([Date].[ALL].[2021].[Q3].[August], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Fuel costs] 816765 [Crew costs] 464265 [Maintenance and repair costs] 351190 [Airport fees] 260719 [Insurance costs] 407367 [Administrative and overhead costs] 138142 [Taxes] 251307 [Catering and other in-flight services] 300282),
+([Date].[ALL].[2021].[Q3].[August], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Fuel costs] 816765 [Crew costs] 464265 [Maintenance and repair costs] 351190 [Airport fees] 260719 [Insurance costs] 407367 [Administrative and overhead costs] 138142 [Taxes] 251307 [Catering and other in-flight services] 300282);
+
+---
+
+insert [Airline Cost Of Flight]
 ([Date].[ALL].[2021].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Fuel costs] 573117 [Crew costs] 347815 [Maintenance and repair costs] 277228 [Airport fees] 199375 [Insurance costs] 311172 [Administrative and overhead costs] 103495 [Taxes] 185099 [Catering and other in-flight services] 236449),
 ([Date].[ALL].[2021].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Fuel costs] 1190066 [Crew costs] 677376 [Maintenance and repair costs] 536831 [Airport fees] 413634 [Insurance costs] 600948 [Administrative and overhead costs] 205888 [Taxes] 381537 [Catering and other in-flight services] 470588),
 ([Date].[ALL].[2021].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner] measures [Fuel costs] 2043029 [Crew costs] 1118227 [Maintenance and repair costs] 909667 [Airport fees] 680186 [Insurance costs] 979619 [Administrative and overhead costs] 340706 [Taxes] 582457 [Catering and other in-flight services] 793631),
@@ -18860,7 +19009,11 @@ insert [Airline Cost Of Flight]
 ([Date].[ALL].[2022].[Q2].[May], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Fuel costs] 899181 [Crew costs] 528899 [Maintenance and repair costs] 399771 [Airport fees] 312285 [Insurance costs] 455776 [Administrative and overhead costs] 152514 [Taxes] 288126 [Catering and other in-flight services] 364420),
 ([Date].[ALL].[2022].[Q2].[May], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Fuel costs] 825990 [Crew costs] 458150 [Maintenance and repair costs] 369307 [Airport fees] 260357 [Insurance costs] 404827 [Administrative and overhead costs] 139125 [Taxes] 244450 [Catering and other in-flight services] 327014),
 ([Date].[ALL].[2022].[Q2].[May], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Fuel costs] 860634 [Crew costs] 495485 [Maintenance and repair costs] 387817 [Airport fees] 285824 [Insurance costs] 447529 [Administrative and overhead costs] 142225 [Taxes] 258408 [Catering and other in-flight services] 322264),
-([Date].[ALL].[2022].[Q2].[June], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Fuel costs] 575167 [Crew costs] 318119 [Maintenance and repair costs] 265045 [Airport fees] 190852 [Insurance costs] 283760 [Administrative and overhead costs] 93147 [Taxes] 175995 [Catering and other in-flight services] 232331),
+([Date].[ALL].[2022].[Q2].[June], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Fuel costs] 575167 [Crew costs] 318119 [Maintenance and repair costs] 265045 [Airport fees] 190852 [Insurance costs] 283760 [Administrative and overhead costs] 93147 [Taxes] 175995 [Catering and other in-flight services] 232331);
+
+---
+
+insert [Airline Cost Of Flight]
 ([Date].[ALL].[2022].[Q2].[June], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Fuel costs] 1142882 [Crew costs] 608229 [Maintenance and repair costs] 501334 [Airport fees] 389480 [Insurance costs] 571702 [Administrative and overhead costs] 185516 [Taxes] 345282 [Catering and other in-flight services] 452308),
 ([Date].[ALL].[2022].[Q2].[June], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner] measures [Fuel costs] 1986240 [Crew costs] 1056399 [Maintenance and repair costs] 873473 [Airport fees] 660572 [Insurance costs] 949305 [Administrative and overhead costs] 326164 [Taxes] 558344 [Catering and other in-flight services] 713425),
 ([Date].[ALL].[2022].[Q2].[June], [Aircraft Type].[ALL].[Airbus].[Airbus A380] measures [Fuel costs] 1959317 [Crew costs] 1066399 [Maintenance and repair costs] 862731 [Airport fees] 650759 [Insurance costs] 927654 [Administrative and overhead costs] 326781 [Taxes] 556844 [Catering and other in-flight services] 737303),
@@ -18886,7 +19039,11 @@ insert [Airline Cost Of Flight]
 ([Date].[ALL].[2022].[Q3].[August], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Fuel costs] 835918 [Crew costs] 451367 [Maintenance and repair costs] 353758 [Airport fees] 271262 [Insurance costs] 395731 [Administrative and overhead costs] 134630 [Taxes] 260850 [Catering and other in-flight services] 313430),
 ([Date].[ALL].[2022].[Q3].[August], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Fuel costs] 914981 [Crew costs] 507328 [Maintenance and repair costs] 392692 [Airport fees] 296267 [Insurance costs] 455124 [Administrative and overhead costs] 148876 [Taxes] 293057 [Catering and other in-flight services] 354347),
 ([Date].[ALL].[2022].[Q3].[August], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Fuel costs] 821512 [Crew costs] 446685 [Maintenance and repair costs] 360234 [Airport fees] 269928 [Insurance costs] 416642 [Administrative and overhead costs] 135463 [Taxes] 253665 [Catering and other in-flight services] 324727),
-([Date].[ALL].[2022].[Q3].[August], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Fuel costs] 831889 [Crew costs] 466762 [Maintenance and repair costs] 385227 [Airport fees] 290755 [Insurance costs] 417304 [Administrative and overhead costs] 145541 [Taxes] 256310 [Catering and other in-flight services] 324917),
+([Date].[ALL].[2022].[Q3].[August], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Fuel costs] 831889 [Crew costs] 466762 [Maintenance and repair costs] 385227 [Airport fees] 290755 [Insurance costs] 417304 [Administrative and overhead costs] 145541 [Taxes] 256310 [Catering and other in-flight services] 324917);
+
+---
+
+insert [Airline Cost Of Flight]
 ([Date].[ALL].[2022].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Fuel costs] 570054 [Crew costs] 332371 [Maintenance and repair costs] 267847 [Airport fees] 204864 [Insurance costs] 283552 [Administrative and overhead costs] 100098 [Taxes] 178544 [Catering and other in-flight services] 219917),
 ([Date].[ALL].[2022].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Fuel costs] 1185827 [Crew costs] 674293 [Maintenance and repair costs] 539782 [Airport fees] 398850 [Insurance costs] 603450 [Administrative and overhead costs] 192185 [Taxes] 374934 [Catering and other in-flight services] 450181),
 ([Date].[ALL].[2022].[Q3].[September], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner] measures [Fuel costs] 1945132 [Crew costs] 1079520 [Maintenance and repair costs] 871841 [Airport fees] 651231 [Insurance costs] 1032317 [Administrative and overhead costs] 329416 [Taxes] 610608 [Catering and other in-flight services] 735022),
@@ -18896,13 +19053,21 @@ insert [Airline Cost Of Flight]
 ([Date].[ALL].[2022].[Q3].[September], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Fuel costs] 891921 [Crew costs] 473151 [Maintenance and repair costs] 381052 [Airport fees] 304769 [Insurance costs] 444675 [Administrative and overhead costs] 144545 [Taxes] 262307 [Catering and other in-flight services] 335919),
 ([Date].[ALL].[2022].[Q3].[September], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Fuel costs] 785003 [Crew costs] 447166 [Maintenance and repair costs] 343118 [Airport fees] 260535 [Insurance costs] 399440 [Administrative and overhead costs] 129637 [Taxes] 246506 [Catering and other in-flight services] 289529),
 ([Date].[ALL].[2022].[Q3].[September], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Fuel costs] 834024 [Crew costs] 470448 [Maintenance and repair costs] 352628 [Airport fees] 270682 [Insurance costs] 408831 [Administrative and overhead costs] 138956 [Taxes] 259749 [Catering and other in-flight services] 335752),
-([Date].[ALL].[2022].[Q4].[October], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Fuel costs] 592530 [Crew costs] 309195 [Maintenance and repair costs] 269625 [Airport fees] 198589 [Insurance costs] 296333 [Administrative and overhead costs] 98810 [Taxes] 172909 [Catering and other in-flight services] 226940),
+([Date].[ALL].[2022].[Q4].[October], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Fuel costs] 592530 [Crew costs] 309195 [Maintenance and repair costs] 269625 [Airport fees] 198589 [Insurance costs] 296333 [Administrative and overhead costs] 98810 [Taxes] 172909 [Catering and other in-flight services] 226940);
+
+---
+
+insert [Airline Cost Of Flight]
 ([Date].[ALL].[2022].[Q4].[October], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Fuel costs] 1127892 [Crew costs] 618938 [Maintenance and repair costs] 528881 [Airport fees] 403846 [Insurance costs] 573516 [Administrative and overhead costs] 190732 [Taxes] 369485 [Catering and other in-flight services] 448942),
 ([Date].[ALL].[2022].[Q4].[October], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner] measures [Fuel costs] 2008588 [Crew costs] 1065566 [Maintenance and repair costs] 858146 [Airport fees] 647052 [Insurance costs] 946996 [Administrative and overhead costs] 338066 [Taxes] 600903 [Catering and other in-flight services] 773719),
 ([Date].[ALL].[2022].[Q4].[October], [Aircraft Type].[ALL].[Airbus].[Airbus A380] measures [Fuel costs] 1919132 [Crew costs] 1123692 [Maintenance and repair costs] 855759 [Airport fees] 648031 [Insurance costs] 996745 [Administrative and overhead costs] 333197 [Taxes] 595337 [Catering and other in-flight services] 754947),
 ([Date].[ALL].[2022].[Q4].[October], [Aircraft Type].[ALL].[Airbus].[Airbus A350] measures [Fuel costs] 1256016 [Crew costs] 678566 [Maintenance and repair costs] 577147 [Airport fees] 414983 [Insurance costs] 640237 [Administrative and overhead costs] 216786 [Taxes] 376652 [Catering and other in-flight services] 473080),
 ([Date].[ALL].[2022].[Q4].[October], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Fuel costs] 803445 [Crew costs] 451979 [Maintenance and repair costs] 350266 [Airport fees] 261180 [Insurance costs] 404698 [Administrative and overhead costs] 126439 [Taxes] 227684 [Catering and other in-flight services] 313139),
-([Date].[ALL].[2022].[Q4].[October], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Fuel costs] 854675 [Crew costs] 473034 [Maintenance and repair costs] 381245 [Airport fees] 281769 [Insurance costs] 450710 [Administrative and overhead costs] 152292 [Taxes] 278383 [Catering and other in-flight services] 355889),
+([Date].[ALL].[2022].[Q4].[October], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Fuel costs] 854675 [Crew costs] 473034 [Maintenance and repair costs] 381245 [Airport fees] 281769 [Insurance costs] 450710 [Administrative and overhead costs] 152292 [Taxes] 278383 [Catering and other in-flight services] 355889);
+
+---
+
+insert [Airline Cost Of Flight]
 ([Date].[ALL].[2022].[Q4].[October], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Fuel costs] 757933 [Crew costs] 433201 [Maintenance and repair costs] 333161 [Airport fees] 259011 [Insurance costs] 386358 [Administrative and overhead costs] 126865 [Taxes] 237564 [Catering and other in-flight services] 301350),
 ([Date].[ALL].[2022].[Q4].[October], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Fuel costs] 794683 [Crew costs] 441194 [Maintenance and repair costs] 371807 [Airport fees] 274752 [Insurance costs] 413395 [Administrative and overhead costs] 132128 [Taxes] 248052 [Catering and other in-flight services] 325731),
 ([Date].[ALL].[2022].[Q4].[November], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Fuel costs] 601851 [Crew costs] 309096 [Maintenance and repair costs] 245680 [Airport fees] 192538 [Insurance costs] 284233 [Administrative and overhead costs] 91894 [Taxes] 174072 [Catering and other in-flight services] 213012),
@@ -18911,12 +19076,20 @@ insert [Airline Cost Of Flight]
 ([Date].[ALL].[2022].[Q4].[November], [Aircraft Type].[ALL].[Airbus].[Airbus A380] measures [Fuel costs] 1855416 [Crew costs] 1081647 [Maintenance and repair costs] 870909 [Airport fees] 644225 [Insurance costs] 981271 [Administrative and overhead costs] 304965 [Taxes] 602279 [Catering and other in-flight services] 770284),
 ([Date].[ALL].[2022].[Q4].[November], [Aircraft Type].[ALL].[Airbus].[Airbus A350] measures [Fuel costs] 1299719 [Crew costs] 706458 [Maintenance and repair costs] 561971 [Airport fees] 430009 [Insurance costs] 631402 [Administrative and overhead costs] 216577 [Taxes] 377027 [Catering and other in-flight services] 484141),
 ([Date].[ALL].[2022].[Q4].[November], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Fuel costs] 734730 [Crew costs] 409240 [Maintenance and repair costs] 356590 [Airport fees] 249117 [Insurance costs] 397610 [Administrative and overhead costs] 124423 [Taxes] 243744 [Catering and other in-flight services] 301499),
-([Date].[ALL].[2022].[Q4].[November], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Fuel costs] 883275 [Crew costs] 458820 [Maintenance and repair costs] 371922 [Airport fees] 290138 [Insurance costs] 435482 [Administrative and overhead costs] 148220 [Taxes] 274205 [Catering and other in-flight services] 321388),
+([Date].[ALL].[2022].[Q4].[November], [Aircraft Type].[ALL].[Embraer].[Embraer E-Jets] measures [Fuel costs] 883275 [Crew costs] 458820 [Maintenance and repair costs] 371922 [Airport fees] 290138 [Insurance costs] 435482 [Administrative and overhead costs] 148220 [Taxes] 274205 [Catering and other in-flight services] 321388);
+
+---
+
+insert [Airline Cost Of Flight]
 ([Date].[ALL].[2022].[Q4].[November], [Aircraft Type].[ALL].[Bombardier].[Bombardier CRJ] measures [Fuel costs] 755637 [Crew costs] 426055 [Maintenance and repair costs] 344514 [Airport fees] 254940 [Insurance costs] 363303 [Administrative and overhead costs] 130451 [Taxes] 224901 [Catering and other in-flight services] 301692),
 ([Date].[ALL].[2022].[Q4].[November], [Aircraft Type].[ALL].[Sukhoi].[Sukhoi Superjet] measures [Fuel costs] 815337 [Crew costs] 444396 [Maintenance and repair costs] 348260 [Airport fees] 271851 [Insurance costs] 387863 [Administrative and overhead costs] 130307 [Taxes] 251133 [Catering and other in-flight services] 324356),
 ([Date].[ALL].[2022].[Q4].[December], [Aircraft Type].[ALL].[Boeing].[Boeing 747] measures [Fuel costs] 586877 [Crew costs] 307913 [Maintenance and repair costs] 263383 [Airport fees] 187731 [Insurance costs] 277412 [Administrative and overhead costs] 90672 [Taxes] 170744 [Catering and other in-flight services] 224832),
 ([Date].[ALL].[2022].[Q4].[December], [Aircraft Type].[ALL].[Boeing].[Boeing 777] measures [Fuel costs] 1090787 [Crew costs] 657776 [Maintenance and repair costs] 507724 [Airport fees] 389443 [Insurance costs] 543511 [Administrative and overhead costs] 198420 [Taxes] 341276 [Catering and other in-flight services] 457425),
-([Date].[ALL].[2022].[Q4].[December], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner] measures [Fuel costs] 1954159 [Crew costs] 1101886 [Maintenance and repair costs] 863107 [Airport fees] 616328 [Insurance costs] 908660 [Administrative and overhead costs] 330245 [Taxes] 591781 [Catering and other in-flight services] 761059),
+([Date].[ALL].[2022].[Q4].[December], [Aircraft Type].[ALL].[Boeing].[Boeing 787 Dreamliner] measures [Fuel costs] 1954159 [Crew costs] 1101886 [Maintenance and repair costs] 863107 [Airport fees] 616328 [Insurance costs] 908660 [Administrative and overhead costs] 330245 [Taxes] 591781 [Catering and other in-flight services] 761059);
+
+---
+
+insert [Airline Cost Of Flight]
 ([Date].[ALL].[2022].[Q4].[December], [Aircraft Type].[ALL].[Airbus].[Airbus A380] measures [Fuel costs] 1829421 [Crew costs] 1057855 [Maintenance and repair costs] 807440 [Airport fees] 650962 [Insurance costs] 935806 [Administrative and overhead costs] 312161 [Taxes] 597299 [Catering and other in-flight services] 714167),
 ([Date].[ALL].[2022].[Q4].[December], [Aircraft Type].[ALL].[Airbus].[Airbus A350] measures [Fuel costs] 1284415 [Crew costs] 702081 [Maintenance and repair costs] 532710 [Airport fees] 412314 [Insurance costs] 643835 [Administrative and overhead costs] 212901 [Taxes] 394224 [Catering and other in-flight services] 499130),
 ([Date].[ALL].[2022].[Q4].[December], [Aircraft Type].[ALL].[Airbus].[Airbus A330] measures [Fuel costs] 761084 [Crew costs] 410764 [Maintenance and repair costs] 347471 [Airport fees] 241939 [Insurance costs] 376313 [Administrative and overhead costs] 123192 [Taxes] 229773 [Catering and other in-flight services] 284862),

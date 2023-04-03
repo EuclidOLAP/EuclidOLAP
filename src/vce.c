@@ -1,11 +1,16 @@
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
+#include <dirent.h>
+
 #include "log.h"
+#include "cfg.h"
 #include "mdd.h"
 #include "vce.h"
 #include "utils.h"
+#include "net.h"
 
 #include "tools/elastic-byte-buffer.h"
 
@@ -14,7 +19,9 @@ static ArrayList *space_mam_ls;
 static ArrayList *coor_sys_ls;
 static ArrayList *space_ls;
 
-static void _do_calculate_measure_value(MDContext *md_ctx, MeasureSpace *space, ArrayList *sor_ls, int deep, unsigned long offset, GridData *grid_data, int mea_val_idx);
+static void _do_calculate_measure_value(
+    // MDContext *md_ctx, 
+    MeasureSpace *space, ArrayList *sor_ls, int deep, unsigned long offset, GridData *grid_data, int mea_val_idx);
 
 static void MeasureSpace_coordinate_intersection_value(MeasureSpace *space, unsigned long index, int mea_val_idx, GridData *gridData);
 
@@ -27,24 +34,52 @@ void vce_init()
 }
 
 void vce_load() {
-    FILE *cubes_fd = open_file(META_DEF_CUBES_FILE_PATH, "r");
 
-	md_gid cube_id;
-	while (fread((void *)&cube_id, sizeof(md_gid), 1, cubes_fd) > 0) {
+    DIR *dir = NULL;
+    struct dirent *entry;
+    char *prefix = "data-";
+    int prefix_len = strlen(prefix);
+    char *suffix, *endptr;
+    long cube_id;
 
-        char src_dir[128];
-        memset(src_dir, 0, 128);
-        getcwd(src_dir, 80);
+	char f[128];
+	memset(f, 0, 128);
+	getcwd(f, 80);
+	strcat(f, "/data");
+    
+    dir = opendir(f);
 
-        char profile_path[128];
-        memset(profile_path, 0, 128);
-        sprintf(profile_path, "%s/data/profile-%lu", src_dir, cube_id);
+    assert(dir != NULL);
 
-        if (access(profile_path, F_OK) == 0)
+    while ((entry = readdir(dir)) != NULL) {
+        if (strncmp(entry->d_name, prefix, prefix_len) == 0) {
+            suffix = entry->d_name + prefix_len;
+            cube_id = strtol(suffix, &endptr, 10);
             reload_space(cube_id);
+        }
     }
 
-    fclose(cubes_fd);
+    closedir(dir);
+
+
+    // FILE *cubes_fd = open_file(META_DEF_CUBES_FILE_PATH, "r");
+
+	// md_gid cube_id;
+	// while (fread((void *)&cube_id, sizeof(md_gid), 1, cubes_fd) > 0) {
+
+    //     char src_dir[128];
+    //     memset(src_dir, 0, 128);
+    //     getcwd(src_dir, 80);
+
+    //     char profile_path[128];
+    //     memset(profile_path, 0, 128);
+    //     sprintf(profile_path, "%s/data/profile-%lu", src_dir, cube_id);
+
+    //     if (access(profile_path, F_OK) == 0)
+    //         reload_space(cube_id);
+    // }
+
+    // fclose(cubes_fd);
 }
 
 /* TODO
@@ -52,9 +87,9 @@ void vce_load() {
  * When inserting new detailed measure data, the order in which it is defined must be the same as the
  * order of dimension roles when building the cube, otherwise the data will not be able to be found.
  */
-int vce_append(EuclidCommand *ec)
+int vce_append(EuclidCommand *action)
 {
-    char *bytes = ec->bytes;
+    char *bytes = action->bytes;
     unsigned int pkg_capacity = *((unsigned int *)bytes);
     size_t i = sizeof(int) + sizeof(short);
 
@@ -207,7 +242,7 @@ void reload_space(unsigned long cs_id) {
         ++space_partition_count;
     }
 
-    log_print("[debug] space_capacity < %lu >, SPACE_DEF_PARTITION_COUNT < %d >, space_partition_count < %lu >\n", space_capacity, SPACE_DEF_PARTITION_COUNT, space_partition_count);
+    // log_print("[debug] space_capacity < %lu >, SPACE_DEF_PARTITION_COUNT < %d >, space_partition_count < %lu >\n", space_capacity, SPACE_DEF_PARTITION_COUNT, space_partition_count);
 
     // Creates a new logical multidimensional array object by MemAllocMng.
     MeasureSpace *space = space_new(cs_id, space_partition_count, SPACE_DEF_PARTITION_SPAN_MIN, vals_count, cs_mam);
@@ -506,6 +541,11 @@ void space__destory(MeasureSpace *s)
 
 double *vce_vactors_values(MDContext *md_ctx, MddTuple **tuples_matrix_h, unsigned long v_len, char **null_flags)
 {
+    /**
+     * todo
+     * If the current node is running in master mode, you need to send the aggregate query request to the worker node, 
+     * wait at the semaphore, and wait until the worker node is woken up after all executions are completed.
+     */
     Cube *cube = Tuple_ctx_cube(tuples_matrix_h[0]);
 
     unsigned long i, j;
@@ -655,6 +695,24 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
 
     ArrayList_sort(tuple->mr_ls, MddMemberRole_cmp);
 
+    EuclidConfig *cfg = get_cfg();
+
+    if (cfg->mode == MODE_MASTER) {
+        ArrayList *one_tp_ls = als_new(1, "MddTuple *", THREAD_MAM, NULL);
+        als_add(one_tp_ls, tuple);
+
+        double *mea_val__;
+        char *null_flag__;
+        unsigned long len__;
+
+        dispatchAggregateMeasure(/*md_ctx,*/ cube, one_tp_ls, &mea_val__, &null_flag__, &len__);
+
+        grid_data->val = *mea_val__;
+        grid_data->null_flag = *null_flag__;
+
+        return;
+    }
+
     int coor_count = als_size(coor_sys_ls);
 
     CoordinateSystem *coor = NULL;
@@ -737,10 +795,14 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
 
     memset(grid_data, 0, sizeof(GridData));
     grid_data->null_flag = 1; // measure value is default null
-    _do_calculate_measure_value(md_ctx, space, sor_ls, 0, 0, grid_data, mea_val_idx);
+    _do_calculate_measure_value(
+        // md_ctx, 
+        space, sor_ls, 0, 0, grid_data, mea_val_idx);
 }
 
-static void _do_calculate_measure_value(MDContext *md_ctx, MeasureSpace *space, ArrayList *sor_ls, int deep, unsigned long offset, GridData *grid_data, int mea_val_idx)
+static void _do_calculate_measure_value(
+    // MDContext *md_ctx, 
+    MeasureSpace *space, ArrayList *sor_ls, int deep, unsigned long offset, GridData *grid_data, int mea_val_idx)
 {
     ScaleOffsetRange *sor = (ScaleOffsetRange *)als_get(sor_ls, deep);
     unsigned long _position;
@@ -758,7 +820,9 @@ static void _do_calculate_measure_value(MDContext *md_ctx, MeasureSpace *space, 
         }
         else
         {
-            _do_calculate_measure_value(md_ctx, space, sor_ls, deep + 1, offset + _position * sor->offset, grid_data, mea_val_idx);
+            _do_calculate_measure_value(
+                // md_ctx, 
+                space, sor_ls, deep + 1, offset + _position * sor->offset, grid_data, mea_val_idx);
         }
     }
 }
@@ -876,6 +940,122 @@ static void MeasureSpace_coordinate_intersection_value(MeasureSpace *space, unsi
     gridData->null_flag = 1;
 }
 
+void dispatchAggregateMeasure(/*MDContext *md_context,*/ Cube *cube, ArrayList *direct_vectors, double **_measures_, char **_null_flags_, unsigned long *_len_) {
+
+    unsigned long task_group_code = gen_md_gid();
+
+    // Cube *cube = select_def__get_cube(md_context->select_def);
+    int dr_count = als_size(cube->dim_role_ls);
+
+    unsigned int size = als_size(direct_vectors);
+
+    unsigned int pkg_size = 4+2+8+8+4+4+8+(sizeof(md_gid) * dr_count + sizeof(int)) * size;
+    ByteBuf *buff = buf__alloc(pkg_size);
+
+    *((unsigned int *) buf_cutting(buff, sizeof(int))) = pkg_size;
+    *((unsigned short *) buf_cutting(buff, sizeof(short))) = INTENT__VECTOR_AGGREGATION;
+    *((md_gid *) buf_cutting(buff, sizeof(md_gid))) = cube->gid;
+    *((unsigned long *) buf_cutting(buff, sizeof(long))) = task_group_code;
+    buf_cutting(buff, sizeof(int)); // skip the max task group number
+    buf_cutting(buff, sizeof(int)); // skip the task group number
+    *((long *) buf_cutting(buff, sizeof(long))) = size;
+
+    for (int i=0; i<size; i++) {
+        MddTuple *tuple = als_get(direct_vectors, i);
+        ArrayList_sort(tuple->mr_ls, MddMemberRole_cmp);
+
+        MddMemberRole *measure_mr = NULL;
+
+        int count = als_size(tuple->mr_ls);
+        for (int j=0; j<count; j++) {
+            MddMemberRole *mr = als_get(tuple->mr_ls, j);
+            DimensionRole *dr = mr->dim_role;
+
+            if (dr == NULL) {
+                measure_mr = mr;
+                continue;
+            }
+
+            *((md_gid *) buf_cutting(buff, sizeof(md_gid))) = mr->member->gid;
+        }
+
+        // int mea_val_idx = 0;
+        Member *measure_m = measure_mr->member;
+        for (int j = 0; j < als_size(cube->measure_mbrs); j++)
+        {
+            Member *_m = (Member *)als_get(cube->measure_mbrs, j);
+            if (measure_m->gid == _m->gid)
+            {
+                // mea_val_idx = j;
+                buf_append_int(buff, j);
+                break;
+            }
+        }
+    }
+
+    ArrayList *node_list = worker_nodes();
+
+    size_t buf_sz = buf_size(buff);
+
+    // buf_clear(buf);
+    // *((int *) buf_cutting(buf, 4+2+8+8)) = als_size(node_list);
+    buf_set_cursor(buff, 4+2+8+8);
+
+    int max_task_grp_num = als_size(node_list);
+
+    buf_append_int(buff, max_task_grp_num);
+
+    sem_t semt;
+    put_agg_task_group(task_group_code, max_task_grp_num, &semt);
+
+    sem_init(&semt, 0, 0);
+    
+    for (int i=0; i<als_size(node_list); i++) {
+        SockIntentThread *node_sit = als_get(node_list, i);
+
+        *((int *) buf_cutting(buff, sizeof(int))) = i;
+
+
+        ssize_t rscode = send(node_sit->sock_fd, buf_starting(buff), buf_sz, 0);
+
+        buf_set_cursor(buff, 4+2+8+8);
+    }
+
+    for (int i=0;i<max_task_grp_num;i++) {
+        sem_wait(&semt);
+    }
+
+    sem_destroy(&semt);
+
+    double *measure_vals = NULL;
+    char *null_flags = NULL;
+    int vals_size;
+    agg_task_group_result(task_group_code, &measure_vals, &null_flags, &vals_size);
+
+    assert(((measure_vals == NULL) && (null_flags == NULL)) || ((measure_vals != NULL) && (null_flags != NULL)));
+
+    if (measure_vals) {
+        *_measures_ = mam_alloc(sizeof(double) * vals_size, OBJ_TYPE__RAW_BYTES, NULL, 0);
+        *_null_flags_ = mam_alloc(sizeof(char) * vals_size, OBJ_TYPE__RAW_BYTES, NULL, 0);
+        *_len_ = vals_size;
+
+        memcpy(*_measures_, measure_vals, vals_size * sizeof(double));
+        memcpy(*_null_flags_, null_flags, vals_size * sizeof(char));
+
+        obj_release(measure_vals);
+        obj_release(null_flags);
+    } else {
+        *_measures_ = mam_alloc(sizeof(double) * als_size(direct_vectors), OBJ_TYPE__RAW_BYTES, NULL, 0);
+        *_null_flags_ = mam_alloc(sizeof(char) * als_size(direct_vectors), OBJ_TYPE__RAW_BYTES, NULL, 0);
+        memset(*_null_flags_, 1, sizeof(char) * als_size(direct_vectors));
+        *_len_ = als_size(direct_vectors);
+
+        // memset(*_null_flags_, 1, als_size(direct_vectors));
+    }
+
+    buf_release(buff);
+}
+
 void MeasureSpace_print(MeasureSpace *space) {
     log_print(">>>>>>>>\n");
     log_print(">>>>>>>>>>>>>>>>\n");
@@ -934,4 +1114,99 @@ Scale *ax_find_scale(Axis *axis, Scale *sample) {
 void scal_init(Scale *scale) {
     scale->fragments_len=0;
     scale->fragments = NULL;
+}
+
+ArrayList *worker_aggregate_measure(EuclidCommand *ec) {
+
+    char *payload = ec->bytes;
+    unsigned int idx = 4+2;
+
+    md_gid cube_gid = *((md_gid *)(payload + idx));
+    CoordinateSystem *cs = NULL;
+    for (int i = 0; i < als_size(coor_sys_ls); i++) {
+        cs = als_get(coor_sys_ls, i);
+        if (cs->id == cube_gid)
+            break;
+        cs = NULL;
+    }
+
+    if (cs == NULL)
+        return NULL;
+
+    MeasureSpace *space;
+    for (int i = 0; i < als_size(space_ls); i++)
+    {
+        space = (MeasureSpace *)als_get(space_ls, i);
+        if (space->id == cube_gid)
+            break;
+        else
+            space = NULL;
+    }
+
+    assert(cs != NULL && space != NULL);
+
+    idx = 4+2+8+8+4+4;
+
+    unsigned long quantity_vectors = *((unsigned long *)(payload + idx));
+
+    int ax_count = als_size(cs->axes);
+
+    idx += sizeof(long);
+    
+    ScaleOffsetRange key;
+    memset(&key, 0, sizeof(ScaleOffsetRange));
+
+    MemAllocMng *thread_mam = MemAllocMng_current_thread_mam();
+    ArrayList *grids = als_new((unsigned int)quantity_vectors, "GridData *", SPEC_MAM, thread_mam);
+
+    for (int i=0; i<quantity_vectors; i++) {
+        ArrayList *sor_ls = als_new(64, "ScaleOffsetRange *", THREAD_MAM, NULL);
+
+        char mark_null = 0;
+
+        for (int j=0; j<ax_count; j++) {
+
+            Axis *ax = cs_get_axis(cs, j);
+
+            md_gid member_gid = *((md_gid *)(payload + idx));
+            // idx += sizeof(md_gid);
+            // log_print("\tmember_gid = %ld\n", member_gid);
+            key.gid = member_gid;
+
+            RBNode *node = rbt__find(ax->sor_idx_tree, &key);
+
+            if (node == NULL) {
+                mark_null = 1;
+                // break;
+                // als_add(grids, NULL);
+            } else {
+                ScaleOffsetRange *sor = (ScaleOffsetRange *)node->obj;
+                als_add(sor_ls, sor);
+            }
+
+            idx += sizeof(md_gid);
+        }
+
+        if (mark_null) {
+            als_add(grids, NULL);
+            idx += sizeof(int);
+            continue;
+        }
+
+        int measure_idx = *((int *)(payload + idx));
+        // log_print("--------measure_idx = %d\n", measure_idx);
+        idx += sizeof(int);
+
+        GridData *grid = mam_hlloc(thread_mam, sizeof(GridData));
+        // memset(grid, 0, sizeof(GridData));
+
+        grid->null_flag = 1; // measure value is default null
+
+        _do_calculate_measure_value(space, sor_ls, 0, 0, grid, measure_idx);
+
+        als_add(grids, grid);
+    }
+    
+    return grids;
+
 }

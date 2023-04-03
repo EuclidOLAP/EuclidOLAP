@@ -177,6 +177,7 @@ MultiDimResult *exe_multi_dim_queries(SelectDef *);
 typedef struct mdd_tuple
 {
 	ArrayList *mr_ls;
+	int attachment; // There is no fixed meaning, it is used according to the program context.
 } MddTuple;
 
 void Tuple_print(MddTuple *);
@@ -321,5 +322,27 @@ void ExpFnCoalesceEmpty_evolving(MDContext *md_ctx, ExpFnCoalesceEmpty *ce, Cube
 ArrayList *mdd__lv_ancestor_peer_descendants(Level *, Member *);
 
 void *gce_transform(MDContext *md_ctx, GeneralChainExpression *gce, MddTuple *context_tuple, Cube *cube);
+
+void put_agg_task_group(long task_group_code, int max_task_grp_num, sem_t *semt);
+
+void agg_task_group_result(long task_group_code, double ** mea_vals_p, char **null_flags_p, int *size_p);
+
+void put_agg_task_result(Action *act);
+
+/*************************************************************************************
+ * MddTuple(struct mdd_tuple) functions                                              *
+ *************************************************************************************/
+/**
+ * Whether to include the calculated formula member role.
+ * return 0 - include
+ *        1 - exclude
+ */
+int tup_is_calculated(MddTuple *tuple);
+
+
+/*************************************************************************************
+ * Cube(struct _euclid_cube_stct_) functions                                         *
+ *************************************************************************************/
+Cube *select_def__get_cube(SelectDef *sd);
 
 #endif

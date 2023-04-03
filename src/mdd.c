@@ -3,6 +3,7 @@
 #include <string.h>
 // #include <dirent.h>
 #include <unistd.h> // for usleep
+#include <pthread.h>
 
 #include "log.h"
 #include "mdd.h"
@@ -11,6 +12,7 @@
 #include "cfg.h"
 #include "net.h"
 #include "vce.h"
+#include "utils.h"
 #include "obj-type-def.h"
 
 // extern Stack AST_STACK;
@@ -26,12 +28,15 @@ static ArrayList *levels_pool = NULL;
 
 static MemAllocMng *meta_mam;
 
+static ArrayList *agg_tasks_pool;
+static pthread_mutex_t agg_tasks_lock;
+
 static Member *_create_member_lv1(Dimension *dim, char *mbr_name);
 static Member *_create_member_child(Member *parent, char *child_name);
 
 static ArrayList *select_def__build_axes(MDContext *md_ctx, SelectDef *);
 
-static Cube *select_def__get_cube(SelectDef *);
+// static Cube *select_def__get_cube(SelectDef *);
 
 static MddTuple *cube__basic_ref_vector(Cube *);
 
@@ -55,6 +60,9 @@ int mdd_init()
 	member_pool = als_new(256, "members pool | Member *", SPEC_MAM, meta_mam);
 	cubes_pool = als_new(8, "cubes pool", SPEC_MAM, meta_mam);
 	levels_pool = als_new(128, "Level *", SPEC_MAM, meta_mam);
+
+	agg_tasks_pool = als_new(32, "ArrayList *", SPEC_MAM, meta_mam);
+	pthread_mutex_init(&agg_tasks_lock, NULL);
 }
 
 static int load_dimensions()
@@ -651,19 +659,20 @@ int store_measure(EuclidCommand *ec)
 
 int distribute_store_measure(EuclidCommand *ec)
 {
-	/**
-	 * TODO Distributed structures are currently not supported.
-	 */
+	EuclidConfig *cfg = get_cfg();
 
-	// Store in the current node.
-	return store_measure(ec);
+	if (cfg->mode != MODE_MASTER) {
+		// Store in the current node.
+		return store_measure(ec);
+	}
+
 
 	// if (d_nodes_count() < 1 || rand() % 2)
 	// {
 	// 	return store_measure(ec); // Store in the current node.
 	// }
 
-	// return send(random_child_sock(), ec->bytes, *((int *)(ec->bytes)), 0) == (ssize_t)(*((int *)(ec->bytes)));
+	return send(random_child_sock(), ec->bytes, *((int *)(ec->bytes)), 0) == (ssize_t)(*((int *)(ec->bytes)));
 }
 
 int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
@@ -908,6 +917,82 @@ MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 
 	MultiDimResult *md_result = MultiDimResult_creat();
 
+	EuclidConfig *cfg = get_cfg();
+	if (cfg->mode == MODE_MASTER) {
+		ArrayList *direct_vectors = als_new(rs_len, "MddTuple *", THREAD_MAM, NULL);
+		ArrayList *calcul_vectors = als_new(rs_len, "MddTuple *", THREAD_MAM, NULL);
+
+		ArrayList *__merge_in__ = als_new(rs_len, "void *", THREAD_MAM, NULL);
+
+		void *__dv__ = NULL;
+		void *__cv__ = &__dv__;
+
+		for (i = 0; i < rs_len; i++) {
+			tuples_matrix_h[i]->attachment = i;
+			if (tup_is_calculated(tuples_matrix_h[i])) {
+				als_add(direct_vectors, tuples_matrix_h[i]);
+				als_add(__merge_in__, __dv__);
+			} else {
+				als_add(calcul_vectors, tuples_matrix_h[i]);
+				als_add(__merge_in__, __cv__);
+			}
+		}
+
+		double *md_rs__vals;
+		char *md_rs__null_flags;
+		unsigned long md_rs__rs_len;
+
+		if (als_size(direct_vectors) > 0)
+			dispatchAggregateMeasure(/*md_ctx,*/ cube, direct_vectors, &md_rs__vals, &md_rs__null_flags, &md_rs__rs_len);
+
+
+		ArrayList *cal_grids = als_new(als_size(calcul_vectors), "GridData *", THREAD_MAM, NULL);
+
+		if (als_size(calcul_vectors) > 0) {
+			// GridData grid_data;
+			for (int k=0;k<als_size(calcul_vectors);k++) {
+				MddTuple *cal_tp = als_get(calcul_vectors, k);
+				unsigned int csz__ = als_size(cal_tp->mr_ls);
+
+				GridData *gd = mam_hlloc(MemAllocMng_current_thread_mam(), sizeof(GridData));
+
+				for (int i__ = csz__ - 1; i__ >= 0; i__--)
+				{
+					MddMemberRole *mr = als_get(cal_tp->mr_ls, i__);
+					if (mr->member_formula)
+					{
+						Expression *exp = mr->member_formula->exp;
+						Expression_evaluate(md_ctx, exp, cube, cal_tp, gd);
+						break;
+					}
+				}
+
+				als_add(cal_grids, gd);
+			}
+		}
+
+		md_result->vals = mam_alloc(sizeof(double) * rs_len, OBJ_TYPE__RAW_BYTES, NULL, 0);
+		md_result->null_flags = mam_alloc(sizeof(char) * rs_len, OBJ_TYPE__RAW_BYTES, NULL, 0);
+		md_result->rs_len = rs_len;
+
+		int di = 0, ci = 0;
+		for (int x=0; x<rs_len; x++) {
+			if (als_get(__merge_in__, x) == __dv__) {
+				md_result->vals[x] = md_rs__vals[di];
+				md_result->null_flags[x] = md_rs__null_flags[di];
+				++di;
+			} else {
+				GridData *gd = als_get(cal_grids, ci++);
+				md_result->vals[x] = gd->val;
+				md_result->null_flags[x] = gd->null_flag;
+			}
+		}
+
+		md_result->axes = axes;
+
+		return md_result;
+	}
+
 	// 'measure_vals' is equivalent to a double array whose length is 'rs_len'.
 	double *measure_vals = vce_vactors_values(md_ctx, tuples_matrix_h, rs_len, &(md_result->null_flags));
 	md_result->axes = axes;
@@ -952,7 +1037,7 @@ static ArrayList *select_def__build_axes(MDContext *md_ctx, SelectDef *select_de
 	return axes_ls;
 }
 
-static Cube *select_def__get_cube(SelectDef *select_def)
+/*static*/ Cube *select_def__get_cube(SelectDef *select_def)
 {
 	int i;
 	int cubes_count = als_size(cubes_pool);
@@ -3374,4 +3459,120 @@ void *gce_transform(MDContext *md_ctx, GeneralChainExpression *gce, MddTuple *co
 		log_print("[ error ] exit. The program logic error is in the gce_transform function.\n");
 		exit(EXIT_FAILURE);
 	}
+}
+
+int tup_is_calculated(MddTuple *tuple) {
+
+	for (int i=0; i<als_size(tuple->mr_ls); i++) {
+		MddMemberRole *mr = als_get(tuple->mr_ls, i);
+        if (mr->member_formula)
+        {
+            return 0;
+        }
+	}
+	return 1;
+}
+
+void put_agg_task_group(long task_group_code, int max_task_grp_num, sem_t *semt) {
+
+	ArrayList *agg_task = als_new(32, "[0..1] long, [2] sem_t *, [3..]Action *", DIRECT, NULL);
+	long num_long = max_task_grp_num;
+	als_add(agg_task, (void *)task_group_code);
+	als_add(agg_task, (void *)num_long);
+	als_add(agg_task, semt);
+
+	pthread_mutex_lock(&agg_tasks_lock);
+	als_add(agg_tasks_pool, agg_task);
+	pthread_mutex_unlock(&agg_tasks_lock);
+}
+
+void agg_task_group_result(long task_group_code, double **mea_vals_p, char **null_flags_p, int *size_p) {
+
+	ArrayList *agg_task = NULL;
+
+	pthread_mutex_lock(&agg_tasks_lock);
+	for (int i=0;i<als_size(agg_tasks_pool);i++) {
+		ArrayList *als = als_get(agg_tasks_pool, i);
+		if (((long) als_get(als, 0)) == task_group_code) {
+			agg_task = als;
+			als_rm_index(agg_tasks_pool, i);
+			break;
+		}
+		agg_task = NULL;
+	}
+	pthread_mutex_unlock(&agg_tasks_lock);
+
+	*mea_vals_p = NULL;
+	*null_flags_p = NULL;
+
+	for (int i=3;i<als_size(agg_task);i++) {
+		Action *act = als_get(agg_task, i);
+
+		char *payload = act->bytes;
+
+		long count_of_grids = *((long *)(payload + 4+2+8+8+4+4));
+
+		if (count_of_grids == 0) {
+			obj_release(act->bytes);
+			obj_release(act);
+			continue;
+		}
+
+		if (*mea_vals_p == NULL) {
+			*mea_vals_p = obj_alloc(sizeof(double) * count_of_grids, OBJ_TYPE__RAW_BYTES);
+			*null_flags_p = obj_alloc(sizeof(char) * count_of_grids, OBJ_TYPE__RAW_BYTES);
+			memset(*null_flags_p, 1, sizeof(char) * count_of_grids);
+			*size_p = (int) count_of_grids;
+		}
+
+		char *idx = payload + 4+2+8+8+4+4+8;
+		for (int j=0;j<count_of_grids;j++) {
+			(*mea_vals_p)[j] += *((double *)idx);
+			idx += sizeof(double);
+		}
+		for (int j=0;j<count_of_grids;j++) {
+			(*null_flags_p)[j] &= *idx;
+			idx += sizeof(char);
+		}
+
+		obj_release(act->bytes);
+		obj_release(act);
+	}
+
+	als_release(agg_task);
+
+}
+
+void put_agg_task_result(Action *act) {
+
+	char *payload = act->bytes;
+
+	long tg_code = *(long *)(payload + 4+2+8);
+
+	ArrayList *agg_task = NULL;
+
+	pthread_mutex_lock(&agg_tasks_lock);
+
+	for (int i=0;i<als_size(agg_tasks_pool);i++) {
+		agg_task = als_get(agg_tasks_pool, i);
+		if (((long) als_get(agg_task, 0)) == tg_code)
+			break;
+		agg_task = NULL;
+	}
+
+	pthread_mutex_unlock(&agg_tasks_lock);
+
+	if (agg_task != NULL) {
+		als_add(agg_task, act);
+
+		sem_post((sem_t *)als_get(agg_task, 2));
+
+		return;
+	}
+
+	sleep(100);
+
+	log_print("[ error ] - in fn:put_agg_task_result ....................................\n");
+	exit(EXIT_FAILURE);
+
 }
