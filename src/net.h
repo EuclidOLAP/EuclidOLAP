@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 
 #include "command.h"
+#include "utils.h"
 
 void net_init();
 
@@ -25,10 +26,13 @@ int sit_send_command(SockIntentThread *sit, EuclidCommand *ec);
 // Randomly obtain a socket corresponding to a downstream node.
 int random_child_sock();
 
+SockIntentThread *master_sit();
+
 // get the count of children-nodes in same cluster
 __uint32_t d_nodes_count();
 
 
+ArrayList *worker_nodes();
 
 
 /*************************************************************************************

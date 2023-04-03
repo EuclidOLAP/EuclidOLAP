@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <unistd.h>
 // #include <stdio.h>
 // #include <string.h>
 // #include <pthread.h>
@@ -56,4 +57,24 @@ char *buf_starting(ByteBuf *byte_buf) {
 
 size_t buf_size(ByteBuf *byte_buf) {
 	return byte_buf->index;
+}
+
+void buf_mv_cursor(ByteBuf *buf, ssize_t offset) {
+	buf->index += offset;
+}
+
+void buf_set_cursor(ByteBuf *buf, size_t position) {
+	buf->index = position;
+}
+
+void buf_append_short(ByteBuf *buf, short sval) {
+	*((short *)buf_cutting(buf, sizeof(short))) = sval;
+}
+
+void buf_append_int(ByteBuf *buf, int ival) {
+	*((int *)buf_cutting(buf, sizeof(int))) = ival;
+}
+
+void buf_append_long(ByteBuf *buf, long lval) {
+	*((long *)buf_cutting(buf, sizeof(long))) = lval;
 }

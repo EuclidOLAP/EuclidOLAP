@@ -8,6 +8,7 @@
 
 #include "log.h"
 #include "net.h"
+#include "mdd.h"
 #include "cfg.h"
 #include "utils.h"
 #include "command.h"
@@ -17,6 +18,8 @@
 // static ArrayList *downstream_sockets;
 
 static ArrayList *worker_sits;
+
+static SockIntentThread *_master__sit_;
 
 static void *sit_startup(void *sit_addr);
 
@@ -39,6 +42,10 @@ int net_service_startup()
 	EuclidConfig *cfg = get_cfg();
 
 	int ss_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	// Set the socket option to enable address reuse functionality.
+	int optval = 1;
+	setsockopt(ss_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 
 	struct sockaddr_in ss_addr;
 	memset(&ss_addr, 0, sizeof(ss_addr));
@@ -187,8 +194,8 @@ int join_cluster()
 		return -1;
 	}
 
-	SockIntentThread *worker_up_sit = sit_alloc(to_parent_sock_fd);
-	sit_send_command(worker_up_sit, get_const_command_intent(INTENT__CHILD_NODE_JOIN));
+	_master__sit_ = sit_alloc(to_parent_sock_fd);
+	sit_send_command(_master__sit_, get_const_command_intent(INTENT__CHILD_NODE_JOIN));
 
 	void *buf = NULL;
 	size_t buf_len;
@@ -210,8 +217,8 @@ int join_cluster()
 	obj_release(allow_f_serv->bytes);
 	obj_release(allow_f_serv);
 
-	pthread_create(&(worker_up_sit->thread_id), NULL, command_receiving_thread, worker_up_sit);
-	pthread_detach(worker_up_sit->thread_id);
+	pthread_create(&(_master__sit_->thread_id), NULL, command_receiving_thread, _master__sit_);
+	pthread_detach(_master__sit_->thread_id);
 
 	return 0;
 }
@@ -245,10 +252,17 @@ static void receive_command_loop(SockIntentThread *sit)
 		buf = NULL;
 		buf_len = 0;
 		ssize_t pkg_size = read_sock_pkg(sit->sock_fd, &buf, &buf_len);
-		log_print("INFO - receive_command_loop() ... read_sock_pkg, pkg_size = %ld\n", pkg_size);
+		// log_print("INFO - receive_command_loop() ... <<<<<< sit->sock_fd = %d >>>>>> read_sock_pkg, pkg_size = %ld\n", sit->sock_fd, pkg_size);
 		if (pkg_size >= min_pkg_size)
 		{
 			EuclidCommand *task = create_command(buf);
+
+			if (ec_get_intent(task) == INTENT__AGGREGATE_TASK_RESULT) {
+				put_agg_task_result(task);
+				continue;
+			}
+
+
 			sem_init(&(task->sem), 0, 0);
 
 			/**
@@ -261,7 +275,12 @@ static void receive_command_loop(SockIntentThread *sit)
 			sem_wait(&(task->sem));
 			sem_destroy(&(task->sem));
 
-			sit_send_command(sit, task->result ? task->result : get_const_command_intent(INTENT__SUCCESSFUL));
+			EuclidConfig *cfg = get_cfg();
+			if (cfg->mode != MODE_WORKER) {
+				sit_send_command(sit, task->result ? task->result : get_const_command_intent(INTENT__SUCCESSFUL));
+			} else if (task->result) {
+				sit_send_command(sit, task->result);	
+			}
 
 			if (task->result)
 			{
@@ -288,9 +307,14 @@ int random_child_sock()
 {
 	// __uint32_t r_idx = rand() % als_size(downstream_sockets);
 	// return *((int *)als_get(downstream_sockets, r_idx));
-	log_print("[ error ] Process end: caused by an incorrect function call.\n");
-	exit(EXIT_FAILURE);
-	return 0;
+	
+	__uint32_t r_idx = rand() % als_size(worker_sits);
+	SockIntentThread *sit = als_get(worker_sits, r_idx);
+	return sit->sock_fd;
+
+	// log_print("[ error ] Process end: caused by an incorrect function call.\n");
+	// exit(EXIT_FAILURE);
+	// return 0;
 }
 
 __uint32_t d_nodes_count()
@@ -299,4 +323,12 @@ __uint32_t d_nodes_count()
 	log_print("[ error ] Process end: caused by an incorrect function call.\n");
 	exit(EXIT_FAILURE);
 	return 0;
+}
+
+ArrayList *worker_nodes() {
+	return worker_sits;
+}
+
+SockIntentThread *master_sit() {
+	return _master__sit_;
 }

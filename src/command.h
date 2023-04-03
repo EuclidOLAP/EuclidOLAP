@@ -12,6 +12,8 @@ typedef struct euclid_command
 	sem_t sem;
 } EuclidCommand;
 
+typedef struct euclid_command Action;
+
 /**
  * (terminal client) -> (euclid node)
  */
@@ -115,6 +117,46 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
  *
  */
 #define INTENT__MDX_EXPECT_RESULT_TXT 9
+
+/**
+ * The master node assigns the metric vector aggregation task to the worker node.
+ * 
+ * (master node) -> (worker node)
+ *
+ * 4 bytes - data package capacity
+ * 2 bytes - intention
+ * 8 bytes - MeasureSpace::id (Cube::gid)
+ * 8 bytes - task group code
+ * 4 bytes - max task group number
+ * 4 bytes - task group number (start with 0)
+ * 8 bytes - QOV : quantity of vectors
+ * (
+ *     8 bytes * {cube dimension roles quantity} - member gid array
+ *     4 bytes - measure index
+ * ) * QOV
+ */
+#define INTENT__VECTOR_AGGREGATION 10
+
+/**
+ * The aggregation node reports the execution result of the aggregate task to the logic node.
+ * 
+ * aggregation node(worker node) -> logic node(master node)
+ *
+ * 4 bytes - data package capacity
+ * 2 bytes - intention
+ * 8 bytes - MeasureSpace::id (Cube::gid)
+ * 8 bytes - task group code
+ * 4 bytes - max task group number
+ * 4 bytes - task group number (start with 0)
+ * 8 bytes - COG : a long value that count of grids, if it equales zero that mean there's no MeasureSpace object
+ * (
+ *     8 bytes - measure double value
+ * ) * COG
+ * (
+ *     1 bytes - null flag
+ * ) * COG
+ */
+#define INTENT__AGGREGATE_TASK_RESULT 11
 
 #define INTENT__UNKNOWN 65535
 
