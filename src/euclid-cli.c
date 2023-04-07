@@ -8,9 +8,17 @@
 #include "command.h"
 #include "utils.h"
 
+#define __PROMPT_TEXT__ ">>>>>> Please enter a command, exit enter the 'q' >>>>>>"
+#define __RESULT_TEXT__ ">>>>>>>>>>>>>>>>>>>>>>>> RESULT >>>>>>>>>>>>>>>>>>>>>>>>"
+
+static void __prompt__(char *before, char *after) {
+	printf("%s%s%s", before ? before : "", __PROMPT_TEXT__, after ? after : "");
+}
+
 static void ctrl_c_act(int sig_no)
 {
-	printf("\n");
+	// printf("\n");
+__prompt__("\n", "\n\n");
 }
 
 /**
@@ -60,10 +68,10 @@ int main(int argc, char *argv[])
 		size_t line_len = 1024 * 2;
 		char *input_line = obj_alloc(line_len, OBJ_TYPE__RAW_BYTES);
 		MemAllocMng *mam = MemAllocMng_new();
-
+__prompt__(NULL, "\n\n");
 		while (1)
 		{
-			printf("olapcli > ");
+			// printf("olapcli > ");
 			fgets(input_line, line_len, stdin);
 
 			if (strlen(input_line) >= line_len - 1) {
@@ -104,6 +112,8 @@ int main(int argc, char *argv[])
 				read_sock_pkg(sock_fd, &buf, &buf_len);
 				EuclidCommand *result = create_command(buf);
 
+printf("\n%s\n", __RESULT_TEXT__);
+
 				switch (ec_get_intent(result))
 				{
 				case INTENT__SUCCESSFUL:
@@ -125,6 +135,7 @@ int main(int argc, char *argv[])
 				}
 
 				mam_reset(mam);
+__prompt__(NULL, "\n\n");
 			}
 		}
 
