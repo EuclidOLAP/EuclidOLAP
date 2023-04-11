@@ -572,9 +572,6 @@ where ( [completion date].[2020].[Q1].[M3], Transport.[railway], [starting regio
 
 
 
-
-
-
 ---
 with
 member measure.[################ finished ################] as 660880
