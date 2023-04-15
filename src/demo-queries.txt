@@ -559,20 +559,17 @@ select
     {([Goods].[electronic product].computer)}  on 1 
 from [logistics.test] 
 where ( [completion date].[2020].[Q1].[M3], Transport.[railway], [starting region].[Europe].[UK], [ending region].[Europe].[Italy], measure.cost );
-
-
-
-
-
-
-
-
-
-
-
-
+---
+with 
+member measure.PROPORTION 
+as (measure.Turnover, currentMember(Date)) / (measure.Turnover, parent(currentMember(Date)))
+select
+children([Date].[ALL].[2022]) on 0,
+{ measure.Turnover, measure.PROPORTION } on 1
+from [Airline Turnover];
 
 ---
+
 with
 member measure.[################ finished ################] as 660880
 member measure.[##########################################] as 660880
