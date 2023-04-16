@@ -148,10 +148,13 @@ int set_param(char *p_key, char *p_val)
 		strcpy(cfg.parent_node_ip, str_arr_get(arr, 0));
 		cfg.parent_node_port = atoi(str_arr_get(arr, 1));
 		destory_StrArr(arr);
-	} else if (strcmp(p_key, "worker.id") == 0) {
+	}
+	else if (strcmp(p_key, "worker.id") == 0)
+	{
 		assert(strlen(p_val) < CFG_WORKERID_LEN_LIMIT);
 		strcpy(cfg.worker_id, p_val);
-	} else
+	}
+	else
 	{
 		log_print("Unknown parameter type %s=%s.\n", p_key, p_val);
 		exit(EXIT_FAILURE);
@@ -193,10 +196,12 @@ static int load_conf_files()
 
 	strcat(conf_path, cfg_file_name);
 
-	if (access(conf_path, F_OK) != 0) {
+	if (access(conf_path, F_OK) != 0)
+	{
 		// the config file was not existed.
 
-		if (cfg.mode == MODE_CLIENT) {
+		if (cfg.mode == MODE_CLIENT)
+		{
 			// set the default ip and port of euclid-olap server, when it's client mode.
 			cfg.cli_ctrl_node_port = 8760;
 			strcpy(cfg.cli_ctrl_node_host, "127.0.0.1");
