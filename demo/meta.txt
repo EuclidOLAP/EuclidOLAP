@@ -1,3 +1,46 @@
+create dimensions [Calendar] [Goods] [Store Type] [Payment Method] [Region] [Transport] [Date] [Aircraft Type] [Service Type] [Area];
+
+---
+
+create levels [Calendar] (2:year, 3:quarter, 4:month), [Region] (2:[continent], 3:[country]), [Date] (2:Year, 3:Quarter, 4:Month);
+
+---
+
+build cube [Airline Turnover] dimensions [Date] [Date] [Aircraft Type] [Aircraft Type] [Service Type] [Service Type] measures [Turnover];
+
+---
+
+build cube [Airline Cost Of Flight] 
+dimensions  [Date] [Date] [Aircraft Type] [Aircraft Type]
+measures [Fuel costs]
+[Crew costs]
+[Maintenance and repair costs]
+[Airport fees]
+[Insurance costs]
+[Administrative and overhead costs]
+[Taxes]
+[Catering and other in-flight services];
+
+---
+
+build cube [Flight Passengers Statistics] 
+dimensions [Area] [Starting Point] [Area] Destination [Date] [Date] [Aircraft Type] [Aircraft Type]
+measures [Number of Passengers];
+
+---
+
+build cube [Online Store] dimensions [Store Type] [Store Type] [Payment Method] [Payment Method] [Goods] [Goods] [Calendar] [Calendar] measures [sales amount] [sales quantity] [cash back];
+
+---
+
+build cube [logistics.test] dimensions Goods Goods Transport Transport Region [starting region] Region [ending region] Calendar [starting date] Calendar [completion date] measures cost income quantity;
+
+---
+
+build cube [nonexistent measure] dimensions Goods Goods Transport Transport Region [starting region] Region [ending region] Calendar [starting date] Calendar [completion date] measures cost income quantity;
+
+---
+
 create members
 [Calendar].[ALL].[2019].[Q1].[M1],
 [Calendar].[ALL].[2019].[Q1].[M2],
