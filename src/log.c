@@ -55,12 +55,14 @@ static void __log_prt__(const char *fmt, va_list ap)
 	struct tm *tmins = gmtime(&time_p);
 
 	FILE *log_fd = fopen(def_log_file, "a");
-	for (int i=0; i<5 && log_fd==NULL; i++) {
+	for (int i = 0; i < 5 && log_fd == NULL; i++)
+	{
 		usleep(10000);
 		log_fd = fopen(def_log_file, "a");
 	}
 
-	if (log_fd == NULL) {
+	if (log_fd == NULL)
+	{
 		fprintf(stderr, "Can't open the log file<%s>.\n", def_log_file);
 		return;
 	}
