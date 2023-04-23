@@ -54,3 +54,4 @@ dkms.conf
 .vscode/
 test/
 tests/
+_private/
