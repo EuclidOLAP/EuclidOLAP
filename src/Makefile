@@ -1,13 +1,16 @@
 SRC_FILES = cfg.c net.c utils.c command.c mdxext-lex.yy.c mdxext-yacc.tab.c mdx.c mdd.c vce.c rb-tree.c log.c \
-tools/elastic-byte-buffer.c locks/global-locks.c
+tools/elastic-byte-buffer.c locks/global-locks.c simd-aggregation.c
 OBJ_FILES = cfg.o net.o utils.o command.o mdxext-lex.yy.o mdxext-yacc.tab.o mdx.o mdd.o vce.o rb-tree.o log.o \
-tools/elastic-byte-buffer.o locks/global-locks.o
+tools/elastic-byte-buffer.o locks/global-locks.o simd-aggregation.o
 
 euclid : euclid-svr.c euclid-cli.c $(SRC_FILES) euclid-svr.o euclid-cli.o $(OBJ_FILES)
 	cc      $(OBJ_FILES)  euclid-svr.o  -o euclid-svr      -lpthread
-	cc  -g  $(SRC_FILES)  euclid-svr.c  -o euclid-svr.out  -lpthread
+	cc  -g  $(SRC_FILES)  euclid-svr.c  -o euclid-svr.out  -lpthread  -msse -mavx -mavx2
 	cc      $(OBJ_FILES)  euclid-cli.o  -o euclid-cli      -lpthread
-	cc  -g  $(SRC_FILES)  euclid-cli.c  -o euclid-cli.out  -lpthread
+	cc  -g  $(SRC_FILES)  euclid-cli.c  -o euclid-cli.out  -lpthread  -msse -mavx -mavx2
+
+simd-aggregation.o:
+	cc -msse -mavx -mavx2 -c simd-aggregation.c -o simd-aggregation.o
 
 mdxext-lex.yy.c: mdxext-lex.l
 	flex -i -o mdxext-lex.yy.c mdxext-lex.l

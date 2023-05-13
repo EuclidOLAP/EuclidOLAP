@@ -12,6 +12,8 @@
 #include "utils.h"
 #include "net.h"
 
+#include "simd-aggregation.h"
+
 #include "tools/elastic-byte-buffer.h"
 
 static MemAllocMng *vce_mam;
@@ -21,7 +23,7 @@ static ArrayList *space_ls;
 
 static void _do_calculate_measure_value(
     // MDContext *md_ctx, 
-    MeasureSpace *space, ArrayList *sor_ls, int deep, unsigned long offset, GridData *grid_data, int mea_val_idx);
+    MeasureSpace *space, ArrayList *sor_ls, int deep, unsigned long offset, GridData *grid_data, SIMDAggSt *sas, int mea_val_idx);
 
 static void MeasureSpace_coordinate_intersection_value(MeasureSpace *space, unsigned long index, int mea_val_idx, GridData *gridData);
 
@@ -795,14 +797,30 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
 
     memset(grid_data, 0, sizeof(GridData));
     grid_data->null_flag = 1; // measure value is default null
+
+    // SIMDAggSt *sas = mam_alloc(sizeof(SIMDAggSt), OBJ_TYPE__RAW_BYTES, NULL, 0);
+    SIMDAggSt *sas = aligned_alloc(32, sizeof(SIMDAggSt));
+    memset(sas, 0, sizeof(SIMDAggSt));
+
+    sas->null_flag = 1;
+// log_print("SIMD_do_calculate_measure_value\n");
     _do_calculate_measure_value(
         // md_ctx, 
-        space, sor_ls, 0, 0, grid_data, mea_val_idx);
+        space, sor_ls, 0, 0, grid_data, sas, mea_val_idx);
+
+    sas_agg(sas);
+
+    grid_data->null_flag = sas->null_flag;
+    grid_data->val = sas->summary_value;
+
+    log_print("801_use_SIMD_here >>> grid_data::val [ %lf ] sas::summary_value [ %lf ]\n", grid_data->val, sas->summary_value);        
+
+    free(sas);
 }
 
 static void _do_calculate_measure_value(
     // MDContext *md_ctx, 
-    MeasureSpace *space, ArrayList *sor_ls, int deep, unsigned long offset, GridData *grid_data, int mea_val_idx)
+    MeasureSpace *space, ArrayList *sor_ls, int deep, unsigned long offset, GridData *grid_data, SIMDAggSt *sas, int mea_val_idx)
 {
     ScaleOffsetRange *sor = (ScaleOffsetRange *)als_get(sor_ls, deep);
     unsigned long _position;
@@ -812,17 +830,29 @@ static void _do_calculate_measure_value(
         {
             GridData date;
             MeasureSpace_coordinate_intersection_value(space, offset + _position * sor->offset, mea_val_idx, &date);
+
+
             if (date.null_flag == 0)
             {
-                grid_data->val += date.val;
-                grid_data->null_flag = 0;
+                // log_print("ooo-ddd-fff-ccc_XXXXXXXXXXXXXXXXXXXXXXXXXXX %lf\n", date.val);
+                // grid_data->val += date.val;
+                // grid_data->null_flag = 0;
+
+                // use SIMD
+                if (sas->index >= SAS_ELS_LEN) {
+                    sas_agg_all(sas);
+                }
+                sas->elements[sas->index] = date.val;
+                sas->index++;
             }
+
+
         }
         else
         {
             _do_calculate_measure_value(
                 // md_ctx, 
-                space, sor_ls, deep + 1, offset + _position * sor->offset, grid_data, mea_val_idx);
+                space, sor_ls, deep + 1, offset + _position * sor->offset, grid_data, sas, mea_val_idx);
         }
     }
 }
@@ -1202,7 +1232,16 @@ ArrayList *worker_aggregate_measure(EuclidCommand *ec) {
 
         grid->null_flag = 1; // measure value is default null
 
-        _do_calculate_measure_value(space, sor_ls, 0, 0, grid, measure_idx);
+        SIMDAggSt *sas = aligned_alloc(32, sizeof(SIMDAggSt));
+        memset(sas, 0, sizeof(SIMDAggSt));
+        sas->null_flag = 1;
+
+        _do_calculate_measure_value(space, sor_ls, 0, 0, grid, sas, measure_idx);
+
+        sas_agg(sas);
+        grid->null_flag = sas->null_flag;
+        grid->val = sas->summary_value;
+        free(sas);
 
         als_add(grids, grid);
     }
