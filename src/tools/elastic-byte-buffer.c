@@ -8,6 +8,7 @@
 // #include "log.h"
 // #include "command.h"
 #include "../utils.h"
+#include "../memory-management.h"
 // #include "cfg.h"
 // #include "mdx.h"
 // #include "mdd.h"
@@ -21,7 +22,7 @@ ByteBuf *buf__alloc(size_t capacity) {
 	byte_buf->capacity = capacity;
 	byte_buf->index = 0;
 	// byte_buf->buf_addr = obj_alloc(capacity, OBJ_TYPE__RAW_BYTES);
-	byte_buf->buf_addr = bytes_alloc(capacity);
+	byte_buf->buf_addr = allocate_memory(capacity);
 
 	return byte_buf;
 }
@@ -32,7 +33,7 @@ void buf_clear(ByteBuf *byte_buf) {
 
 void buf_release(ByteBuf *byte_buf) {
 	// obj_release(byte_buf->buf_addr);
-	bytes_free(byte_buf->buf_addr);
+	release_memory(byte_buf->buf_addr);
 	obj_release(byte_buf);
 }
 

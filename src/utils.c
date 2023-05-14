@@ -12,6 +12,7 @@
 #include "log.h"
 #include "utils.h"
 #include "rb-tree.h"
+#include "memory-management.h"
 
 extern RedBlackTree *_thread_mam_pool;
 
@@ -200,7 +201,7 @@ MemAllocMng *obj_mam(void *obj) {
 
 void *obj_alloc(size_t size, short type) {
 	size += BYTES_ALIGNMENT;
-	char *obj_head = bytes_alloc(size);
+	char *obj_head = allocate_memory(size);
 	// log_print("@@obj_alloc@@ << %p %lu\n", obj_head, size);
 	memset(obj_head, 0, size);
 	// *obj_head = type;
@@ -220,7 +221,7 @@ void obj_release(void *obj) {
 	}
 	char *freed = ((char *)obj) - BYTES_ALIGNMENT;
 	// log_print("@@obj_release@@ >> %p\n", freed);
-	bytes_free(freed);
+	release_memory(freed);
 }
 
 ssize_t read_sock_pkg(int sock_fd, void **buf, size_t *buf_len)
@@ -689,36 +690,40 @@ void ArrayList_sort(ArrayList *ls, int (*obj_cmp_fn)(void *obj, void *other))
 extern pthread_mutex_t gloc__mem_counter_mtx;
 static size_t used_mem_size = 0;
 
-char *bytes_alloc(size_t size) {
 
-	return malloc(size);
 
-	// char *mem_addr = malloc(size);
+// char *bytes_alloc(size_t size) {
 
-	// size_t muz = malloc_usable_size(mem_addr);
+// 	return malloc(size);
 
-	// // todo replaced by __sync_bool_compare_and_swap or __sync_val_compare_and_swap
-	// pthread_mutex_lock(&gloc__mem_counter_mtx);
-	// size_t ums_snapshoot = used_mem_size;
-	// used_mem_size += muz;
-	// pthread_mutex_unlock(&gloc__mem_counter_mtx);
+// 	// char *mem_addr = malloc(size);
 
-	// log_print("[ Mem statistics + ] %lu ... +%lu<%p> ... %lu\n", ums_snapshoot, muz, mem_addr, ums_snapshoot + muz);
+// 	// size_t muz = malloc_usable_size(mem_addr);
 
-	// return mem_addr;
-}
+// 	// // todo replaced by __sync_bool_compare_and_swap or __sync_val_compare_and_swap
+// 	// pthread_mutex_lock(&gloc__mem_counter_mtx);
+// 	// size_t ums_snapshoot = used_mem_size;
+// 	// used_mem_size += muz;
+// 	// pthread_mutex_unlock(&gloc__mem_counter_mtx);
 
-void bytes_free(void *freed) {
+// 	// log_print("[ Mem statistics + ] %lu ... +%lu<%p> ... %lu\n", ums_snapshoot, muz, mem_addr, ums_snapshoot + muz);
 
-	// size_t muz = malloc_usable_size(freed);
+// 	// return mem_addr;
+// }
 
-	// // todo replaced by __sync_bool_compare_and_swap or __sync_val_compare_and_swap
-	// pthread_mutex_lock(&gloc__mem_counter_mtx);
-	// size_t ums_snapshoot = used_mem_size;
-	// used_mem_size -= muz;
-	// pthread_mutex_unlock(&gloc__mem_counter_mtx);
 
-	// log_print("[ Mem statistics - ] %lu ... -%lu<%p> ... %lu\n", ums_snapshoot, muz, freed, ums_snapshoot - muz);
 
-	free(freed);
-}
+// void bytes_free(void *freed) {
+
+// 	// size_t muz = malloc_usable_size(freed);
+
+// 	// // todo replaced by __sync_bool_compare_and_swap or __sync_val_compare_and_swap
+// 	// pthread_mutex_lock(&gloc__mem_counter_mtx);
+// 	// size_t ums_snapshoot = used_mem_size;
+// 	// used_mem_size -= muz;
+// 	// pthread_mutex_unlock(&gloc__mem_counter_mtx);
+
+// 	// log_print("[ Mem statistics - ] %lu ... -%lu<%p> ... %lu\n", ums_snapshoot, muz, freed, ums_snapshoot - muz);
+
+// 	free(freed);
+// }

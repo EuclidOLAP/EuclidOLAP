@@ -237,9 +237,9 @@ void *mam_alloc(size_t size, short type, MemAllocMng *mam, int mam_mark);
  */
 void *mam_hlloc(MemAllocMng *mam, size_t size);
 
-char *bytes_alloc(size_t size);
+// char *bytes_alloc(size_t size);
 
-void bytes_free(void *freed);
+// void bytes_free(void *freed);
 
 
 /*************************************************************************************
