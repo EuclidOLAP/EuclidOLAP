@@ -598,6 +598,68 @@ from [Airline Turnover];
 
 ---
 
+select 
+{ ([Goods].[foods],[Transport].[railway],[starting region].[Europe].[UK]), ([Transport].[highway],[starting region].[Asia].[Japan]) } on 0, 
+{ (ClosingPeriod([starting region].[country])) } on 2 
+from [logistics.test];
+
+---
+
+select 
+{ ([Goods].[foods],[Transport].[railway],[starting region].[Europe].[UK]), ([Transport].[highway],[starting region].[Asia].[Japan]) } on 0, 
+{ [starting region].[ALL].Europe.UK } on 2
+from [logistics.test];
+
+---
+
+select 
+{ ([Goods].[foods],[Transport].[railway],[starting region].[Europe].[UK]), ([Transport].[highway],[starting region].[Asia].[Japan]) } on 0, 
+{ (OpeningPeriod([starting region].[country])) } on 2 
+from [logistics.test];
+
+---
+
+select 
+{ ([Goods].[foods],[Transport].[railway],[starting region].[Europe].[UK]), ([Transport].[highway],[starting region].[Asia].[Japan]) } on 0, 
+{ [starting region].[ALL].[Asia].[China] } on 2 
+from [logistics.test];
+
+---
+
+select 
+{ (ClosingPeriod(
+    Calendar.quarter,
+    Calendar.[ALL].[2021]
+)) } on 10,
+{ (measure.[sales amount]) } on SECTIONS
+from [Online Store] ;
+
+---
+
+select 
+{ Calendar.[ALL].[2021].Q4 } on 10,
+{ (measure.[sales amount]) } on SECTIONS
+from [Online Store] ;
+
+---
+
+select 
+{ (OpeningPeriod(
+    Calendar.month,
+    Calendar.[ALL].[2021].Q3
+)) } on 10,
+{ (measure.[sales amount]) } on SECTIONS
+from [Online Store] ;
+
+---
+
+select 
+{ Calendar.[ALL].[2021].Q3.M7 } on 10,
+{ (measure.[sales amount]) } on SECTIONS
+from [Online Store] ;
+
+---
+
 with
 member measure.[################ finished ################] as 660880
 member measure.[##########################################] as 660880

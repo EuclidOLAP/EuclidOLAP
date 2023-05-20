@@ -83,6 +83,8 @@ Stack AST_STACK = { 0 };
 %token CURRENT_MEMBER	/* currentmember */
 %token PREV_MEMBER		/* prevmember */
 %token PARALLEL_PERIOD	/* parallelPeriod */
+%token CLOSING_PERIOD	/* ClosingPeriod */
+%token OPENING_PERIOD	/* OpeningPeriod */
 
 /* expression functions key words */
 %token SUM				/* sum */
@@ -1018,6 +1020,70 @@ member_statement:
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = pp;
 		stack_push(&AST_STACK, mbr_def);
+	}
+  | member_role_fn_closing_period {
+		MemberRoleFnClosingPeriod *closing_period;
+		stack_pop(&AST_STACK, (void **) &closing_period);
+		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
+		mbr_def->member_fn = closing_period;
+		stack_push(&AST_STACK, mbr_def);
+	}
+  | member_role_fn_opening_period {
+		MemberRoleFnOpeningPeriod *opening_period;
+		stack_pop(&AST_STACK, (void **) &opening_period);
+		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
+		mbr_def->member_fn = opening_period;
+		stack_push(&AST_STACK, mbr_def);
+	}
+;
+
+member_role_fn_closing_period:
+	CLOSING_PERIOD ROUND_BRACKET_L ROUND_BRACKET_R {
+		MemberRoleFnClosingPeriod *mr_fn = MemberRoleFnClosingPeriod_creat(NULL, NULL);
+		stack_push(&AST_STACK, mr_fn);
+	}
+  |
+	CLOSING_PERIOD ROUND_BRACKET_L level_role_statement ROUND_BRACKET_R {
+		LevelRoleDef *lvr_def;
+		stack_pop(&AST_STACK, (void **) &lvr_def);
+		MemberRoleFnClosingPeriod *mr_fn = MemberRoleFnClosingPeriod_creat(lvr_def, NULL);
+		stack_push(&AST_STACK, mr_fn);
+
+	}
+  |
+	CLOSING_PERIOD ROUND_BRACKET_L level_role_statement COMMA member_statement ROUND_BRACKET_R {
+		MemberDef *mbr_def;
+		stack_pop(&AST_STACK, (void **) &mbr_def);
+		LevelRoleDef *lvr_def;
+		stack_pop(&AST_STACK, (void **) &lvr_def);
+		MemberRoleFnClosingPeriod *mr_fn = MemberRoleFnClosingPeriod_creat(lvr_def, mbr_def);
+		stack_push(&AST_STACK, mr_fn);
+
+	}
+;
+
+member_role_fn_opening_period:
+	OPENING_PERIOD ROUND_BRACKET_L ROUND_BRACKET_R {
+		MemberRoleFnOpeningPeriod *mr_fn = MemberRoleFnOpeningPeriod_creat(NULL, NULL);
+		stack_push(&AST_STACK, mr_fn);
+	}
+  |
+	OPENING_PERIOD ROUND_BRACKET_L level_role_statement ROUND_BRACKET_R {
+		LevelRoleDef *lvr_def;
+		stack_pop(&AST_STACK, (void **) &lvr_def);
+		MemberRoleFnOpeningPeriod *mr_fn = MemberRoleFnOpeningPeriod_creat(lvr_def, NULL);
+		stack_push(&AST_STACK, mr_fn);
+
+	}
+  |
+	OPENING_PERIOD ROUND_BRACKET_L level_role_statement COMMA member_statement ROUND_BRACKET_R {
+		MemberDef *mbr_def;
+		stack_pop(&AST_STACK, (void **) &mbr_def);
+		LevelRoleDef *lvr_def;
+		stack_pop(&AST_STACK, (void **) &lvr_def);
+		MemberRoleFnOpeningPeriod *mr_fn = MemberRoleFnOpeningPeriod_creat(lvr_def, mbr_def);
+		stack_push(&AST_STACK, mr_fn);
+		
 	}
 ;
 

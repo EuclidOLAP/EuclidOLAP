@@ -152,6 +152,14 @@ parallelperiod {
 	return PARALLEL_PERIOD;
 }
 
+ClosingPeriod {
+	return CLOSING_PERIOD;
+}
+
+OpeningPeriod {
+	return OPENING_PERIOD;
+}
+
 lateralMembers {
 	return LATERAL_MEMBERS;
 }
