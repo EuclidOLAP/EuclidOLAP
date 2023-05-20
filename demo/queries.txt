@@ -570,6 +570,34 @@ from [Airline Turnover];
 
 ---
 
+select
+{ Date.[ALL].[2022] } on 0,
+{ measure.Turnover } on 1
+from [Airline Turnover];
+
+---
+
+select
+{ (ClosingPeriod()) } on 0,
+{ measure.Turnover } on 1
+from [Airline Turnover];
+
+---
+
+select
+{ Date.[ALL].[2020] } on 0,
+{ measure.Turnover } on 1
+from [Airline Turnover];
+
+---
+
+select
+{ (OpeningPeriod()) } on 0,
+{ measure.Turnover } on 1
+from [Airline Turnover];
+
+---
+
 with
 member measure.[################ finished ################] as 660880
 member measure.[##########################################] as 660880
