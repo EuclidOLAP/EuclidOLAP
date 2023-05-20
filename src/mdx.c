@@ -361,6 +361,22 @@ MemberRoleFnParallelPeriod *MemberRoleFnParallelPeriod_creat(LevelRoleDef *lvDef
     return pp;
 }
 
+
+MemberRoleFnClosingPeriod *MemberRoleFnClosingPeriod_creat(LevelRoleDef *lvr, MemberDef *mr) {
+    MemberRoleFnClosingPeriod *cp = mam_alloc(sizeof(MemberRoleFnClosingPeriod), OBJ_TYPE__MemberRoleFnClosingPeriod, NULL, 0);
+    cp->lvr_def = lvr;
+    cp->mr_def = mr;
+    return cp;
+}
+
+MemberRoleFnOpeningPeriod *MemberRoleFnOpeningPeriod_creat(LevelRoleDef *lvr, MemberDef *mr) {
+    MemberRoleFnOpeningPeriod *op = mam_alloc(sizeof(MemberRoleFnOpeningPeriod), OBJ_TYPE__MemberRoleFnOpeningPeriod, NULL, 0);
+    op->lvr_def = lvr;
+    op->mr_def = mr;
+    return op;
+}
+
+
 SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *mdef)
 {
     SetFnLateralMembers *latmbr = mam_alloc(sizeof(SetFnLateralMembers), OBJ_TYPE__SetFnLateralMembers, NULL, 0);

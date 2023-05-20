@@ -295,6 +295,23 @@ typedef struct Member_Role_Fn_Parallel_Period_
 } MemberRoleFnParallelPeriod;
 MemberRoleFnParallelPeriod *MemberRoleFnParallelPeriod_creat(LevelRoleDef *, Expression *, MemberDef *);
 
+
+typedef struct Member_Role_Fn_Closing_Period_
+{
+    LevelRoleDef *lvr_def;
+    MemberDef *mr_def;
+} MemberRoleFnClosingPeriod;
+MemberRoleFnClosingPeriod *MemberRoleFnClosingPeriod_creat(LevelRoleDef *lvr, MemberDef *mr);
+
+
+typedef struct Member_Role_Fn_Opening_Period_
+{
+    LevelRoleDef *lvr_def;
+    MemberDef *mr_def;
+} MemberRoleFnOpeningPeriod;
+MemberRoleFnOpeningPeriod *MemberRoleFnOpeningPeriod_creat(LevelRoleDef *lvr, MemberDef *mr);
+
+
 typedef struct SetFn_LateralMembers
 {
     MemberDef *mr_def;
