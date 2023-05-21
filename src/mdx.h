@@ -312,6 +312,32 @@ typedef struct Member_Role_Fn_Opening_Period_
 MemberRoleFnOpeningPeriod *MemberRoleFnOpeningPeriod_creat(LevelRoleDef *lvr, MemberDef *mr);
 
 
+typedef struct Member_Role_Fn_FirstChild_
+{
+    MemberDef *mr_def;
+} MemberRoleFnFirstChild;
+MemberRoleFnFirstChild *MemberRoleFnFirstChild_creat(MemberDef *mr);
+
+typedef struct Member_Role_Fn_LastChild_
+{
+    MemberDef *mr_def;
+} MemberRoleFnLastChild;
+MemberRoleFnLastChild *MemberRoleFnLastChild_creat(MemberDef *mr);
+
+
+typedef struct Member_Role_Fn_FirstSibling_
+{
+    MemberDef *mr_def;
+} MemberRoleFnFirstSibling;
+MemberRoleFnFirstSibling *MemberRoleFnFirstSibling_creat(MemberDef *mr);
+
+typedef struct Member_Role_Fn_LastSibling_
+{
+    MemberDef *mr_def;
+} MemberRoleFnLastSibling;
+MemberRoleFnLastSibling *MemberRoleFnLastSibling_creat(MemberDef *mr);
+
+
 typedef struct SetFn_LateralMembers
 {
     MemberDef *mr_def;

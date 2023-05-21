@@ -1,0 +1,4 @@
+select 
+{ ( LastSibling([starting date].[2020]) ) } on 0,
+{ (measure.income), (measure.cost) } on 100 
+from [logistics.test];

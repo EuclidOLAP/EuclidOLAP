@@ -153,6 +153,14 @@ typedef short type_obj;
 
 #define OBJ_TYPE__MemberRoleFnOpeningPeriod 73
 
+#define OBJ_TYPE__MemberRoleFnFirstChild 74
+
+#define OBJ_TYPE__MemberRoleFnLastChild 75
+
+#define OBJ_TYPE__MemberRoleFnFirstSibling 76
+
+#define OBJ_TYPE__MemberRoleFnLastSibling 77
+
 #define OBJ_TYPE__RAW_BYTES 1024
 
 #endif

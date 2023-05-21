@@ -1517,6 +1517,26 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 			member_role_ = MemberRoleFnOpeningPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
 		}
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberRoleFnFirstChild)
+		{
+			member_role_ = MemberRoleFnFirstChild_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			return member_role_;
+		}
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberRoleFnLastChild)
+		{
+			member_role_ = MemberRoleFnLastChild_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			return member_role_;
+		}
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberRoleFnFirstSibling)
+		{
+			member_role_ = MemberRoleFnFirstSibling_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			return member_role_;
+		}
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberRoleFnLastSibling)
+		{
+			member_role_ = MemberRoleFnLastSibling_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			return member_role_;
+		}
 		else
 		{
 			log_print("[ error ] - ids_mbrsdef__build() obj_type_of(m_def->member_fn)\n");
@@ -3089,6 +3109,65 @@ MddMemberRole *MemberRoleFnOpeningPeriod_evolving(MDContext *md_ctx, MemberRoleF
 	log_print("[ error ] MemberRoleFnOpeningPeriod_evolving\n");
 	exit(EXIT_FAILURE);
 }
+
+
+MddMemberRole *MemberRoleFnFirstChild_evolving(MDContext *md_ctx, MemberRoleFnFirstChild *mr_fn, MddTuple *context_tuple, Cube *cube) {
+	MddMemberRole *parent_mr = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
+	Member *member = NULL;
+	for (int i=0; i<als_size(member_pool); i++) {
+		Member *m = als_get(member_pool, i);
+		if (m->p_gid != parent_mr->member->gid)
+			continue;
+		if (member == NULL || m->gid < member->gid)
+			member = m;
+	}
+	return mdd_mr__create(member, parent_mr->dim_role);
+}
+
+MddMemberRole *MemberRoleFnLastChild_evolving(MDContext *md_ctx, MemberRoleFnLastChild *mr_fn, MddTuple *context_tuple, Cube *cube) {
+	MddMemberRole *parent_mr = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
+	Member *member = NULL;
+	for (int i=0; i<als_size(member_pool); i++) {
+		Member *m = als_get(member_pool, i);
+		if (m->p_gid != parent_mr->member->gid)
+			continue;
+		if (member == NULL || m->gid > member->gid)
+			member = m;
+	}
+	return mdd_mr__create(member, parent_mr->dim_role);
+}
+
+
+MddMemberRole *MemberRoleFnFirstSibling_evolving(MDContext *md_ctx, MemberRoleFnFirstSibling *mr_fn, MddTuple *context_tuple, Cube *cube) {
+	MddMemberRole *member_role = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
+	// if (member_role->member->p_gid == 0)
+	// 	return member_role;
+	Member *member = NULL;
+	for (int i=0; i<als_size(member_pool); i++) {
+		Member *m = als_get(member_pool, i);
+		if (m->p_gid != member_role->member->p_gid)
+			continue;
+		if (member == NULL || m->gid <= member->gid)
+			member = m;
+	}
+	return mdd_mr__create(member, member_role->dim_role);
+}
+
+MddMemberRole *MemberRoleFnLastSibling_evolving(MDContext *md_ctx, MemberRoleFnLastSibling *mr_fn, MddTuple *context_tuple, Cube *cube) {
+	MddMemberRole *member_role = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
+	// if (member_role->member->p_gid == 0)
+	// 	return member_role;
+	Member *member = NULL;
+	for (int i=0; i<als_size(member_pool); i++) {
+		Member *m = als_get(member_pool, i);
+		if (m->p_gid != member_role->member->p_gid)
+			continue;
+		if (member == NULL || m->gid >= member->gid)
+			member = m;
+	}
+	return mdd_mr__create(member, member_role->dim_role);
+}
+
 
 MultiDimResult *MultiDimResult_creat()
 {

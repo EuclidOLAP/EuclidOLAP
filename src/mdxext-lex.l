@@ -160,6 +160,22 @@ OpeningPeriod {
 	return OPENING_PERIOD;
 }
 
+FirstChild {
+	return FIRST_CHILD;
+}
+
+LastChild {
+	return LAST_CHILD;
+}
+
+FirstSibling {
+	return FIRST_SIBLING;
+}
+
+LastSibling {
+	return LAST_SIBLING;
+}
+
 lateralMembers {
 	return LATERAL_MEMBERS;
 }

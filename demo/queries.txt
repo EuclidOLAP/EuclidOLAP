@@ -660,6 +660,34 @@ from [Online Store] ;
 
 ---
 
+select 
+members(measure) on 1, 
+{ ( FirstChild([starting date].[ALL].[2020]) ) } on 0 
+from [logistics.test];
+
+---
+
+select 
+members(measure) on 1, 
+{ ( LastChild([starting date].[ALL].[2020]) ) } on 0 
+from [logistics.test];
+
+---
+
+select 
+{ ( FirstSibling([starting date].[2020]) ) } on 0,
+{ (measure.income), (measure.cost) } on 100 
+from [logistics.test];
+
+---
+
+select 
+{ ( LastSibling([starting date].[2020]) ) } on 0,
+{ (measure.income), (measure.cost) } on 100 
+from [logistics.test];
+
+---
+
 with
 member measure.[################ finished ################] as 660880
 member measure.[##########################################] as 660880

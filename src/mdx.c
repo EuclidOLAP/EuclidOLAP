@@ -377,6 +377,32 @@ MemberRoleFnOpeningPeriod *MemberRoleFnOpeningPeriod_creat(LevelRoleDef *lvr, Me
 }
 
 
+MemberRoleFnFirstChild *MemberRoleFnFirstChild_creat(MemberDef *mr) {
+    MemberRoleFnFirstChild *mr_fn = mam_alloc(sizeof(MemberRoleFnFirstChild), OBJ_TYPE__MemberRoleFnFirstChild, NULL, 0);
+    mr_fn->mr_def = mr;
+    return mr_fn;
+}
+
+MemberRoleFnLastChild *MemberRoleFnLastChild_creat(MemberDef *mr) {
+    MemberRoleFnLastChild *mr_fn = mam_alloc(sizeof(MemberRoleFnLastChild), OBJ_TYPE__MemberRoleFnLastChild, NULL, 0);
+    mr_fn->mr_def = mr;
+    return mr_fn;
+}
+
+
+MemberRoleFnFirstSibling *MemberRoleFnFirstSibling_creat(MemberDef *mr) {
+    MemberRoleFnFirstSibling *mr_fn = mam_alloc(sizeof(MemberRoleFnFirstSibling), OBJ_TYPE__MemberRoleFnFirstSibling, NULL, 0);
+    mr_fn->mr_def = mr;
+    return mr_fn;
+}
+
+MemberRoleFnLastSibling *MemberRoleFnLastSibling_creat(MemberDef *mr) {
+    MemberRoleFnLastSibling *mr_fn = mam_alloc(sizeof(MemberRoleFnLastSibling), OBJ_TYPE__MemberRoleFnLastSibling, NULL, 0);
+    mr_fn->mr_def = mr;
+    return mr_fn;
+}
+
+
 SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *mdef)
 {
     SetFnLateralMembers *latmbr = mam_alloc(sizeof(SetFnLateralMembers), OBJ_TYPE__SetFnLateralMembers, NULL, 0);
