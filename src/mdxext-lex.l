@@ -176,6 +176,14 @@ LastSibling {
 	return LAST_SIBLING;
 }
 
+Lag {
+	return LAG;
+}
+
+Lead {
+	return LEAD;
+}
+
 lateralMembers {
 	return LATERAL_MEMBERS;
 }

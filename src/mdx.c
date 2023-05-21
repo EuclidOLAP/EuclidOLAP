@@ -403,6 +403,14 @@ MemberRoleFnLastSibling *MemberRoleFnLastSibling_creat(MemberDef *mr) {
 }
 
 
+MemberRoleFnLag *MemberRoleFnLag_creat(MemberDef *_mr_def, long _index) {
+    MemberRoleFnLag *mr_fn = mam_alloc(sizeof(MemberRoleFnLag), OBJ_TYPE__MemberRoleFnLag, NULL, 0);
+    mr_fn->mr_def = _mr_def;
+    mr_fn->index = _index;
+    return mr_fn;
+}
+
+
 SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *mdef)
 {
     SetFnLateralMembers *latmbr = mam_alloc(sizeof(SetFnLateralMembers), OBJ_TYPE__SetFnLateralMembers, NULL, 0);

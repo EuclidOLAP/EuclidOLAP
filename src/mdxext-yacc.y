@@ -89,6 +89,8 @@ Stack AST_STACK = { 0 };
 %token LAST_CHILD		/* LastChild */
 %token FIRST_SIBLING	/* FirstSibling */
 %token LAST_SIBLING		/* LastSibling */
+%token LAG				/* Lag */
+%token LEAD				/* Lead */
 
 /* expression functions key words */
 %token SUM				/* sum */
@@ -1052,6 +1054,28 @@ member_statement:
 		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
 	}
+  | LAG ROUND_BRACKET_L member_statement COMMA decimal_value ROUND_BRACKET_R {
+		void *ptol = NULL;
+		stack_pop(&AST_STACK, (void **) &ptol);
+		long index = (long) ptol;
+		MemberDef *member_role_def;
+		stack_pop(&AST_STACK, (void **) &member_role_def);
+		MemberRoleFnLag *mr_fn = MemberRoleFnLag_creat(member_role_def, index);
+		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
+		mbr_def->member_fn = mr_fn;
+		stack_push(&AST_STACK, mbr_def);
+	}
+  | LEAD ROUND_BRACKET_L member_statement COMMA decimal_value ROUND_BRACKET_R {
+		void *ptol = NULL;
+		stack_pop(&AST_STACK, (void **) &ptol);
+		long index = (long) ptol;
+		MemberDef *member_role_def;
+		stack_pop(&AST_STACK, (void **) &member_role_def);
+		MemberRoleFnLag *mr_fn = MemberRoleFnLag_creat(member_role_def, 0 - index);
+		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
+		mbr_def->member_fn = mr_fn;
+		stack_push(&AST_STACK, mbr_def);
+	}
   | member_role_fn_parallel_period {
 		MemberRoleFnParallelPeriod *pp;
 		stack_pop(&AST_STACK, (void **) &pp);
@@ -1330,6 +1354,10 @@ levels_list:
 decimal_value:
 	DECIMAL {
 		long level = atoi(yytext);
+		stack_push(&AST_STACK, *((void **)&level));
+	}
+  | MINUS DECIMAL {
+		long level = 0 - atoi(yytext);
 		stack_push(&AST_STACK, *((void **)&level));
 	}
 ;

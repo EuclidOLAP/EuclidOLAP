@@ -688,6 +688,82 @@ from [logistics.test];
 
 ---
 
+select
+{ 
+    [Service Type].[ALL].[Business Suite],
+    ( Lag ([Service Type].[ALL].[Business Suite], 0) ),
+    ( Lead([Service Type].[ALL].[Business Suite], 0) )
+} on rows,
+{
+    [Aircraft Type].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 787 Dreamliner]
+} on columns
+from [Airline Turnover];
+
+---
+
+select
+{ 
+    [Service Type].[ALL].[Business Suite],
+    ( Lag ([Service Type].[ALL].[Business Suite], 110) ),
+    ( Lead([Service Type].[ALL].[Business Suite], 110) )
+} on rows,
+{
+    [Aircraft Type].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 787 Dreamliner]
+} on columns
+from [Airline Turnover];
+
+---
+
+select
+{ 
+    [Service Type].[ALL].[Business Suite],
+    ( Lag ([Service Type].[ALL].[Business Suite], 2) ),
+    ( Lead([Service Type].[ALL].[Business Suite], 2) )
+} on rows,
+{
+    [Aircraft Type].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 787 Dreamliner]
+} on columns
+from [Airline Turnover];
+
+---
+
+select
+{ 
+    [Service Type].[ALL].[Business Suite],
+    ( Lag ([Service Type].[ALL].[Business Suite], -110) ),
+    ( Lead([Service Type].[ALL].[Business Suite], - 110) )
+} on rows,
+{
+    [Aircraft Type].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 787 Dreamliner]
+} on columns
+from [Airline Turnover];
+
+---
+
+select
+{ 
+    [Service Type].[ALL].[Business Suite],
+    ( Lag ([Service Type].[ALL].[Business Suite], -
+    2) ),
+    ( Lead([Service Type].[ALL].[Business Suite], -2) )
+} on rows,
+{
+    [Aircraft Type].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 787 Dreamliner]
+} on columns
+from [Airline Turnover];
+
+---
+
 with
 member measure.[################ finished ################] as 660880
 member measure.[##########################################] as 660880

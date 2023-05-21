@@ -320,6 +320,8 @@ MddMemberRole *MemberRoleFnFirstSibling_evolving(MDContext *md_ctx, MemberRoleFn
 
 MddMemberRole *MemberRoleFnLastSibling_evolving(MDContext *md_ctx, MemberRoleFnLastSibling *mr_fn, MddTuple *context_tuple, Cube *cube);
 
+MddMemberRole *MemberRoleFnLag_evolving(MDContext *md_ctx, MemberRoleFnLag *mr_fn, MddTuple *context_tuple, Cube *cube);
+
 void ExpFnSum_evolving(MDContext *md_ctx, ExpFnSum *sum, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data);
 
 void ExpFnCount_evolving(MDContext *md_ctx, ExpFnCount *count, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data);
