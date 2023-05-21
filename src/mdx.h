@@ -338,6 +338,14 @@ typedef struct Member_Role_Fn_LastSibling_
 MemberRoleFnLastSibling *MemberRoleFnLastSibling_creat(MemberDef *mr);
 
 
+typedef struct Member_Role_Fn_Lag_
+{
+    MemberDef *mr_def;
+    long index;
+} MemberRoleFnLag;
+MemberRoleFnLag *MemberRoleFnLag_creat(MemberDef *_mr_def, long _index);
+
+
 typedef struct SetFn_LateralMembers
 {
     MemberDef *mr_def;
