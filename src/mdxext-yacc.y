@@ -85,6 +85,10 @@ Stack AST_STACK = { 0 };
 %token PARALLEL_PERIOD	/* parallelPeriod */
 %token CLOSING_PERIOD	/* ClosingPeriod */
 %token OPENING_PERIOD	/* OpeningPeriod */
+%token FIRST_CHILD		/* FirstChild */
+%token LAST_CHILD		/* LastChild */
+%token FIRST_SIBLING	/* FirstSibling */
+%token LAST_SIBLING		/* LastSibling */
 
 /* expression functions key words */
 %token SUM				/* sum */
@@ -1012,6 +1016,40 @@ member_statement:
 		MemberFnPrevMember *fn = MemberFnPrevMember_creat(curr_mr);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = fn;
+		stack_push(&AST_STACK, mbr_def);
+	}
+  | FIRST_CHILD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
+		MemberDef *member_role_def;
+		stack_pop(&AST_STACK, (void **) &member_role_def);
+		MemberRoleFnFirstChild *mr_fn = MemberRoleFnFirstChild_creat(member_role_def);
+		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
+		mbr_def->member_fn = mr_fn;
+		stack_push(&AST_STACK, mbr_def);
+	}
+  | LAST_CHILD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
+		MemberDef *member_role_def;
+		stack_pop(&AST_STACK, (void **) &member_role_def);
+		MemberRoleFnLastChild *mr_fn = MemberRoleFnLastChild_creat(member_role_def);
+		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
+		mbr_def->member_fn = mr_fn;
+		stack_push(&AST_STACK, mbr_def);
+	}
+  | FIRST_SIBLING ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
+		/* FirstSibling */
+		MemberDef *member_role_def;
+		stack_pop(&AST_STACK, (void **) &member_role_def);
+		MemberRoleFnFirstSibling *mr_fn = MemberRoleFnFirstSibling_creat(member_role_def);
+		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
+		mbr_def->member_fn = mr_fn;
+		stack_push(&AST_STACK, mbr_def);
+	}
+  | LAST_SIBLING ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
+		/* LastSibling */
+		MemberDef *member_role_def;
+		stack_pop(&AST_STACK, (void **) &member_role_def);
+		MemberRoleFnLastSibling *mr_fn = MemberRoleFnLastSibling_creat(member_role_def);
+		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
+		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
 	}
   | member_role_fn_parallel_period {

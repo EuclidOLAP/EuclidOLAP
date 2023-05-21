@@ -312,6 +312,14 @@ MddMemberRole *MemberRoleFnClosingPeriod_evolving(MDContext *md_ctx, MemberRoleF
 
 MddMemberRole *MemberRoleFnOpeningPeriod_evolving(MDContext *md_ctx, MemberRoleFnOpeningPeriod *op, MddTuple *context_tuple, Cube *cube);
 
+MddMemberRole *MemberRoleFnFirstChild_evolving(MDContext *md_ctx, MemberRoleFnFirstChild *mr_fn, MddTuple *context_tuple, Cube *cube);
+
+MddMemberRole *MemberRoleFnLastChild_evolving(MDContext *md_ctx, MemberRoleFnLastChild *mr_fn, MddTuple *context_tuple, Cube *cube);
+
+MddMemberRole *MemberRoleFnFirstSibling_evolving(MDContext *md_ctx, MemberRoleFnFirstSibling *mr_fn, MddTuple *context_tuple, Cube *cube);
+
+MddMemberRole *MemberRoleFnLastSibling_evolving(MDContext *md_ctx, MemberRoleFnLastSibling *mr_fn, MddTuple *context_tuple, Cube *cube);
+
 void ExpFnSum_evolving(MDContext *md_ctx, ExpFnSum *sum, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data);
 
 void ExpFnCount_evolving(MDContext *md_ctx, ExpFnCount *count, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data);
