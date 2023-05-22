@@ -6,7 +6,8 @@
 /************************************************************************
  * typedef struct elastic_byte_buf ByteBuf                              *
  ************************************************************************/
-typedef struct elastic_byte_buf {
+typedef struct elastic_byte_buf
+{
 	void *buf_addr;
 	size_t capacity;
 	size_t index;
