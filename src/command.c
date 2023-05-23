@@ -173,49 +173,30 @@ static void *do_process_command(void *addr)
 		MemAllocMng *mam = MemAllocMng_current_thread_mam();
 		mam_reset(mam);
 
-		if (setjmp(mam->excep_ctx_env) == 0) {
+		if (setjmp(mam->excep_ctx_env) == 0)
+		{
 			int exe_result = execute_command(ec);
-			if (ec->result == NULL) {
-				if (mam->exception_desc) {
+			if (ec->result == NULL)
+			{
+				if (mam->exception_desc)
+				{
 					ec->result = ec_new(INTENT__EXE_RESULT_DESC, strlen(mam->exception_desc) + 1);
 					strcpy(ec->result->bytes + SZOF_INT + SZOF_SHORT, mam->exception_desc);
-				} else if (exe_result != 0) {
+				}
+				else if (exe_result != 0)
+				{
 					// task execution failed
 					ec->result = EuclidCommand_failure("Unrecognized statement.");
 				}
 			}
-		} else {
+		}
+		else
+		{
 			ec->result = ec_new(INTENT__EXE_RESULT_DESC, strlen(mam->exception_desc) + 1);
 			strcpy(ec->result->bytes + SZOF_INT + SZOF_SHORT, mam->exception_desc);
 		}
 
-		// int exe_result = execute_command(ec);
-
-		// if (ec->result == NULL) {
-		// 	if (mam->exception_desc) {
-		// 		ec->result = ec_new(INTENT__EXE_RESULT_DESC, strlen(mam->exception_desc) + 1);
-		// 		strcpy(ec->result->bytes + SZOF_INT + SZOF_SHORT, mam->exception_desc);
-		// 	} else if (exe_result != 0) {
-		// 		// task execution failed
-		// 		ec->result = EuclidCommand_failure("Unrecognized statement.");
-		// 	}
-		// }
-
-		// if (exe_result != 0 && ec->result == NULL) {
-		// 	// task execution failed
-		// 	ec->result = EuclidCommand_failure("Unrecognized statement.");
-		// }
-
 		sem_post(&(ec->sem));
-
-		// obj_release(ec->bytes);
-		// obj_release(ec);
-
-		// if (mam) {
-		// 	mam_reset(mam);
-		// }
-
-		// ec = NULL;
 	}
 
 	return NULL;
@@ -226,9 +207,6 @@ static int __execute_command__count = 1;
 static int execute_command(EuclidCommand *action)
 {
 	Stack stk;
-
-	// todo try use the CAS function __atomic_add_fetch
-	// log_print("@@@@@@ __execute_command__count = %d\n", __execute_command__count++);
 
 	intent inte = ec_get_intent(action);
 	if (inte == INTENT__INSERT_CUBE_MEASURE_VALS)
@@ -243,7 +221,8 @@ static int execute_command(EuclidCommand *action)
 
 		parse_mdx((action->bytes) + 10, &stk);
 
-		if ((cur_thrd_mam->bin_flags & 0x0001) == 0) {
+		if ((cur_thrd_mam->bin_flags & 0x0001) == 0)
+		{
 			// Empty the stack to prevent stack overflow.
 			stk.top_idx = 0;
 
@@ -253,8 +232,9 @@ static int execute_command(EuclidCommand *action)
 
 		void *ids_type;
 
-		if (stack_pop(&stk, &ids_type) != 0) {
-			log_print("[ error ] Program exit. Impossible program execution location.\n");	
+		if (stack_pop(&stk, &ids_type) != 0)
+		{
+			log_print("[ error ] Program exit. Impossible program execution location.\n");
 			exit(EXIT_FAILURE);
 		}
 
@@ -294,11 +274,14 @@ static int execute_command(EuclidCommand *action)
 			stack_pop(&stk, (void **)&select_def);
 
 			// Check if the axes of the result set are repeatedly defined.
-			for (int i=0; i<als_size(select_def->ax_def_ls); i++) {
-				for (int j=0; j!=i && j<als_size(select_def->ax_def_ls); j++) {
+			for (int i = 0; i < als_size(select_def->ax_def_ls); i++)
+			{
+				for (int j = 0; j != i && j < als_size(select_def->ax_def_ls); j++)
+				{
 					AxisDef *axi = als_get(select_def->ax_def_ls, i);
 					AxisDef *axj = als_get(select_def->ax_def_ls, j);
-					if (axi->posi == axj->posi) {
+					if (axi->posi == axj->posi)
+					{
 						cur_thrd_mam->exception_desc = "exception: There are multiple axes with duplicate positions in the query results.";
 						longjmp(cur_thrd_mam->excep_ctx_env, -1);
 					}
@@ -307,31 +290,29 @@ static int execute_command(EuclidCommand *action)
 
 			MultiDimResult *md_rs = exe_multi_dim_queries(select_def);
 
-			if (cur_thrd_mam->exception_desc == NULL) {
+			if (cur_thrd_mam->exception_desc == NULL)
+			{
 				// MultiDimResult_print(md_rs);
 
-				if (ec_get_intent(action) == INTENT__MDX_EXPECT_RESULT_TXT) {
+				if (ec_get_intent(action) == INTENT__MDX_EXPECT_RESULT_TXT)
+				{
 					// todo Do not use the allocated memory block directly, replace by ElasticByteBuffer.
-					char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL<<19, OBJ_TYPE__RAW_BYTES);
+					char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL << 19, OBJ_TYPE__RAW_BYTES);
 
-					*((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL<<19;
+					*((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL << 19;
 					*((unsigned short *)(payload + SZOF_INT)) = INTENT__SUCCESSFUL;
-					mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL<<19);
+					mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL << 19);
 					action->result = create_command(payload);
-				} else {
+				}
+				else
+				{
 					ByteBuf *binuf = mdrs_to_bin(md_rs);
 					char *payload = obj_alloc(binuf->index, OBJ_TYPE__RAW_BYTES);
 					memcpy(payload, binuf->buf_addr, binuf->index);
 					buf_release(binuf);
 					action->result = create_command(payload);
 				}
-				
 			}
-			// else
-			// {
-			// 	ec->result = ec_new(INTENT__EXE_RESULT_DESC, strlen(cur_thrd_mam->exception_desc) + 1);
-			// 	strcpy(ec->result->bytes + SZOF_INT + SZOF_SHORT, cur_thrd_mam->exception_desc);
-			// }
 		}
 		else if (ids_type == IDS_ARRLS_DIMS_LVS_INFO)
 		{
@@ -339,7 +320,8 @@ static int execute_command(EuclidCommand *action)
 			stack_pop(&stk, (void **)&dim_lv_map_ls);
 
 			// check for unknown dimensions
-			for (int i=0; i<als_size(dim_lv_map_ls); i++) {
+			for (int i = 0; i < als_size(dim_lv_map_ls); i++)
+			{
 				ArrayList *map = als_get(dim_lv_map_ls, i);
 				char *dimension_name = als_get(map, 0);
 				if (find_dim_by_name(dimension_name))
@@ -348,13 +330,15 @@ static int execute_command(EuclidCommand *action)
 				return 0;
 			}
 
-			int i,j,map_len, map_count = als_size(dim_lv_map_ls);
-			for (i = 0; i < map_count; i++) {
+			int i, j, map_len, map_count = als_size(dim_lv_map_ls);
+			for (i = 0; i < map_count; i++)
+			{
 				ArrayList *map = als_get(dim_lv_map_ls, i);
 				char *dimension_name = als_get(map, 0);
 				Dimension *dim = find_dim_by_name(dimension_name);
 				map_len = als_size(map);
-				for (j=1;j<map_len;j+=2) {
+				for (j = 1; j < map_len; j += 2)
+				{
 					void *lv_trans = als_get(map, j);
 					long *lv_p = (long *)&lv_trans;
 					char *level_name = als_get(map, j + 1);
@@ -365,58 +349,69 @@ static int execute_command(EuclidCommand *action)
 				}
 			}
 		}
-		else {
+		else
+		{
 			log_print("[ error ] program exit(1), cause by: unknow ids_type < %p >\n", ids_type);
 			exit(1);
 		}
-	} else if (inte == INTENT__VECTOR_AGGREGATION) {
+	}
+	else if (inte == INTENT__VECTOR_AGGREGATION)
+	{
 
 		ArrayList *grids = worker_aggregate_measure(action);
 
 		long len = grids ? als_size(grids) : 0;
 
-		int payload_capacity = 4+2+8+8+4+4+8;
+		int payload_capacity = 4 + 2 + 8 + 8 + 4 + 4 + 8;
 		payload_capacity += len * (sizeof(double) + sizeof(char));
 
 		char *payload = obj_alloc(payload_capacity, OBJ_TYPE__RAW_BYTES);
 		char *idx = payload;
 
 		*((int *)idx) = payload_capacity;
-		idx+=sizeof(payload_capacity);
+		idx += sizeof(payload_capacity);
 
 		short inte = INTENT__AGGREGATE_TASK_RESULT;
 		*((short *)idx) = inte;
-		idx+=sizeof(inte);
+		idx += sizeof(inte);
 
-		memcpy(idx, action->bytes + sizeof(int) + sizeof(short), 8+8+4+4);
-		idx += 8+8+4+4;
+		memcpy(idx, action->bytes + sizeof(int) + sizeof(short), 8 + 8 + 4 + 4);
+		idx += 8 + 8 + 4 + 4;
 		*((long *)idx) = len;
-		idx+=sizeof(len);
+		idx += sizeof(len);
 
-		for (int i=0;i<len;i++) {
+		for (int i = 0; i < len; i++)
+		{
 			GridData *gd = als_get(grids, i);
 
 			if (gd != NULL)
 				*((double *)idx) = gd->val;
 
-			idx+=sizeof(double);
+			idx += sizeof(double);
 		}
 
-		for (int i=0;i<len;i++) {
+		for (int i = 0; i < len; i++)
+		{
 			GridData *gd = als_get(grids, i);
 
 			*idx = gd ? gd->null_flag : 1;
-			idx+=sizeof(char);
+			idx += sizeof(char);
 		}
 
 		assert(action->result == NULL);
 
 		action->result = create_command(payload);
-	} else if (inte == INTENT__AGGREGATE_TASK_RESULT) {
+	}
+	else if (inte == INTENT__AGGREGATE_TASK_RESULT)
+	{
 		log_print("// todo at once ............................ INTENT__AGGREGATE_TASK_RESULT\n");
-	} else if (inte == INTENT__SUCCESSFUL) {
+	}
+	else if (inte == INTENT__SUCCESSFUL)
+	{
 		log_print("// todo at once ............................ INTENT__SUCCESSFUL\n");
-	} else {
+	}
+	else
+	{
 		log_print("[ error ] program exit(1), unknown inte < %d >\n", inte);
 		exit(EXIT_FAILURE);
 	}
@@ -442,7 +437,8 @@ EuclidCommand *build_intent_command_mdx(char *mdx)
 	return ec;
 }
 
-EuclidCommand *EuclidCommand_failure(char *desc) {
+EuclidCommand *EuclidCommand_failure(char *desc)
+{
 	assert(desc != NULL);
 	assert(strlen(desc) > 0);
 
@@ -454,7 +450,8 @@ EuclidCommand *EuclidCommand_failure(char *desc) {
 	return create_command(payload);
 }
 
-EuclidCommand *ec_new(intent inte, size_t payload_sz) {
+EuclidCommand *ec_new(intent inte, size_t payload_sz)
+{
 	EuclidCommand *ec = obj_alloc(sizeof(EuclidCommand), OBJ_TYPE__EuclidCommand);
 	ec->bytes = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT + payload_sz, OBJ_TYPE__RAW_BYTES);
 	*((unsigned int *)ec->bytes) = SZOF_USG_INT + SZOF_USG_SHORT + payload_sz;
@@ -462,6 +459,7 @@ EuclidCommand *ec_new(intent inte, size_t payload_sz) {
 	return ec;
 }
 
-void ec_change_intent(EuclidCommand *ec, intent inte) {
+void ec_change_intent(EuclidCommand *ec, intent inte)
+{
 	*(intent *)(ec->bytes + sizeof(int)) = inte;
 }
