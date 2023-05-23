@@ -60,7 +60,7 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
 
 /**
  * (*) <-> (*)
- * 
+ *
  * 4 bytes - data package capacity
  * 2 bytes - intention
  * N bytes - A descriptive paragraph, include valid text and a trailing 0 character.
@@ -69,7 +69,7 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
 
 /**
  * (*) <-> (*)
- * 
+ *
  * 4 bytes - data package capacity
  * 2 bytes - intention
  * N bytes - A descriptive paragraph, include valid text and a trailing 0 character.
@@ -78,7 +78,7 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
 
 /**
  * (*) <-> (*)
- * 
+ *
  * 4 bytes - data package capacity
  * 2 bytes - intention
  * N bytes - A descriptive paragraph, include valid text and a trailing 0 character.
@@ -107,7 +107,7 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
 
 /**
  * Execute MDX and expect the result to be returned in text format.
- * 
+ *
  * (terminal client) -> (euclid master node)
  *
  * 4 bytes - data package capacity
@@ -120,7 +120,7 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
 
 /**
  * The master node assigns the metric vector aggregation task to the worker node.
- * 
+ *
  * (master node) -> (worker node)
  *
  * 4 bytes - data package capacity
@@ -139,7 +139,7 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
 
 /**
  * The aggregation node reports the execution result of the aggregate task to the logic node.
- * 
+ *
  * aggregation node(worker node) -> logic node(master node)
  *
  * 4 bytes - data package capacity
