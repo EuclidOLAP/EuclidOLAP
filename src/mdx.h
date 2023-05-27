@@ -2,6 +2,7 @@
 #define EUCLID__MDX_H 1
 
 #include "utils.h"
+#include "mdx-ext.h"
 
 void mdx_init();
 
@@ -82,6 +83,7 @@ void ids_tupledef___set_mbrs_def(TupleDef *, MembersDef *);
 #define SET_DEF__TUP_DEF_LS 1
 #define SET_DEF__SET_FUNCTION 2
 #define SET_DEF__VAR_OR_BLOCK 3
+#define SET_DEF__MDE_UNI_PATH 4
 
 typedef struct set_definition
 {
@@ -89,6 +91,7 @@ typedef struct set_definition
     ArrayList *tuple_def_ls;
     void *set_fn;
     char *var_block;
+    MDMEntityUniversalPath *up;
 } SetDef;
 
 SetDef *ids_setdef_new(ids_ct);
@@ -470,5 +473,74 @@ typedef struct ExpFn_CoalesceEmpty
 } ExpFnCoalesceEmpty;
 
 ExpFnCoalesceEmpty *ExpFnCoalesceEmpty_creat(ArrayList *exp_ls);
+
+
+/*************************************************************************************
+ * member function templates                                                         *
+ *************************************************************************************/
+#define MDX_FN_SUFFIX_FALSE  0
+#define MDX_FN_SUFFIX_TRUE  1
+
+typedef struct _member_role_func_parent_ {
+    char suf_flag;
+    MDMEntityUniversalPath *hierarchy;
+} MemberRoleFuncParent;
+
+typedef struct _member_role_func_currentmember_ {
+    char suf_flag;
+
+} MemberRoleFuncCurrentMember;
+
+typedef struct _member_role_func_prevmember_ {
+    char suf_flag;
+
+} MemberRoleFuncPrevMember;
+
+typedef struct _member_role_func_firstchild_ {
+    char suf_flag;
+
+} MemberRoleFuncFirstChild;
+
+typedef struct _member_role_func_lastchild_ {
+    char suf_flag;
+
+} MemberRoleFuncLastChild;
+
+typedef struct _member_role_func_firstsibling_ {
+    char suf_flag;
+    MDMEntityUniversalPath *hierarchy;
+
+} MemberRoleFuncFirstSibling;
+
+typedef struct _member_role_func_lastsibling_ {
+    char suf_flag;
+    MDMEntityUniversalPath *hierarchy;
+
+} MemberRoleFuncLastSibling;
+
+typedef struct _member_role_func_lag_ {
+    char suf_flag;
+    long index;
+
+} MemberRoleFuncLag;
+
+typedef struct _member_role_func_lead_ {
+    char suf_flag;
+    long index;
+
+} MemberRoleFuncLead;
+
+
+/*************************************************************************************
+ * set function templates                                                            *
+ *************************************************************************************/
+typedef struct _set_func_children_ {
+    char suf_flag;
+} SetFuncChildren;
+
+typedef struct _set_func_members_ {
+    char suf_flag;
+} SetFuncMembers;
+
 
 #endif
