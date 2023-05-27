@@ -332,6 +332,10 @@ void ExpFnIif_evolving(MDContext *md_ctx, ExpFnIif *iif, Cube *cube, MddTuple *c
 
 void ExpFnCoalesceEmpty_evolving(MDContext *md_ctx, ExpFnCoalesceEmpty *ce, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data);
 
+
+void *up_evolving(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube *cube, MddTuple *ctx_tuple);
+
+
 // Returns a list of peer members that have a same ancestor at the same level as the current member.
 ArrayList *mdd__lv_ancestor_peer_descendants(Level *, Member *);
 

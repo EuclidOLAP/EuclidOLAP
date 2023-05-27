@@ -314,12 +314,28 @@ coalesceEmpty {
 	return DOT;
 }
 
+"&" {
+	return AMPERSAND;
+}
+
+"@" {
+	return AT_SIGN;
+}
+
 "("	{
 	return ROUND_BRACKET_L;
 }
 
 ")"	{
 	return ROUND_BRACKET_R;
+}
+
+"[" {
+	return OPENING_BRACKET;
+}
+
+"]" {
+	return CLOSING_BRACKET;
 }
 
 "{" {

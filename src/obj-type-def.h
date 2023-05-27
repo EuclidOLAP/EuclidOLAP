@@ -163,6 +163,32 @@ typedef short type_obj;
 
 #define OBJ_TYPE__MemberRoleFnLag 78
 
+#define OBJ_TYPE__MdmEntityUpSegment 79
+
+#define OBJ_TYPE__MemberRoleFuncParent 80
+
+#define OBJ_TYPE__MemberRoleFuncCurrentMember 81
+
+#define OBJ_TYPE__MemberRoleFuncPrevMember 82
+
+#define OBJ_TYPE__MemberRoleFuncFirstChild 83
+
+#define OBJ_TYPE__MemberRoleFuncLastChild 84
+
+#define OBJ_TYPE__MemberRoleFuncFirstSibling 85
+
+#define OBJ_TYPE__MemberRoleFuncLastSibling 86
+
+#define OBJ_TYPE__MemberRoleFuncLag 87
+
+#define OBJ_TYPE__MemberRoleFuncLead 88
+
+#define OBJ_TYPE__SetFuncChildren 89
+
+#define OBJ_TYPE__SetFuncMembers 90
+
+#define OBJ_TYPE__MDMEntityUniversalPath 91
+
 #define OBJ_TYPE__RAW_BYTES 1024
 
 #endif
