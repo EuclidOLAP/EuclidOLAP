@@ -1366,6 +1366,20 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 		}
 	}
 	else if (set_def->t_cons == SET_DEF__MDE_UNI_PATH) {
+
+		// Handling special cases.
+		// When a set definition cannot give a reference tuple for influencing the context, it simply return a NULL.
+		if (als_size(set_def->up->list) == 1) {
+			void *obj = als_get(set_def->up->list, 0);
+			short _type;
+			enum_oms _strat;
+			MemAllocMng *_mam;
+			obj_info(obj, &_type, &_strat, &_mam);
+			if (_type == OBJ_TYPE__SetFnYTD && ((SetFnYTD *)obj)->mbr_def == NULL) {
+				return NULL;
+			}
+		}
+
 		void *var = up_evolving(md_ctx, set_def->up, cube, context_tuple);
 
 		short obj_type;
