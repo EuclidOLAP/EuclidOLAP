@@ -20,7 +20,7 @@ static ArrayList *coor_sys_ls;
 static ArrayList *space_ls;
 
 static void _do_calculate_measure_value(
-    // MDContext *md_ctx, 
+    // MDContext *md_ctx,
     MeasureSpace *space, ArrayList *sor_ls, int deep, unsigned long offset, GridData *grid_data, int mea_val_idx);
 
 static void MeasureSpace_coordinate_intersection_value(MeasureSpace *space, unsigned long index, int mea_val_idx, GridData *gridData);
@@ -33,7 +33,8 @@ void vce_init()
     space_mam_ls = als_new(16, "MemAllocMng *", SPEC_MAM, vce_mam);
 }
 
-void vce_load() {
+void vce_load()
+{
 
     DIR *dir = NULL;
     struct dirent *entry;
@@ -42,17 +43,19 @@ void vce_load() {
     char *suffix, *endptr;
     long cube_id;
 
-	char f[128];
-	memset(f, 0, 128);
-	getcwd(f, 80);
-	strcat(f, "/data");
-    
+    char f[128];
+    memset(f, 0, 128);
+    getcwd(f, 80);
+    strcat(f, "/data");
+
     dir = opendir(f);
 
     assert(dir != NULL);
 
-    while ((entry = readdir(dir)) != NULL) {
-        if (strncmp(entry->d_name, prefix, prefix_len) == 0) {
+    while ((entry = readdir(dir)) != NULL)
+    {
+        if (strncmp(entry->d_name, prefix, prefix_len) == 0)
+        {
             suffix = entry->d_name + prefix_len;
             cube_id = strtol(suffix, &endptr, 10);
             reload_space(cube_id);
@@ -61,11 +64,10 @@ void vce_load() {
 
     closedir(dir);
 
-
     // FILE *cubes_fd = open_file(META_DEF_CUBES_FILE_PATH, "r");
 
-	// md_gid cube_id;
-	// while (fread((void *)&cube_id, sizeof(md_gid), 1, cubes_fd) > 0) {
+    // md_gid cube_id;
+    // while (fread((void *)&cube_id, sizeof(md_gid), 1, cubes_fd) > 0) {
 
     //     char src_dir[128];
     //     memset(src_dir, 0, 128);
@@ -98,18 +100,19 @@ int vce_append(EuclidCommand *action)
     unsigned int vals_count = *((unsigned int *)slide_over_mem(bytes, sizeof(int), &i));
 
     char src_dir[128];
-	memset(src_dir, 0, 128);
-	getcwd(src_dir, 80);
+    memset(src_dir, 0, 128);
+    getcwd(src_dir, 80);
 
     char profile[128];
-	memset(profile, 0, 128);
+    memset(profile, 0, 128);
     sprintf(profile, "data/profile-%lu", cs_id);
 
     char profile_path[128];
-	memset(profile_path, 0, 128);
+    memset(profile_path, 0, 128);
     sprintf(profile_path, "%s/%s", src_dir, profile);
 
-    if (access(profile_path, F_OK) != 0) {
+    if (access(profile_path, F_OK) != 0)
+    {
         // create persistent file about the CoordinateSystem
         append_file_data(profile, (void *)&cs_id, sizeof(cs_id));
         append_file_data(profile, (void *)&axes_count, sizeof(axes_count));
@@ -126,17 +129,20 @@ int vce_append(EuclidCommand *action)
     return 0;
 }
 
-static void *Scale_print__rbt(RBNode *node, void *param) {
+static void *Scale_print__rbt(RBNode *node, void *param)
+{
     Scale_print(node->obj);
     return NULL;
 }
 
-static void *ScaleOffsetRange_print__rbt(RBNode *node, void *param) {
+static void *ScaleOffsetRange_print__rbt(RBNode *node, void *param)
+{
     ScaleOffsetRange_print(node->obj);
     return NULL;
 }
 
-void reload_space(unsigned long cs_id) {
+void reload_space(unsigned long cs_id)
+{
     space_unload(cs_id);
 
     ByteBuf *tmp_buf = buf__alloc(0x01UL << 10);
@@ -168,7 +174,8 @@ void reload_space(unsigned long cs_id) {
     FILE *data_fd = open_file(data_file, "r");
     int coor_pointer_len;
 
-    while (fread(&coor_pointer_len, sizeof(int), 1, data_fd) > 0) {
+    while (fread(&coor_pointer_len, sizeof(int), 1, data_fd) > 0)
+    {
 
         // fread(tmpbuf, coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
         buf_clear(tmp_buf);
@@ -180,9 +187,10 @@ void reload_space(unsigned long cs_id) {
 
         sample->fragments = buf_cutting(tmp_buf, coor_pointer_len * sizeof(md_gid));
         fread(sample->fragments, coor_pointer_len * sizeof(md_gid), 1, data_fd);
-        
+
         Axis *axis = cs_get_axis(cs, 0);
-        if (ax_find_scale(axis, sample) == NULL) {
+        if (ax_find_scale(axis, sample) == NULL)
+        {
             Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
             scale->fragments = mam_alloc(coor_pointer_len * sizeof(md_gid), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
             scale->fragments_len = sample->fragments_len;
@@ -190,7 +198,8 @@ void reload_space(unsigned long cs_id) {
             ax_set_scale(axis, scale);
         }
 
-        for (i=1;i<axes_count;i++) {
+        for (i = 1; i < axes_count; i++)
+        {
 
             fread(&coor_pointer_len, sizeof(int), 1, data_fd);
 
@@ -204,7 +213,8 @@ void reload_space(unsigned long cs_id) {
             fread(sample->fragments, coor_pointer_len * sizeof(md_gid), 1, data_fd);
 
             axis = cs_get_axis(cs, i);
-            if (ax_find_scale(axis, sample) == NULL) {
+            if (ax_find_scale(axis, sample) == NULL)
+            {
                 Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
                 scale->fragments = mam_alloc(coor_pointer_len * sizeof(md_gid), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
                 scale->fragments_len = sample->fragments_len;
@@ -236,9 +246,12 @@ void reload_space(unsigned long cs_id) {
     }
 
     size_t space_partition_count = space_capacity / SPACE_DEF_PARTITION_SPAN_MIN;
-    if (space_partition_count == 0) {
+    if (space_partition_count == 0)
+    {
         space_partition_count = 1;
-    } else if (space_capacity % SPACE_DEF_PARTITION_SPAN_MIN) {
+    }
+    else if (space_capacity % SPACE_DEF_PARTITION_SPAN_MIN)
+    {
         ++space_partition_count;
     }
 
@@ -282,7 +295,8 @@ void reload_space(unsigned long cs_id) {
 
         // todo at once, modify it be use a temp memory allocation manager
         // void *cell = mam_alloc(sizeof(measure_space_idx) + cell_mem_sz, OBJ_TYPE__RAW_BYTES, cs_mam, 0);
-        if (load_meval_count % BYTES_ALIGNMENT == 0) {
+        if (load_meval_count % BYTES_ALIGNMENT == 0)
+        {
             cellcm = mam_hlloc(cs_mam, (sizeof(measure_space_idx) + cell_mem_sz) * BYTES_ALIGNMENT);
         }
         // void *cell = mam_hlloc(cs_mam, sizeof(measure_space_idx) + cell_mem_sz);
@@ -310,10 +324,10 @@ finished:
     CoordinateSystem__calculate_offset(cs);
 
     als_add(space_ls, space);
-
 }
 
-CoordinateSystem *coosys_new(unsigned long id, int axes_count, MemAllocMng *mam) {
+CoordinateSystem *coosys_new(unsigned long id, int axes_count, MemAllocMng *mam)
+{
 
     CoordinateSystem *cs = mam_alloc(sizeof(CoordinateSystem), OBJ_TYPE__CoordinateSystem, mam, 1);
     cs->id = id;
@@ -381,17 +395,21 @@ int scal_cmp(void *_one, void *_other)
 
 void space_unload(__uint64_t id)
 {
-    for (int i = 0; i < als_size(coor_sys_ls); i++) {
+    for (int i = 0; i < als_size(coor_sys_ls); i++)
+    {
         CoordinateSystem *cs = als_get(coor_sys_ls, i);
-        if (cs->id == id) {
+        if (cs->id == id)
+        {
             als_rm_index(coor_sys_ls, i);
             break;
         }
     }
-    
-    for (int i = 0; i < als_size(space_ls); i++) {
+
+    for (int i = 0; i < als_size(space_ls); i++)
+    {
         MeasureSpace *ms = als_get(space_ls, i);
-        if (ms->id == id) {
+        if (ms->id == id)
+        {
             als_rm_index(space_ls, i);
 
             short type;
@@ -441,7 +459,8 @@ static void *_cell__destory(void *cell)
     // _release_mem_(cell);
 }
 
-MeasureSpace *space_new(unsigned long id, size_t segment_count, size_t segment_scope, int cell_vals_count, MemAllocMng *mam) {
+MeasureSpace *space_new(unsigned long id, size_t segment_count, size_t segment_scope, int cell_vals_count, MemAllocMng *mam)
+{
 
     MeasureSpace *s = mam_alloc(sizeof(MeasureSpace), OBJ_TYPE__MeasureSpace, mam, 1);
     s->id = id;
@@ -543,7 +562,7 @@ double *vce_vactors_values(MDContext *md_ctx, MddTuple **tuples_matrix_h, unsign
 {
     /**
      * todo
-     * If the current node is running in master mode, you need to send the aggregate query request to the worker node, 
+     * If the current node is running in master mode, you need to send the aggregate query request to the worker node,
      * wait at the semaphore, and wait until the worker node is woken up after all executions are completed.
      */
     Cube *cube = Tuple_ctx_cube(tuples_matrix_h[0]);
@@ -575,7 +594,6 @@ double *vce_vactors_values(MDContext *md_ctx, MddTuple **tuples_matrix_h, unsign
 
     double *result = mam_alloc(v_len * sizeof(double), OBJ_TYPE__RAW_BYTES, NULL, 0);
     *null_flags = mam_alloc(v_len * sizeof(char), OBJ_TYPE__RAW_BYTES, NULL, 0);
-
 
     GridData tmp;
     for (i = 0; i < v_len; i++)
@@ -697,7 +715,8 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
 
     EuclidConfig *cfg = get_cfg();
 
-    if (cfg->mode == MODE_MASTER) {
+    if (cfg->mode == MODE_MASTER)
+    {
         ArrayList *one_tp_ls = als_new(1, "MddTuple *", THREAD_MAM, NULL);
         als_add(one_tp_ls, tuple);
 
@@ -730,7 +749,8 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
         }
     }
 
-    if (coor == NULL) {
+    if (coor == NULL)
+    {
         MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
         thrd_mam->exception_desc = "No measure data of cube.";
         longjmp(thrd_mam->excep_ctx_env, -1);
@@ -796,12 +816,12 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
     memset(grid_data, 0, sizeof(GridData));
     grid_data->null_flag = 1; // measure value is default null
     _do_calculate_measure_value(
-        // md_ctx, 
+        // md_ctx,
         space, sor_ls, 0, 0, grid_data, mea_val_idx);
 }
 
 static void _do_calculate_measure_value(
-    // MDContext *md_ctx, 
+    // MDContext *md_ctx,
     MeasureSpace *space, ArrayList *sor_ls, int deep, unsigned long offset, GridData *grid_data, int mea_val_idx)
 {
     ScaleOffsetRange *sor = (ScaleOffsetRange *)als_get(sor_ls, deep);
@@ -821,7 +841,7 @@ static void _do_calculate_measure_value(
         else
         {
             _do_calculate_measure_value(
-                // md_ctx, 
+                // md_ctx,
                 space, sor_ls, deep + 1, offset + _position * sor->offset, grid_data, mea_val_idx);
         }
     }
@@ -940,7 +960,8 @@ static void MeasureSpace_coordinate_intersection_value(MeasureSpace *space, unsi
     gridData->null_flag = 1;
 }
 
-void dispatchAggregateMeasure(/*MDContext *md_context,*/ Cube *cube, ArrayList *direct_vectors, double **_measures_, char **_null_flags_, unsigned long *_len_) {
+void dispatchAggregateMeasure(/*MDContext *md_context,*/ Cube *cube, ArrayList *direct_vectors, double **_measures_, char **_null_flags_, unsigned long *_len_)
+{
 
     unsigned long task_group_code = gen_md_gid();
 
@@ -949,34 +970,37 @@ void dispatchAggregateMeasure(/*MDContext *md_context,*/ Cube *cube, ArrayList *
 
     unsigned int size = als_size(direct_vectors);
 
-    unsigned int pkg_size = 4+2+8+8+4+4+8+(sizeof(md_gid) * dr_count + sizeof(int)) * size;
+    unsigned int pkg_size = 4 + 2 + 8 + 8 + 4 + 4 + 8 + (sizeof(md_gid) * dr_count + sizeof(int)) * size;
     ByteBuf *buff = buf__alloc(pkg_size);
 
-    *((unsigned int *) buf_cutting(buff, sizeof(int))) = pkg_size;
-    *((unsigned short *) buf_cutting(buff, sizeof(short))) = INTENT__VECTOR_AGGREGATION;
-    *((md_gid *) buf_cutting(buff, sizeof(md_gid))) = cube->gid;
-    *((unsigned long *) buf_cutting(buff, sizeof(long))) = task_group_code;
+    *((unsigned int *)buf_cutting(buff, sizeof(int))) = pkg_size;
+    *((unsigned short *)buf_cutting(buff, sizeof(short))) = INTENT__VECTOR_AGGREGATION;
+    *((md_gid *)buf_cutting(buff, sizeof(md_gid))) = cube->gid;
+    *((unsigned long *)buf_cutting(buff, sizeof(long))) = task_group_code;
     buf_cutting(buff, sizeof(int)); // skip the max task group number
     buf_cutting(buff, sizeof(int)); // skip the task group number
-    *((long *) buf_cutting(buff, sizeof(long))) = size;
+    *((long *)buf_cutting(buff, sizeof(long))) = size;
 
-    for (int i=0; i<size; i++) {
+    for (int i = 0; i < size; i++)
+    {
         MddTuple *tuple = als_get(direct_vectors, i);
         ArrayList_sort(tuple->mr_ls, MddMemberRole_cmp);
 
         MddMemberRole *measure_mr = NULL;
 
         int count = als_size(tuple->mr_ls);
-        for (int j=0; j<count; j++) {
+        for (int j = 0; j < count; j++)
+        {
             MddMemberRole *mr = als_get(tuple->mr_ls, j);
             DimensionRole *dr = mr->dim_role;
 
-            if (dr == NULL) {
+            if (dr == NULL)
+            {
                 measure_mr = mr;
                 continue;
             }
 
-            *((md_gid *) buf_cutting(buff, sizeof(md_gid))) = mr->member->gid;
+            *((md_gid *)buf_cutting(buff, sizeof(md_gid))) = mr->member->gid;
         }
 
         // int mea_val_idx = 0;
@@ -999,7 +1023,7 @@ void dispatchAggregateMeasure(/*MDContext *md_context,*/ Cube *cube, ArrayList *
 
     // buf_clear(buf);
     // *((int *) buf_cutting(buf, 4+2+8+8)) = als_size(node_list);
-    buf_set_cursor(buff, 4+2+8+8);
+    buf_set_cursor(buff, 4 + 2 + 8 + 8);
 
     int max_task_grp_num = als_size(node_list);
 
@@ -1009,19 +1033,20 @@ void dispatchAggregateMeasure(/*MDContext *md_context,*/ Cube *cube, ArrayList *
     put_agg_task_group(task_group_code, max_task_grp_num, &semt);
 
     sem_init(&semt, 0, 0);
-    
-    for (int i=0; i<als_size(node_list); i++) {
+
+    for (int i = 0; i < als_size(node_list); i++)
+    {
         SockIntentThread *node_sit = als_get(node_list, i);
 
-        *((int *) buf_cutting(buff, sizeof(int))) = i;
-
+        *((int *)buf_cutting(buff, sizeof(int))) = i;
 
         ssize_t rscode = send(node_sit->sock_fd, buf_starting(buff), buf_sz, 0);
 
-        buf_set_cursor(buff, 4+2+8+8);
+        buf_set_cursor(buff, 4 + 2 + 8 + 8);
     }
 
-    for (int i=0;i<max_task_grp_num;i++) {
+    for (int i = 0; i < max_task_grp_num; i++)
+    {
         sem_wait(&semt);
     }
 
@@ -1034,7 +1059,8 @@ void dispatchAggregateMeasure(/*MDContext *md_context,*/ Cube *cube, ArrayList *
 
     assert(((measure_vals == NULL) && (null_flags == NULL)) || ((measure_vals != NULL) && (null_flags != NULL)));
 
-    if (measure_vals) {
+    if (measure_vals)
+    {
         *_measures_ = mam_alloc(sizeof(double) * vals_size, OBJ_TYPE__RAW_BYTES, NULL, 0);
         *_null_flags_ = mam_alloc(sizeof(char) * vals_size, OBJ_TYPE__RAW_BYTES, NULL, 0);
         *_len_ = vals_size;
@@ -1044,7 +1070,9 @@ void dispatchAggregateMeasure(/*MDContext *md_context,*/ Cube *cube, ArrayList *
 
         obj_release(measure_vals);
         obj_release(null_flags);
-    } else {
+    }
+    else
+    {
         *_measures_ = mam_alloc(sizeof(double) * als_size(direct_vectors), OBJ_TYPE__RAW_BYTES, NULL, 0);
         *_null_flags_ = mam_alloc(sizeof(char) * als_size(direct_vectors), OBJ_TYPE__RAW_BYTES, NULL, 0);
         memset(*_null_flags_, 1, sizeof(char) * als_size(direct_vectors));
@@ -1056,7 +1084,8 @@ void dispatchAggregateMeasure(/*MDContext *md_context,*/ Cube *cube, ArrayList *
     buf_release(buff);
 }
 
-void MeasureSpace_print(MeasureSpace *space) {
+void MeasureSpace_print(MeasureSpace *space)
+{
     log_print(">>>>>>>>\n");
     log_print(">>>>>>>>>>>>>>>>\n");
     log_print(">>>>>>>>>>>>>>>>>>>>>>>>\n");
@@ -1073,17 +1102,20 @@ void MeasureSpace_print(MeasureSpace *space) {
     int cell_len = sizeof(long) + space->cell_vals_count * (sizeof(double) + sizeof(char));
 
     int i;
-    for (i=0;i<space->segment_count;i++) {
+    for (i = 0; i < space->segment_count; i++)
+    {
         log_print("\n");
 
         log_print("%lu\n", space->data_lens[i]);
         int j;
-        for (j=0;j<space->data_lens[i];j++) {
+        for (j = 0; j < space->data_lens[i]; j++)
+        {
             void *cell = space->data_ls_h[i] + j * cell_len;
             log_print("% 12lu  >  ", *((unsigned long *)cell));
             cell += sizeof(long);
             int k;
-            for (k=0;k<space->cell_vals_count;k++) {
+            for (k = 0; k < space->cell_vals_count; k++)
+            {
                 log_print("% 20lf - ", *((double *)(cell + k * (sizeof(double) + sizeof(char)))));
                 log_print("%d    ", *((char *)(cell + k * (sizeof(double) + sizeof(char)) + sizeof(double))));
             }
@@ -1102,28 +1134,30 @@ void MeasureSpace_print(MeasureSpace *space) {
     log_print(">>>>>>>>\n");
 }
 
-
 // Axis(struct _coordinate_axis) functions
-Scale *ax_find_scale(Axis *axis, Scale *sample) {
+Scale *ax_find_scale(Axis *axis, Scale *sample)
+{
     RBNode *node = rbt__find(axis->rbtree, sample);
     return node ? node->obj : NULL;
 }
 
-
 // Scale(struct _axis_scale) functions
-void scal_init(Scale *scale) {
-    scale->fragments_len=0;
+void scal_init(Scale *scale)
+{
+    scale->fragments_len = 0;
     scale->fragments = NULL;
 }
 
-ArrayList *worker_aggregate_measure(EuclidCommand *ec) {
+ArrayList *worker_aggregate_measure(EuclidCommand *ec)
+{
 
     char *payload = ec->bytes;
-    unsigned int idx = 4+2;
+    unsigned int idx = 4 + 2;
 
     md_gid cube_gid = *((md_gid *)(payload + idx));
     CoordinateSystem *cs = NULL;
-    for (int i = 0; i < als_size(coor_sys_ls); i++) {
+    for (int i = 0; i < als_size(coor_sys_ls); i++)
+    {
         cs = als_get(coor_sys_ls, i);
         if (cs->id == cube_gid)
             break;
@@ -1145,26 +1179,28 @@ ArrayList *worker_aggregate_measure(EuclidCommand *ec) {
 
     assert(cs != NULL && space != NULL);
 
-    idx = 4+2+8+8+4+4;
+    idx = 4 + 2 + 8 + 8 + 4 + 4;
 
     unsigned long quantity_vectors = *((unsigned long *)(payload + idx));
 
     int ax_count = als_size(cs->axes);
 
     idx += sizeof(long);
-    
+
     ScaleOffsetRange key;
     memset(&key, 0, sizeof(ScaleOffsetRange));
 
     MemAllocMng *thread_mam = MemAllocMng_current_thread_mam();
     ArrayList *grids = als_new((unsigned int)quantity_vectors, "GridData *", SPEC_MAM, thread_mam);
 
-    for (int i=0; i<quantity_vectors; i++) {
+    for (int i = 0; i < quantity_vectors; i++)
+    {
         ArrayList *sor_ls = als_new(64, "ScaleOffsetRange *", THREAD_MAM, NULL);
 
         char mark_null = 0;
 
-        for (int j=0; j<ax_count; j++) {
+        for (int j = 0; j < ax_count; j++)
+        {
 
             Axis *ax = cs_get_axis(cs, j);
 
@@ -1175,11 +1211,14 @@ ArrayList *worker_aggregate_measure(EuclidCommand *ec) {
 
             RBNode *node = rbt__find(ax->sor_idx_tree, &key);
 
-            if (node == NULL) {
+            if (node == NULL)
+            {
                 mark_null = 1;
                 // break;
                 // als_add(grids, NULL);
-            } else {
+            }
+            else
+            {
                 ScaleOffsetRange *sor = (ScaleOffsetRange *)node->obj;
                 als_add(sor_ls, sor);
             }
@@ -1187,7 +1226,8 @@ ArrayList *worker_aggregate_measure(EuclidCommand *ec) {
             idx += sizeof(md_gid);
         }
 
-        if (mark_null) {
+        if (mark_null)
+        {
             als_add(grids, NULL);
             idx += sizeof(int);
             continue;
@@ -1206,7 +1246,6 @@ ArrayList *worker_aggregate_measure(EuclidCommand *ec) {
 
         als_add(grids, grid);
     }
-    
-    return grids;
 
+    return grids;
 }
