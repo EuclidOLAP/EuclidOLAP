@@ -11,14 +11,15 @@
 #define __PROMPT_TEXT__ ">>>>>> Please enter a command, exit enter the 'q' >>>>>>"
 #define __RESULT_TEXT__ ">>>>>>>>>>>>>>>>>>>>>>>> RESULT >>>>>>>>>>>>>>>>>>>>>>>>"
 
-static void __prompt__(char *before, char *after) {
+static void __prompt__(char *before, char *after)
+{
 	printf("%s%s%s", before ? before : "", __PROMPT_TEXT__, after ? after : "");
 }
 
 static void ctrl_c_act(int sig_no)
 {
 	// printf("\n");
-__prompt__("\n", "\n\n");
+	__prompt__("\n", "\n\n");
 }
 
 /**
@@ -68,13 +69,14 @@ int main(int argc, char *argv[])
 		size_t line_len = 1024 * 2;
 		char *input_line = obj_alloc(line_len, OBJ_TYPE__RAW_BYTES);
 		MemAllocMng *mam = MemAllocMng_new();
-__prompt__(NULL, "\n\n");
+		__prompt__(NULL, "\n\n");
 		while (1)
 		{
 			// printf("olapcli > ");
 			fgets(input_line, line_len, stdin);
 
-			if (strlen(input_line) >= line_len - 1) {
+			if (strlen(input_line) >= line_len - 1)
+			{
 				printf("There are too many characters entered in one line, restart the client and use line breaks.\n");
 				goto _exit_;
 			}
@@ -97,7 +99,6 @@ __prompt__(NULL, "\n\n");
 				}
 
 				char *statement = mam_hlloc(mam, statement_len);
-				
 
 				for (int i = 0; i < als_size(input_ls); i++)
 				{
@@ -112,7 +113,7 @@ __prompt__(NULL, "\n\n");
 				read_sock_pkg(sock_fd, &buf, &buf_len);
 				EuclidCommand *result = create_command(buf);
 
-printf("\n%s\n", __RESULT_TEXT__);
+				printf("\n%s\n", __RESULT_TEXT__);
 
 				switch (ec_get_intent(result))
 				{
@@ -130,12 +131,13 @@ printf("\n%s\n", __RESULT_TEXT__);
 				obj_release(result->bytes);
 				obj_release(result);
 
-				for (int i = als_size(input_ls) - 1; i >= 0; i--) {
+				for (int i = als_size(input_ls) - 1; i >= 0; i--)
+				{
 					als_rm_index(input_ls, i);
 				}
 
 				mam_reset(mam);
-__prompt__(NULL, "\n\n");
+				__prompt__(NULL, "\n\n");
 			}
 		}
 
