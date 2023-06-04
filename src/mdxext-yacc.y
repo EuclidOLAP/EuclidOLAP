@@ -1011,14 +1011,14 @@ member_statement:
 		stack_push(&AST_STACK, mbr_def);
 	}
   | PARENT ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		MemberFnParent *fn = MemberFnParent_creat(NULL);
+		ASTMemberFunc_Parent *fn = ASTMemberFunc_Parent_creat(NULL);
 		stack_pop(&AST_STACK, (void **) &(fn->child_def));
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = fn;
 		stack_push(&AST_STACK, mbr_def);
 	}
   | CURRENT_MEMBER ROUND_BRACKET_L dimension_statement ROUND_BRACKET_R {
-		MemberFnCurrentMember *cm = MemberFnCurrentMember_creat();
+		ASTMemberFunc_CurrentMember *cm = ASTMemberFunc_CurrentMember_creat();
 		stack_pop(&AST_STACK, (void **) &(cm->dr_def));
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = cm;
@@ -1027,7 +1027,7 @@ member_statement:
   | PREV_MEMBER ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
 		MemberDef *curr_mr;
 		stack_pop(&AST_STACK, (void **) &curr_mr);
-		MemberFnPrevMember *fn = MemberFnPrevMember_creat(curr_mr);
+		ASTMemberFunc_PrevMember *fn = ASTMemberFunc_PrevMember_creat(curr_mr);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1035,7 +1035,7 @@ member_statement:
   | FIRST_CHILD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
-		MemberRoleFnFirstChild *mr_fn = MemberRoleFnFirstChild_creat(member_role_def);
+		ASTMemberFunc_FirstChild *mr_fn = ASTMemberFunc_FirstChild_creat(member_role_def);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1043,7 +1043,7 @@ member_statement:
   | LAST_CHILD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
-		MemberRoleFnLastChild *mr_fn = MemberRoleFnLastChild_creat(member_role_def);
+		ASTMemberFunc_LastChild *mr_fn = ASTMemberFunc_LastChild_creat(member_role_def);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1052,7 +1052,7 @@ member_statement:
 		/* FirstSibling */
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
-		MemberRoleFnFirstSibling *mr_fn = MemberRoleFnFirstSibling_creat(member_role_def);
+		ASTMemberFunc_FirstSibling *mr_fn = ASTMemberFunc_FirstSibling_creat(member_role_def);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1061,7 +1061,7 @@ member_statement:
 		/* LastSibling */
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
-		MemberRoleFnLastSibling *mr_fn = MemberRoleFnLastSibling_creat(member_role_def);
+		ASTMemberFunc_LastSibling *mr_fn = ASTMemberFunc_LastSibling_creat(member_role_def);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1072,7 +1072,7 @@ member_statement:
 		long index = (long) ptol;
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
-		MemberRoleFnLag *mr_fn = MemberRoleFnLag_creat(member_role_def, index);
+		ASTMemberFunc_Lag *mr_fn = ASTMemberFunc_Lag_creat(member_role_def, index);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1083,27 +1083,27 @@ member_statement:
 		long index = (long) ptol;
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
-		MemberRoleFnLag *mr_fn = MemberRoleFnLag_creat(member_role_def, 0 - index);
+		ASTMemberFunc_Lag *mr_fn = ASTMemberFunc_Lag_creat(member_role_def, 0 - index);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
 	}
   | member_role_fn_parallel_period {
-		MemberRoleFnParallelPeriod *pp;
+		ASTMemberFunc_ParallelPeriod *pp;
 		stack_pop(&AST_STACK, (void **) &pp);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = pp;
 		stack_push(&AST_STACK, mbr_def);
 	}
   | member_role_fn_closing_period {
-		MemberRoleFnClosingPeriod *closing_period;
+		ASTMemberFunc_ClosingPeriod *closing_period;
 		stack_pop(&AST_STACK, (void **) &closing_period);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = closing_period;
 		stack_push(&AST_STACK, mbr_def);
 	}
   | member_role_fn_opening_period {
-		MemberRoleFnOpeningPeriod *opening_period;
+		ASTMemberFunc_OpeningPeriod *opening_period;
 		stack_pop(&AST_STACK, (void **) &opening_period);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = opening_period;
@@ -1114,14 +1114,14 @@ member_statement:
 
 member_function_template:
 	PARENT ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		MemberFnParent *fn = MemberFnParent_creat(NULL);
+		ASTMemberFunc_Parent *fn = ASTMemberFunc_Parent_creat(NULL);
 		stack_pop(&AST_STACK, (void **) &(fn->child_def));
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = fn;
 		stack_push(&AST_STACK, mbr_def);
 	}
   | CURRENT_MEMBER ROUND_BRACKET_L dimension_statement ROUND_BRACKET_R {
-		MemberFnCurrentMember *cm = MemberFnCurrentMember_creat();
+		ASTMemberFunc_CurrentMember *cm = ASTMemberFunc_CurrentMember_creat();
 		stack_pop(&AST_STACK, (void **) &(cm->dr_def));
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = cm;
@@ -1130,7 +1130,7 @@ member_function_template:
   | PREV_MEMBER ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
 		MemberDef *curr_mr;
 		stack_pop(&AST_STACK, (void **) &curr_mr);
-		MemberFnPrevMember *fn = MemberFnPrevMember_creat(curr_mr);
+		ASTMemberFunc_PrevMember *fn = ASTMemberFunc_PrevMember_creat(curr_mr);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1138,7 +1138,7 @@ member_function_template:
   | FIRST_CHILD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
-		MemberRoleFnFirstChild *mr_fn = MemberRoleFnFirstChild_creat(member_role_def);
+		ASTMemberFunc_FirstChild *mr_fn = ASTMemberFunc_FirstChild_creat(member_role_def);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1146,7 +1146,7 @@ member_function_template:
   | LAST_CHILD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
-		MemberRoleFnLastChild *mr_fn = MemberRoleFnLastChild_creat(member_role_def);
+		ASTMemberFunc_LastChild *mr_fn = ASTMemberFunc_LastChild_creat(member_role_def);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1155,7 +1155,7 @@ member_function_template:
 		/* FirstSibling */
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
-		MemberRoleFnFirstSibling *mr_fn = MemberRoleFnFirstSibling_creat(member_role_def);
+		ASTMemberFunc_FirstSibling *mr_fn = ASTMemberFunc_FirstSibling_creat(member_role_def);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1164,7 +1164,7 @@ member_function_template:
 		/* LastSibling */
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
-		MemberRoleFnLastSibling *mr_fn = MemberRoleFnLastSibling_creat(member_role_def);
+		ASTMemberFunc_LastSibling *mr_fn = ASTMemberFunc_LastSibling_creat(member_role_def);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1175,7 +1175,7 @@ member_function_template:
 		long index = (long) ptol;
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
-		MemberRoleFnLag *mr_fn = MemberRoleFnLag_creat(member_role_def, index);
+		ASTMemberFunc_Lag *mr_fn = ASTMemberFunc_Lag_creat(member_role_def, index);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1186,14 +1186,14 @@ member_function_template:
 		long index = (long) ptol;
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
-		MemberRoleFnLag *mr_fn = MemberRoleFnLag_creat(member_role_def, 0 - index);
+		ASTMemberFunc_Lag *mr_fn = ASTMemberFunc_Lag_creat(member_role_def, 0 - index);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = mr_fn;
 		stack_push(&AST_STACK, mbr_def);
 	}
   |
 	member_role_fn_parallel_period {
-		MemberRoleFnParallelPeriod *pp;
+		ASTMemberFunc_ParallelPeriod *pp;
 		stack_pop(&AST_STACK, (void **) &pp);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = pp;
@@ -1201,7 +1201,7 @@ member_function_template:
 	}
   |
 	member_role_fn_closing_period {
-		MemberRoleFnClosingPeriod *closing_period;
+		ASTMemberFunc_ClosingPeriod *closing_period;
 		stack_pop(&AST_STACK, (void **) &closing_period);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = closing_period;
@@ -1209,7 +1209,7 @@ member_function_template:
 	}
   |
 	member_role_fn_opening_period {
-		MemberRoleFnOpeningPeriod *opening_period;
+		ASTMemberFunc_OpeningPeriod *opening_period;
 		stack_pop(&AST_STACK, (void **) &opening_period);
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = opening_period;
@@ -1220,14 +1220,14 @@ member_function_template:
 
 member_role_fn_closing_period:
 	CLOSING_PERIOD ROUND_BRACKET_L ROUND_BRACKET_R {
-		MemberRoleFnClosingPeriod *mr_fn = MemberRoleFnClosingPeriod_creat(NULL, NULL);
+		ASTMemberFunc_ClosingPeriod *mr_fn = ASTMemberFunc_ClosingPeriod_creat(NULL, NULL);
 		stack_push(&AST_STACK, mr_fn);
 	}
   |
 	CLOSING_PERIOD ROUND_BRACKET_L level_role_statement ROUND_BRACKET_R {
 		LevelRoleDef *lvr_def;
 		stack_pop(&AST_STACK, (void **) &lvr_def);
-		MemberRoleFnClosingPeriod *mr_fn = MemberRoleFnClosingPeriod_creat(lvr_def, NULL);
+		ASTMemberFunc_ClosingPeriod *mr_fn = ASTMemberFunc_ClosingPeriod_creat(lvr_def, NULL);
 		stack_push(&AST_STACK, mr_fn);
 
 	}
@@ -1237,7 +1237,7 @@ member_role_fn_closing_period:
 		stack_pop(&AST_STACK, (void **) &mbr_def);
 		LevelRoleDef *lvr_def;
 		stack_pop(&AST_STACK, (void **) &lvr_def);
-		MemberRoleFnClosingPeriod *mr_fn = MemberRoleFnClosingPeriod_creat(lvr_def, mbr_def);
+		ASTMemberFunc_ClosingPeriod *mr_fn = ASTMemberFunc_ClosingPeriod_creat(lvr_def, mbr_def);
 		stack_push(&AST_STACK, mr_fn);
 
 	}
@@ -1245,14 +1245,14 @@ member_role_fn_closing_period:
 
 member_role_fn_opening_period:
 	OPENING_PERIOD ROUND_BRACKET_L ROUND_BRACKET_R {
-		MemberRoleFnOpeningPeriod *mr_fn = MemberRoleFnOpeningPeriod_creat(NULL, NULL);
+		ASTMemberFunc_OpeningPeriod *mr_fn = ASTMemberFunc_OpeningPeriod_creat(NULL, NULL);
 		stack_push(&AST_STACK, mr_fn);
 	}
   |
 	OPENING_PERIOD ROUND_BRACKET_L level_role_statement ROUND_BRACKET_R {
 		LevelRoleDef *lvr_def;
 		stack_pop(&AST_STACK, (void **) &lvr_def);
-		MemberRoleFnOpeningPeriod *mr_fn = MemberRoleFnOpeningPeriod_creat(lvr_def, NULL);
+		ASTMemberFunc_OpeningPeriod *mr_fn = ASTMemberFunc_OpeningPeriod_creat(lvr_def, NULL);
 		stack_push(&AST_STACK, mr_fn);
 
 	}
@@ -1262,7 +1262,7 @@ member_role_fn_opening_period:
 		stack_pop(&AST_STACK, (void **) &mbr_def);
 		LevelRoleDef *lvr_def;
 		stack_pop(&AST_STACK, (void **) &lvr_def);
-		MemberRoleFnOpeningPeriod *mr_fn = MemberRoleFnOpeningPeriod_creat(lvr_def, mbr_def);
+		ASTMemberFunc_OpeningPeriod *mr_fn = ASTMemberFunc_OpeningPeriod_creat(lvr_def, mbr_def);
 		stack_push(&AST_STACK, mr_fn);
 		
 	}
@@ -1270,14 +1270,14 @@ member_role_fn_opening_period:
 
 member_role_fn_parallel_period:
 	PARALLEL_PERIOD ROUND_BRACKET_L ROUND_BRACKET_R {
-		MemberRoleFnParallelPeriod *pp = MemberRoleFnParallelPeriod_creat(NULL, NULL, NULL);
+		ASTMemberFunc_ParallelPeriod *pp = ASTMemberFunc_ParallelPeriod_creat(NULL, NULL, NULL);
 		stack_push(&AST_STACK, pp);
 	}
   | 
 	PARALLEL_PERIOD ROUND_BRACKET_L level_role_statement ROUND_BRACKET_R {
 		LevelRoleDef *lvr_def;
 		stack_pop(&AST_STACK, (void **) &lvr_def);
-		MemberRoleFnParallelPeriod *pp = MemberRoleFnParallelPeriod_creat(lvr_def, NULL, NULL);
+		ASTMemberFunc_ParallelPeriod *pp = ASTMemberFunc_ParallelPeriod_creat(lvr_def, NULL, NULL);
 		stack_push(&AST_STACK, pp);
 	}
   | 
@@ -1286,7 +1286,7 @@ member_role_fn_parallel_period:
 		stack_pop(&AST_STACK, (void **) &exp);
 		LevelRoleDef *lvr_def;
 		stack_pop(&AST_STACK, (void **) &lvr_def);
-		MemberRoleFnParallelPeriod *pp = MemberRoleFnParallelPeriod_creat(lvr_def, exp, NULL);
+		ASTMemberFunc_ParallelPeriod *pp = ASTMemberFunc_ParallelPeriod_creat(lvr_def, exp, NULL);
 		stack_push(&AST_STACK, pp);
 	}
   | 
@@ -1297,7 +1297,7 @@ member_role_fn_parallel_period:
 		stack_pop(&AST_STACK, (void **) &exp);
 		LevelRoleDef *lvr_def;
 		stack_pop(&AST_STACK, (void **) &lvr_def);
-		MemberRoleFnParallelPeriod *pp = MemberRoleFnParallelPeriod_creat(lvr_def, exp, mbr_def);
+		ASTMemberFunc_ParallelPeriod *pp = ASTMemberFunc_ParallelPeriod_creat(lvr_def, exp, mbr_def);
 		stack_push(&AST_STACK, pp);
 	}
 ;

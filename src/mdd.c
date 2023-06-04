@@ -1518,59 +1518,59 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 	}
 	else if (m_def->t_cons == MEMBER_DEF__MBR_FUNCTION)
 	{
-		if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberFnParent)
+		if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_Parent)
 		{
-			member_role_ = MemberFnParent_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			member_role_ = ASTMemberFunc_Parent_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
 		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberFnCurrentMember)
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_CurrentMember)
 		{
-			member_role_ = MemberFnCurrentMember_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			member_role_ = ASTMemberFunc_CurrentMember_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
 		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberFnPrevMember)
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_PrevMember)
 		{
-			member_role_ = MemberFnPrevMember_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			member_role_ = ASTMemberFunc_PrevMember_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
 		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberRoleFnParallelPeriod)
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_ParallelPeriod)
 		{
-			member_role_ = MemberRoleFnParallelPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			member_role_ = ASTMemberFunc_ParallelPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
 		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberRoleFnClosingPeriod)
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_ClosingPeriod)
 		{
-			member_role_ = MemberRoleFnClosingPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			member_role_ = ASTMemberFunc_ClosingPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
 		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberRoleFnOpeningPeriod)
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_OpeningPeriod)
 		{
-			member_role_ = MemberRoleFnOpeningPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			member_role_ = ASTMemberFunc_OpeningPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
 		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberRoleFnFirstChild)
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_FirstChild)
 		{
-			member_role_ = MemberRoleFnFirstChild_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			member_role_ = ASTMemberFunc_FirstChild_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
 		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberRoleFnLastChild)
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_LastChild)
 		{
-			member_role_ = MemberRoleFnLastChild_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			member_role_ = ASTMemberFunc_LastChild_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
 		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberRoleFnFirstSibling)
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_FirstSibling)
 		{
-			member_role_ = MemberRoleFnFirstSibling_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			member_role_ = ASTMemberFunc_FirstSibling_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
 		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberRoleFnLastSibling)
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_LastSibling)
 		{
-			member_role_ = MemberRoleFnLastSibling_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			member_role_ = ASTMemberFunc_LastSibling_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
 		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__MemberRoleFnLag)
+		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_Lag)
 		{
-			member_role_ = MemberRoleFnLag_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+			member_role_ = ASTMemberFunc_Lag_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
 		}
 		else
@@ -2800,7 +2800,7 @@ MddSet *SetFnIntersect_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, Mdd
 	return result;
 }
 
-MddMemberRole *MemberFnParent_evolving(MDContext *md_ctx, MemberFnParent *fn_parent, MddTuple *context_tuple, Cube *cube)
+MddMemberRole *ASTMemberFunc_Parent_evolving(MDContext *md_ctx, ASTMemberFunc_Parent *fn_parent, MddTuple *context_tuple, Cube *cube)
 {
 	// when current member has no parent, return itself.
 	MddMemberRole *child_mr = ids_mbrsdef__build(md_ctx, fn_parent->child_def, context_tuple, cube);
@@ -2810,7 +2810,7 @@ MddMemberRole *MemberFnParent_evolving(MDContext *md_ctx, MemberFnParent *fn_par
 		return child_mr;
 }
 
-MddMemberRole *MemberFnCurrentMember_evolving(MDContext *md_ctx, MemberFnCurrentMember *cm, MddTuple *context_tuple, Cube *cube)
+MddMemberRole *ASTMemberFunc_CurrentMember_evolving(MDContext *md_ctx, ASTMemberFunc_CurrentMember *cm, MddTuple *context_tuple, Cube *cube)
 {
 	char *dimRole_name = cm->dr_def->name;
 	DimensionRole *dimRole = NULL; // NULL mean that current dimension role is measure
@@ -2827,7 +2827,7 @@ MddMemberRole *MemberFnCurrentMember_evolving(MDContext *md_ctx, MemberFnCurrent
 		dimRole = NULL;
 	}
 
-	log_print("[ error ] - MemberFnCurrentMember do not matching DimensionRole - < %s >\n", dimRole_name);
+	log_print("[ error ] - ASTMemberFunc_CurrentMember do not matching DimensionRole - < %s >\n", dimRole_name);
 	return NULL;
 
 point:
@@ -2841,11 +2841,11 @@ point:
 			return mbrRole;
 	}
 
-	log_print("[ error ] - MemberFnCurrentMember do not matching DimensionRole - < %s >\n", dimRole_name);
+	log_print("[ error ] - ASTMemberFunc_CurrentMember do not matching DimensionRole - < %s >\n", dimRole_name);
 	return NULL;
 }
 
-MddMemberRole *MemberFnPrevMember_evolving(MDContext *md_ctx, MemberFnPrevMember *pm, MddTuple *context_tuple, Cube *cube)
+MddMemberRole *ASTMemberFunc_PrevMember_evolving(MDContext *md_ctx, ASTMemberFunc_PrevMember *pm, MddTuple *context_tuple, Cube *cube)
 {
 	MddMemberRole *mr = ids_mbrsdef__build(md_ctx, pm->curr_mr, context_tuple, cube);
 
@@ -2885,7 +2885,7 @@ MddMemberRole *MemberFnPrevMember_evolving(MDContext *md_ctx, MemberFnPrevMember
 }
 
 // TODO The function is too bloated and needs to be optimized.
-MddMemberRole *MemberRoleFnParallelPeriod_evolving(MDContext *md_ctx, MemberRoleFnParallelPeriod *pp, MddTuple *context_tuple, Cube *cube)
+MddMemberRole *ASTMemberFunc_ParallelPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_ParallelPeriod *pp, MddTuple *context_tuple, Cube *cube)
 {
 
 	// ParallelPeriod()
@@ -3028,7 +3028,7 @@ MddMemberRole *MemberRoleFnParallelPeriod_evolving(MDContext *md_ctx, MemberRole
 	return mdd_mr__create(Member_find_posi_descmbr(ancestor_prev, desc_posi), lv_role->dim_role);
 }
 
-MddMemberRole *MemberRoleFnClosingPeriod_evolving(MDContext *md_ctx, MemberRoleFnClosingPeriod *cp, MddTuple *context_tuple, Cube *cube) {
+MddMemberRole *ASTMemberFunc_ClosingPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_ClosingPeriod *cp, MddTuple *context_tuple, Cube *cube) {
 	if (cp->lvr_def == NULL && cp->mr_def == NULL) {
 		ArrayList *roles_of_date_dims = Cube_find_date_dim_roles(cube);
 		if (als_size(roles_of_date_dims) != 1)
@@ -3095,11 +3095,11 @@ MddMemberRole *MemberRoleFnClosingPeriod_evolving(MDContext *md_ctx, MemberRoleF
 		return mdd_mr__create(member, lv_role->dim_role);
 	}
 
-	log_print("[ error ] MemberRoleFnClosingPeriod_evolving\n");
+	log_print("[ error ] ASTMemberFunc_ClosingPeriod_evolving\n");
 	exit(EXIT_FAILURE);
 }
 
-MddMemberRole *MemberRoleFnOpeningPeriod_evolving(MDContext *md_ctx, MemberRoleFnOpeningPeriod *op, MddTuple *context_tuple, Cube *cube) {
+MddMemberRole *ASTMemberFunc_OpeningPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_OpeningPeriod *op, MddTuple *context_tuple, Cube *cube) {
 	if (op->lvr_def == NULL && op->mr_def == NULL) {
 		ArrayList *roles_of_date_dims = Cube_find_date_dim_roles(cube);
 		if (als_size(roles_of_date_dims) != 1)
@@ -3165,12 +3165,12 @@ MddMemberRole *MemberRoleFnOpeningPeriod_evolving(MDContext *md_ctx, MemberRoleF
 		return mdd_mr__create(member, lv_role->dim_role);
 	}
 
-	log_print("[ error ] MemberRoleFnOpeningPeriod_evolving\n");
+	log_print("[ error ] ASTMemberFunc_OpeningPeriod_evolving\n");
 	exit(EXIT_FAILURE);
 }
 
 
-MddMemberRole *MemberRoleFnFirstChild_evolving(MDContext *md_ctx, MemberRoleFnFirstChild *mr_fn, MddTuple *context_tuple, Cube *cube) {
+MddMemberRole *ASTMemberFunc_FirstChild_evolving(MDContext *md_ctx, ASTMemberFunc_FirstChild *mr_fn, MddTuple *context_tuple, Cube *cube) {
 	MddMemberRole *parent_mr = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
 	Member *member = NULL;
 	for (int i=0; i<als_size(member_pool); i++) {
@@ -3183,7 +3183,7 @@ MddMemberRole *MemberRoleFnFirstChild_evolving(MDContext *md_ctx, MemberRoleFnFi
 	return mdd_mr__create(member, parent_mr->dim_role);
 }
 
-MddMemberRole *MemberRoleFnLastChild_evolving(MDContext *md_ctx, MemberRoleFnLastChild *mr_fn, MddTuple *context_tuple, Cube *cube) {
+MddMemberRole *ASTMemberFunc_LastChild_evolving(MDContext *md_ctx, ASTMemberFunc_LastChild *mr_fn, MddTuple *context_tuple, Cube *cube) {
 	MddMemberRole *parent_mr = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
 	Member *member = NULL;
 	for (int i=0; i<als_size(member_pool); i++) {
@@ -3197,7 +3197,7 @@ MddMemberRole *MemberRoleFnLastChild_evolving(MDContext *md_ctx, MemberRoleFnLas
 }
 
 
-MddMemberRole *MemberRoleFnFirstSibling_evolving(MDContext *md_ctx, MemberRoleFnFirstSibling *mr_fn, MddTuple *context_tuple, Cube *cube) {
+MddMemberRole *ASTMemberFunc_FirstSibling_evolving(MDContext *md_ctx, ASTMemberFunc_FirstSibling *mr_fn, MddTuple *context_tuple, Cube *cube) {
 	MddMemberRole *member_role = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
 	// if (member_role->member->p_gid == 0)
 	// 	return member_role;
@@ -3212,7 +3212,7 @@ MddMemberRole *MemberRoleFnFirstSibling_evolving(MDContext *md_ctx, MemberRoleFn
 	return mdd_mr__create(member, member_role->dim_role);
 }
 
-MddMemberRole *MemberRoleFnLastSibling_evolving(MDContext *md_ctx, MemberRoleFnLastSibling *mr_fn, MddTuple *context_tuple, Cube *cube) {
+MddMemberRole *ASTMemberFunc_LastSibling_evolving(MDContext *md_ctx, ASTMemberFunc_LastSibling *mr_fn, MddTuple *context_tuple, Cube *cube) {
 	MddMemberRole *member_role = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
 	// if (member_role->member->p_gid == 0)
 	// 	return member_role;
@@ -3234,7 +3234,7 @@ int __mr_fn_lag_cmp__(void *obj, void *other) {
 	return moth->gid < mobj->gid ? -1 : (moth->gid > mobj->gid ? 1 : 0);
 }
 
-MddMemberRole *MemberRoleFnLag_evolving(MDContext *md_ctx, MemberRoleFnLag *mr_fn, MddTuple *context_tuple, Cube *cube) {
+MddMemberRole *ASTMemberFunc_Lag_evolving(MDContext *md_ctx, ASTMemberFunc_Lag *mr_fn, MddTuple *context_tuple, Cube *cube) {
 	MddMemberRole *member_role = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
 	if (mr_fn->index == 0)
 		return member_role;

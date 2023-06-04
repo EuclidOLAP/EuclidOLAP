@@ -300,27 +300,27 @@ MddSet *SetFnUnion_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTupl
 
 MddSet *SetFnIntersect_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple);
 
-MddMemberRole *MemberFnParent_evolving(MDContext *md_ctx, MemberFnParent *fn_parent, MddTuple *context_tuple, Cube *cube);
+MddMemberRole *ASTMemberFunc_Parent_evolving(MDContext *md_ctx, ASTMemberFunc_Parent *fn_parent, MddTuple *context_tuple, Cube *cube);
 
-MddMemberRole *MemberFnCurrentMember_evolving(MDContext *md_ctx, MemberFnCurrentMember *cm, MddTuple *context_tuple, Cube *cube);
+MddMemberRole *ASTMemberFunc_CurrentMember_evolving(MDContext *md_ctx, ASTMemberFunc_CurrentMember *cm, MddTuple *context_tuple, Cube *cube);
 
-MddMemberRole *MemberFnPrevMember_evolving(MDContext *md_ctx, MemberFnPrevMember *pm, MddTuple *context_tuple, Cube *cube);
+MddMemberRole *ASTMemberFunc_PrevMember_evolving(MDContext *md_ctx, ASTMemberFunc_PrevMember *pm, MddTuple *context_tuple, Cube *cube);
 
-MddMemberRole *MemberRoleFnParallelPeriod_evolving(MDContext *md_ctx, MemberRoleFnParallelPeriod *pp, MddTuple *context_tuple, Cube *cube);
+MddMemberRole *ASTMemberFunc_ParallelPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_ParallelPeriod *pp, MddTuple *context_tuple, Cube *cube);
 
-MddMemberRole *MemberRoleFnClosingPeriod_evolving(MDContext *md_ctx, MemberRoleFnClosingPeriod *cp, MddTuple *context_tuple, Cube *cube);
+MddMemberRole *ASTMemberFunc_ClosingPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_ClosingPeriod *cp, MddTuple *context_tuple, Cube *cube);
 
-MddMemberRole *MemberRoleFnOpeningPeriod_evolving(MDContext *md_ctx, MemberRoleFnOpeningPeriod *op, MddTuple *context_tuple, Cube *cube);
+MddMemberRole *ASTMemberFunc_OpeningPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_OpeningPeriod *op, MddTuple *context_tuple, Cube *cube);
 
-MddMemberRole *MemberRoleFnFirstChild_evolving(MDContext *md_ctx, MemberRoleFnFirstChild *mr_fn, MddTuple *context_tuple, Cube *cube);
+MddMemberRole *ASTMemberFunc_FirstChild_evolving(MDContext *md_ctx, ASTMemberFunc_FirstChild *mr_fn, MddTuple *context_tuple, Cube *cube);
 
-MddMemberRole *MemberRoleFnLastChild_evolving(MDContext *md_ctx, MemberRoleFnLastChild *mr_fn, MddTuple *context_tuple, Cube *cube);
+MddMemberRole *ASTMemberFunc_LastChild_evolving(MDContext *md_ctx, ASTMemberFunc_LastChild *mr_fn, MddTuple *context_tuple, Cube *cube);
 
-MddMemberRole *MemberRoleFnFirstSibling_evolving(MDContext *md_ctx, MemberRoleFnFirstSibling *mr_fn, MddTuple *context_tuple, Cube *cube);
+MddMemberRole *ASTMemberFunc_FirstSibling_evolving(MDContext *md_ctx, ASTMemberFunc_FirstSibling *mr_fn, MddTuple *context_tuple, Cube *cube);
 
-MddMemberRole *MemberRoleFnLastSibling_evolving(MDContext *md_ctx, MemberRoleFnLastSibling *mr_fn, MddTuple *context_tuple, Cube *cube);
+MddMemberRole *ASTMemberFunc_LastSibling_evolving(MDContext *md_ctx, ASTMemberFunc_LastSibling *mr_fn, MddTuple *context_tuple, Cube *cube);
 
-MddMemberRole *MemberRoleFnLag_evolving(MDContext *md_ctx, MemberRoleFnLag *mr_fn, MddTuple *context_tuple, Cube *cube);
+MddMemberRole *ASTMemberFunc_Lag_evolving(MDContext *md_ctx, ASTMemberFunc_Lag *mr_fn, MddTuple *context_tuple, Cube *cube);
 
 void ExpFnSum_evolving(MDContext *md_ctx, ExpFnSum *sum, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data);
 
