@@ -196,8 +196,8 @@ SetFnChildren *SetFnChildren_creat(MemberDef *m_def);
 typedef struct mbr_fn_parent
 {
     MemberDef *child_def;
-} MemberFnParent;
-MemberFnParent *MemberFnParent_creat(MemberDef *child_def);
+} ASTMemberFunc_Parent;
+ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def);
 
 typedef struct exp_fn_sum
 {
@@ -280,14 +280,14 @@ SetFnFilter *SetFnFilter_creat(SetDef *, BooleanExpression *);
 typedef struct Member_Fn_Current_Member_
 {
     DimRoleDef *dr_def;
-} MemberFnCurrentMember;
-MemberFnCurrentMember *MemberFnCurrentMember_creat();
+} ASTMemberFunc_CurrentMember;
+ASTMemberFunc_CurrentMember *ASTMemberFunc_CurrentMember_creat();
 
 typedef struct Member_Fn_Prev_Member_
 {
     MemberDef *curr_mr;
-} MemberFnPrevMember;
-MemberFnPrevMember *MemberFnPrevMember_creat(MemberDef *);
+} ASTMemberFunc_PrevMember;
+ASTMemberFunc_PrevMember *ASTMemberFunc_PrevMember_creat(MemberDef *);
 
 
 typedef struct Member_Role_Fn_Parallel_Period_
@@ -295,58 +295,58 @@ typedef struct Member_Role_Fn_Parallel_Period_
     LevelRoleDef *lvr_def;
     Expression *index;
     MemberDef *mr_def;
-} MemberRoleFnParallelPeriod;
-MemberRoleFnParallelPeriod *MemberRoleFnParallelPeriod_creat(LevelRoleDef *, Expression *, MemberDef *);
+} ASTMemberFunc_ParallelPeriod;
+ASTMemberFunc_ParallelPeriod *ASTMemberFunc_ParallelPeriod_creat(LevelRoleDef *, Expression *, MemberDef *);
 
 
 typedef struct Member_Role_Fn_Closing_Period_
 {
     LevelRoleDef *lvr_def;
     MemberDef *mr_def;
-} MemberRoleFnClosingPeriod;
-MemberRoleFnClosingPeriod *MemberRoleFnClosingPeriod_creat(LevelRoleDef *lvr, MemberDef *mr);
+} ASTMemberFunc_ClosingPeriod;
+ASTMemberFunc_ClosingPeriod *ASTMemberFunc_ClosingPeriod_creat(LevelRoleDef *lvr, MemberDef *mr);
 
 
 typedef struct Member_Role_Fn_Opening_Period_
 {
     LevelRoleDef *lvr_def;
     MemberDef *mr_def;
-} MemberRoleFnOpeningPeriod;
-MemberRoleFnOpeningPeriod *MemberRoleFnOpeningPeriod_creat(LevelRoleDef *lvr, MemberDef *mr);
+} ASTMemberFunc_OpeningPeriod;
+ASTMemberFunc_OpeningPeriod *ASTMemberFunc_OpeningPeriod_creat(LevelRoleDef *lvr, MemberDef *mr);
 
 
 typedef struct Member_Role_Fn_FirstChild_
 {
     MemberDef *mr_def;
-} MemberRoleFnFirstChild;
-MemberRoleFnFirstChild *MemberRoleFnFirstChild_creat(MemberDef *mr);
+} ASTMemberFunc_FirstChild;
+ASTMemberFunc_FirstChild *ASTMemberFunc_FirstChild_creat(MemberDef *mr);
 
 typedef struct Member_Role_Fn_LastChild_
 {
     MemberDef *mr_def;
-} MemberRoleFnLastChild;
-MemberRoleFnLastChild *MemberRoleFnLastChild_creat(MemberDef *mr);
+} ASTMemberFunc_LastChild;
+ASTMemberFunc_LastChild *ASTMemberFunc_LastChild_creat(MemberDef *mr);
 
 
 typedef struct Member_Role_Fn_FirstSibling_
 {
     MemberDef *mr_def;
-} MemberRoleFnFirstSibling;
-MemberRoleFnFirstSibling *MemberRoleFnFirstSibling_creat(MemberDef *mr);
+} ASTMemberFunc_FirstSibling;
+ASTMemberFunc_FirstSibling *ASTMemberFunc_FirstSibling_creat(MemberDef *mr);
 
 typedef struct Member_Role_Fn_LastSibling_
 {
     MemberDef *mr_def;
-} MemberRoleFnLastSibling;
-MemberRoleFnLastSibling *MemberRoleFnLastSibling_creat(MemberDef *mr);
+} ASTMemberFunc_LastSibling;
+ASTMemberFunc_LastSibling *ASTMemberFunc_LastSibling_creat(MemberDef *mr);
 
 
 typedef struct Member_Role_Fn_Lag_
 {
     MemberDef *mr_def;
     long index;
-} MemberRoleFnLag;
-MemberRoleFnLag *MemberRoleFnLag_creat(MemberDef *_mr_def, long _index);
+} ASTMemberFunc_Lag;
+ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index);
 
 
 typedef struct SetFn_LateralMembers

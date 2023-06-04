@@ -13,7 +13,7 @@ typedef short type_obj;
 
 #define OBJ_TYPE__SetFormula 3
 
-#define OBJ_TYPE__MemberFnParent 4
+#define OBJ_TYPE__ASTMemberFunc_Parent 4
 
 #define OBJ_TYPE__MemberDef 5
 
@@ -103,15 +103,15 @@ typedef short type_obj;
 
 #define OBJ_TYPE__SetFnFilter 48
 
-#define OBJ_TYPE__MemberFnCurrentMember 49
+#define OBJ_TYPE__ASTMemberFunc_CurrentMember 49
 
-#define OBJ_TYPE__MemberFnPrevMember 50
+#define OBJ_TYPE__ASTMemberFunc_PrevMember 50
 
 #define OBJ_TYPE__Level 51
 
 #define OBJ_TYPE__LevelRoleDef 52
 
-#define OBJ_TYPE__MemberRoleFnParallelPeriod 53
+#define OBJ_TYPE__ASTMemberFunc_ParallelPeriod 53
 
 #define OBJ_TYPE__LevelRole 54
 
@@ -149,19 +149,19 @@ typedef short type_obj;
 
 #define OBJ_TYPE__ByteBuf 71
 
-#define OBJ_TYPE__MemberRoleFnClosingPeriod 72
+#define OBJ_TYPE__ASTMemberFunc_ClosingPeriod 72
 
-#define OBJ_TYPE__MemberRoleFnOpeningPeriod 73
+#define OBJ_TYPE__ASTMemberFunc_OpeningPeriod 73
 
-#define OBJ_TYPE__MemberRoleFnFirstChild 74
+#define OBJ_TYPE__ASTMemberFunc_FirstChild 74
 
-#define OBJ_TYPE__MemberRoleFnLastChild 75
+#define OBJ_TYPE__ASTMemberFunc_LastChild 75
 
-#define OBJ_TYPE__MemberRoleFnFirstSibling 76
+#define OBJ_TYPE__ASTMemberFunc_FirstSibling 76
 
-#define OBJ_TYPE__MemberRoleFnLastSibling 77
+#define OBJ_TYPE__ASTMemberFunc_LastSibling 77
 
-#define OBJ_TYPE__MemberRoleFnLag 78
+#define OBJ_TYPE__ASTMemberFunc_Lag 78
 
 #define OBJ_TYPE__MdmEntityUpSegment 79
 
