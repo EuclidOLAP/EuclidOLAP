@@ -194,7 +194,7 @@ void MemberFormula_print(MemberFormula *mf)
 
 SetFormula *SetFormula_creat()
 {
-    return mam_alloc(sizeof(SetFormula), OBJ_TYPE__SET_FORMULA, NULL, 0);
+    return mam_alloc(sizeof(SetFormula), OBJ_TYPE__SetFormula, NULL, 0);
 }
 
 FormulaContext *FormulaContext_creat()
@@ -207,12 +207,12 @@ FormulaContext *FormulaContext_creat()
 
 MDContext *MDContext_creat()
 {
-    return mam_alloc(sizeof(MDContext), OBJ_TYPE__MD_CONTEXT, NULL, 0);
+    return mam_alloc(sizeof(MDContext), OBJ_TYPE__MDContext, NULL, 0);
 }
 
 SetFnChildren *SetFnChildren_creat(MemberDef *m_def)
 {
-    SetFnChildren *fn = mam_alloc(sizeof(SetFnChildren), OBJ_TYPE__SET_FN_CHILDREN, NULL, 0);
+    SetFnChildren *fn = mam_alloc(sizeof(SetFnChildren), OBJ_TYPE__SetFnChildren, NULL, 0);
     fn->m_def = m_def;
     return fn;
 }

@@ -1274,7 +1274,7 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 	}
 	else if (set_def->t_cons == SET_DEF__SET_FUNCTION)
 	{
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SET_FN_CHILDREN)
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnChildren)
 		{
 			MddSet *set = SetFnChildren_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
 			return als_get(set->tuples, 0);
@@ -1666,7 +1666,7 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 	}
 	else if (set_def->t_cons == SET_DEF__SET_FUNCTION)
 	{
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SET_FN_CHILDREN)
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnChildren)
 		{
 			return SetFnChildren_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		}
@@ -3542,7 +3542,7 @@ log_print("[ debug ] --------------------------------- up_evolving ~ OBJ_TYPE__M
 	} else if (_type == OBJ_TYPE__MemberDef) {
 		MddMemberRole *mr = ids_mbrsdef__build(md_ctx, (MemberDef *)pointer, ctx_tuple, cube);
 		entity = mr;
-	} else if (_type == OBJ_TYPE__SET_FN_CHILDREN) {
+	} else if (_type == OBJ_TYPE__SetFnChildren) {
 		MddSet *set = SetFnChildren_evolving(md_ctx, pointer, cube, ctx_tuple);
 		entity = set;
 		

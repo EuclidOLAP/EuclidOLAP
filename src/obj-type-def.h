@@ -7,11 +7,11 @@ typedef short type_obj;
 #define BYTES_ALIGNMENT (sizeof(void *))
 #define BYTES_ALIG_CHK_MASK (0x0000000000000007UL)
 
-#define OBJ_TYPE__MD_CONTEXT 1
+#define OBJ_TYPE__MDContext 1
 
-#define OBJ_TYPE__SET_FN_CHILDREN 2
+#define OBJ_TYPE__SetFnChildren 2
 
-#define OBJ_TYPE__SET_FORMULA 3
+#define OBJ_TYPE__SetFormula 3
 
 #define OBJ_TYPE__MemberFnParent 4
 
