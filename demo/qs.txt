@@ -1,8 +1,0 @@
-select 
-YTD() on 10 
-from [Online Store] 
-where (Calendar.[ALL].[2021].Q4.M12);
-
----
-
-with member measure.SSSSSS as sum(Ytd(), (measure.[sales amount])) select { (measure.[sales amount]), (measure.SSSSSS)} on 1, YTD() on 10 from [Online Store] where (Calendar.[ALL].[2021].Q4.M12, [Payment Method].[ALL].[Credit Card]);
