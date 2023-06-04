@@ -266,4 +266,4 @@ EuclidOLAP also extends the multidimensional data model, for example, adding the
 - Human-machine dialogue and machine assistant data analysis mode based on AI.
 
 # 6. License <a name="license"></a>
-EuclidOLAP is under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License Version 2.0</a>.
+EuclidOLAP under the <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License, Version 2.0</a>.
