@@ -3605,6 +3605,9 @@ log_print("[ debug ] --------------------------------- up_evolving ~ OBJ_TYPE__M
 
 	if (als_size(up->list) == 1)
 		return entity;
+
+	log_print("[ error ] Function functionality is not implemented.\n");
+	exit(EXIT_FAILURE);
 }
 
 
