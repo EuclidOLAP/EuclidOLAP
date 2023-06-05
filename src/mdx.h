@@ -2,7 +2,7 @@
 #define EUCLID__MDX_H 1
 
 #include "utils.h"
-#include "mdx-ext.h"
+#include "mdx-ast-struct.h"
 
 void mdx_init();
 
