@@ -2,3 +2,10 @@ select
 Date.[ALL].[2020].Q1.Parent on 10,
 { measure.Turnover } on 1
 from [Airline Turnover];
+
+---
+
+select
+&987236 on 10,
+{ measure.Turnover } on 1
+from [Airline Turnover];
