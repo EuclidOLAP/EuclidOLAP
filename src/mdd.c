@@ -3531,7 +3531,7 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 		if (up_seg->type == MEU_SEG_TYPE_TXT) {
 
 			// Match a custom set template to interpret and return the corresponding set entity.
-			int set_formulas_size = als_size(md_ctx->select_def->set_formulas);
+			int set_formulas_size = md_ctx->select_def->set_formulas ? als_size(md_ctx->select_def->set_formulas) : 0;
 			for (int i = 0; i < set_formulas_size; i++) {
 				SetFormula *sf = als_get(md_ctx->select_def->set_formulas, i);
 				if (strcmp(up_seg->info.seg_str, sf->var_block) == 0) {
