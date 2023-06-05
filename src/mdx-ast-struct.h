@@ -1,3 +1,8 @@
+#ifndef MDX_AST_STRUCT__H
+#define MDX_AST_STRUCT__H 1
+
+#include "utils.h"
+
 #define MEU_SEG_TYPE_TXT   't'
 #define MEU_SEG_TYPE_ID    'i'
 #define MEU_SEG_TYPE_STAMP 's'
@@ -18,3 +23,5 @@ typedef struct _mdmentityupsegment_
     } info;
     char type;
 } MdmEntityUpSegment;
+
+#endif
