@@ -3513,101 +3513,114 @@ void ExpFnCoalesceEmpty_evolving(MDContext *md_ctx, ExpFnCoalesceEmpty *ce, Cube
 }
 
 
-void *up_evolving(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube *cube, MddTuple *ctx_tuple) {
-	// up->list;
-	void *pointer = als_get(up->list, 0);
+// The first fragment is interpreted and the corresponding multidimensional model entity is returned.
+static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube *cube, MddTuple *ctx_tuple) {
+
+	void *seg_0 = als_get(up->list, 0);
 
 	short _type;
 	enum_oms _strat;
 	MemAllocMng *_mam;
-	obj_info(pointer, &_type, &_strat, &_mam);
+	obj_info(seg_0, &_type, &_strat, &_mam);
 
-	void *entity = NULL;
+	log_print("[ debug ] _up_interpret_0 :: _type = %d\n", _type);
 
 	if (_type == OBJ_TYPE__MdmEntityUpSegment) {
-		// entity = upseg_evolving(md_ctx, (MdmEntityUpSegment *)pointer, cube, ctx_tuple);
+		MdmEntityUpSegment *up_seg = seg_0;
 
-		MdmEntityUpSegment *up_seg = pointer;
+		if (up_seg->type == MEU_SEG_TYPE_TXT) {
 
-log_print("[ debug ] --------------------------------- up_evolving ~ OBJ_TYPE__MdmEntityUpSegment\n");
-		if (als_size(up->list) == 1 && up_seg->type == MEU_SEG_TYPE_TXT) {
-			int i, sz = als_size(md_ctx->select_def->set_formulas);
-			for (i = 0; i < sz; i++) {
+			// Match a custom set template to interpret and return the corresponding set entity.
+			int set_formulas_size = md_ctx->select_def->set_formulas ? als_size(md_ctx->select_def->set_formulas) : 0;
+			for (int i = 0; i < set_formulas_size; i++) {
 				SetFormula *sf = als_get(md_ctx->select_def->set_formulas, i);
 				if (strcmp(up_seg->info.seg_str, sf->var_block) == 0) {
 					return ids_setdef__build(md_ctx, sf->set_def, ctx_tuple, cube);
 				}
 			}
+
+			// In most cases, this represents a dimension role.
+			for (int i=0; i<als_size(cube->dim_role_ls); i++) {
+				DimensionRole *dim_role = als_get(cube->dim_role_ls, i);
+				if (strcmp(up_seg->info.seg_str, dim_role->name) == 0) {
+					return dim_role;
+				}
+			}
 		}
-	} else if (_type == OBJ_TYPE__MemberDef) {
-		MddMemberRole *mr = ids_mbrsdef__build(md_ctx, (MemberDef *)pointer, ctx_tuple, cube);
-		entity = mr;
-	} else if (_type == OBJ_TYPE__SetFnChildren) {
-		MddSet *set = SetFnChildren_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else if (_type == OBJ_TYPE__SetFnMembers) {
-		MddSet *set = SetFnMembers_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else if (_type == OBJ_TYPE__SetFnCrossJoin) {
-		MddSet *set = SetFnCrossJoin_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else if (_type == OBJ_TYPE__SetFnFilter) {
-		MddSet *set = SetFnFilter_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else if (_type == OBJ_TYPE__SetFnLateralMembers) {
-		MddSet *set = SetFnLateralMembers_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else if (_type == OBJ_TYPE__SetFnOrder) {
-		MddSet *set = SetFnOrder_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else if (_type == OBJ_TYPE__SetFnTopCount) {
-		MddSet *set = SetFnTopCount_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else if (_type == OBJ_TYPE__SetFnExcept) {
-		MddSet *set = SetFnExcept_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else if (_type == OBJ_TYPE__SetFnYTD) {
-		MddSet *set = SetFnYTD_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else if (_type == OBJ_TYPE__SetFnDescendants) {
-		MddSet *set = SetFnDescendants_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else if (_type == OBJ_TYPE__SetFnTail) {
-		MddSet *set = SetFnTail_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else if (_type == OBJ_TYPE__SetFnBottomOrTopPercent) {
-		MddSet *set = SetFnBottomOrTopPercent_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else if (_type == OBJ_TYPE__SetFnUnion) {
-		MddSet *set = SetFnUnion_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else if (_type == OBJ_TYPE__SetFnIntersect) {
-		MddSet *set = SetFnIntersect_evolving(md_ctx, pointer, cube, ctx_tuple);
-		entity = set;
-		
-	} else {
-		log_print("[ error ] The up_evolving function error.\n");
-		exit(EXIT_FAILURE);
+
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: // TODO _up_interpret_0 :: Code is missing.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
 	}
 
-	if (als_size(up->list) == 1)
-		return entity;
+	if (_type == OBJ_TYPE__MemberDef) {
+		return ids_mbrsdef__build(md_ctx, (MemberDef *)seg_0, ctx_tuple, cube);
+	} else if (_type == OBJ_TYPE__SetFnChildren) {
+		return SetFnChildren_evolving(md_ctx, seg_0, cube, ctx_tuple);
+		
+	} else if (_type == OBJ_TYPE__SetFnMembers) {
+		return SetFnMembers_evolving(md_ctx, seg_0, cube, ctx_tuple);
+		
+	} else if (_type == OBJ_TYPE__SetFnCrossJoin) {
+		return SetFnCrossJoin_evolving(md_ctx, seg_0, cube, ctx_tuple);
+		
+	} else if (_type == OBJ_TYPE__SetFnFilter) {
+		return SetFnFilter_evolving(md_ctx, seg_0, cube, ctx_tuple);
+		
+	} else if (_type == OBJ_TYPE__SetFnLateralMembers) {
+		return SetFnLateralMembers_evolving(md_ctx, seg_0, cube, ctx_tuple);
+		
+	} else if (_type == OBJ_TYPE__SetFnOrder) {
+		return SetFnOrder_evolving(md_ctx, seg_0, cube, ctx_tuple);
+		
+	} else if (_type == OBJ_TYPE__SetFnTopCount) {
+		return SetFnTopCount_evolving(md_ctx, seg_0, cube, ctx_tuple);
+		
+	} else if (_type == OBJ_TYPE__SetFnExcept) {
+		return SetFnExcept_evolving(md_ctx, seg_0, cube, ctx_tuple);
+		
+	} else if (_type == OBJ_TYPE__SetFnYTD) {
+		return SetFnYTD_evolving(md_ctx, seg_0, cube, ctx_tuple);
+		
+	} else if (_type == OBJ_TYPE__SetFnDescendants) {
+		return SetFnDescendants_evolving(md_ctx, seg_0, cube, ctx_tuple);
+		
+	} else if (_type == OBJ_TYPE__SetFnTail) {
+		return SetFnTail_evolving(md_ctx, seg_0, cube, ctx_tuple);
+		
+	} else if (_type == OBJ_TYPE__SetFnBottomOrTopPercent) {
+		return SetFnBottomOrTopPercent_evolving(md_ctx, seg_0, cube, ctx_tuple);
+		
+	} else if (_type == OBJ_TYPE__SetFnUnion) {
+		return SetFnUnion_evolving(md_ctx, seg_0, cube, ctx_tuple);
+		
+	} else if (_type == OBJ_TYPE__SetFnIntersect) {
+		return SetFnIntersect_evolving(md_ctx, seg_0, cube, ctx_tuple);
+	}
 
-	log_print("[ error ] Function functionality is not implemented.\n");
-	exit(EXIT_FAILURE);
+	MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+	thrd_mam->exception_desc = "exception: // TODO _up_interpret_0 :: Code is missing.";
+	longjmp(thrd_mam->excep_ctx_env, -1);
+}
+
+void *up_evolving(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube *cube, MddTuple *ctx_tuple) {
+
+	void *entity = _up_interpret_0(md_ctx, up, cube, ctx_tuple);
+
+	short _type;
+	enum_oms _strat;
+	MemAllocMng *_mam;
+	obj_info(entity, &_type, &_strat, &_mam);
+	log_print("[ debug ] up_evolving :: _type = %d\n", _type);
+
+	int size = als_size(up->list);
+
+	for (int i=1; i<size; i++) {
+		//TODO
+	}
+
+	return entity;
+
 }
 
 
