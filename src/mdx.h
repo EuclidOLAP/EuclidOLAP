@@ -76,6 +76,7 @@ void ids_tupledef___set_mbrs_def(TupleDef *, MembersDef *);
 #define SET_DEF__SET_FUNCTION 2
 #define SET_DEF__VAR_OR_BLOCK 3
 #define SET_DEF__MDE_UNI_PATH 4
+#define SET_DEF__TUPLE_STATEMENT 5
 
 typedef struct set_definition
 {
@@ -84,6 +85,7 @@ typedef struct set_definition
     void *set_fn;
     char *var_block;
     MDMEntityUniversalPath *up;
+    TupleDef *tuple_def;
 } SetDef;
 
 SetDef *ids_setdef_new(ids_ct);

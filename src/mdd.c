@@ -1404,8 +1404,9 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 		thrd_mam->exception_desc = "Exception: A Set object is needed here.";
 		longjmp(thrd_mam->excep_ctx_env, -1);
 
-	}
-	else
+	} else if (set_def->t_cons == SET_DEF__TUPLE_STATEMENT) {
+		return ids_tupledef__build(md_ctx, set_def->tuple_def, context_tuple, cube);
+	} else
 	{
 		log_print("[ error ] - ids_setdef__head_ref_tuple() set_def->t_cons = %d\n", set_def->t_cons);
 		exit(1);
@@ -1776,6 +1777,11 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 			thrd_mam->exception_desc = "Exception: 0 - A Set object is needed here.";
 			longjmp(thrd_mam->excep_ctx_env, -1);
 		}
+	} else if (set_def->t_cons == SET_DEF__TUPLE_STATEMENT) {
+		MddTuple *tuple = ids_tupledef__build(md_ctx, set_def->tuple_def, ctx_tuple, cube);
+		MddSet *set = mdd_set__create();
+		mddset__add_tuple(set, tuple);
+		return set;
 	}
 	else
 	{
