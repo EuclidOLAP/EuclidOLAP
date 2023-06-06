@@ -220,7 +220,7 @@ SetFnChildren *SetFnChildren_creat(MemberDef *m_def)
 ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def)
 {
     ASTMemberFunc_Parent *fn = mam_alloc(sizeof(ASTMemberFunc_Parent), OBJ_TYPE__ASTMemberFunc_Parent, NULL, 0);
-    fn->child_def = child_def;
+    fn->ast_member = child_def;
     return fn;
 }
 

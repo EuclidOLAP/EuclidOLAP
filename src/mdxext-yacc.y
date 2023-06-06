@@ -6,6 +6,7 @@
 
 #include "utils.h"
 #include "mdx.h"
+#include "mdm-astmrfn-interpreter.h"
 
 int yyerror(const char *);
 extern int yylex();
@@ -1012,7 +1013,7 @@ member_statement:
 	}
   | PARENT ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
 		ASTMemberFunc_Parent *fn = ASTMemberFunc_Parent_creat(NULL);
-		stack_pop(&AST_STACK, (void **) &(fn->child_def));
+		stack_pop(&AST_STACK, (void **) &(fn->ast_member));
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1115,7 +1116,7 @@ member_statement:
 member_function_template:
 	PARENT ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
 		ASTMemberFunc_Parent *fn = ASTMemberFunc_Parent_creat(NULL);
-		stack_pop(&AST_STACK, (void **) &(fn->child_def));
+		stack_pop(&AST_STACK, (void **) &(fn->ast_member));
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = fn;
 		stack_push(&AST_STACK, mbr_def);
@@ -1548,17 +1549,21 @@ dims_and_roles:
 
 mrfn_Parent_suftpl:
 	PARENT {
-		MemberRoleFuncParent *mr_func = mam_alloc(sizeof(MemberRoleFuncParent), OBJ_TYPE__MemberRoleFuncParent, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
+		// MemberRoleFuncParent *mr_func = mam_alloc(sizeof(MemberRoleFuncParent), OBJ_TYPE__MemberRoleFuncParent, NULL, 0);
+		// mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
+		ASTMemberFunc_Parent *mr_func = mam_alloc(sizeof(ASTMemberFunc_Parent), OBJ_TYPE__ASTMemberFunc_Parent, NULL, 0);
+		mr_func->head.interpret = interpret_ast_mrf_parent;
 		stack_push(&AST_STACK, mr_func);
 	}
   |
 	PARENT ROUND_BRACKET_L ROUND_BRACKET_R {
-		MemberRoleFuncParent *mr_func = mam_alloc(sizeof(MemberRoleFuncParent), OBJ_TYPE__MemberRoleFuncParent, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
+		// MemberRoleFuncParent *mr_func = mam_alloc(sizeof(MemberRoleFuncParent), OBJ_TYPE__MemberRoleFuncParent, NULL, 0);
+		// mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
+		ASTMemberFunc_Parent *mr_func = mam_alloc(sizeof(ASTMemberFunc_Parent), OBJ_TYPE__ASTMemberFunc_Parent, NULL, 0);
+		mr_func->head.interpret = interpret_ast_mrf_parent;
 		stack_push(&AST_STACK, mr_func);
 	}
-  |
+  /* |
 	PARENT ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
 		// mdm_entity_universal_path is expected to represent a hierarchy(hierarchy role)
 		MDMEntityUniversalPath *up = NULL;
@@ -1568,7 +1573,7 @@ mrfn_Parent_suftpl:
 		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
 		mr_func->hierarchy = up;
 		stack_push(&AST_STACK, mr_func);
-	}
+	} */
 ;
 
 mrfn_CurrentMember_suftpl:

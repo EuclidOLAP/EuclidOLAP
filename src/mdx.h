@@ -27,7 +27,7 @@ typedef struct __vector_measures__
     ArrayList *ls_mears_vals;
 } IDSVectorMears;
 
-typedef unsigned char ids_ct;
+
 
 
 typedef struct Level_Role_Def_
@@ -37,15 +37,7 @@ typedef struct Level_Role_Def_
 LevelRoleDef *LevelRoleDef_creat(ArrayList *lr_path);
 
 
-#define MEMBER_DEF__MBR_ABS_PATH 1
-#define MEMBER_DEF__MBR_FUNCTION 2
 
-typedef struct member_definition
-{
-    ids_ct t_cons;
-    ArrayList *mbr_abs_path;
-    void *member_fn;
-} MemberDef;
 
 MemberDef *ids_mbrdef_new__mbr_abs_path(ArrayList *);
 MemberDef *MemberDef_creat(ids_ct t_cons);
@@ -193,10 +185,7 @@ typedef struct set_fn_children
 } SetFnChildren;
 SetFnChildren *SetFnChildren_creat(MemberDef *m_def);
 
-typedef struct mbr_fn_parent
-{
-    MemberDef *child_def;
-} ASTMemberFunc_Parent;
+
 ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def);
 
 typedef struct exp_fn_sum
@@ -481,10 +470,7 @@ ExpFnCoalesceEmpty *ExpFnCoalesceEmpty_creat(ArrayList *exp_ls);
 #define MDX_FN_SUFFIX_FALSE  0
 #define MDX_FN_SUFFIX_TRUE  1
 
-typedef struct _member_role_func_parent_ {
-    char suf_flag;
-    MDMEntityUniversalPath *hierarchy;
-} MemberRoleFuncParent;
+
 
 typedef struct _member_role_func_currentmember_ {
     char suf_flag;

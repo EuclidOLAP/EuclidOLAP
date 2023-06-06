@@ -1387,14 +1387,23 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 		MemAllocMng *mam;
 		obj_info(var, &obj_type, &obj_strat, &mam);
 
-		if (obj_type != OBJ_TYPE__MddSet) {
-			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-			thrd_mam->exception_desc = "Exception: A Set object is needed here.";
-			longjmp(thrd_mam->excep_ctx_env, -1);
+		if (obj_type == OBJ_TYPE__MddSet) {
+			MddSet *set = var;
+			return als_get(set->tuples, 0);
 		}
 
-		MddSet *set = var;
-		return als_get(set->tuples, 0);
+		if (obj_type == OBJ_TYPE__MddMemberRole) {
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, var);
+			// MddSet *set = mdd_set__create();
+			// mddset__add_tuple(set, tuple);
+			return tuple;
+		}
+
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "Exception: A Set object is needed here.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+
 	}
 	else
 	{
@@ -1755,8 +1764,13 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 			log_print("[ warn ] Undeveloped functionality!\n");
 			exit(EXIT_FAILURE);
 		} else if (obj_type == OBJ_TYPE__MddMemberRole) {
-			log_print("[ warn ] Undeveloped functionality!\n");
-			exit(EXIT_FAILURE);
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, entity);
+			MddSet *set = mdd_set__create();
+			mddset__add_tuple(set, tuple);
+			return set;
+			// log_print("[ warn ] Undeveloped functionality!\n");
+			// exit(EXIT_FAILURE);
 		} else {
 			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 			thrd_mam->exception_desc = "Exception: 0 - A Set object is needed here.";
@@ -2803,7 +2817,7 @@ MddSet *SetFnIntersect_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, Mdd
 MddMemberRole *ASTMemberFunc_Parent_evolving(MDContext *md_ctx, ASTMemberFunc_Parent *fn_parent, MddTuple *context_tuple, Cube *cube)
 {
 	// when current member has no parent, return itself.
-	MddMemberRole *child_mr = ids_mbrsdef__build(md_ctx, fn_parent->child_def, context_tuple, cube);
+	MddMemberRole *child_mr = ids_mbrsdef__build(md_ctx, fn_parent->ast_member, context_tuple, cube);
 	if (child_mr->member->p_gid)
 		return mdd_mr__create(find_member_by_gid(child_mr->member->p_gid), child_mr->dim_role);
 	else
@@ -3603,6 +3617,103 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	longjmp(thrd_mam->excep_ctx_env, -1);
 }
 
+static void *_up_interpret_segment_mr(MDContext *md_ctx, MddMemberRole *mr, MdmEntityUpSegment *seg, Cube *cube, MddTuple *ctx_tuple) {
+
+	Member *member = mr->member;
+
+	if (seg->type == MEU_SEG_TYPE_TXT) {
+		int msize = als_size(member_pool);
+		for (int i=0; i<msize; i++) {
+			Member *m = als_get(member_pool, i);
+			if (m->p_gid == member->gid && strcmp(seg->info.seg_str, m->name) == 0)
+				return mdd_mr__create(m, mr->dim_role);
+		}
+	}
+
+
+	// TODO
+	if (seg->type == MEU_SEG_TYPE_ID) {
+
+		return NULL;
+	}
+	
+	// TODO
+	if (seg->type == MEU_SEG_TYPE_STAMP) {
+
+		return NULL;
+	}
+}
+
+static void *_up_interpret_segment_dr(MDContext *md_ctx, DimensionRole *dr, MdmEntityUpSegment *seg, Cube *cube, MddTuple *ctx_tuple) {
+
+	if (seg->type == MEU_SEG_TYPE_TXT) {
+		// This might be a HierarchyRole or a LevelRole or a MemberRole.
+
+		// MemberRole
+		int msize = als_size(member_pool);
+		for (int i=0; i<msize; i++) {
+			Member *m = als_get(member_pool, i);
+			if (dr->dim_gid == m->dim_gid && strcmp(seg->info.seg_str, m->name) == 0)
+				return mdd_mr__create(m, dr);
+		}
+
+		// TODO HierarchyRole
+
+		// TODO LevelRole
+
+		return NULL;
+	}
+	
+
+	// TODO
+	if (seg->type == MEU_SEG_TYPE_ID) {
+
+		return NULL;
+	}
+	
+	// TODO
+	if (seg->type == MEU_SEG_TYPE_STAMP) {
+
+		return NULL;
+	}
+
+}
+
+static void *_up_interpret_segment(MDContext *md_ctx, void *entity, MdmEntityUpSegment *seg, Cube *cube, MddTuple *ctx_tuple) {
+	
+	short _type;
+	enum_oms _strat;
+	MemAllocMng *_mam;
+	obj_info(entity, &_type, &_strat, &_mam);
+
+	// TODO Cube
+
+
+
+	// TODO Dimension Role
+	if (_type == OBJ_TYPE__DimensionRole) {
+		return _up_interpret_segment_dr(md_ctx, entity, seg, cube, ctx_tuple);
+	}
+
+	// TODO Member Role
+	if (_type == OBJ_TYPE__MddMemberRole) {
+		return _up_interpret_segment_mr(md_ctx, entity, seg, cube, ctx_tuple);
+	}
+
+
+
+	// TODO Hierarchy Role
+	// TODO Level Role
+	// TODO Tuple
+	// TODO Set
+	// TODO Other
+
+
+	MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+	thrd_mam->exception_desc = "exception: // TODO _up_interpret_segment :: Code is missing.";
+	longjmp(thrd_mam->excep_ctx_env, -1);
+}
+
 void *up_evolving(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube *cube, MddTuple *ctx_tuple) {
 
 	void *entity = _up_interpret_0(md_ctx, up, cube, ctx_tuple);
@@ -3616,7 +3727,28 @@ void *up_evolving(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube *cube, Mdd
 	int size = als_size(up->list);
 
 	for (int i=1; i<size; i++) {
-		//TODO
+		void *elei = als_get(up->list, i);
+		obj_info(elei, &_type, &_strat, &_mam);
+
+		// elei is a MdmEntityUpSegment object.
+		if (_type == OBJ_TYPE__MdmEntityUpSegment) {
+			entity = _up_interpret_segment(md_ctx, entity, elei, cube, ctx_tuple);
+			continue;
+		}
+
+		// TODO elei is a define of AST member function.
+		if (is_type_astmemberfunc(_type)) {
+			// entity = _up_interpret_astmrfn(md_ctx, entity, elei, cube, ctx_tuple);
+			entity = ((ASTCommonMemberFunc *)elei)->interpret(md_ctx, entity, elei, ctx_tuple, cube);
+			continue;
+		}
+
+		// TODO elei is a define of AST set function.
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: // TODO up_evolving :: Code is missing.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+
+
 	}
 
 	return entity;
