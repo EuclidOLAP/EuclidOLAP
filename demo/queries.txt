@@ -808,6 +808,20 @@ from [Airline Turnover];
 
 ---
 
+select 
+[Calendar].[2020].[Q1] on 0, 
+([Payment Method].[Credit Card], measure.[sales amount]) on 1 
+from [Online Store];
+
+---
+
+select 
+[Calendar].[2020].[Q1] on 0, 
+{ ([Payment Method].[Credit Card], measure.[sales amount]) } on 1 
+from [Online Store];
+
+---
+
 with
 member measure.[################ finished ################] as 660880
 member measure.[##########################################] as 660880

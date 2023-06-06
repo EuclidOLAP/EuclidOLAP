@@ -547,6 +547,16 @@ set_statement:
 		ids_setdef__set_tuple_def_ls(set_def, t_def_ls);
 		stack_push(&AST_STACK, set_def);
 	}
+  |
+	tuple_statement {
+		TupleDef *t_def = NULL;
+		stack_pop(&AST_STACK, (void **) &t_def);
+
+		SetDef *set_def = ids_setdef_new(SET_DEF__TUPLE_STATEMENT);
+		set_def->tuple_def = t_def;
+
+		stack_push(&AST_STACK, set_def);
+	}
   /* | set_function_template {
 		SetDef *set_def = ids_setdef_new(SET_DEF__SET_FUNCTION);
 		stack_pop(&AST_STACK, (void **) &(set_def->set_fn));
