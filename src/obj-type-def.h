@@ -8,6 +8,9 @@ typedef short type_obj;
 #define BYTES_ALIG_CHK_MASK (0x0000000000000007UL)
 
 
+#define is_type_astmemberfunc(obj_type) (obj_type >= OBJ_TYPE__ASTMEMBERFUNC__MIN && obj_type <= OBJ_TYPE__ASTMEMBERFUNC__MAX)
+
+
 // The range reserved for the member functions of the AST is 1~200.
 #define OBJ_TYPE__ASTMEMBERFUNC__MIN 1
 
