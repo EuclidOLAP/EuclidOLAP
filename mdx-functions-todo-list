@@ -1,0 +1,430 @@
+<< Array Functions >>
+	(M)	SetToArray
+
+
+<< Date Functions >>
+	(O)	DateRoll
+	(O)	GetFirstDate
+	(O)	GetFirstDay
+	(O)	GetLastDate
+	(O)	GetLastDay
+	(O)	GetNextDay
+	(O)	JulianDate
+	(O)	TodateEx
+	(O)	Today
+	(O)	UnixDate
+
+
+<< Hierarchy Functions >>
+	(M)	Dimension
+	(M)	Dimensions
+	(M)	Hierarchy
+
+
+<< Level Functions >>
+	(O)	Generation
+	(O)	Generations
+	(O)	Level
+	(M)	Level
+	(O)	Levels
+	(M)	Levels
+
+
+<< Logical Functions >>
+	(I)	And
+	(I)	Case
+	(O)	Contains
+	(I)	EQ : '='
+	(I)	GE : '>='
+	(I)	GT : '>'
+	(I)	IIf
+	(O)	Is
+	(O)	IsAccType
+	(O)	IsAncestor
+	(M)	IsAncestor
+	(O)	IsChild
+	(I)	IsEmpty
+	(O)	IsEmpty
+	(M)	IsEmpty
+	(O)	IsGeneration
+	(M)	IsGeneration
+	(O)	IsLeaf
+	(M)	IsLeaf
+	(O)	IsLevel
+	(O)	IsSibling
+	(M)	IsSibling
+	(O)	IsUda
+	(O)	IsValid
+	(I)	LE : '<='
+	(I)	LT : '<'
+	(I)	NE : '<>'
+	(I)	Not
+	(I)	Or
+
+
+<< Member Functions >>
+	(O)	Ancestor
+	(M)	Ancestor
+	(E)	ClosingPeriod
+	(I)	ClosingPeriod
+	(O)	ClosingPeriod
+	(M)	ClosingPeriod
+	(O)	Cousin
+	(M)	Cousin
+	(O)	CurrentAxisMember
+	(E)	CurrentMember
+	(I)	CurrentMember
+	(O)	CurrentMember
+	(M)	CurrentMember
+	(M)	DataMember
+	(O)	DateToMember
+	(O)	DefaultMember
+	(M)	DefaultMember
+	(E)	FirstChild
+	(I)	FirstChild
+	(O)	FirstChild
+	(M)	FirstChild
+	(E)	FirstSibling
+	(I)	FirstSibling
+	(O)	FirstSibling
+	(M)	FirstSibling
+	(M)	Item (Member)
+	(E)	Lag
+	(I)	Lag
+	(O)	Lag
+	(M)	Lag
+	(E)	LastChild
+	(I)	LastChild
+	(O)	LastChild
+	(M)	LastChild
+	(E)	LastSibling
+	(I)	LastSibling
+	(O)	LastSibling
+	(M)	LastSibling
+	(E)	Lead
+	(I)	Lead
+	(O)	Lead
+	(M)	Lead
+	(M)	LinkMember
+	(M)	Members (String)
+	(I)	Name
+	(I)	NextMember
+	(O)	NextMember
+	(M)	NextMember
+	(E)	OpeningPeriod
+	(I)	OpeningPeriod
+	(O)	OpeningPeriod
+	(M)	OpeningPeriod
+	(E)	ParallelPeriod
+	(I)	ParallelPeriod
+	(O)	ParallelPeriod
+	(M)	ParallelPeriod
+	(E)	Parent
+	(I)	Parent
+	(O)	Parent
+	(M)	Parent
+	(E)	PrevMember
+	(I)	PrevMember
+	(O)	PrevMember
+	(M)	PrevMember
+	(I)	Properties
+	(O)	StrToMbr
+	(M)	StrToMember
+	(M)	UnknownMember
+	(M)	ValidMeasure
+
+
+<< Numeric Functions >>
+	(I)	Abs
+	(O)	Abs
+	(I)	Aggregate
+	(O)	Aggregate
+	(M)	Aggregate
+	(I)	Avg
+	(O)	Avg
+	(M)	Avg
+	(M)	CalculationCurrentPass
+	(M)	CalculationPassValue
+	(O)	Case
+	(O)	CellValue
+	(E)	CoalesceEmpty
+	(I)	CoalesceEmpty
+	(O)	CoalesceEmpty
+	(M)	CoalesceEmpty
+	(I)	Correlation
+	(M)	Correlation
+	(I)	Count
+	(O)	Count
+	(M)	Count (Dimension)
+	(M)	Count (Hierarchy Levels)
+	(E)	Count (Set)
+	(M)	Count (Set)
+	(M)	Count (Tuple)
+	(I)	Covariance
+	(M)	Covariance
+	(M)	CovarianceN
+	(O)	DateDiff
+	(O)	DatePart
+	(M)	DistinctCount
+	(O)	EnumText
+	(O)	EnumValue
+	(O)	Exp
+	(O)	Factorial
+	(E)	IIf
+	(O)	IIF
+	(M)	IIf
+	(O)	InStr
+	(O)	Int
+	(O)	Len
+	(I)	LinRegIntercept
+	(M)	LinRegIntercept
+	(M)	LinRegPoint
+	(I)	LinRegR2
+	(M)	LinRegR2
+	(I)	LinRegSlope
+	(M)	LinRegSlope
+	(I)	LinRegVariance
+	(M)	LinRegVariance
+	(O)	Ln
+	(O)	Log
+	(O)	Log10
+	(E)	LookUpCube
+	(M)	LookupCube
+	(I)	Max
+	(O)	Max
+	(M)	Max
+	(I)	Median
+	(O)	Median
+	(M)	Median
+	(I)	Min
+	(O)	Min
+	(M)	Min
+	(O)	Mod
+	(O)	NonEmptyCount
+	(O)	NTile
+	(O)	Ordinal
+	(M)	Ordinal
+	(O)	Percentile
+	(O)	Power
+	(M)	Predict
+	(I)	Rank
+	(O)	Rank
+	(M)	Rank
+	(O)	RealValue
+	(O)	Remainder
+	(M)	RollupChildren
+	(O)	Round
+	(O)	Stddev
+	(M)	Stddev
+	(O)	Stddevp
+	(M)	StddevP
+	(I)	Stdev
+	(M)	Stdev
+	(M)	StdevP
+	(O)	StrToNum
+	(M)	StrToValue
+	(E)	Sum
+	(I)	Sum
+	(O)	Sum
+	(M)	Sum
+	(O)	Todate
+	(O)	Truncate
+	(M)	Value
+	(I)	Var
+	(M)	Var
+	(M)	Variance
+	(M)	VarianceP
+	(M)	VarP
+
+
+<< Other Functions >>
+	(M)	Error
+
+
+<< Set Functions >>
+	(M)	AddCalculatedMembers
+	(M)	AllMembers
+	(I)	Ancestors
+	(M)	Ancestors
+	(M)	Ascendants
+	(M)	Axis
+	(I)	BottomCount
+	(M)	BottomCount
+	(E)	BottomPercent
+	(I)	BottomPercent
+	(M)	BottomPercent
+	(I)	BottomSum
+	(M)	BottomSum
+	(E)	Children
+	(I)	Children
+	(M)	Children
+	(E)	CrossJoin
+	(I)	CrossJoin
+	(O)	CrossJoin
+	(M)	Crossjoin
+	(M)	CurrentOrdinal
+	(E)	Descendants
+	(I)	Descendants
+	(M)	Descendants
+	(I)	Distinct
+	(O)	Distinct
+	(M)	Distinct
+	(I)	DrilldownLevel
+	(M)	DrilldownLevel
+	(I)	DrilldownLevelBottom
+	(M)	DrilldownLevelBottom
+	(I)	DrillDownLevelTop
+	(M)	DrilldownLevelTop
+	(I)	DrillDownMember
+	(M)	DrilldownMember
+	(I)	DrillDownMemberBottom
+	(M)	DrilldownMemberBottom
+	(I)	DrillDownMemberTop
+	(M)	DrilldownMemberTop
+	(I)	DrillupLevel
+	(M)	DrillupLevel
+	(I)	DrillupMember
+	(M)	DrillupMember
+	(E)	Except
+	(I)	Except
+	(O)	Except
+	(M)	Except
+	(M)	Exists
+	(I)	Extract
+	(M)	Extract
+	(E)	Filter
+	(I)	Filter
+	(M)	Filter
+	(O)	Generate
+	(M)	Generate
+	(O)	Head
+	(M)	Head
+	(M)	Hierarchize
+	(E)	Intersect
+	(I)	Intersect
+	(O)	Intersect
+	(M)	Intersect
+	(M)	LastPeriods
+	(E)	LateralMembers
+	(E)	Members
+	(I)	Members
+	(M)	Members (Set)
+	(I)	Mtd
+	(M)	Mtd
+	(M)	NameToSet
+	(M)	NonEmptyCrossjoin
+	(E)	Order
+	(I)	Order
+	(M)	Order
+	(I)	PeriodsToDate
+	(M)	PeriodsToDate
+	(I)	Qtd
+	(M)	Qtd
+	(M)	Siblings
+	(M)	StripCalculatedMembers
+	(M)	StrToSet
+	(O)	Subset
+	(M)	Subset
+	(E)	Tail
+	(O)	Tail
+	(M)	Tail
+	(M)	ToggleDrillState
+	(E)	TopCount
+	(I)	TopCount
+	(M)	TopCount
+	(E)	TopPercent
+	(I)	TopPercent
+	(M)	TopPercent
+	(I)	TopSum
+	(M)	TopSum
+	(O)	TupleRange
+	(E)	Union
+	(I)	Union
+	(O)	Union
+	(M)	Union
+	(M)	Unorder
+	(M)	VisualTotals
+	(I)	Wtd
+	(M)	Wtd
+	(E)	Ytd
+	(I)	Ytd
+	(M)	Ytd
+
+
+<< String Functions >>
+	(M)	CalculationPassValue
+	(M)	CoalesceEmpty
+	(O)	Concat
+	(O)	FormatDate
+	(M)	Generate
+	(M)	IIf
+	(O)	Left
+	(M)	LookupCube
+	(O)	Lower
+	(O)	LTrim
+	(M)	MemberToStr
+	(M)	Name
+	(O)	NumToStr
+	(M)	Properties
+	(O)	Right
+	(O)	RTrim
+	(M)	SetToStr
+	(O)	Substring
+	(M)	TupleToStr
+	(M)	UniqueName
+	(O)	Upper
+	(M)	UserName
+
+
+<< Subcube Functions >>
+	(M)	Leaves
+	(M)	This
+
+
+<< Tuple Functions >>
+	(M)	Current
+	(O)	CurrentTuple
+	(O)	Item
+	(M)	Item (Tuple)
+	(M)	Root
+	(M)	StrToTuple
+
+
+########################################################
+#                       FINISHED                       #
+########################################################
+
+<< Array Functions >>
+
+
+<< Date Functions >>
+
+
+<< Hierarchy Functions >>
+
+
+<< Level Functions >>
+
+
+<< Logical Functions >>
+
+
+<< Member Functions >>
+
+
+<< Numeric Functions >>
+
+
+<< Other Functions >>
+
+
+<< Set Functions >>
+
+
+<< String Functions >>
+
+
+<< Subcube Functions >>
+
+
+<< Tuple Functions >>
