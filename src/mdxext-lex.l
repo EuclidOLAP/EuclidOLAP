@@ -292,6 +292,10 @@ coalesceEmpty {
 	return COALESCE_EMPTY;
 }
 
+IsEmpty {
+	return IS_EMPTY;
+}
+
 [_a-zA-Z][_a-zA-Z0-9]*	{
 	return VAR;
 }

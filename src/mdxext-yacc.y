@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "mdx.h"
 #include "mdm-astmrfn-interpreter.h"
+#include "mdm-astlogifn-interpreter.h"
 
 int yyerror(const char *);
 extern int yylex();
@@ -102,6 +103,9 @@ Stack AST_STACK = { 0 };
 %token IIF				/* iif */
 %token COALESCE_EMPTY	/* coalesceEmpty */
 
+/* Logical Functions */
+%token IS_EMPTY			/* IsEmpty */
+
 /* punctuations */
 %token COMMA				/* , */
 %token DOT					/* . */
@@ -128,7 +132,7 @@ Stack AST_STACK = { 0 };
 %token GREA					/* >  (Greater Than)			 */
 %token GREA_EQ				/* >= (Greater Than or Equal To) */
 
-%token FLAG_EXP  /* @@EXP */
+%token FLAG_EXP				/* @@EXP */
 
 %token VAR
 %token BLOCK
@@ -273,24 +277,24 @@ member_formula_statement:
 
 expression:
 	term {
-		Term *t;
+		Term *t = NULL;
 		stack_pop(&AST_STACK, (void **) &t);
 		Expression *e = Expression_creat();
 		Expression_plus_term(e, t);
 		stack_push(&AST_STACK, e);
 	}
   | expression PLUS term {
-		Term *t;
+		Term *t = NULL;
 		stack_pop(&AST_STACK, (void **) &t);
-		Expression *e;
+		Expression *e = NULL;
 		stack_pop(&AST_STACK, (void **) &e);
 		Expression_plus_term(e, t);
 		stack_push(&AST_STACK, e);
 	}
   | expression MINUS term {
-		Term *t;
+		Term *t = NULL;
 		stack_pop(&AST_STACK, (void **) &t);
-		Expression *e;
+		Expression *e = NULL;
 		stack_pop(&AST_STACK, (void **) &e);
 		Expression_minus_term(e, t);
 		stack_push(&AST_STACK, e);
@@ -299,14 +303,14 @@ expression:
 
 term:
 	factory {
-		Factory *f;
+		Factory *f = NULL;
 		stack_pop(&AST_STACK, (void **) &f);
 		Term *t = Term_creat();
 		Term_mul_factory(t, f);
 		stack_push(&AST_STACK, t);
 	}
   | term MULTIPLIED factory {
-		Factory *f;
+		Factory *f = NULL;
 		stack_pop(&AST_STACK, (void **) &f);
 		Term *t = Term_creat();
 		stack_pop(&AST_STACK, (void **) &t);
@@ -314,7 +318,7 @@ term:
 		stack_push(&AST_STACK, t);
 	}
   | term DIVIDED factory {
-		Factory *f;
+		Factory *f = NULL;
 		stack_pop(&AST_STACK, (void **) &f);
 		Term *t = Term_creat();
 		stack_pop(&AST_STACK, (void **) &t);
@@ -331,7 +335,7 @@ factory:
 		stack_push(&AST_STACK, f);
 	}
   |	tuple_statement {
-		TupleDef *t_def;
+		TupleDef *t_def = NULL;
 		stack_pop(&AST_STACK, (void **) &t_def);
 
 		Factory *f = Factory_creat();
@@ -352,6 +356,9 @@ factory:
 		stack_pop(&AST_STACK, (void **) &(factory->exp));
 		stack_push(&AST_STACK, factory);
 	}
+  /* | mdm_entity_universal_path {
+
+	} */
 ;
 
 expression_function:
@@ -374,7 +381,7 @@ expression_function:
 
 exp_fn__coalesce_empty:
 	COALESCE_EMPTY ROUND_BRACKET_L expression_list ROUND_BRACKET_R {
-		ArrayList *exp_ls;
+		ArrayList *exp_ls = NULL;
 		stack_pop(&AST_STACK, (void **) &exp_ls);
 		stack_push(&AST_STACK, ExpFnCoalesceEmpty_creat(exp_ls));
 	}
@@ -382,16 +389,16 @@ exp_fn__coalesce_empty:
 
 expression_list:
 	expression {
-		Expression *exp;
+		Expression *exp = NULL;
 		stack_pop(&AST_STACK, (void **) &exp);
 		ArrayList *exp_ls = als_new(8, "Expression *", THREAD_MAM, NULL);
 		als_add(exp_ls, exp);
 		stack_push(&AST_STACK, exp_ls);
 	}
   | expression_list COMMA expression {
-		Expression *exp;
+		Expression *exp = NULL;
 		stack_pop(&AST_STACK, (void **) &exp);
-		ArrayList *exp_ls;
+		ArrayList *exp_ls = NULL;
 		stack_pop(&AST_STACK, (void **) &exp_ls);
 		als_add(exp_ls, exp);
 		stack_push(&AST_STACK, exp_ls);
@@ -400,11 +407,11 @@ expression_list:
 
 exp_fn__iif:
 	IIF ROUND_BRACKET_L boolean_expression COMMA expression COMMA expression ROUND_BRACKET_R {
-		Expression *exp2;
+		Expression *exp2 = NULL;
 		stack_pop(&AST_STACK, (void **) &exp2);
-		Expression *exp1;
+		Expression *exp1 = NULL;
 		stack_pop(&AST_STACK, (void **) &exp1);
-		BooleanExpression *bool_exp;
+		BooleanExpression *bool_exp = NULL;
 		stack_pop(&AST_STACK, (void **) &bool_exp);
 		stack_push(&AST_STACK, ExpFnIif_creat(bool_exp, exp1, exp2));
 	}
@@ -412,30 +419,30 @@ exp_fn__iif:
 
 exp_fn__look_up_cube:
 	LOOK_UP_CUBE ROUND_BRACKET_L str COMMA str ROUND_BRACKET_R {
-		char *exp_str;
+		char *exp_str = NULL;
 		stack_pop(&AST_STACK, (void **) &exp_str);
-		char *cube_name;
+		char *cube_name = NULL;
 		stack_pop(&AST_STACK, (void **) &cube_name);
 		stack_push(&AST_STACK, ExpFnLookUpCube_creat(cube_name, exp_str, NULL));
 	}
   | LOOK_UP_CUBE ROUND_BRACKET_L str COMMA expression ROUND_BRACKET_R {
-		Expression *exp;
+		Expression *exp = NULL;
 		stack_pop(&AST_STACK, (void **) &exp);
-		char *cube_name;
+		char *cube_name = NULL;
 		stack_pop(&AST_STACK, (void **) &cube_name);
 		stack_push(&AST_STACK, ExpFnLookUpCube_creat(cube_name, NULL, exp));
 	}
   | LOOK_UP_CUBE ROUND_BRACKET_L var_or_block COMMA str ROUND_BRACKET_R {
-		char *exp_str;
+		char *exp_str = NULL;
 		stack_pop(&AST_STACK, (void **) &exp_str);
-		char *cube_name;
+		char *cube_name = NULL;
 		stack_pop(&AST_STACK, (void **) &cube_name);
 		stack_push(&AST_STACK, ExpFnLookUpCube_creat(cube_name, exp_str, NULL));
 	}
   | LOOK_UP_CUBE ROUND_BRACKET_L var_or_block COMMA expression ROUND_BRACKET_R {
-		Expression *exp;
+		Expression *exp = NULL;
 		stack_pop(&AST_STACK, (void **) &exp);
-		char *cube_name;
+		char *cube_name = NULL;
 		stack_pop(&AST_STACK, (void **) &cube_name);
 		stack_push(&AST_STACK, ExpFnLookUpCube_creat(cube_name, NULL, exp));
 	}
@@ -443,14 +450,14 @@ exp_fn__look_up_cube:
 
 exp_fn_count:
 	COUNT ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
-		SetDef *set_def;
+		SetDef *set_def = NULL;
 		stack_pop(&AST_STACK, (void **) &set_def);
 		ExpFnCount *count = ExpFnCount_creat();
 		ExpFnCount_set_setDef(count, set_def);
 		stack_push(&AST_STACK, count);
 	}
   | COUNT ROUND_BRACKET_L set_statement COMMA EXCLUDEEMPTY ROUND_BRACKET_R {
-		SetDef *set_def;
+		SetDef *set_def = NULL;
 		stack_pop(&AST_STACK, (void **) &set_def);
 		ExpFnCount *count = ExpFnCount_creat();
 		ExpFnCount_set_setDef(count, set_def);
@@ -458,7 +465,7 @@ exp_fn_count:
 		stack_push(&AST_STACK, count);
 	}
   | COUNT ROUND_BRACKET_L set_statement COMMA INCLUDEEMPTY ROUND_BRACKET_R {
-		SetDef *set_def;
+		SetDef *set_def = NULL;
 		stack_pop(&AST_STACK, (void **) &set_def);
 		ExpFnCount *count = ExpFnCount_creat();
 		ExpFnCount_set_setDef(count, set_def);
@@ -482,7 +489,7 @@ exp_fn_sum:
 
 cube__statement:
 	var_or_block {
-		char *cube_name;
+		char *cube_name = NULL;
 		stack_pop(&AST_STACK, (void **) &cube_name);
 		CubeDef *cube_def = ids_cubedef_new(cube_name);
 		stack_push(&AST_STACK, cube_def);
@@ -491,14 +498,14 @@ cube__statement:
 
 axes_statement:
 	axis_statement {
-		AxisDef *ax_def;
+		AxisDef *ax_def = NULL;
 		stack_pop(&AST_STACK, (void **) &ax_def);
 		ArrayList *ax_def_ls = als_new(32, "AxisDef *", THREAD_MAM, NULL);
 		als_add(ax_def_ls, ax_def);
 		stack_push(&AST_STACK, ax_def_ls);
 	}
   | axes_statement COMMA axis_statement {
-		AxisDef *ax_def;
+		AxisDef *ax_def = NULL;
 		stack_pop(&AST_STACK, (void **) &ax_def);
 		ArrayList *ax_def_ls;
 		stack_pop(&AST_STACK, (void **) &ax_def_ls);
@@ -509,9 +516,9 @@ axes_statement:
 
 axis_statement:
 	set_statement ON axis_num {
-		void *ax_num;
+		void *ax_num = NULL;
 		stack_pop(&AST_STACK, &ax_num);
-		SetDef *set_def;
+		SetDef *set_def = NULL;
 		stack_pop(&AST_STACK, (void **) &set_def);
 		AxisDef *axis_def = ids_axisdef_new(set_def, (unsigned short)(*(long *)&ax_num));
 		stack_push(&AST_STACK, axis_def);
@@ -541,7 +548,7 @@ axis_num:
 
 set_statement:
 	BRACE_L tuples_statement BRACE_R {
-		ArrayList *t_def_ls;
+		ArrayList *t_def_ls = NULL;
 		stack_pop(&AST_STACK, (void **) &t_def_ls);
 		SetDef *set_def = ids_setdef_new(SET_DEF__TUP_DEF_LS);
 		ids_setdef__set_tuple_def_ls(set_def, t_def_ls);
@@ -579,7 +586,7 @@ set_statement:
 
 set_function_template:
 	CHILDREN ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		MemberDef *mbr_def;
+		MemberDef *mbr_def = NULL;
 		stack_pop(&AST_STACK, (void **) &mbr_def);
 		SetFnChildren *fn = SetFnChildren_creat(mbr_def);
 		stack_push(&AST_STACK, fn);
@@ -591,7 +598,7 @@ set_function_template:
 	}
   | MEMBERS ROUND_BRACKET_L dimension_statement COMMA var_or_block ROUND_BRACKET_R {
 		SetFnMembers *fn_ms = SetFnMembers_creat();
-		char *option;
+		char *option = NULL;
 		stack_pop(&AST_STACK, (void **) &option);
 		strcpy(fn_ms->option, option);
 		stack_pop(&AST_STACK, (void **) &(fn_ms->dr_def));
@@ -605,7 +612,7 @@ set_function_template:
 	}
   | CROSS_JOIN ROUND_BRACKET_L set_list ROUND_BRACKET_R {
 		SetFnCrossJoin *cross_join = SetFnCrossJoin_creat();
-		ArrayList *set_def_ls;
+		ArrayList *set_def_ls = NULL;
 		stack_pop(&AST_STACK, (void **) &set_def_ls);
 		int i, len = als_size(set_def_ls);
 		for (i=0;i<len;i++) {
@@ -614,47 +621,47 @@ set_function_template:
 		stack_push(&AST_STACK, cross_join);
 	}
   | FILTER ROUND_BRACKET_L set_statement COMMA boolean_expression ROUND_BRACKET_R {
-		BooleanExpression *bool_exp;
-		SetDef *set_def;
+		BooleanExpression *bool_exp = NULL;
+		SetDef *set_def = NULL;
 		stack_pop(&AST_STACK, (void **) &bool_exp);
 		stack_pop(&AST_STACK, (void **) &set_def);
 		SetFnFilter *filter = SetFnFilter_creat(set_def, bool_exp);
 		stack_push(&AST_STACK, filter);
 	}
   | LATERAL_MEMBERS ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		MemberDef *mbr_def;
+		MemberDef *mbr_def = NULL;
 		stack_pop(&AST_STACK, (void **) &mbr_def);
 		SetFnLateralMembers *lateral_ms = SetFnLateralMembers_creat(mbr_def);
 		stack_push(&AST_STACK, lateral_ms);
 	}
   | ORDER ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
-		Expression *exp;
+		Expression *exp = NULL;
 		stack_pop(&AST_STACK, (void **) &exp);
-		SetDef *set;
+		SetDef *set = NULL;
 		stack_pop(&AST_STACK, (void **) &set);
 		SetFnOrder *order = SetFnOrder_creat(set, exp, SET_FN__ORDER_ASC);
 		stack_push(&AST_STACK, order);
 	}
   | ORDER ROUND_BRACKET_L set_statement COMMA expression COMMA ASC ROUND_BRACKET_R {
-		Expression *exp;
+		Expression *exp = NULL;
 		stack_pop(&AST_STACK, (void **) &exp);
-		SetDef *set;
+		SetDef *set = NULL;
 		stack_pop(&AST_STACK, (void **) &set);
 		SetFnOrder *order = SetFnOrder_creat(set, exp, SET_FN__ORDER_ASC);
 		stack_push(&AST_STACK, order);
 	}
   | ORDER ROUND_BRACKET_L set_statement COMMA expression COMMA DESC ROUND_BRACKET_R {
-		Expression *exp;
+		Expression *exp = NULL;
 		stack_pop(&AST_STACK, (void **) &exp);
-		SetDef *set;
+		SetDef *set = NULL;
 		stack_pop(&AST_STACK, (void **) &set);
 		SetFnOrder *order = SetFnOrder_creat(set, exp, SET_FN__ORDER_DESC);
 		stack_push(&AST_STACK, order);
 	}
   | ORDER ROUND_BRACKET_L set_statement COMMA expression COMMA BASC ROUND_BRACKET_R {
-		Expression *exp;
+		Expression *exp = NULL;
 		stack_pop(&AST_STACK, (void **) &exp);
-		SetDef *set;
+		SetDef *set = NULL;
 		stack_pop(&AST_STACK, (void **) &set);
 		SetFnOrder *order = SetFnOrder_creat(set, exp, SET_FN__ORDER_BASC);
 		stack_push(&AST_STACK, order);
@@ -917,11 +924,20 @@ boolean_factory:
 		stack_push(&AST_STACK, bf);
 	}
   | ROUND_BRACKET_L boolean_expression ROUND_BRACKET_R {
-		BooleanExpression *bool_exp;
+		BooleanExpression *bool_exp = NULL;
 		stack_pop(&AST_STACK, (void **) &bool_exp);
 		BooleanFactory *bf = BooleanFactory_creat(NULL, 0, NULL);
 		BooleanFactory_setBoolExp(bf, bool_exp);
 		stack_push(&AST_STACK, bf);
+	}
+  | boolean_function {
+		void *ast_bool_fn = NULL;
+		stack_pop(&AST_STACK, (void **)&ast_bool_fn);
+
+		BooleanFactory *bool_fac = mam_alloc(sizeof(BooleanFactory), OBJ_TYPE__BooleanFactory, NULL, 0);
+		bool_fac->ast_boolean_func = ast_bool_fn;
+
+		stack_push(&AST_STACK, bool_fac);
 	}
 ;
 
@@ -1004,6 +1020,19 @@ tuple_statement:
 
 		stack_push(&AST_STACK, t_def);
 	}
+  /* |
+	mdm_entity_universal_path {
+		MDMEntityUniversalPath *universal_path = NULL;
+		stack_pop(&AST_STACK, (void **)&universal_path);
+
+		ArrayList *up_ls = als_new(1, "<MDMEntityUniversalPath *>", THREAD_MAM, NULL);
+		als_add(up_ls, universal_path);
+
+		TupleDef *tuple_def = ids_tupledef_new(TUPLE_DEF__UPATH_LS);
+		tuple_def->universal_path_ls = up_ls;
+
+		stack_push(&AST_STACK, tuple_def);
+	} */
 ;
 
 /* mbrs_statement:
@@ -1566,6 +1595,25 @@ dims_and_roles:
 	}
 ;
 
+boolean_function:
+	logical_func_isEmpty {
+		// don't need do anything at here.
+	}
+;
+
+logical_func_isEmpty:
+	IS_EMPTY ROUND_BRACKET_L expression ROUND_BRACKET_R {
+		Expression *_exp = NULL;
+		stack_pop(&AST_STACK, (void **)&_exp);
+
+		ASTLogicalFunc_IsEmpty *is_empty = mam_alloc(sizeof(ASTLogicalFunc_IsEmpty), OBJ_TYPE__ASTLogicalFunc_IsEmpty, NULL, 0);
+		is_empty->head.interpret = interpret_ast_is_empty;
+
+		is_empty->exp = _exp;
+
+		stack_push(&AST_STACK, is_empty);
+	}
+;
 
 mrfn_Parent_suftpl:
 	PARENT {

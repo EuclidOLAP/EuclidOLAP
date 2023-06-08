@@ -154,11 +154,7 @@ Term *Term_creat();
 void Term_mul_factory(Term *t, Factory *f);
 void Term_div_factory(Term *t, Factory *f);
 
-typedef struct term_expression
-{
-    ArrayList *plus_terms;
-    ArrayList *minus_terms;
-} Expression;
+
 Expression *Expression_creat();
 void Expression_plus_term(Expression *e, Term *t);
 void Expression_minus_term(Expression *e, Term *t);
@@ -247,6 +243,8 @@ typedef struct Boolean_Factory_
     Expression *left__exp;
     Expression *right_exp;
     void *boolean_expression;
+
+    void *ast_boolean_func;
 } BooleanFactory;
 BooleanFactory *BooleanFactory_creat(Expression *, char, Expression *);
 void BooleanFactory_setBoolExp(BooleanFactory *bf, void *boolean_expression);

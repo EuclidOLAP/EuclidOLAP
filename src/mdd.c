@@ -14,6 +14,7 @@
 #include "vce.h"
 #include "utils.h"
 #include "obj-type-def.h"
+#include "mdm-astlogifn-interpreter.h"
 
 // extern Stack AST_STACK;
 
@@ -2163,6 +2164,12 @@ void BooleanTerm_evaluate(MDContext *md_ctx, BooleanTerm *boolTerm, Cube *cube, 
 
 void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data)
 {
+	if (boolFac->ast_boolean_func) {
+		((ASTFunctionCommonHead *)boolFac->ast_boolean_func)
+			->interpret(md_ctx, grid_data, boolFac->ast_boolean_func, ctx_tuple, cube);
+		return;
+	}
+
 	grid_data->null_flag = 0;
 	grid_data->type = GRIDDATA_TYPE_BOOL;
 	grid_data->boolean = GRIDDATA_BOOL_FALSE;
@@ -3825,7 +3832,7 @@ void *up_evolving(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube *cube, Mdd
 		// TODO elei is a define of AST member function.
 		if (is_type_astmemberfunc(_type)) {
 			// entity = _up_interpret_astmrfn(md_ctx, entity, elei, cube, ctx_tuple);
-			entity = ((ASTCommonMemberFunc *)elei)->interpret(md_ctx, entity, elei, ctx_tuple, cube);
+			entity = ((ASTFunctionCommonHead *)elei)->interpret(md_ctx, entity, elei, ctx_tuple, cube);
 			continue;
 		}
 

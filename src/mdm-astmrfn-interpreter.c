@@ -18,7 +18,7 @@ void *interpret_ast_mrf_parent
 
     MDContext *md_ctx = __md_context;
     ASTMemberFunc_Parent *func_parent = __ast_member_func;
-    MddTuple *ctx_cube = __context_tuple;
+    MddTuple *ctx_tuple = __context_tuple;
     Cube *cube = __cube;
 
     MddMemberRole *member_role = NULL;
@@ -41,7 +41,7 @@ void *interpret_ast_mrf_parent
     }
 
     if (member_role == NULL)
-        member_role = ids_mbrsdef__build(md_ctx, func_parent->ast_member, ctx_cube, cube);
+        member_role = ids_mbrsdef__build(md_ctx, func_parent->ast_member, ctx_tuple, cube);
 
     // when current member has no parent, return itself.
     if (member_role->member->p_gid)

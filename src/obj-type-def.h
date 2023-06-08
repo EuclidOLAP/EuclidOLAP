@@ -9,9 +9,10 @@ typedef short type_obj;
 
 
 #define is_type_astmemberfunc(obj_type) (obj_type >= OBJ_TYPE__ASTMEMBERFUNC__MIN && obj_type <= OBJ_TYPE__ASTMEMBERFUNC__MAX)
+#define is_type_astlogicalfunc(obj_type) (obj_type >= OBJ_TYPE__ASTLOGICALFUNC__MIN && obj_type <= OBJ_TYPE__ASTLOGICALFUNC__MAX)
 
 
-// The range reserved for the member functions of the AST is 1~200.
+// The range reserved for the member functions of the AST is 1 ~ 200.
 #define OBJ_TYPE__ASTMEMBERFUNC__MIN 1
 
 #define OBJ_TYPE__ASTMemberFunc_ClosingPeriod 1
@@ -27,6 +28,14 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTMemberFunc_PrevMember 11
 
 #define OBJ_TYPE__ASTMEMBERFUNC__MAX 200
+
+
+// The range reserved for the logical functions of the AST is 201 ~ 300.
+#define OBJ_TYPE__ASTLOGICALFUNC__MIN       201
+
+#define OBJ_TYPE__ASTLogicalFunc_IsEmpty    201
+
+#define OBJ_TYPE__ASTLOGICALFUNC__MAX       300
 
 
 #define OBJ_TYPE__RAW_BYTES 10001
