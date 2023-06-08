@@ -822,6 +822,43 @@ from [Online Store];
 
 ---
 
+select
+{
+    measure.[sales amount]
+} on 0,
+crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)) on 1
+from [Online Store]
+where
+([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes]);
+
+---
+
+with
+member measure.EEEEEEEEE as IIf(isEmpty( (measure.[sales amount]) ), 1000, 2000)
+select
+{
+    measure.[sales amount],
+    measure.EEEEEEEEE
+} on 0,
+crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)) on 1
+from [Online Store]
+where
+([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes]);
+
+---
+
+select
+measure.[sales amount] on 0,
+Filter(
+    crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)),
+    isEmpty((measure.[sales amount]))
+) on 1
+from [Online Store]
+where
+([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes]);
+
+---
+
 with
 member measure.[################ finished ################] as 660880
 member measure.[##########################################] as 660880

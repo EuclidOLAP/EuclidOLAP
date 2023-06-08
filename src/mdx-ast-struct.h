@@ -37,23 +37,33 @@ typedef struct member_definition
 } MemberDef;
 
 
-// The common head of AST member function define.
-typedef struct _ast_common_member_func_
+typedef struct term_expression
+{
+    ArrayList *plus_terms;
+    ArrayList *minus_terms;
+} Expression;
+
+
+// The common head of AST function defines.
+typedef struct _ast_function_common_head_
 {
     /*
      * @param  md_context      - MDContext
-     * @param  prefix_option   - Represents default option when shortened form
+     * @param  prefix_option   - Represents the default entity option when the function is a suffix,
+     *                           the default option may be a multidimensional model entity
+     *                           (dimension, hierarchy, level, member) or a set or tuple.
+     *                           In the case of a logical function, this parameter represents a GridData pointer.
      * @param  ast_member_func - AST member function define
      * @param  context_tuple   - MddTuple
      * @param  cube            - Cube
      * @return MddMemberRole
      */
     void *(* interpret)(void *md_context, void *prefix_option, void *ast_member_func, void *context_tuple, void *cube);
-} ASTCommonMemberFunc;
+} ASTFunctionCommonHead;
 
 typedef struct _ast_member_func_parent_
 {
-    ASTCommonMemberFunc head;
+    ASTFunctionCommonHead head;
     MemberDef *ast_member;
 } ASTMemberFunc_Parent;
 
@@ -62,5 +72,11 @@ typedef struct _member_role_func_parent_ {
     char suf_flag;
     MDMEntityUniversalPath *hierarchy;
 } MemberRoleFuncParent;
+
+typedef struct _ast_logical_func_is_empty_
+{
+    ASTFunctionCommonHead head;
+    Expression *exp;
+} ASTLogicalFunc_IsEmpty;
 
 #endif
