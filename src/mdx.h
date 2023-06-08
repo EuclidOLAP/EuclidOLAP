@@ -61,11 +61,15 @@ typedef struct dim_role_def
 DimRoleDef *DimRoleDef_creat();
 
 #define TUPLE_DEF__MBRS_DEF 1
+#define TUPLE_DEF__UPATH_LS 2
 
 typedef struct tuple_definition
 {
     ids_ct t_cons;
     MembersDef *ms_def;
+
+    // ArrayList<MDMEntityUniversalPath>
+    ArrayList *universal_path_ls;
 } TupleDef;
 
 TupleDef *ids_tupledef_new(ids_ct);

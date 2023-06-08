@@ -987,16 +987,26 @@ tuples_statement:
 ;
 
 tuple_statement:
-	ROUND_BRACKET_L mbrs_statement ROUND_BRACKET_R {
+	/* ROUND_BRACKET_L mbrs_statement ROUND_BRACKET_R {
 		MembersDef *ms_def;
 		stack_pop(&AST_STACK, (void **) &ms_def);
 		TupleDef *t_def = ids_tupledef_new(TUPLE_DEF__MBRS_DEF);
 		ids_tupledef___set_mbrs_def(t_def, ms_def);
 		stack_push(&AST_STACK, t_def);
 	}
+  | */
+	ROUND_BRACKET_L up_list ROUND_BRACKET_R {
+		ArrayList *up_ls = NULL;
+		stack_pop(&AST_STACK, (void **) &up_ls);
+
+		TupleDef *t_def = ids_tupledef_new(TUPLE_DEF__UPATH_LS);
+		t_def->universal_path_ls = up_ls;
+
+		stack_push(&AST_STACK, t_def);
+	}
 ;
 
-mbrs_statement:
+/* mbrs_statement:
 	member_statement {
 		MemberDef *mbr_def;
 		stack_pop(&AST_STACK, (void **) &mbr_def);
@@ -1012,7 +1022,7 @@ mbrs_statement:
 		ids_mbrsdef__add_mbr_def(ms_def, mbr_def);
 		stack_push(&AST_STACK, ms_def);
   }
-;
+; */
 
 member_statement:
 	var_block_chain {
@@ -1864,6 +1874,31 @@ mdm_entity_universal_path:
 
 		als_add(up->list, suf_setfn_tpl);
 		stack_push(&AST_STACK, up);
+	}
+;
+
+
+up_list:
+	mdm_entity_universal_path {
+		MDMEntityUniversalPath *universal_path = NULL;
+		stack_pop(&AST_STACK, (void **) &universal_path);
+
+		ArrayList *up_ls = als_new(8, "<MDMEntityUniversalPath *>", THREAD_MAM, NULL);
+		als_add(up_ls, universal_path);
+
+		stack_push(&AST_STACK, up_ls);
+	}
+  |
+	up_list COMMA mdm_entity_universal_path {
+		MDMEntityUniversalPath *universal_path = NULL;
+		stack_pop(&AST_STACK, (void **) &universal_path);
+
+		ArrayList *up_ls = NULL;
+		stack_pop(&AST_STACK, (void **) &up_ls);
+
+		als_add(up_ls, universal_path);
+
+		stack_push(&AST_STACK, up_ls);
 	}
 ;
 
