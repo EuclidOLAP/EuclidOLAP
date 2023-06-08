@@ -1415,15 +1415,47 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 
 static MddTuple *ids_tupledef__build(MDContext *md_ctx, TupleDef *t_def, MddTuple *context_tuple, Cube *cube)
 {
-	MddTuple *t = (MddTuple *)mdd_tp__create();
-	int i, len = als_size(t_def->ms_def->mbr_def_ls);
-	for (i = 0; i < len; i++)
-	{
-		MemberDef *m_def = als_get(t_def->ms_def->mbr_def_ls, i);
-		MddMemberRole *mr = ids_mbrsdef__build(md_ctx, m_def, context_tuple, cube);
-		mdd_tp__add_mbrole(t, mr);
+	// MddTuple *t = (MddTuple *)mdd_tp__create();
+	// int i, len = als_size(t_def->ms_def->mbr_def_ls);
+	// for (i = 0; i < len; i++)
+	// {
+	// 	MemberDef *m_def = als_get(t_def->ms_def->mbr_def_ls, i);
+	// 	MddMemberRole *mr = ids_mbrsdef__build(md_ctx, m_def, context_tuple, cube);
+	// 	mdd_tp__add_mbrole(t, mr);
+	// }
+	// return t;
+
+	MddTuple *tuple = mdd_tp__create();
+
+	if (t_def->t_cons == TUPLE_DEF__UPATH_LS) {
+		int up_size = als_size(t_def->universal_path_ls);
+		for (int i=0; i<up_size; i++) {
+			// void *up_evolving(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube *cube, MddTuple *ctx_tuple);
+			MddMemberRole *member_role = up_evolving(md_ctx, als_get(t_def->universal_path_ls, i), cube, context_tuple);
+
+			short obj_type;
+			enum_oms obj_strat;
+			MemAllocMng *mam;
+			obj_info(member_role, &obj_type, &obj_strat, &mam);
+
+			if (obj_type != OBJ_TYPE__MddMemberRole) {
+				MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+				thrd_mam->exception_desc = "exception: Tuples can only consist of dimension members.";
+				longjmp(thrd_mam->excep_ctx_env, -1);
+			}
+
+			mdd_tp__add_mbrole(tuple, member_role);
+		}
+		return tuple;
 	}
-	return t;
+
+	if (t_def->t_cons == TUPLE_DEF__MBRS_DEF) {
+		log_print("[ error ] - ids_tupledef__build :: !\n");
+		exit(EXIT_FAILURE);
+	}
+
+	log_print("[ error ] - ids_tupledef__build :: ?\n");
+	exit(EXIT_FAILURE);
 }
 
 MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple *context_tuple, Cube *cube)
@@ -3543,7 +3575,7 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	MemAllocMng *_mam;
 	obj_info(seg_0, &_type, &_strat, &_mam);
 
-	log_print("[ debug ] _up_interpret_0 :: _type = %d\n", _type);
+	// log_print("[ debug ] _up_interpret_0 :: _type = %d\n", _type);
 
 	if (_type == OBJ_TYPE__MdmEntityUpSegment) {
 		MdmEntityUpSegment *up_seg = seg_0;
@@ -3551,25 +3583,37 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 		if (up_seg->type == MEU_SEG_TYPE_TXT) {
 
 			// Match a custom set template to interpret and return the corresponding set entity.
-			int set_formulas_size = md_ctx->select_def->set_formulas ? als_size(md_ctx->select_def->set_formulas) : 0;
-			for (int i = 0; i < set_formulas_size; i++) {
-				SetFormula *sf = als_get(md_ctx->select_def->set_formulas, i);
-				if (strcmp(up_seg->info.seg_str, sf->var_block) == 0) {
-					return ids_setdef__build(md_ctx, sf->set_def, ctx_tuple, cube);
+			// for lookupCube function
+			if (md_ctx) {
+				int set_formulas_size = md_ctx->select_def->set_formulas ? als_size(md_ctx->select_def->set_formulas) : 0;
+				for (int i = 0; i < set_formulas_size; i++) {
+					SetFormula *sf = als_get(md_ctx->select_def->set_formulas, i);
+					if (strcmp(up_seg->info.seg_str, sf->var_block) == 0) {
+						return ids_setdef__build(md_ctx, sf->set_def, ctx_tuple, cube);
+					}
 				}
 			}
 
 			// In most cases, this represents a dimension role.
+
+			// it is not a measure dimension role
 			for (int i=0; i<als_size(cube->dim_role_ls); i++) {
 				DimensionRole *dim_role = als_get(cube->dim_role_ls, i);
 				if (strcmp(up_seg->info.seg_str, dim_role->name) == 0) {
 					return dim_role;
 				}
 			}
+
+			// it is a measure dimension role
+			if (strcmp(up_seg->info.seg_str, STANDARD_MEASURE_DIMENSION) == 0) {
+				DimensionRole *measure_dr = mam_alloc(sizeof(DimensionRole), OBJ_TYPE__DimensionRole, NULL, 0);
+				strcpy(measure_dr->name, STANDARD_MEASURE_DIMENSION);
+				return measure_dr;
+			}
 		}
 
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-		thrd_mam->exception_desc = "exception: // TODO _up_interpret_0 :: Code is missing.";
+		thrd_mam->exception_desc = "exception: // TODO _up_interpret_0 :: Code is missing(0).";
 		longjmp(thrd_mam->excep_ctx_env, -1);
 	}
 
@@ -3619,7 +3663,7 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	}
 
 	MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-	thrd_mam->exception_desc = "exception: // TODO _up_interpret_0 :: Code is missing.";
+	thrd_mam->exception_desc = "exception: // TODO _up_interpret_0 :: Code is missing(1).";
 	longjmp(thrd_mam->excep_ctx_env, -1);
 }
 
@@ -3634,6 +3678,9 @@ static void *_up_interpret_segment_mr(MDContext *md_ctx, MddMemberRole *mr, MdmE
 			if (m->p_gid == member->gid && strcmp(seg->info.seg_str, m->name) == 0)
 				return mdd_mr__create(m, mr->dim_role);
 		}
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: // TODO _up_interpret_segment_mr :: MDX could not be resolved.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
 	}
 
 
@@ -3648,6 +3695,8 @@ static void *_up_interpret_segment_mr(MDContext *md_ctx, MddMemberRole *mr, MdmE
 
 		return NULL;
 	}
+
+	return NULL;
 }
 
 static void *_up_interpret_segment_dr(MDContext *md_ctx, DimensionRole *dr, MdmEntityUpSegment *seg, Cube *cube, MddTuple *ctx_tuple) {
@@ -3663,11 +3712,41 @@ static void *_up_interpret_segment_dr(MDContext *md_ctx, DimensionRole *dr, MdmE
 				return mdd_mr__create(m, dr);
 		}
 
+		// measure member role
+		if (strcmp(dr->name, STANDARD_MEASURE_DIMENSION) == 0) {
+			int mmsize = als_size(cube->measure_mbrs);
+			for (int i=0; i<mmsize; i++) {
+				Member *m = als_get(cube->measure_mbrs, i);
+				if (strcmp(seg->info.seg_str, m->name) == 0)
+					return mdd_mr__create(m, NULL);
+			}
+			// It is possible to correspond to a formula member of the measure dimension, so no exception can be thrown here.
+		}
+
+		// Custom formula member
+		if (md_ctx && md_ctx->select_def->member_formulas) {
+			int fms_size = als_size(md_ctx->select_def->member_formulas);
+			for (int i=0; i<fms_size; i++) {
+				MemberFormula *formula = als_get(md_ctx->select_def->member_formulas, i);
+				if ((!strcmp(dr->name, als_get(formula->path, 0))) && (!strcmp(seg->info.seg_str, als_get(formula->path, 1)))) {
+					MddMemberRole *f_mr = mam_alloc(sizeof(MddMemberRole), OBJ_TYPE__MddMemberRole, NULL, 0);
+
+					if (strcmp(dr->name, STANDARD_MEASURE_DIMENSION))
+						f_mr->dim_role = dr;
+
+					f_mr->member_formula = formula;
+					return f_mr;
+				}
+			}
+		}
+
 		// TODO HierarchyRole
 
 		// TODO LevelRole
 
-		return NULL;
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: // TODO _up_interpret_segment_dr :: MDX could not be resolved.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
 	}
 	
 
@@ -3683,6 +3762,7 @@ static void *_up_interpret_segment_dr(MDContext *md_ctx, DimensionRole *dr, MdmE
 		return NULL;
 	}
 
+	return NULL;
 }
 
 static void *_up_interpret_segment(MDContext *md_ctx, void *entity, MdmEntityUpSegment *seg, Cube *cube, MddTuple *ctx_tuple) {
@@ -3728,7 +3808,7 @@ void *up_evolving(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube *cube, Mdd
 	enum_oms _strat;
 	MemAllocMng *_mam;
 	obj_info(entity, &_type, &_strat, &_mam);
-	log_print("[ debug ] up_evolving :: _type = %d\n", _type);
+	// log_print("[ debug ] up_evolving :: _type = %d\n", _type);
 
 	int size = als_size(up->list);
 
