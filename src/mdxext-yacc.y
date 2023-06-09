@@ -334,7 +334,25 @@ factory:
 		f->decimal = strtod(yytext, NULL);
 		stack_push(&AST_STACK, f);
 	}
-  |	tuple_statement {
+  |
+	mdm_entity_universal_path {
+		MDMEntityUniversalPath *universal_path = NULL;
+		stack_pop(&AST_STACK, (void **)&universal_path);
+
+		ArrayList *up_ls = als_new(8, "<MDMEntityUniversalPath *>", THREAD_MAM, NULL);
+		als_add(up_ls, universal_path);
+
+		TupleDef *t_def = ids_tupledef_new(TUPLE_DEF__UPATH_LS);
+		t_def->universal_path_ls = up_ls;
+
+		Factory *factory = Factory_creat();
+		factory->t_cons = FACTORY_DEF__TUP_DEF;
+		factory->tuple_def = t_def;
+
+		stack_push(&AST_STACK, factory);
+	}
+  |
+	tuple_2__ {
 		TupleDef *t_def = NULL;
 		stack_pop(&AST_STACK, (void **) &t_def);
 
@@ -739,22 +757,47 @@ set_function_template:
 		stack_pop(&AST_STACK, (void **) &mbr_def);
 		stack_push(&AST_STACK, SetFnDescendants_creat(mbr_def, lvr_def, NULL, flag));
 	}
-  | DESCENDANTS ROUND_BRACKET_L member_statement COMMA expression ROUND_BRACKET_R {
-		Expression *distance;
-		stack_pop(&AST_STACK, (void **) &distance);
-		MemberDef *mbr_def;
-		stack_pop(&AST_STACK, (void **) &mbr_def);
+  |
+	DESCENDANTS ROUND_BRACKET_L member_statement COMMA DECIMAL {
+		Factory *f = Factory_creat();
+		f->t_cons = FACTORY_DEF__DECIMAL;
+		f->decimal = strtod(yytext, NULL);
+
+		Term *t = Term_creat();
+		Term_mul_factory(t, f);
+
+		Expression *distance = Expression_creat();
+		Expression_plus_term(distance, t);
+
+		MemberDef *mbr_def = NULL;
+		stack_pop(&AST_STACK, (void **)&mbr_def);
 		stack_push(&AST_STACK, SetFnDescendants_creat(mbr_def, NULL, distance, SET_FN__DESCENDANTS_OPT_SELF));
-	}
-  | DESCENDANTS ROUND_BRACKET_L member_statement COMMA expression COMMA desc_flag ROUND_BRACKET_R {
+	} ROUND_BRACKET_R
+  |
+	DESCENDANTS ROUND_BRACKET_L member_statement COMMA DECIMAL {
+		Factory *f = Factory_creat();
+		f->t_cons = FACTORY_DEF__DECIMAL;
+		f->decimal = strtod(yytext, NULL);
+
+		Term *t = Term_creat();
+		Term_mul_factory(t, f);
+
+		Expression *distance = Expression_creat();
+		Expression_plus_term(distance, t);
+
+		stack_push(&AST_STACK, distance);
+	} COMMA desc_flag ROUND_BRACKET_R {
 		void *vf;
 		stack_pop(&AST_STACK, (void **) &vf);
 		long *lflag = (long *)&vf;
 		char flag = *lflag;
-		Expression *distance;
+
+		Expression *distance = NULL;
 		stack_pop(&AST_STACK, (void **) &distance);
-		MemberDef *mbr_def;
+
+		MemberDef *mbr_def = NULL;
 		stack_pop(&AST_STACK, (void **) &mbr_def);
+
 		stack_push(&AST_STACK, SetFnDescendants_creat(mbr_def, NULL, distance, flag));
 	}
   | TAIL ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
@@ -999,6 +1042,18 @@ tuples_statement:
 		stack_pop(&AST_STACK, (void **) &t_def_ls);
 		als_add(t_def_ls, gce);
 		stack_push(&AST_STACK, t_def_ls);
+	}
+;
+
+tuple_2__:
+	ROUND_BRACKET_L up_list_2__ ROUND_BRACKET_R {
+		ArrayList *up_ls = NULL;
+		stack_pop(&AST_STACK, (void **) &up_ls);
+
+		TupleDef *t_def = ids_tupledef_new(TUPLE_DEF__UPATH_LS);
+		t_def->universal_path_ls = up_ls;
+
+		stack_push(&AST_STACK, t_def);
 	}
 ;
 
@@ -1925,6 +1980,33 @@ mdm_entity_universal_path:
 	}
 ;
 
+up_list_2__:
+	mdm_entity_universal_path COMMA mdm_entity_universal_path {
+		MDMEntityUniversalPath *up_1 = NULL;
+		stack_pop(&AST_STACK, (void **)&up_1);
+
+		MDMEntityUniversalPath *up_2 = NULL;
+		stack_pop(&AST_STACK, (void **)&up_2);
+		
+		ArrayList *up_ls = als_new(8, "<MDMEntityUniversalPath *>", THREAD_MAM, NULL);
+		als_add(up_ls, up_1);
+		als_add(up_ls, up_2);
+
+		stack_push(&AST_STACK, up_ls);
+	}
+  |
+	up_list_2__ COMMA mdm_entity_universal_path {
+		MDMEntityUniversalPath *universal_path = NULL;
+		stack_pop(&AST_STACK, (void **) &universal_path);
+
+		ArrayList *up_ls = NULL;
+		stack_pop(&AST_STACK, (void **) &up_ls);
+
+		als_add(up_ls, universal_path);
+
+		stack_push(&AST_STACK, up_ls);
+	}
+;
 
 up_list:
 	mdm_entity_universal_path {
@@ -2060,9 +2142,9 @@ chain_ring:
 	var_or_block {
 		// do nothing
 	}
-  | str {
+  /* | str {
 		// do nothing
-	}
+	} */
 ;
 
 general_chain:

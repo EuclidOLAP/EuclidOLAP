@@ -860,6 +860,112 @@ where
 ---
 
 with
+member measure.EEEEEEEEE as IIf(isEmpty(measure.[sales amount]), 1000, 2000)
+select
+{
+    measure.[sales amount],
+    measure.EEEEEEEEE
+} on 0,
+crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)) on 1
+from [Online Store]
+where
+([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes]);
+
+---
+
+with
+member measure.EEEEEEEEE as IIf(isEmpty(measure.[sales amount]), 1000, 2000)
+select
+{
+    measure.[sales amount],
+    (measure.EEEEEEEEE)
+} on 0,
+crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)) on 1
+from [Online Store]
+where
+([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes]);
+
+---
+
+with 
+member Calendar.[First half 2020] 
+as [Calendar].[2020].[Q1] + [Calendar].[2020].[Q2]
+member Calendar.[Second half 2020] as ([Calendar].[2020].[Q3]) + [Calendar].[2020].[Q4]
+select 
+{ 
+    ([Calendar].[2020].[Q1]), 
+    ([Calendar].[2020].[Q2]), 
+    ([Calendar].[2020].[Q3]), 
+    ([Calendar].[2020].[Q4]), 
+    Calendar.[First half 2020], 
+    Calendar.[Second half 2020]
+} on 0, 
+{ 
+    ([Payment Method].[Credit Card]), 
+    [Payment Method].[Debit Card], 
+    ([Payment Method].[Account Balance]) 
+} on 1 
+from [Online Store];
+
+---
+
+with 
+member measure.XXX 
+    as (measure.[sales amount], parallelPeriod(Calendar.year)) 
+select 
+{ Calendar.[ALL].[2021].Q4.M12 } on 0, 
+{ measure.XXX } on 1 
+from [Online Store] ;
+
+
+---
+
+with 
+member measure.SSSSSS as lookUpCube("logistics.test", "(measure.cost)") 
+select 
+{ ( measure.[sales amount] ), measure.SSSSSS } on 0, 
+children(Calendar.[ALL].[2021]) on 1 
+from [Online Store] ;
+
+---
+
+with member [measure].proportion as [measure].Turnover / ([Service Type].[ALL], [measure].Turnover)
+select
+{Date.[ALL].[2020],Date.[ALL].[2021],Date.[ALL].[2022]} on 1,
+members([Service Type], LEAFS) on 0
+from [Airline Turnover]
+where ([measure].proportion, [Aircraft Type].[ALL].[Airbus].[Airbus A380]);
+
+---
+
+select
+{ 
+    [Service Type].[ALL].[Business Suite],
+    Lag ([Service Type].[ALL].[Business Suite], -
+    2),
+    Lead([Service Type].[ALL].[Business Suite], -2)
+} on rows,
+{
+    [Aircraft Type].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Type].[ALL].Boeing.[Boeing 787 Dreamliner]
+} on columns
+from [Airline Turnover];
+
+---
+
+with 
+member measure.SSSSSS as 
+    sum(Ytd(), measure.[sales amount]) 
+select { (measure.[sales amount]), measure.SSSSSS} on 1, 
+YTD() on 10 
+from [Online Store] 
+where (Calendar.[ALL].[2021].Q4.M12, [Payment Method].[ALL].[Credit Card]);
+
+
+---
+
+with
 member measure.[################ finished ################] as 660880
 member measure.[##########################################] as 660880
 select
