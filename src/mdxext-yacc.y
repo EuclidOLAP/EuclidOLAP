@@ -2134,6 +2134,18 @@ var_or_block:
   |	BLOCK	{
 		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__STRING, NULL, 0);
 		memcpy(str, yytext + 1, strlen(yytext) - 2);
+
+		int __length__ = strlen(str);
+		int _move_forward = 0;
+		for (int i = 0; i < __length__; i++) {
+			str[i - _move_forward] = str[i];
+			if (str[i] == ']') {
+				_move_forward++;
+				i++;
+			}
+		}
+		str[__length__ - _move_forward] = 0;
+
 		stack_push(&AST_STACK, str);
 	}
 ;

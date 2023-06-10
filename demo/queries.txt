@@ -962,6 +962,50 @@ YTD() on 10
 from [Online Store] 
 where (Calendar.[ALL].[2021].Q4.M12, [Payment Method].[ALL].[Credit Card]);
 
+---
+
+with 
+set [SS[]]SSS]]]]S]
+    as tail( crossjoin(LATERALMEMBERS([starting region].[ALL].[Europe]), LATERALMEMBERS(measure.income)), 8 ) 
+SELECT 
+[SS[]]SSS]]]]S] On 10, 
+LATERALMEMBERS([completion date].[ALL]) On 1 
+frOM [logistics.test] ;
+
+---
+
+with 
+set [SSSSSS]]]]]]]] [] 
+    as filter(descendants(Calendar.[ALL].[2021], 1, SELF_AND_AFTER), (measureWWWWWWWWWWWWWWWWWW.[sales amount]) > 1) 
+member measure.XXXXXX 
+    as (measuZZZZZZZZZZZZZZZZZZZre.[sales amount]) - 18000 
+select 
+    bottomPercent([SSSSSS]]]]]]]] [], 53, (measure.[XXXXXX])) on 10, 
+    {(measure.[XXXXXX])} on 1 
+from [Online Store] ;
+
+---
+
+with member [measure].[[p[ro[port]]io]]n]]] as [measure].Turnover / ([Service Type].[ALL], [measure].Turnover)
+select
+{Date.[ALL].[2020],Date.[ALL].[2021],Date.[ALL].[2022]} on 1,
+members([Service Type], LEAFS) on 0
+from [Airline Turnover]
+where ([measure].[[p[ro[port]]io]]n]]], [Aircraft Type].[ALL].[Airbus].[Airbus A380]);
+
+---
+
+with
+member measure.[[################]] finished [################]]] as 660880
+member measure.[##########################################] as 660880
+select
+{ (Calendar.[ALL]) } on 0,
+{
+    (measure.[##########################################]),
+    (measure.[[################]] finished [################]]]),
+    (measure.[##########################################])
+} on SECTIons
+from [Online Store];
 
 ---
 
