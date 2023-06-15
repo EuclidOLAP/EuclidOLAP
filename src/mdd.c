@@ -23,6 +23,7 @@
 static md_gid lastest_md_gid = -1;
 
 static ArrayList *dims_pool = NULL;
+static ArrayList *hierarchies_pool = NULL;
 static ArrayList *member_pool = NULL;
 static ArrayList *cubes_pool = NULL;
 static ArrayList *levels_pool = NULL;
@@ -32,8 +33,8 @@ static MemAllocMng *meta_mam;
 static ArrayList *agg_tasks_pool;
 static pthread_mutex_t agg_tasks_lock;
 
-static Member *_create_member_lv1(Dimension *dim, char *mbr_name);
-static Member *_create_member_child(Member *parent, char *child_name);
+static Member *_create_member_lv1(Dimension *dim, Hierarchy *hierarchy, char *mbr_name);
+static Member *_create_member_child(Hierarchy *hierarchy, Member *parent, char *child_name);
 
 static ArrayList *select_def__build_axes(MDContext *md_ctx, SelectDef *);
 
@@ -58,6 +59,7 @@ int mdd_init()
 	meta_mam = MemAllocMng_new();
 
 	dims_pool = als_new(32, "dimensions pool", SPEC_MAM, meta_mam);
+	hierarchies_pool = als_new(32, "hierarchies pool", SPEC_MAM, meta_mam);
 	member_pool = als_new(256, "members pool | Member *", SPEC_MAM, meta_mam);
 	cubes_pool = als_new(8, "cubes pool", SPEC_MAM, meta_mam);
 	levels_pool = als_new(128, "Level *", SPEC_MAM, meta_mam);
@@ -68,7 +70,6 @@ int mdd_init()
 
 static int load_dimensions()
 {
-
 	FILE *dims_file = open_file(META_DEF_DIMS_FILE_PATH, "r");
 	Dimension dim;
 	while (1)
@@ -81,6 +82,21 @@ static int load_dimensions()
 		als_add(dims_pool, dimension);
 	}
 	return fclose(dims_file);
+}
+
+static int load_hierarchies() {
+	FILE *file = open_file(META_DEF_HIERARCHIES_FILE_PATH, "r");
+	Hierarchy hier;
+	while (1)
+	{
+		if (fread(&hier, sizeof(Hierarchy), 1, file) < 1)
+			break;
+
+		Hierarchy *hierarchy = mam_alloc(sizeof(Hierarchy), OBJ_TYPE__Hierarchy, meta_mam, 0);
+		memcpy(hierarchy, &hier, sizeof(Hierarchy));
+		als_add(hierarchies_pool, hierarchy);
+	}
+	return fclose(file);
 }
 
 static int load_levels()
@@ -198,18 +214,54 @@ static int load_cubes()
 int mdd_load()
 {
 	load_dimensions();
+	load_hierarchies();
 	load_levels();
 	load_members();
 	load_cubes();
 }
 
-Member *_new_member(char *name, md_gid dim_gid, md_gid parent_gid, __u_short lv);
+Member *_new_member(char *name, md_gid dim_gid, Hierarchy *hierarchy, md_gid parent_gid, __u_short lv);
 
-Dimension *create_dimension(char *dim_name)
+
+/*
+ * @param dimension
+ * @param hierarchy_name
+ * @return
+ */
+Hierarchy *create_hierarchy(Dimension *dimension, char *hierarchy_name) {
+
+	if (strlen(hierarchy_name) >= MD_ENTITY_NAME_BYTSZ)
+	{
+		log_print("[WARN] - The hierarchy name <%s> is too long.\n", hierarchy_name);
+		return NULL;
+	}
+
+	// create a Hierarchy object.
+	Hierarchy *hierarchy = mam_alloc(sizeof(Hierarchy), OBJ_TYPE__Hierarchy, meta_mam, 0);
+	hierarchy->gid = gen_md_gid();
+	hierarchy->dimension_gid = dimension->gid;
+	memcpy(hierarchy->name, hierarchy_name, strlen(hierarchy_name));
+
+	// 2 - save the dim-obj into a persistent file.
+	append_file_data(META_DEF_HIERARCHIES_FILE_PATH, (char *)hierarchy, sizeof(Hierarchy));
+
+	als_add(hierarchies_pool, hierarchy);
+
+	return hierarchy;
+}
+
+/*
+ * @param dim_name
+ * @param hierarchy_name
+ * @param def_flag - 1 create a default hierarchy
+ * 				   - 0 isn't a default hierarchy
+ * @return
+ */
+static Dimension *create_dimension(char *dim_name, char *hierarchy_name, int def_flag)
 {
 	if (strlen(dim_name) >= MD_ENTITY_NAME_BYTSZ)
 	{
-		log_print("[WARN] - dim name too long <%s>\n", dim_name);
+		log_print("[WARN] - Dimension name <%s> is too long.\n", dim_name);
 		return NULL;
 	}
 
@@ -219,19 +271,25 @@ Dimension *create_dimension(char *dim_name)
 	memcpy(dim->name, dim_name, strlen(dim_name));
 	log_print("[INFO] create dimension [ %ld ] %s\n", dim->gid, dim->name);
 
+	Hierarchy *hierarchy = create_hierarchy(dim, hierarchy_name ? hierarchy_name : dim_name);
+	if (def_flag)
+		dim->def_hierarchy_gid = hierarchy->gid;
+
 	// 2 - save the dim-obj into a persistent file.
 	append_file_data(META_DEF_DIMS_FILE_PATH, (char *)dim, sizeof(Dimension));
 
-	// create a root level of dimension
-	Level *rootLv = Level_creat("ROOT_LEVEL", dim, 0);
-	mdd__save_level(rootLv);
-	mdd__use_level(rootLv);
-
 	als_add(dims_pool, dim);
+
+	// TODO What is the use of creating this 'ROOT LEVEL'? Can these three lines of code be removed?
+	// create a root level of dimension
+	// Level *rootLv = Level_creat("ROOT_LEVEL", dim, 0);
+	// mdd__save_level(rootLv);
+	// mdd__use_level(rootLv);
+
 	return dim;
 }
 
-int create_dims(ArrayList *dim_names, EuclidCommand **result)
+int create_dims(ArrayList *dim_names, ArrayList *def_hie_names, EuclidCommand **result)
 {
 	__uint32_t i, sz = als_size(dim_names);
 	ArrayList *dimensions_exist = als_new(sz, "char *", THREAD_MAM, NULL);
@@ -241,7 +299,8 @@ int create_dims(ArrayList *dim_names, EuclidCommand **result)
 		char *dim_name = (char *)als_get(dim_names, i);
 
 		if (find_dim_by_name(dim_name) == NULL)
-			create_dimension(dim_name);
+			// create a dimension and defalut hierarchy
+			create_dimension(dim_name, als_get(def_hie_names, i), 1);
 		else
 			als_add(dimensions_exist, dim_name);
 	}
@@ -289,7 +348,7 @@ md_gid gen_md_gid()
 	}
 }
 
-Level *Level_creat(char *name_, Dimension *dim, unsigned int level_)
+Level *Level_creat(char *name_, Dimension *dim, Hierarchy *hierarchy, unsigned int level_)
 {
 
 	if (strlen(name_) >= MD_ENTITY_NAME_BYTSZ)
@@ -300,6 +359,7 @@ Level *Level_creat(char *name_, Dimension *dim, unsigned int level_)
 	memcpy(lv->name, name_, strlen(name_));
 	lv->dim_gid = dim->gid;
 	lv->level = level_;
+	lv->hierarchy_gid = hierarchy->gid;
 
 	return lv;
 }
@@ -316,37 +376,67 @@ void mdd__use_level(Level *lv)
 
 Member *create_member(ArrayList *mbr_path)
 {
-	unsigned int sz = als_size(mbr_path);
-	int i = 0;
-	int new_leaf_mbr_lv = sz - 1;
+	char *dimension_name = als_get(mbr_path, 0);
+	Dimension *dim = find_dim_by_name(dimension_name);
 
-	Dimension *dim = find_dim_by_name(als_get(mbr_path, 0));
+	// create a dimension and defalut hierarchy
 	if (dim == NULL)
-		dim = create_dimension(als_get(mbr_path, 0));
+		dim = create_dimension(dimension_name, dimension_name, 1);
 
-	Member *mbr_lv1 = find_member_lv1(dim, als_get(mbr_path, 1));
-	if (mbr_lv1 == NULL)
-	{
-		mbr_lv1 = _create_member_lv1(dim, als_get(mbr_path, 1));
-		append_file_data(META_DEF_MBRS_FILE_PATH, (char *)mbr_lv1, sizeof(Member));
+	unsigned int sz = als_size(mbr_path);
+	int first_mbr_name_idx = 2;
 
-		als_add(member_pool, mbr_lv1);
+	Hierarchy *hierarchy = dim_find_hierarchy_by_name(dim, als_get(mbr_path, 1));
+	if (hierarchy == NULL) {
+		hierarchy = find_hierarchy(dim->def_hierarchy_gid);
+		first_mbr_name_idx = 1;
 	}
 
-	if (mbr_lv1->lv < new_leaf_mbr_lv && mdd_mbr__is_leaf(mbr_lv1))
-	{
-		mdd_mbr__set_as_leaf(mbr_lv1);
-		append_file_data(META_DEF_MBRS_FILE_PATH, (char *)mbr_lv1, sizeof(Member));
+	int new_leaf_mbr_lv = sz - first_mbr_name_idx;
+
+	// ArrayList *path_mls = als_new(8, "<Member *>", THREAD_MAM, NULL);
+
+	Member *mbr_lv1 = NULL;
+
+	mbr_lv1 = find_member_lv1(dim, hierarchy, als_get(mbr_path, first_mbr_name_idx));
+	if (mbr_lv1) {
+		// als_add(path_mls, mbr_lv1);
+		goto jump_point;
 	}
+
+	// int lv = 1;
+	// hmm_info = find_HMMountingInfo(dim, hierarchy, als_get(mbr_path, first_mbr_name_idx), &lv);
+	// if (hmm_info) {
+	// 	als_add(path_mls, hmm_info);
+	// 	goto jump_point;
+	// }
+
+	mbr_lv1 = _create_member_lv1(dim, hierarchy, als_get(mbr_path, first_mbr_name_idx));
+	append_file_data(META_DEF_MBRS_FILE_PATH, (char *)mbr_lv1, sizeof(Member));
+
+	als_add(member_pool, mbr_lv1);
+
+	// als_add(path_mls, mbr_lv1);
+
+jump_point:
+
+	if (mbr_lv1->lv < new_leaf_mbr_lv) {
+		if (mdd_mbr__is_leaf(mbr_lv1)) {
+			mdd_mbr__set_as_leaf(mbr_lv1);
+			append_file_data(META_DEF_MBRS_FILE_PATH, (char *)mbr_lv1, sizeof(Member));
+		}
+	}
+
 
 	Member *p_m = mbr_lv1;
 	Member *m = mbr_lv1;
-	for (i = 2; i < sz; i++)
+
+	for (int i = first_mbr_name_idx + 1; i < sz; i++)
 	{
 		m = find_member_child(p_m, als_get(mbr_path, i));
 		if (m == NULL)
 		{
-			m = _create_member_child(p_m, als_get(mbr_path, i));
+			m = _create_member_child(hierarchy, p_m, als_get(mbr_path, i));
 			append_file_data(META_DEF_MBRS_FILE_PATH, (char *)m, sizeof(Member));
 			als_add(member_pool, m);
 		}
@@ -400,13 +490,13 @@ Dimension *find_dim_by_gid(md_gid dim_gid)
 	return NULL;
 }
 
-Member *find_member_lv1(Dimension *dim, char *mbr_name)
+Member *find_member_lv1(Dimension *dim, Hierarchy *hierarchy, char *mbr_name)
 {
 	__uint32_t i = 0, sz = als_size(member_pool);
 	while (i < sz)
 	{
 		Member *mbr = als_get(member_pool, i++);
-		if ((strcmp(mbr_name, mbr->name) == 0) && dim->gid == mbr->dim_gid)
+		if ((strcmp(mbr_name, mbr->name) == 0) && hierarchy->gid == mbr->hierarchy_gid)
 			return mbr;
 	}
 	return NULL;
@@ -545,17 +635,17 @@ Member *find_member_child(Member *parent_mbr, char *child_name)
 	return NULL;
 }
 
-static Member *_create_member_lv1(Dimension *dim, char *mbr_name)
+static Member *_create_member_lv1(Dimension *dim, Hierarchy *hierarchy, char *mbr_name)
 {
-	return _new_member(mbr_name, dim->gid, 0, 1);
+	return _new_member(mbr_name, dim->gid, hierarchy, 0, 1);
 }
 
-static Member *_create_member_child(Member *parent, char *child_name)
+static Member *_create_member_child(Hierarchy *hierarchy, Member *parent, char *child_name)
 {
-	return _new_member(child_name, parent->dim_gid, parent->gid, parent->lv + 1);
+	return _new_member(child_name, parent->dim_gid, hierarchy, parent->gid, parent->lv + 1);
 }
 
-Member *_new_member(char *name, md_gid dim_gid, md_gid parent_gid, __u_short lv)
+Member *_new_member(char *name, md_gid dim_gid, Hierarchy *hierarchy, md_gid parent_gid, __u_short lv)
 {
 	if (strlen(name) >= MD_ENTITY_NAME_BYTSZ)
 		return NULL;
@@ -564,9 +654,10 @@ Member *_new_member(char *name, md_gid dim_gid, md_gid parent_gid, __u_short lv)
 	memcpy(mbr->name, name, strlen(name));
 	mbr->gid = gen_md_gid();
 	mbr->dim_gid = dim_gid;
+	mbr->hierarchy_gid = hierarchy->gid;
 	mbr->p_gid = parent_gid;
 	mbr->lv = lv;
-	log_print("[INFO] new Member - dim_gid [ %ld ] p_gid [% 17ld ] gid [ %ld ] name [ %s ] lv [ %d ]\n", mbr->dim_gid, mbr->p_gid, mbr->gid, mbr->name, mbr->lv);
+	log_print("[INFO] new Member - dim_gid [ %ld ] hierarchy_gid [ %ld ] p_gid [% 17ld ] gid [ %ld ] name [ %s ] lv [ %d ]\n", mbr->dim_gid, mbr->hierarchy_gid, mbr->p_gid, mbr->gid, mbr->name, mbr->lv);
 
 	return mbr;
 }
@@ -612,8 +703,9 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 		als_add(cube->dim_role_ls, d_role);
 	}
 
-	// Create a measure dimension object.
-	Dimension *mear_dim = create_dimension(STANDARD_MEASURE_DIMENSION);
+	// Create a measure dimension object, and defalut hierarchy.
+	Dimension *mear_dim = create_dimension(STANDARD_MEASURE_DIMENSION, STANDARD_MEASURE_DIMENSION, 1);
+	Hierarchy *mear_hie = find_hierarchy(mear_dim->def_hierarchy_gid);
 
 	cube->measure_dim = mear_dim;
 
@@ -621,7 +713,7 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 	size_t mea_sz = als_size(measures);
 	for (i = 0; i < mea_sz; i++)
 	{
-		Member *mea_mbr = _new_member(als_get(measures, i), mear_dim->gid, 0, 1);
+		Member *mea_mbr = _new_member(als_get(measures, i), mear_dim->gid, mear_hie, 0, 1);
 		als_add(cube->measure_mbrs, mea_mbr);
 	}
 
@@ -813,7 +905,10 @@ int gen_member_gid_abs_path(Cube *cube, ArrayList *mbr_path_str, char *abs_path)
 		if (strcmp(dim_role_name, dr->name) != 0)
 			continue;
 		dim = find_dim_by_gid(dr->dim_gid);
-		mbr = lv1_mbr = find_member_lv1(dim, (char *)als_get(mbr_path_str, 1));
+
+		Hierarchy *hierarchy = find_hierarchy(dim->def_hierarchy_gid);
+
+		mbr = lv1_mbr = find_member_lv1(dim, hierarchy, (char *)als_get(mbr_path_str, 1));
 		break;
 	}
 
@@ -1651,9 +1746,16 @@ DimensionRole *cube__dim_role(Cube *cube, char *dim_role_name)
 
 Member *dim__find_mbr(Dimension *dim, ArrayList *mbr_name_path)
 {
+	int start = 0;
+	Hierarchy *hierarchy = dim_find_hierarchy_by_name(dim, als_get(mbr_name_path, 0));
+	if (hierarchy)
+		start = 1;
+	else
+		hierarchy = find_hierarchy(dim->def_hierarchy_gid);
+
 	int i, len = als_size(mbr_name_path);
-	Member *m = find_member_lv1(dim, als_get(mbr_name_path, 0));
-	for (i = 1; i < len; i++)
+	Member *m = find_member_lv1(dim, hierarchy, als_get(mbr_name_path, start));
+	for (i = start + 1; i < len; i++)
 	{
 		if (!m)
 			break;
@@ -3604,10 +3706,12 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 			// In most cases, this represents a dimension role.
 
 			// it is not a measure dimension role
-			for (int i=0; i<als_size(cube->dim_role_ls); i++) {
-				DimensionRole *dim_role = als_get(cube->dim_role_ls, i);
-				if (strcmp(up_seg->info.seg_str, dim_role->name) == 0) {
-					return dim_role;
+			if (cube) {
+				for (int i=0; i<als_size(cube->dim_role_ls); i++) {
+					DimensionRole *dim_role = als_get(cube->dim_role_ls, i);
+					if (strcmp(up_seg->info.seg_str, dim_role->name) == 0) {
+						return dim_role;
+					}
 				}
 			}
 
@@ -3617,6 +3721,10 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 				strcpy(measure_dr->name, STANDARD_MEASURE_DIMENSION);
 				return measure_dr;
 			}
+
+			Dimension *dim = find_dim_by_name(up_seg->info.seg_str);
+			if (dim)
+				return dim;
 		}
 
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
@@ -3672,6 +3780,116 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 	thrd_mam->exception_desc = "exception: // TODO _up_interpret_0 :: Code is missing(1).";
 	longjmp(thrd_mam->excep_ctx_env, -1);
+}
+
+static void *_up_interpret_segment_hier
+	(MDContext *md_ctx, Hierarchy *hier, MdmEntityUpSegment *seg, Cube *cube, MddTuple *ctx_tuple) {
+
+	if (seg->type == MEU_SEG_TYPE_TXT) {
+		Member *member = NULL;
+		for (int i = 0; i < als_size(member_pool); i++) {
+			Member *m = als_get(member_pool, i);
+			if (m->lv > 1)
+				continue;
+
+			if (strcmp(m->name, seg->info.seg_str))
+				continue;
+
+			if (m->lv == 0)
+				return m;
+			else
+				member = m;
+		}
+
+		return member;
+	}
+
+	if (seg->type == MEU_SEG_TYPE_ID) {
+		// TODO
+		return NULL;
+	}
+
+	if (seg->type == MEU_SEG_TYPE_STAMP) {
+		// TODO
+		return NULL;
+	}
+
+	return NULL;
+}
+
+static void *_up_interpret_segment_mbr
+	(MDContext *md_ctx, Member *member, MdmEntityUpSegment *seg, Cube *cube, MddTuple *ctx_tuple) {
+
+	if (seg->type == MEU_SEG_TYPE_TXT) {
+		for (int i = 0; i < als_size(member_pool); i++) {
+			Member *m = als_get(member_pool, i);
+			if (m->p_gid == member->gid && !strcmp(m->name, seg->info.seg_str)) {
+				return m;
+			}
+		}
+	}
+
+	if (seg->type == MEU_SEG_TYPE_ID) {
+		// TODO
+		return NULL;
+	}
+
+	if (seg->type == MEU_SEG_TYPE_STAMP) {
+		// TODO
+		return NULL;
+	}
+
+	return NULL;
+}
+
+static void *_up_interpret_segment_dim
+	(MDContext *md_ctx, Dimension *dim, MdmEntityUpSegment *seg, Cube *cube, MddTuple *ctx_tuple) {
+
+	if (seg->type == MEU_SEG_TYPE_TXT) {
+		Hierarchy *hier = dim_find_hierarchy_by_name(dim, seg->info.seg_str);
+		if (hier)
+			return hier;
+
+		hier = find_hierarchy(dim->def_hierarchy_gid);
+
+		Member *root = NULL;
+		Member *member = NULL;
+		for (int i = 0; i < als_size(member_pool); i++) {
+			Member *m = als_get(member_pool, i);
+			if (m->lv > 1)
+				continue;
+
+			if (strcmp(m->name, seg->info.seg_str))
+				continue;
+
+			if (m->lv == 0)
+				root = m;
+			else
+				member = m;
+		}
+
+		if (root)
+			return root;
+
+		if (member)
+			return member;
+
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: // TODO _up_interpret_segment_dim :: do not found a member...";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
+
+	if (seg->type == MEU_SEG_TYPE_ID) {
+		// TODO
+		return NULL;
+	}
+
+	if (seg->type == MEU_SEG_TYPE_STAMP) {
+		// TODO
+		return NULL;
+	}
+
+	return NULL;
 }
 
 static void *_up_interpret_segment_mr(MDContext *md_ctx, MddMemberRole *mr, MdmEntityUpSegment *seg, Cube *cube, MddTuple *ctx_tuple) {
@@ -3791,6 +4009,21 @@ static void *_up_interpret_segment(MDContext *md_ctx, void *entity, MdmEntityUpS
 	// TODO Member Role
 	if (_type == OBJ_TYPE__MddMemberRole) {
 		return _up_interpret_segment_mr(md_ctx, entity, seg, cube, ctx_tuple);
+	}
+
+	// TODO Dimension
+	if (_type == OBJ_TYPE__Dimension) {
+		return _up_interpret_segment_dim(md_ctx, entity, seg, cube, ctx_tuple);
+	}
+
+	// TODO Member
+	if (_type == OBJ_TYPE__Member) {
+		return _up_interpret_segment_mbr(md_ctx, entity, seg, cube, ctx_tuple);
+	}
+
+	// TODO Hierarchy
+	if (_type == OBJ_TYPE__Hierarchy) {
+		return _up_interpret_segment_hier(md_ctx, entity, seg, cube, ctx_tuple);
 	}
 
 
@@ -4243,4 +4476,24 @@ void put_agg_task_result(Action *act) {
 	log_print("[ error ] - in fn:put_agg_task_result ....................................\n");
 	exit(EXIT_FAILURE);
 
+}
+
+Hierarchy *dim_find_hierarchy_by_name(Dimension *dim, char *hier_name) {
+	int hsz = als_size(hierarchies_pool);
+	for (int i = 0; i < hsz; i++) {
+		Hierarchy *hier = als_get(hierarchies_pool, i);
+		if (hier->dimension_gid == dim->gid && !strcmp(hier->name, hier_name))
+			return hier;
+	}
+	return NULL;
+}
+
+Hierarchy *find_hierarchy(md_gid hier_id) {
+	int hsz = als_size(hierarchies_pool);
+	for (int i = 0; i < hsz; i++) {
+		Hierarchy *hier = als_get(hierarchies_pool, i);
+		if (hier->gid == hier_id)
+			return hier;
+	}
+	return NULL;
 }

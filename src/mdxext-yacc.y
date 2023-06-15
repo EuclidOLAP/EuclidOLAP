@@ -26,6 +26,7 @@ Stack AST_STACK = { 0 };
 /* key words */
 %token CREATE		/* create */
 %token DIMENSIONS	/* dimensions */
+%token HIERARCHY	/* hierarchy */
 %token LEVELS		/* levels */
 %token MEMBERS		/* members */
 %token BUILD		/* build */
@@ -41,6 +42,10 @@ Stack AST_STACK = { 0 };
 %token AS			/* as */
 %token AND			/* and */
 %token OR			/* or */
+
+%token MAKE			/* make */
+%token EQUIVALENT	/* equivalent */
+%token TO			/* to */
 
 %token COLUMNS		/* columns */
 %token ROWS			/* rows */
@@ -143,9 +148,17 @@ Stack AST_STACK = { 0 };
 
 %%
 
-statement:
+script_content:
 	create_dimensions SEMICOLON {
 		stack_push(&AST_STACK, IDS_STRLS_CRTDIMS);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+	}
+  |
+	create_hierarchy SEMICOLON {
+		stack_push(&AST_STACK, IDS_CREATE_HIERARCHY);
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
@@ -167,6 +180,13 @@ statement:
 	}
   |	build_cube SEMICOLON {
 		stack_push(&AST_STACK, IDS_OBJLS_BIUCUBE);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+	}
+  | make_equivalent SEMICOLON {
+		stack_push(&AST_STACK, IDS_MAKE_EQUIVALENT);
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
@@ -1515,9 +1535,79 @@ mdm_entity_path:
 	}
 ;
 
-create_dimensions:
-	CREATE DIMENSIONS vars {
+create_hierarchy:
+	CREATE HIERARCHY var_or_block DOT var_or_block {
 		// no need to do anything.
+	}
+;
+
+create_dimensions:
+	/* CREATE DIMENSIONS vars {
+		// no need to do anything.
+	}
+  | */
+	CREATE DIMENSIONS var_or_block {
+		char *dimension_name = NULL;
+		stack_pop(&AST_STACK, (void **) &dimension_name);
+
+		ArrayList *hie_name_ls = als_new(8, "<char *> hierarchy names", THREAD_MAM, NULL);
+		als_add(hie_name_ls, NULL);
+		stack_push(&AST_STACK, hie_name_ls);
+
+		ArrayList *dim_name_ls = als_new(8, "<char *> dimension names", THREAD_MAM, NULL);
+		als_add(dim_name_ls, dimension_name);
+		stack_push(&AST_STACK, dim_name_ls);
+	}
+  |
+	CREATE DIMENSIONS var_or_block DOT var_or_block {
+		char *hierarchy_name = NULL;
+		stack_pop(&AST_STACK, (void **) &hierarchy_name);
+
+		char *dimension_name = NULL;
+		stack_pop(&AST_STACK, (void **) &dimension_name);
+
+		ArrayList *hie_name_ls = als_new(8, "<char *> hierarchy names", THREAD_MAM, NULL);
+		als_add(hie_name_ls, hierarchy_name);
+		stack_push(&AST_STACK, hie_name_ls);
+
+		ArrayList *dim_name_ls = als_new(8, "<char *> dimension names", THREAD_MAM, NULL);
+		als_add(dim_name_ls, dimension_name);
+		stack_push(&AST_STACK, dim_name_ls);
+	}
+  |
+	create_dimensions var_or_block {
+		char *dimension_name = NULL;
+		stack_pop(&AST_STACK, (void **) &dimension_name);
+
+		ArrayList *dim_name_ls = NULL;
+		stack_pop(&AST_STACK, (void **) &dim_name_ls);
+		als_add(dim_name_ls, dimension_name);
+
+		ArrayList *hie_name_ls = NULL;
+		stack_pop(&AST_STACK, (void **) &hie_name_ls);
+		als_add(hie_name_ls, NULL);
+
+		stack_push(&AST_STACK, hie_name_ls);
+		stack_push(&AST_STACK, dim_name_ls);
+	}
+  |
+	create_dimensions var_or_block DOT var_or_block {
+		char *hierarchy_name = NULL;
+		stack_pop(&AST_STACK, (void **) &hierarchy_name);
+
+		char *dimension_name = NULL;
+		stack_pop(&AST_STACK, (void **) &dimension_name);
+
+		ArrayList *dim_name_ls = NULL;
+		stack_pop(&AST_STACK, (void **) &dim_name_ls);
+		als_add(dim_name_ls, dimension_name);
+
+		ArrayList *hie_name_ls = NULL;
+		stack_pop(&AST_STACK, (void **) &hie_name_ls);
+		als_add(hie_name_ls, hierarchy_name);
+
+		stack_push(&AST_STACK, hie_name_ls);
+		stack_push(&AST_STACK, dim_name_ls);
 	}
 ;
 
@@ -1546,6 +1636,23 @@ dim_levels:
 		char *dim_name;
 		stack_pop(&AST_STACK, (void **) &dim_name);
 		ArrayList_set(dim_lvs, 0, dim_name);
+		ArrayList_set(dim_lvs, 1, NULL);
+		stack_push(&AST_STACK, dim_lvs);
+	}
+  |
+	var_or_block DOT var_or_block ROUND_BRACKET_L levels_list ROUND_BRACKET_R {
+		ArrayList *dim_lvs;
+		stack_pop(&AST_STACK, (void **) &dim_lvs);
+
+		char *hierarchy_name;
+		stack_pop(&AST_STACK, (void **) &hierarchy_name);
+
+		char *dim_name;
+		stack_pop(&AST_STACK, (void **) &dim_name);
+
+		ArrayList_set(dim_lvs, 0, dim_name);
+		ArrayList_set(dim_lvs, 1, hierarchy_name);
+
 		stack_push(&AST_STACK, dim_lvs);
 	}
 ;
@@ -1557,6 +1664,7 @@ levels_list:
 		void *lv_trans;
 		stack_pop(&AST_STACK, (void **) &lv_trans);
 		ArrayList *lv_ls = als_new(64, "[ (char *dim_name), (long level), (char *level_name), (long level), (char *level_name) ... ]", THREAD_MAM, NULL);
+		als_add(lv_ls, NULL);
 		als_add(lv_ls, NULL);
 		als_add(lv_ls, lv_trans);
 		als_add(lv_ls, lv_name);
@@ -1628,8 +1736,44 @@ build_cube:
 	}
 ;
 
+make_equivalent:
+	MAKE mdm_entity_universal_path EQUIVALENT TO mdm_entity_universal_path {
+		MDMEntityUniversalPath *dest = NULL;
+		MDMEntityUniversalPath *src = NULL;
+		stack_pop(&AST_STACK, (void **) &dest);
+		stack_pop(&AST_STACK, (void **) &src);
+		ArrayList *list = als_new(64, "<MDMEntityUniversalPath *>", THREAD_MAM, NULL);
+		als_add(list, src);
+		als_add(list, dest);
+		stack_push(&AST_STACK, list);
+	}
+  |
+	make_equivalent COMMA mdm_entity_universal_path EQUIVALENT TO mdm_entity_universal_path {
+		
+		MDMEntityUniversalPath *dest = NULL;
+		MDMEntityUniversalPath *src = NULL;
+		stack_pop(&AST_STACK, (void **) &dest);
+		stack_pop(&AST_STACK, (void **) &src);
+		ArrayList *list = NULL;
+		stack_pop(&AST_STACK, (void **) &list);
+		als_add(list, src);
+		als_add(list, dest);
+		stack_push(&AST_STACK, list);
+
+	}
+;
+
 dims_and_roles:
-	var_or_block var_or_block {
+	var_or_block {
+		char *dim_name = NULL;
+		stack_pop(&AST_STACK, (void **) &dim_name);
+		ArrayList *dr_ls = als_new(64, "yacc dims_and_roles ::= var_or_block var_or_block", THREAD_MAM, NULL);
+		als_add(dr_ls, dim_name);
+		als_add(dr_ls, dim_name);
+		stack_push(&AST_STACK, dr_ls);
+	}
+  |
+	var_or_block COLON var_or_block {
 		char *dim_name, *role_name;
 		stack_pop(&AST_STACK, (void **) &role_name);
 		stack_pop(&AST_STACK, (void **) &dim_name);
@@ -1638,7 +1782,17 @@ dims_and_roles:
 		als_add(dr_ls, role_name);
 		stack_push(&AST_STACK, dr_ls);
 	}
-  |	dims_and_roles var_or_block var_or_block {
+  |
+	dims_and_roles var_or_block {
+		char *dim_name = NULL;
+		stack_pop(&AST_STACK, (void **) &dim_name);
+		ArrayList *dr_ls = NULL;
+		stack_pop(&AST_STACK, (void **) &dr_ls);
+		als_add(dr_ls, dim_name);
+		als_add(dr_ls, dim_name);
+		stack_push(&AST_STACK, dr_ls);
+	}
+  |	dims_and_roles var_or_block COLON var_or_block {
 		char *dim_name, *role_name;
 		stack_pop(&AST_STACK, (void **) &role_name);
 		stack_pop(&AST_STACK, (void **) &dim_name);

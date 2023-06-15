@@ -27,18 +27,27 @@ typedef long md_gid;
 typedef struct _stct_dim_
 {
 	md_gid gid;
+	md_gid def_hierarchy_gid;
 	char name[MD_ENTITY_NAME_BYTSZ];
 } Dimension;
 
 
 #define MDD_MEMBER__BIN_ATTR_FLAG__NON_LEAF 1
 
-typedef struct _stct_mbr_
+typedef struct mdm_member
 {
 	char name[MD_ENTITY_NAME_BYTSZ];
 	md_gid gid;
 	md_gid p_gid;
 	md_gid dim_gid;
+
+	// If the current member is not in the default hierarchy of the dimension, 
+	// the link attribute points to the equivalent member under the default hierarchy.
+	md_gid link;
+
+	// The ID of the hierarchy in which this dimension member was created.
+	md_gid hierarchy_gid;
+
 	unsigned short lv;
 
 	// Each binary bit represents an attribute switch.
@@ -53,11 +62,11 @@ typedef struct _stct_mbr_
 typedef struct level_
 {
 	md_gid gid;
-	char name[MD_ENTITY_NAME_BYTSZ];
 	md_gid dim_gid;
+	md_gid hierarchy_gid;
+	char name[MD_ENTITY_NAME_BYTSZ];
 	unsigned int level;
 } Level;
-Level *Level_creat(char *name_, Dimension *dim, unsigned int level_);
 
 
 typedef struct _euclid_cube_stct_
@@ -124,5 +133,13 @@ typedef struct Level_Role_
 	Level *lv;
 	DimensionRole *dim_role;
 } LevelRole;
+
+
+typedef struct mdm_hierarchy
+{
+	md_gid gid;
+	md_gid dimension_gid;
+	char name[MD_ENTITY_NAME_BYTSZ];
+} Hierarchy;
 
 #endif
