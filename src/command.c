@@ -13,6 +13,7 @@
 #include "rb-tree.h"
 #include "vce.h"
 #include "net.h"
+#include "obj-type-def.h"
 
 // extern Stack AST_STACK;
 
@@ -240,9 +241,17 @@ static int execute_command(EuclidCommand *action)
 
 		if (ids_type == IDS_STRLS_CRTDIMS)
 		{
-			ArrayList *dim_names_ls;
-			stack_pop(&stk, (void **)&dim_names_ls);
-			create_dims(dim_names_ls, &(action->result));
+			ArrayList *dim_names = NULL;
+			stack_pop(&stk, (void **)&dim_names);
+			ArrayList *def_hie_names = NULL;
+			stack_pop(&stk, (void **)&def_hie_names);
+			create_dims(dim_names, def_hie_names, &(action->result));
+		} else if (ids_type == IDS_CREATE_HIERARCHY) {
+			char *dimension_name = NULL;
+			char *hierarchy_name = NULL;
+			stack_pop(&stk, (void **)&hierarchy_name);
+			stack_pop(&stk, (void **)&dimension_name);
+			create_hierarchy(find_dim_by_name(dimension_name), hierarchy_name);
 		}
 		else if (ids_type == IDS_STRLS_CRTMBRS)
 		{
@@ -335,18 +344,36 @@ static int execute_command(EuclidCommand *action)
 			{
 				ArrayList *map = als_get(dim_lv_map_ls, i);
 				char *dimension_name = als_get(map, 0);
+				char *hierarchy_name = als_get(map, 1);
 				Dimension *dim = find_dim_by_name(dimension_name);
+
+				Hierarchy *hierarchy = hierarchy_name ? dim_find_hierarchy_by_name(dim, hierarchy_name) : find_hierarchy(dim->def_hierarchy_gid);
+
 				map_len = als_size(map);
-				for (j = 1; j < map_len; j += 2)
+				for (j = 2; j < map_len; j += 2)
 				{
 					void *lv_trans = als_get(map, j);
 					long *lv_p = (long *)&lv_trans;
 					char *level_name = als_get(map, j + 1);
-
-					Level *level = Level_creat(level_name, dim, *lv_p);
+					Level *level = Level_creat(level_name, dim, hierarchy, *lv_p);
 					mdd__save_level(level);
 					mdd__use_level(level);
 				}
+			}
+		} else if (ids_type == IDS_MAKE_EQUIVALENT) {
+			ArrayList *up_list = NULL;
+			stack_pop(&stk, (void **)&up_list);
+			for (int i = 0; i < als_size(up_list); i += 2) {
+				MDMEntityUniversalPath *src_up = als_get(up_list, i);
+				MDMEntityUniversalPath *dest_up = als_get(up_list, i + 1);
+
+				Member *ms = up_evolving(NULL, src_up, NULL, NULL);
+				assert(obj_type_of(ms) == OBJ_TYPE__Member);
+				Member *md = up_evolving(NULL, dest_up, NULL, NULL);
+				assert(obj_type_of(md) == OBJ_TYPE__Member);
+
+				ms->link = md->gid;
+				append_file_data(META_DEF_MBRS_FILE_PATH, (char *)ms, sizeof(Member));
 			}
 		}
 		else

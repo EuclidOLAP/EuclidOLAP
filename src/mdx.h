@@ -15,6 +15,8 @@ void parse_mdx(char *mdx, Stack *stk);
 #define IDS_MULTI_DIM_SELECT_DEF ((void *)0x04)
 #define IDS_ARRLS_DIMS_LVS_INFO ((void *)0x05)
 #define IDS_STRLS_CRTDIMS ((void *)0x06)
+#define IDS_CREATE_HIERARCHY ((void *)0x07)
+#define IDS_MAKE_EQUIVALENT ((void *)0x08)
 
 typedef struct general_chain_expression {
     ArrayList *chain;

@@ -1,0 +1,1 @@
+create dimensions [Calendar] [Goods] [Store Type] [Payment Method] [Region] [Transport] [Date] [Aircraft Type] [Service Type] [Area];

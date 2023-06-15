@@ -20,6 +20,10 @@ dimensions {
 	return DIMENSIONS;
 }
 
+hierarchy {
+	return HIERARCHY;
+}
+
 levels {
 	return LEVELS;
 }
@@ -42,6 +46,18 @@ measures	{
 
 insert	{
 	return INSERT;
+}
+
+make	{
+	return MAKE;
+}
+
+equivalent	{
+	return EQUIVALENT;
+}
+
+to	{
+	return TO;
 }
 
 with	{
