@@ -36,14 +36,6 @@ void parse_mdx(char *mdx, Stack *stk) {
 	pthread_mutex_unlock(&sync_parse_mtx);
 }
 
-MemberDef *ids_mbrdef_new__mbr_abs_path(ArrayList *mbr_abs_path)
-{
-    MemberDef *def = mam_alloc(sizeof(MemberDef), OBJ_TYPE__MemberDef, NULL, 0);
-    def->t_cons = MEMBER_DEF__MBR_ABS_PATH;
-    def->mbr_abs_path = mbr_abs_path;
-    return def;
-}
-
 MemberDef *MemberDef_creat(ids_ct t_cons)
 {
     MemberDef *mdef = mam_alloc(sizeof(MemberDef), OBJ_TYPE__MemberDef, NULL, 0);

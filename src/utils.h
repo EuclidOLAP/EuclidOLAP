@@ -63,6 +63,8 @@ struct memory_allocation_manager
 	 * bits from low to high:
 	 * 0th - 0 The MDX expression was not parsed.
 	 * 		 1 The MDX expression has been parsed.
+	 * 1th - 0 When executing up_evolving series of functions for interpretation, NULL is returned first.
+	 * 		 1 When executing up_evolving series of functions for interpretation, exceptions are thrown first.
 	 */
 	int bin_flags;
 

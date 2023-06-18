@@ -64,7 +64,7 @@ Dimension *find_dim_by_name(char *dim_name);
 
 Dimension *find_dim_by_gid(md_gid dim_gid);
 
-Member *find_member_lv1(Dimension *dimension, Hierarchy *hierarchy, char *mbr_name);
+Member *find_member_lv0(Dimension *dimension, Hierarchy *hierarchy, char *mbr_name);
 
 Member *find_member_child(Member *parent_mbr, char *child_name);
 
@@ -85,7 +85,7 @@ Cube *find_cube_by_gid(md_gid);
 /**
  * @return 0 - normal; not 0 - mistake
  */
-int gen_member_gid_abs_path(Cube *cube, ArrayList *mbr_path_str, char *abs_path);
+int gen_member_gid_abs_path(Cube *cube, MddMemberRole *mr, char *abs_path);
 
 int store_measure(EuclidCommand *ec);
 
@@ -169,6 +169,8 @@ Member *find_member_by_gid(md_gid);
 Hierarchy *dim_find_hierarchy_by_name(Dimension *dim, char *hier_name);
 
 Hierarchy *find_hierarchy(md_gid hier_id);
+
+Member *hi_get_root_mbr(Hierarchy *hier);
 
 void Expression_evaluate(MDContext *md_ctx, Expression *exp, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data);
 

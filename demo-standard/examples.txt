@@ -1,0 +1,34 @@
+select
+{
+  Date.[ALL].[2020],
+  Date.Root.[2021],
+  Date.Calendar.[2022]
+} on columns,
+{
+  [measure].Revenue,
+  [measure].Cost
+} on rows
+from [Airline A];
+
+---
+
+select
+{
+  Date.Root.[2021],
+  Date.Calendar.[2022]
+} on columns,
+{
+  [measure].Cost
+} on rows
+from [Airline A];
+
+---
+
+select
+{
+  Date.Calendar.[2022]
+} on columns,
+{
+  [measure].Cost
+} on rows
+from [Airline A];

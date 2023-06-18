@@ -28,12 +28,14 @@ typedef unsigned char ids_ct;
 
 #define MEMBER_DEF__MBR_ABS_PATH 1
 #define MEMBER_DEF__MBR_FUNCTION 2
+#define MEMBER_DEF__UNIVERSALPATH 3
 
 typedef struct member_definition
 {
     ids_ct t_cons;
     ArrayList *mbr_abs_path;
     void *member_fn;
+    MDMEntityUniversalPath *eup;
 } MemberDef;
 
 
