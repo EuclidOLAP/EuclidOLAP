@@ -41,7 +41,7 @@ LevelRoleDef *LevelRoleDef_creat(ArrayList *lr_path);
 
 
 
-MemberDef *ids_mbrdef_new__mbr_abs_path(ArrayList *);
+// MemberDef *ids_mbrdef_new__mbr_abs_path(ArrayList *);
 MemberDef *MemberDef_creat(ids_ct t_cons);
 
 #define MBRS_DEF__MBR_DEF_LS 1

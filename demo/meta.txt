@@ -2,7 +2,7 @@ create dimensions [Calendar] [Goods] [Store Type] [Payment Method] [Region] [Tra
 
 ---
 
-create levels [Calendar] (2:year, 3:quarter, 4:month), [Region] (2:[continent], 3:[country]), [Date] (2:Year, 3:Quarter, 4:Month);
+create levels [Calendar] (1:year, 2:quarter, 3:month), [Region] (1:[continent], 2:[country]), [Date] (1:Year, 2:Quarter, 3:Month);
 
 ---
 

@@ -122,5 +122,6 @@ typedef short type_obj;
 #define OBJ_TYPE__Term 10080
 #define OBJ_TYPE__TupleDef 10081
 #define OBJ_TYPE__Hierarchy 10082
+#define OBJ_TYPE__HierarchyRole 10083
 
 #endif

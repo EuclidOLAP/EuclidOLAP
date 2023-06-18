@@ -155,6 +155,7 @@ script_content:
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
 	}
   |
 	create_hierarchy SEMICOLON {
@@ -163,6 +164,7 @@ script_content:
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
 	}
   | create_levels SEMICOLON {
 		stack_push(&AST_STACK, IDS_ARRLS_DIMS_LVS_INFO);
@@ -170,6 +172,7 @@ script_content:
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
  	}
   |	create_members SEMICOLON {
 		stack_push(&AST_STACK, IDS_STRLS_CRTMBRS);
@@ -177,6 +180,7 @@ script_content:
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
 	}
   |	build_cube SEMICOLON {
 		stack_push(&AST_STACK, IDS_OBJLS_BIUCUBE);
@@ -184,6 +188,7 @@ script_content:
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
 	}
   | make_equivalent SEMICOLON {
 		stack_push(&AST_STACK, IDS_MAKE_EQUIVALENT);
@@ -191,6 +196,7 @@ script_content:
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
 	}
   | insert_cube_measures SEMICOLON {
 	  	stack_push(&AST_STACK, IDS_CXOBJ_ISRTCUBEMEARS);
@@ -198,20 +204,21 @@ script_content:
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
 	}
   | multi_dim_query SEMICOLON {
 		stack_push(&AST_STACK, IDS_MULTI_DIM_SELECT_DEF);
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
-		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0003;
 	}
   | FLAG_EXP expression {
 		// do nothing
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
-		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0003;
 	}
 ;
 
@@ -602,16 +609,6 @@ set_statement:
 
 		stack_push(&AST_STACK, set_def);
 	}
-  /* | set_function_template {
-		SetDef *set_def = ids_setdef_new(SET_DEF__SET_FUNCTION);
-		stack_pop(&AST_STACK, (void **) &(set_def->set_fn));
-		stack_push(&AST_STACK, set_def);
-	} */
-  /* | var_or_block {
-		SetDef *set_def = ids_setdef_new(SET_DEF__VAR_OR_BLOCK);
-		stack_pop(&AST_STACK, (void **) &(set_def->var_block));
-		stack_push(&AST_STACK, set_def);
-	} */
   |
 	mdm_entity_universal_path {
 		MDMEntityUniversalPath *md_up = NULL;
@@ -1031,12 +1028,12 @@ dimension_statement:
 ;
 
 tuples_statement:
-	general_chain {
-		GeneralChainExpression *gce;
-		stack_pop(&AST_STACK, (void **) &gce);
-		gce->final_form = OBJ_TYPE__MddTuple;
-		ArrayList *t_def_ls = als_new(32, "TupleDef * | GeneralChainExpression *", THREAD_MAM, NULL);
-		als_add(t_def_ls, gce);
+	mdm_entity_universal_path {
+		MDMEntityUniversalPath *eup = NULL;
+		stack_pop(&AST_STACK, (void **) &eup);
+
+		ArrayList *t_def_ls = als_new(32, "TupleDef * | MDMEntityUniversalPath *", THREAD_MAM, NULL);
+		als_add(t_def_ls, eup);
 		stack_push(&AST_STACK, t_def_ls);
 	}
   | tuple_statement {
@@ -1054,13 +1051,12 @@ tuples_statement:
 		als_add(t_def_ls, t_def);
 		stack_push(&AST_STACK, t_def_ls);
 	}
-  | tuples_statement COMMA general_chain {
-		GeneralChainExpression *gce;
-		stack_pop(&AST_STACK, (void **) &gce);
-		gce->final_form = OBJ_TYPE__MddTuple;
+  | tuples_statement COMMA mdm_entity_universal_path {
+		MDMEntityUniversalPath *eup = NULL;
+		stack_pop(&AST_STACK, (void **) &eup);
 		ArrayList *t_def_ls;
 		stack_pop(&AST_STACK, (void **) &t_def_ls);
-		als_add(t_def_ls, gce);
+		als_add(t_def_ls, eup);
 		stack_push(&AST_STACK, t_def_ls);
 	}
 ;
@@ -1078,14 +1074,6 @@ tuple_2__:
 ;
 
 tuple_statement:
-	/* ROUND_BRACKET_L mbrs_statement ROUND_BRACKET_R {
-		MembersDef *ms_def;
-		stack_pop(&AST_STACK, (void **) &ms_def);
-		TupleDef *t_def = ids_tupledef_new(TUPLE_DEF__MBRS_DEF);
-		ids_tupledef___set_mbrs_def(t_def, ms_def);
-		stack_push(&AST_STACK, t_def);
-	}
-  | */
 	ROUND_BRACKET_L up_list ROUND_BRACKET_R {
 		ArrayList *up_ls = NULL;
 		stack_pop(&AST_STACK, (void **) &up_ls);
@@ -1095,143 +1083,17 @@ tuple_statement:
 
 		stack_push(&AST_STACK, t_def);
 	}
-  /* |
-	mdm_entity_universal_path {
-		MDMEntityUniversalPath *universal_path = NULL;
-		stack_pop(&AST_STACK, (void **)&universal_path);
-
-		ArrayList *up_ls = als_new(1, "<MDMEntityUniversalPath *>", THREAD_MAM, NULL);
-		als_add(up_ls, universal_path);
-
-		TupleDef *tuple_def = ids_tupledef_new(TUPLE_DEF__UPATH_LS);
-		tuple_def->universal_path_ls = up_ls;
-
-		stack_push(&AST_STACK, tuple_def);
-	} */
 ;
 
-/* mbrs_statement:
-	member_statement {
-		MemberDef *mbr_def;
-		stack_pop(&AST_STACK, (void **) &mbr_def);
-		MembersDef *ms_def = ids_mbrsdef_new(MBRS_DEF__MBR_DEF_LS);
-		ids_mbrsdef__add_mbr_def(ms_def, mbr_def);
-		stack_push(&AST_STACK, ms_def);
-	}
-  | mbrs_statement COMMA member_statement {
-		MemberDef *mbr_def;
-		stack_pop(&AST_STACK, (void **) &mbr_def);
-		MembersDef *ms_def;
-		stack_pop(&AST_STACK, (void **) &ms_def);
-		ids_mbrsdef__add_mbr_def(ms_def, mbr_def);
-		stack_push(&AST_STACK, ms_def);
-  }
-; */
-
 member_statement:
-	var_block_chain {
-		ArrayList *mbr_abs_path;
-		stack_pop(&AST_STACK, (void **) &mbr_abs_path);
-		MemberDef *mbr_def = ids_mbrdef_new__mbr_abs_path(mbr_abs_path);
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | PARENT ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		ASTMemberFunc_Parent *fn = ASTMemberFunc_Parent_creat(NULL);
-		stack_pop(&AST_STACK, (void **) &(fn->ast_member));
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = fn;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | CURRENT_MEMBER ROUND_BRACKET_L dimension_statement ROUND_BRACKET_R {
-		ASTMemberFunc_CurrentMember *cm = ASTMemberFunc_CurrentMember_creat();
-		stack_pop(&AST_STACK, (void **) &(cm->dr_def));
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = cm;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | PREV_MEMBER ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		MemberDef *curr_mr;
-		stack_pop(&AST_STACK, (void **) &curr_mr);
-		ASTMemberFunc_PrevMember *fn = ASTMemberFunc_PrevMember_creat(curr_mr);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = fn;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | FIRST_CHILD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		MemberDef *member_role_def;
-		stack_pop(&AST_STACK, (void **) &member_role_def);
-		ASTMemberFunc_FirstChild *mr_fn = ASTMemberFunc_FirstChild_creat(member_role_def);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = mr_fn;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | LAST_CHILD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		MemberDef *member_role_def;
-		stack_pop(&AST_STACK, (void **) &member_role_def);
-		ASTMemberFunc_LastChild *mr_fn = ASTMemberFunc_LastChild_creat(member_role_def);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = mr_fn;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | FIRST_SIBLING ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		/* FirstSibling */
-		MemberDef *member_role_def;
-		stack_pop(&AST_STACK, (void **) &member_role_def);
-		ASTMemberFunc_FirstSibling *mr_fn = ASTMemberFunc_FirstSibling_creat(member_role_def);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = mr_fn;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | LAST_SIBLING ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		/* LastSibling */
-		MemberDef *member_role_def;
-		stack_pop(&AST_STACK, (void **) &member_role_def);
-		ASTMemberFunc_LastSibling *mr_fn = ASTMemberFunc_LastSibling_creat(member_role_def);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = mr_fn;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | LAG ROUND_BRACKET_L member_statement COMMA decimal_value ROUND_BRACKET_R {
-		void *ptol = NULL;
-		stack_pop(&AST_STACK, (void **) &ptol);
-		long index = (long) ptol;
-		MemberDef *member_role_def;
-		stack_pop(&AST_STACK, (void **) &member_role_def);
-		ASTMemberFunc_Lag *mr_fn = ASTMemberFunc_Lag_creat(member_role_def, index);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = mr_fn;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | LEAD ROUND_BRACKET_L member_statement COMMA decimal_value ROUND_BRACKET_R {
-		void *ptol = NULL;
-		stack_pop(&AST_STACK, (void **) &ptol);
-		long index = (long) ptol;
-		MemberDef *member_role_def;
-		stack_pop(&AST_STACK, (void **) &member_role_def);
-		ASTMemberFunc_Lag *mr_fn = ASTMemberFunc_Lag_creat(member_role_def, 0 - index);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = mr_fn;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | member_role_fn_parallel_period {
-		ASTMemberFunc_ParallelPeriod *pp;
-		stack_pop(&AST_STACK, (void **) &pp);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = pp;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | member_role_fn_closing_period {
-		ASTMemberFunc_ClosingPeriod *closing_period;
-		stack_pop(&AST_STACK, (void **) &closing_period);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = closing_period;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | member_role_fn_opening_period {
-		ASTMemberFunc_OpeningPeriod *opening_period;
-		stack_pop(&AST_STACK, (void **) &opening_period);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = opening_period;
+	mdm_entity_universal_path {
+		MDMEntityUniversalPath *eup_ = NULL;
+		stack_pop(&AST_STACK, (void **) &eup_);
+
+		MemberDef *mbr_def = mam_alloc(sizeof(MemberDef), OBJ_TYPE__MemberDef, NULL, 0);
+		mbr_def->t_cons = MEMBER_DEF__UNIVERSALPATH;
+		mbr_def->eup = eup_;
+
 		stack_push(&AST_STACK, mbr_def);
 	}
 ;
@@ -1455,7 +1317,7 @@ insert_cube_measures:
 ;
 
 vector_measures:
-	ROUND_BRACKET_L vector MEASURES measures_values ROUND_BRACKET_R {
+	ROUND_BRACKET_L vector__ MEASURES measures_values ROUND_BRACKET_R {
 		ArrayList *ls_vector, *ls_mears_vals;
 		stack_pop(&AST_STACK, (void **) &ls_mears_vals);
 		stack_pop(&AST_STACK, (void **) &ls_vector);
@@ -1466,20 +1328,21 @@ vector_measures:
 	}
 ;
 
-vector:
-	mdm_entity_path {
-		ArrayList *ls_vector = als_new(16, "{ vector ::= }, { ArrayList * }", THREAD_MAM, NULL);
-		ArrayList *ls_mep;
-		stack_pop(&AST_STACK, (void **) &ls_mep);
-		als_add(ls_vector, ls_mep);
-		stack_push(&AST_STACK, ls_vector);
+vector__:
+	mdm_entity_universal_path {
+		MDMEntityUniversalPath *eup = NULL;
+		stack_pop(&AST_STACK, (void **) &eup);
+		ArrayList *list = als_new(16, "<MDMEntityUniversalPath *>", THREAD_MAM, NULL);
+		als_add(list, eup);
+		stack_push(&AST_STACK, list);
 	}
-  | vector COMMA mdm_entity_path {
-		ArrayList *ls_mep, *ls_vector;
-		stack_pop(&AST_STACK, (void **) &ls_mep);
-		stack_pop(&AST_STACK, (void **) &ls_vector);
-		als_add(ls_vector, ls_mep);
-		stack_push(&AST_STACK, ls_vector);
+  | vector__ COMMA mdm_entity_universal_path {
+		MDMEntityUniversalPath *eup = NULL;
+		stack_pop(&AST_STACK, (void **) &eup);
+		ArrayList *list = NULL;
+		stack_pop(&AST_STACK, (void **) &list);
+		als_add(list, eup);
+		stack_push(&AST_STACK, list);
 	}
 ;
 
@@ -1517,24 +1380,6 @@ measures_values_existing:
 	}
 ;
 
-mdm_entity_path:
-	var_or_block {
-		ArrayList *path_ls = als_new(12, "yacc mdm_entity_path ::= , type of elements is char *", THREAD_MAM, NULL);
-		char *str;
-		stack_pop(&AST_STACK, (void **) &str);
-		als_add(path_ls, str);
-		stack_push(&AST_STACK, path_ls);
-	}
-  | mdm_entity_path DOT var_or_block {
-		char *str;
-		stack_pop(&AST_STACK, (void **) &str);
-		ArrayList *path_ls;
-		stack_pop(&AST_STACK, (void **) &path_ls);
-		als_add(path_ls, str);
-		stack_push(&AST_STACK, path_ls);
-	}
-;
-
 create_hierarchy:
 	CREATE HIERARCHY var_or_block DOT var_or_block {
 		// no need to do anything.
@@ -1542,10 +1387,6 @@ create_hierarchy:
 ;
 
 create_dimensions:
-	/* CREATE DIMENSIONS vars {
-		// no need to do anything.
-	}
-  | */
 	CREATE DIMENSIONS var_or_block {
 		char *dimension_name = NULL;
 		stack_pop(&AST_STACK, (void **) &dimension_name);
@@ -1695,20 +1536,25 @@ decimal_value:
 ;
 
 create_members:
-	CREATE MEMBERS var_block_chain {
-		ArrayList *mbr_path_ls;
-		stack_pop(&AST_STACK, (void **) &mbr_path_ls);
-		ArrayList *mbrs_ls = als_new(128, "ele type: ArrayList *, yacc create_members", THREAD_MAM, NULL);
-		als_add(mbrs_ls, mbr_path_ls);
-		stack_push(&AST_STACK, mbrs_ls);
+	CREATE MEMBERS mdm_entity_universal_path {
+		MDMEntityUniversalPath *eup = NULL;
+		stack_pop(&AST_STACK, (void **) &eup);
+
+		ArrayList *list = als_new(128, "<MDMEntityUniversalPath *>", THREAD_MAM, NULL);
+		als_add(list, eup);
+		
+		stack_push(&AST_STACK, list);
 	}
-  |	create_members COMMA var_block_chain {
-		ArrayList *mbr_path_ls;
-		stack_pop(&AST_STACK, (void **) &mbr_path_ls);
-		ArrayList *mbrs_ls;
-		stack_pop(&AST_STACK, (void **) &mbrs_ls);
-		als_add(mbrs_ls, mbr_path_ls);
-		stack_push(&AST_STACK, mbrs_ls);
+  |
+	create_members COMMA mdm_entity_universal_path {
+		MDMEntityUniversalPath *eup = NULL;
+		stack_pop(&AST_STACK, (void **) &eup);
+
+		ArrayList *list = NULL;
+		stack_pop(&AST_STACK, (void **) &list);
+		als_add(list, eup);
+		
+		stack_push(&AST_STACK, list);
 	}
 ;
 
@@ -1826,31 +1672,16 @@ logical_func_isEmpty:
 
 mrfn_Parent_suftpl:
 	PARENT {
-		// MemberRoleFuncParent *mr_func = mam_alloc(sizeof(MemberRoleFuncParent), OBJ_TYPE__MemberRoleFuncParent, NULL, 0);
-		// mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
 		ASTMemberFunc_Parent *mr_func = mam_alloc(sizeof(ASTMemberFunc_Parent), OBJ_TYPE__ASTMemberFunc_Parent, NULL, 0);
 		mr_func->head.interpret = interpret_ast_mrf_parent;
 		stack_push(&AST_STACK, mr_func);
 	}
   |
 	PARENT ROUND_BRACKET_L ROUND_BRACKET_R {
-		// MemberRoleFuncParent *mr_func = mam_alloc(sizeof(MemberRoleFuncParent), OBJ_TYPE__MemberRoleFuncParent, NULL, 0);
-		// mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
 		ASTMemberFunc_Parent *mr_func = mam_alloc(sizeof(ASTMemberFunc_Parent), OBJ_TYPE__ASTMemberFunc_Parent, NULL, 0);
 		mr_func->head.interpret = interpret_ast_mrf_parent;
 		stack_push(&AST_STACK, mr_func);
 	}
-  /* |
-	PARENT ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
-		// mdm_entity_universal_path is expected to represent a hierarchy(hierarchy role)
-		MDMEntityUniversalPath *up = NULL;
-		stack_pop(&AST_STACK, (void **) &up);
-
-		MemberRoleFuncParent *mr_func = mam_alloc(sizeof(MemberRoleFuncParent), OBJ_TYPE__MemberRoleFuncParent, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		mr_func->hierarchy = up;
-		stack_push(&AST_STACK, mr_func);
-	} */
 ;
 
 mrfn_CurrentMember_suftpl:
@@ -2308,28 +2139,7 @@ chain_ring:
 	var_or_block {
 		// do nothing
 	}
-  /* | str {
-		// do nothing
-	} */
 ;
-
-general_chain:
-	chain_ring {
-		GeneralChainExpression *gce = mam_alloc(sizeof(GeneralChainExpression), OBJ_TYPE__GeneralChainExpression, NULL, 0);
-		gce->chain = als_new(8, "void *", THREAD_MAM, NULL);
-		void *ring;
-		stack_pop(&AST_STACK, &ring);
-		als_add(gce->chain, ring);
-		stack_push(&AST_STACK, gce);
-	}
-  | general_chain DOT chain_ring {
-		void *ring;
-		stack_pop(&AST_STACK, &ring);
-		GeneralChainExpression *gce;
-		stack_pop(&AST_STACK, (void **) &gce);
-		als_add(gce->chain, ring);
-		stack_push(&AST_STACK, gce);
-	}
 
 %%
 // yacc_f_003

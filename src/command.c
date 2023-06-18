@@ -96,13 +96,6 @@ intent ec_get_intent(EuclidCommand *ec)
 	return *(intent *)(ec->bytes + sizeof(int));
 }
 
-// int ec_release(EuclidCommand *ec)
-// {
-// 	// _release_mem_(ec->bytes);
-// 	// _release_mem_(ec);
-// 	return 0;
-// }
-
 EuclidCommand *get_const_command_intent(intent inte)
 {
 	if (inte == INTENT__ALLOW)
@@ -164,11 +157,7 @@ static void *do_process_command(void *addr)
 		sem_wait(&_ec_p_sem);
 		pthread_mutex_lock(&_ec_p_mtx);
 		ec = (EuclidCommand *)lnk_q_get(_ec_pool);
-		// while (ec == NULL)
-		// {
-		// 	pthread_cond_wait(&_ec_p_cond, &_ec_p_mtx);
-		// 	ec = (EuclidCommand *)lnk_q_get(_ec_pool);
-		// }
+
 		pthread_mutex_unlock(&_ec_p_mtx);
 
 		MemAllocMng *mam = MemAllocMng_current_thread_mam();
@@ -306,11 +295,11 @@ static int execute_command(EuclidCommand *action)
 				if (ec_get_intent(action) == INTENT__MDX_EXPECT_RESULT_TXT)
 				{
 					// todo Do not use the allocated memory block directly, replace by ElasticByteBuffer.
-					char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL << 19, OBJ_TYPE__RAW_BYTES);
+					char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL << 20, OBJ_TYPE__RAW_BYTES);
 
-					*((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL << 19;
+					*((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL << 20;
 					*((unsigned short *)(payload + SZOF_INT)) = INTENT__SUCCESSFUL;
-					mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL << 19);
+					mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL << 20);
 					action->result = create_command(payload);
 				}
 				else

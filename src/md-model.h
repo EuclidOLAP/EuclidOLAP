@@ -142,4 +142,10 @@ typedef struct mdm_hierarchy
 	char name[MD_ENTITY_NAME_BYTSZ];
 } Hierarchy;
 
+typedef struct mdm_hierarchy_role
+{
+	DimensionRole *dim_role;
+	Hierarchy *hierarchy;
+} HierarchyRole;
+
 #endif
