@@ -8,11 +8,16 @@ int yywrap(void);
 
 %%
 
-[ \n\t]+	{
+[ \n\t]+ {
 	// ignore white space
 }
 
-create	{
+\x2F\x2F.* {
+	// ASCII 0x2F is '/'
+	// comment
+}
+
+create {
 	return CREATE;
 }
 
@@ -425,8 +430,9 @@ IsEmpty {
 	return STRING;
 }
 
-.	{
+. {
 	// do nothing
+	// TODO An MDX lexical parsing-related exception should be thrown here.
 }
 
 %%
