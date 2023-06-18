@@ -13,7 +13,7 @@
 #define META_DEF_CUBES_FILE_PATH "/meta/cubes"
 #define META_DEF_HIERARCHIES_FILE_PATH "/meta/hierarchies"
 
-#define STANDARD_MEASURE_DIMENSION "measure"
+#define STANDARD_MEASURE_DIMENSION "Measures"
 
 int mdd_init();
 
