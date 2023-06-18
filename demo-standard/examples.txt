@@ -5,8 +5,8 @@ select
   Date.Calendar.[2022]
 } on columns,
 {
-  [measure].Revenue,
-  [measure].Cost
+  [Measures].Revenue,
+  [Measures].Cost
 } on rows
 from [Airline A];
 
@@ -18,7 +18,7 @@ select
   Date.Calendar.[2022]
 } on columns,
 {
-  [measure].Cost
+  [Measures].Cost
 } on rows
 from [Airline A];
 
@@ -29,6 +29,6 @@ select
   Date.Calendar.[2022]
 } on columns,
 {
-  [measure].Cost
+  [Measures].Cost
 } on rows
 from [Airline A];
