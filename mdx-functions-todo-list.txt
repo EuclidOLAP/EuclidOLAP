@@ -40,7 +40,6 @@
 	IsAccType		(O)
 	IsAncestor		(M) (O)
 	IsChild		(O)
-	IsEmpty		(I) (M) (O)
 	IsGeneration		(M) (O)
 	IsLeaf		(M) (O)
 	IsLevel		(O)
@@ -243,29 +242,29 @@
 
 
 << Logical Functions >>
-
+	IsEmpty				[E] [I] [M] [O]
 
 << Member Functions >>
 	ClosingPeriod		[E] [I] [M] [O]
 	CurrentMember		[E] [I] [M] [O]
-	FirstChild		[E] [I] [M] [O]
+	FirstChild			[E] [I] [M] [O]
 	FirstSibling		[E] [I] [M] [O]
-	Lag		[E] [I] [M] [O]
-	LastChild		[E] [I] [M] [O]
-	LastSibling		[E] [I] [M] [O]
-	Lead		[E] [I] [M] [O]
+	Lag					[E] [I] [M] [O]
+	LastChild			[E] [I] [M] [O]
+	LastSibling			[E] [I] [M] [O]
+	Lead				[E] [I] [M] [O]
 	OpeningPeriod		[E] [I] [M] [O]
 	ParallelPeriod		[E] [I] [M] [O]
-	Parent		[E] [I] [M] [O]
-	PrevMember		[E] [I] [M] [O]
+	Parent				[E] [I] [M] [O]
+	PrevMember			[E] [I] [M] [O]
 
 
 << Numeric Functions >>
 	CoalesceEmpty		[E] [I] [M] [O]
-	Count (Set)		[E] [M]
-	IIf		[E] [M] [O]
-	LookupCube		[E] [M]
-	Sum		[E] [I] [M] [O]
+	Count (Set)			[E] [M]
+	IIf					[E] [M] [O]
+	LookupCube			[E] [M]
+	Sum					[E] [I] [M] [O]
 
 
 << Set Functions >>

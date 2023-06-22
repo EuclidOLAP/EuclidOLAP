@@ -20,9 +20,13 @@ typedef struct euclid_command Action;
 #define INTENT__TERMINAL_CONTROL 0
 
 /**
- * (child node) -> (euclid node)
+ * (worker node) -> (logical node)
+ * 
+ * 4 bytes - data package capacity
+ * 2 bytes - intention
+ * 8 bytes - unsigned long: worker id
  */
-#define INTENT__CHILD_NODE_JOIN 1
+#define INTENT__WORKER_JOINS_CLUSTER 1
 
 /**
  * (euclid node) -> (terminal client)

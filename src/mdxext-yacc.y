@@ -1300,13 +1300,31 @@ level_role_statement:
 
 insert_cube_measures:
 	INSERT var_or_block vector_measures {
-		ArrayList *ls_vms = als_new(128, "{ insert_cube_measures ::= }, { IDSVectorMears * }", THREAD_MAM, NULL);
 		IDSVectorMears *ids_vm;
 		stack_pop(&AST_STACK, (void **) &ids_vm);
+
+		ArrayList *ls_vms = als_new(128, "{ insert_cube_measures ::= }, { IDSVectorMears * }", THREAD_MAM, NULL);
 		als_add(ls_vms, ids_vm);
+
+		stack_push(&AST_STACK, NULL); // NULL is 0
+
 		stack_push(&AST_STACK, ls_vms);
 	}
-  | insert_cube_measures COMMA vector_measures {
+  |
+	INSERT var_or_block EQUIVALENT_TO DECIMAL {
+		unsigned long worker_id = atoi(yytext);
+		stack_push(&AST_STACK, *((void **)&worker_id));
+	} vector_measures {
+		IDSVectorMears *ids_vm;
+		stack_pop(&AST_STACK, (void **) &ids_vm);
+
+		ArrayList *ls_vms = als_new(128, "{ insert_cube_measures ::= }, { IDSVectorMears * }", THREAD_MAM, NULL);
+		als_add(ls_vms, ids_vm);
+
+		stack_push(&AST_STACK, ls_vms);
+	}
+  |
+	insert_cube_measures COMMA vector_measures {
 		IDSVectorMears *ids_vm;
 		stack_pop(&AST_STACK, (void **) &ids_vm);
 		ArrayList *ls_vms;

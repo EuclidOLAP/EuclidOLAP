@@ -144,10 +144,11 @@ static void *sit_startup(void *sit_addr)
 	if (inte == INTENT__TERMINAL_CONTROL) {
 		log_print("[ info ] A terminal was connected < sock_fd : %d >\n", sit->sock_fd);
 		sit->inte = INTENT__TERMINAL_CONTROL;
-	} else if (inte == INTENT__CHILD_NODE_JOIN) {
-		log_print("[ info ] A worker service was connected < sock_fd : %d >\n", sit->sock_fd);
-		sit->inte = INTENT__CHILD_NODE_JOIN;
+	} else if (inte == INTENT__WORKER_JOINS_CLUSTER) {
+		sit->inte = INTENT__WORKER_JOINS_CLUSTER;
+		sit->worker_id = *(unsigned long *)(buf + sizeof(int) + sizeof(short));
 		als_add_sync(worker_sits, sit);
+		log_print("[ info ] A worker <ID:%lu> service was connected < sock_fd : %d >\n", sit->worker_id, sit->sock_fd);
 	} else {
 		// goto _exit_;
 
@@ -162,7 +163,7 @@ static void *sit_startup(void *sit_addr)
 
 _exit_:
 
-	if (sit->inte == INTENT__CHILD_NODE_JOIN)
+	if (sit->inte == INTENT__WORKER_JOINS_CLUSTER)
 		als_remove_sync(worker_sits, sit);
 
 	sit_close(sit); // close sit -> sock_fd, and release sit memory.
@@ -195,7 +196,7 @@ int join_cluster()
 	}
 
 	_master__sit_ = sit_alloc(to_parent_sock_fd);
-	sit_send_command(_master__sit_, get_const_command_intent(INTENT__CHILD_NODE_JOIN));
+	sit_send_command(_master__sit_, get_const_command_intent(INTENT__WORKER_JOINS_CLUSTER));
 
 	void *buf = NULL;
 	size_t buf_len;
@@ -315,6 +316,16 @@ int random_child_sock()
 	// log_print("[ error ] Process end: caused by an incorrect function call.\n");
 	// exit(EXIT_FAILURE);
 	// return 0;
+}
+
+int work_node_sock(unsigned long worker_id) {
+	int sz = als_size(worker_sits);
+	for (int i=0; i<sz; i++) {
+		SockIntentThread *sit = als_get(worker_sits, i);
+		if (sit->worker_id == worker_id)
+			return sit->sock_fd;
+	}
+	return ((SockIntentThread *)als_get(worker_sits, 0))->sock_fd;
 }
 
 __uint32_t d_nodes_count()
