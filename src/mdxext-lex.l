@@ -57,14 +57,6 @@ make	{
 	return MAKE;
 }
 
-equivalent	{
-	return EQUIVALENT;
-}
-
-to	{
-	return TO;
-}
-
 with	{
 	return WITH;
 }
