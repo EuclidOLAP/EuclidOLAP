@@ -137,6 +137,8 @@ Stack AST_STACK = { 0 };
 %token GREA					/* >  (Greater Than)			 */
 %token GREA_EQ				/* >= (Greater Than or Equal To) */
 
+%token EQUIVALENT_TO		/* -> */
+
 %token FLAG_EXP				/* @@EXP */
 
 %token VAR
@@ -1583,7 +1585,7 @@ build_cube:
 ;
 
 make_equivalent:
-	MAKE mdm_entity_universal_path EQUIVALENT TO mdm_entity_universal_path {
+	MAKE mdm_entity_universal_path EQUIVALENT_TO mdm_entity_universal_path {
 		MDMEntityUniversalPath *dest = NULL;
 		MDMEntityUniversalPath *src = NULL;
 		stack_pop(&AST_STACK, (void **) &dest);
@@ -1594,7 +1596,7 @@ make_equivalent:
 		stack_push(&AST_STACK, list);
 	}
   |
-	make_equivalent COMMA mdm_entity_universal_path EQUIVALENT TO mdm_entity_universal_path {
+	make_equivalent COMMA mdm_entity_universal_path EQUIVALENT_TO mdm_entity_universal_path {
 		
 		MDMEntityUniversalPath *dest = NULL;
 		MDMEntityUniversalPath *src = NULL;
