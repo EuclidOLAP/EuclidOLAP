@@ -1,5 +1,17 @@
 select
 {
+  [Date].[2020],
+  [Date].[2021]
+} on rows,
+{
+  [Measures].[Revenue], [Measures].[Cost]
+} on columns
+from [Airline A];
+
+---
+
+select
+{
   Date.[ALL].[2020],
   Date.Root.[2021],
   Date.Calendar.[2022]
@@ -32,3 +44,82 @@ select
   [Measures].Cost
 } on rows
 from [Airline A];
+
+---
+
+select
+{
+  Date.Calendar.[2022].[Q1].M1,
+  Date.Calendar.[2022].[Q1].M2,
+  Date.Calendar.[2022].[Q1].M3
+} on columns,
+{
+  [Measures].Revenue,
+  [Measures].Cost
+} on rows
+from [Airline A]
+where ([Classes of Service].[Economy Plus], [Aircraft Models].[Airbus].[A318]);
+
+---
+
+select
+{
+  [Date].[2020],
+  [Date].[2021]
+} on rows,
+{
+  [Measures].[Revenue], [Measures].[Cost]
+} on columns
+from [Airline B];
+
+---
+
+select
+{
+  Date.[ALL].[2020],
+  Date.Root.[2021],
+  Date.Calendar.[2022]
+} on columns,
+{
+  [Measures].Revenue,
+  [Measures].Cost
+} on rows
+from [Airline B];
+
+---
+
+select
+{
+  Date.Root.[2021],
+  Date.Calendar.[2022]
+} on columns,
+{
+  [Measures].Cost
+} on rows
+from [Airline B];
+
+---
+
+select
+{
+  Date.Calendar.[2022]
+} on columns,
+{
+  [Measures].Cost
+} on rows
+from [Airline B];
+
+---
+
+select
+{
+  Date.Calendar.[2022].[Q1].M1,
+  Date.Calendar.[2022].[Q1].M2,
+  Date.Calendar.[2022].[Q1].M3
+} on columns,
+{
+  [Measures].Revenue,
+  [Measures].Cost
+} on rows
+from [Airline B]
+where ([Classes of Service].[Economy Plus], [Aircraft Models].[Airbus].[A318]);
