@@ -123,3 +123,17 @@ select
 } on rows
 from [Airline B]
 where ([Classes of Service].[Economy Plus], [Aircraft Models].[Airbus].[A318]);
+
+---
+
+with
+member [Measures].CUSMBR as IIf(IsEmpty([Measures].Revenue), 0, [Measures].Revenue)
+select
+Children([Date].[2022].[Q3]) on 1,
+{
+  [Measures].Revenue,
+  [Measures].CUSMBR
+} on 0
+from [Airline A]
+where
+([Classes of Service].[Premium Business], [Aircraft Models].[Boeing].[Boeing 737]);

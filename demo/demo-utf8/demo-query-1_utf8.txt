@@ -6,13 +6,13 @@ with member [支付方式].PROPORTION as ([支付方式].[ALL].[信用卡]) / ([
 ---
 select children([商品].[厨房和餐厅]) on 0, children([Calendar].[ALL].[2021].[Q4]) on 1 from [在线商店] where (measure.[销售额]);
 ---
-select members([商品], NOT_LEAFS) on 10, members(Calendar, LEAFS) on 100 from [在线商店];
+select members([商品], NOT_LEAF) on 10, members(Calendar, LEAF) on 100 from [在线商店];
 ---
-select { (measure.[销售额]), (measure.[销售数量]) } on 10, crossjoin(members([店铺类型], LEAFS), members([支付方式], ALL)) on 100 from [在线商店];
+select { (measure.[销售额]), (measure.[销售数量]) } on 10, crossjoin(members([店铺类型], LEAF), members([支付方式], ALL)) on 100 from [在线商店];
 ---
-select { (measure.[销售额]), (measure.[销售数量]) } on 10, crossjoin(members([店铺类型], LEAFS), members([支付方式], ALL), children([Calendar].[ALL].[2021].[Q4])) on 100 from [在线商店];
+select { (measure.[销售额]), (measure.[销售数量]) } on 10, crossjoin(members([店铺类型], LEAF), members([支付方式], ALL), children([Calendar].[ALL].[2021].[Q4])) on 100 from [在线商店];
 ---
-select { (measure.[销售数量]), (measure.[销售额]) } on 10, crossjoin(members([店铺类型], LEAFS), members([支付方式], ALL), children([Calendar].[ALL].[2021].[Q4]), children([商品].[ALL])) on 100 from [在线商店];
+select { (measure.[销售数量]), (measure.[销售额]) } on 10, crossjoin(members([店铺类型], LEAF), members([支付方式], ALL), children([Calendar].[ALL].[2021].[Q4]), children([商品].[ALL])) on 100 from [在线商店];
 ---
 select members(measure) on 0, crossjoin(children([店铺类型].[ALL]), members([支付方式])) on 1 from [在线商店];
 ---

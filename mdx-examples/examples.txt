@@ -10,15 +10,15 @@ select children([Goods].[Kitchen & Dining]) on 0, children([Calendar].[ALL].[202
 ---
 select children([GoodsXXXXXXXXXXXXXX].[Kitchen & Dining]) on 0, children([Calendar].[ALL].[2021].[Q4]) on 1 from [Online Store] where (measure.[sales amount]);
 ---
-select members([Goods], NOT_LEAFS) on 10, members(Calendar, LEAFS) on 100 from [Online Store];
+select members([Goods], NOT_LEAF) on 10, members(Calendar, LEAF) on 100 from [Online Store];
 ---
-select members([Goods], NOT_LEAFS) on 10, members(Calendar, LEAFS) on 100 from [OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO];
+select members([Goods], NOT_LEAF) on 10, members(Calendar, LEAF) on 100 from [OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO];
 ---
-select { (measure.[sales amount]), (measure.[sales quantity]) } on 10, crossjoin(members([Store Type], LEAFS), members([Payment Method], ALL)) on 100 from [Online Store];
+select { (measure.[sales amount]), (measure.[sales quantity]) } on 10, crossjoin(members([Store Type], LEAF), members([Payment Method], ALL)) on 100 from [Online Store];
 ---
-select { (measure.[sales amount]), (measure.[sales quantity]) } on 10, crossjoin(members([Store Type], LEAFS), members([Payment Method], ALL), children([Calendar].[ALL].[2021].[Q4])) on 100 from [Online Store];
+select { (measure.[sales amount]), (measure.[sales quantity]) } on 10, crossjoin(members([Store Type], LEAF), members([Payment Method], ALL), children([Calendar].[ALL].[2021].[Q4])) on 100 from [Online Store];
 ---
-select { (measure.[sales quantity]), (measure.[sales amount]) } on 10, crossjoin(members([Store Type], LEAFS), members([Payment Method], ALL), children([Calendar].[ALL].[2021].[Q4]), children(Goods.[ALL])) on 100 from [Online Store];
+select { (measure.[sales quantity]), (measure.[sales amount]) } on 10, crossjoin(members([Store Type], LEAF), members([Payment Method], ALL), children([Calendar].[ALL].[2021].[Q4]), children(Goods.[ALL])) on 100 from [Online Store];
 ---
 select members(measure) on 0, crossjoin(children([Store Type].[ALL]), members([Payment Method])) on 1 from [Online Store];
 ---
@@ -242,7 +242,7 @@ with member measure.AAA as CoalesceEmpty((measure.[cash back]), (measure.[sales 
 ---
 with member measure.AAA as CoalesceEmpty(CoalesceEmpty((measure.[cash back]), (measure.[cash back], [Store Type].[ALL].[Platform Self-operated Store])), 8760.66) select { (measure.[sales amount]), (measure.[cash back]), (measure.AAA) } on 0, { (Calendar.[ALL]) } on 1 from [Online Store] ;
 ---
-select { (measure.[sales quantity]), (measure.[sales amount]) } on 10, crossjoin(members([Store Type], LEAFS), members([Payment Method], ALL), children([Calendar].[CCCCCCCCCCCCCCCCC].[2021].[Q4]), children(Goods.[ALL])) on 100 from [Online Store];
+select { (measure.[sales quantity]), (measure.[sales amount]) } on 10, crossjoin(members([Store Type], LEAF), members([Payment Method], ALL), children([Calendar].[CCCCCCCCCCCCCCCCC].[2021].[Q4]), children(Goods.[ALL])) on 100 from [Online Store];
 ---
 select { ( [starting region].[ALL].[Asia].[VVVVVVVVVVVVVV], Transport.[ALL].railway ) } on 0, filter({ ( [starting date].[ALL].[2019].[Q4].[M10], Goods.[ALL].[foods].[nut], [measure].[income] ), ( [starting date].[ALL].[2019].[Q4].[M10], Goods.[ALL].[foods].[nut] ), ( [starting date].[ALL].[2019].[Q3].[M9], Goods.[ALL].[foods].[wine] ), ( [ending region].[ALL].[Asia].[China], [starting date].[ALL].[2019].[Q3].[M7], [completion date].[ALL].[2019].[Q3].[M7] ) }, ((Transport.[ALL].railway) > 0) OR (1 < 2)) on 1 from [logistics.test] ;
 ---
@@ -445,11 +445,11 @@ where
 ---
 select { ( [starting region].[ALL].[Asia].[China], Transport.[ALL].railway ) } on 0, filter({ ( [starting date].[ALL].[2019].[Q4].[M10], Goods.[ALL].[foods].[nut], [measure].[income] ), ( [starting date].[ALL].[2019].[Q4].[M10], Goods.[ALL].[foods].[nut] ), ( [starting date].[ALL].[2019].[Q3].[M9], Goods.[ALL].[foods].[wine] ), ( [ending region].[ALL].[Asia].[China], [starting date].[ALL].[2019].[Q3].[M7], [completion date].[ALL].[2019].[Q3].[M7] ) }, ((Transport.[ALL].railway) > 0) OR (1 < 2)) on 1 from [nonexistent measure];
 ---
-select members([Payment Method], LEAFS) on 1, members([Store Type], LEAFS) on 2 from [Online Store];
+select members([Payment Method], LEAF) on 1, members([Store Type], LEAF) on 2 from [Online Store];
 ---
 select
-members([Transport], LEAFS) on 12220,
-members([starting date], LEAFS) on 111
+members([Transport], LEAF) on 12220,
+members([starting date], LEAF) on 111
 from [logistics.test]
 where ([Goods].[ALL].[electronic product].[computer], [starting region].[ALL].[America].[U.S], [ending region].[ALL].[Europe].[Italy], [completion date].[ALL].[2021].[Q2].[M4]);
 ---
@@ -467,7 +467,7 @@ from [Airline Turnover];
 with member [measure].proportion as ([measure].Turnover) / ([Service Type].[ALL], [measure].Turnover)
 select
 {Date.[ALL].[2020],Date.[ALL].[2021],Date.[ALL].[2022]} on 1,
-members([Service Type], LEAFS) on 0
+members([Service Type], LEAF) on 0
 from [Airline Turnover]
 where ([measure].proportion, [Aircraft Type].[ALL].[Airbus].[Airbus A380]);
 ---
@@ -489,7 +489,7 @@ from [Airline Turnover];
 with member [measure].proportion as ([measure].Turnover) / ([Service Type].[ALL], [measure].Turnover)
 select
 {Date.[ALL].[2020],Date.[ALL].[2021],Date.[ALL].[2022]} on 1,
-members([Service Type], LEAFS) on 0
+members([Service Type], LEAF) on 0
 from [Airline Turnover]
 where ([measure].proportion, [Aircraft Type].[ALL].[Airbus].[Airbus A380]);
 
@@ -499,7 +499,7 @@ select
 {
     ([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes])
 } on 0, 
-crossJoin( { ( [Payment Method].[ALL].[Credit Card] ) } , members([Calendar], LEAFS)) on 1
+crossJoin( { ( [Payment Method].[ALL].[Credit Card] ) } , members([Calendar], LEAF)) on 1
 from [Online Store];
 
 ---
@@ -526,8 +526,8 @@ from [Online Store];
 ---
 
 select 
-crossJoin(members([Store Type], LEAFS), members([Goods], LEAFS)) on 0, 
-crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)) on 1
+crossJoin(members([Store Type], LEAF), members([Goods], LEAF)) on 0, 
+crossJoin(members([Payment Method], LEAF), members([Calendar], LEAF)) on 1
 from [Online Store];
 
 ---
@@ -548,7 +548,7 @@ select
 {
     ([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes])
 } on 0,
-crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)) on 1
+crossJoin(members([Payment Method], LEAF), members([Calendar], LEAF)) on 1
 from [Online Store]
 where (measure.[sales amount]);
 
@@ -826,7 +826,7 @@ select
 {
     measure.[sales amount]
 } on 0,
-crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)) on 1
+crossJoin(members([Payment Method], LEAF), members([Calendar], LEAF)) on 1
 from [Online Store]
 where
 ([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes]);
@@ -840,7 +840,7 @@ select
     measure.[sales amount],
     measure.EEEEEEEEE
 } on 0,
-crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)) on 1
+crossJoin(members([Payment Method], LEAF), members([Calendar], LEAF)) on 1
 from [Online Store]
 where
 ([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes]);
@@ -850,7 +850,7 @@ where
 select
 measure.[sales amount] on 0,
 Filter(
-    crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)),
+    crossJoin(members([Payment Method], LEAF), members([Calendar], LEAF)),
     isEmpty((measure.[sales amount]))
 ) on 1
 from [Online Store]
@@ -866,7 +866,7 @@ select
     measure.[sales amount],
     measure.EEEEEEEEE
 } on 0,
-crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)) on 1
+crossJoin(members([Payment Method], LEAF), members([Calendar], LEAF)) on 1
 from [Online Store]
 where
 ([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes]);
@@ -880,7 +880,7 @@ select
     measure.[sales amount],
     (measure.EEEEEEEEE)
 } on 0,
-crossJoin(members([Payment Method], LEAFS), members([Calendar], LEAFS)) on 1
+crossJoin(members([Payment Method], LEAF), members([Calendar], LEAF)) on 1
 from [Online Store]
 where
 ([Store Type].[ALL].[Platform Self-operated Store], [Goods].[ALL].[Kitchen & Dining].[Bento Boxes]);
@@ -932,7 +932,7 @@ from [Online Store] ;
 with member [measure].proportion as [measure].Turnover / ([Service Type].[ALL], [measure].Turnover)
 select
 {Date.[ALL].[2020],Date.[ALL].[2021],Date.[ALL].[2022]} on 1,
-members([Service Type], LEAFS) on 0
+members([Service Type], LEAF) on 0
 from [Airline Turnover]
 where ([measure].proportion, [Aircraft Type].[ALL].[Airbus].[Airbus A380]);
 
@@ -989,7 +989,7 @@ from [Online Store] ;
 with member [measure].[[p[ro[port]]io]]n]]] as [measure].Turnover / ([Service Type].[ALL], [measure].Turnover)
 select
 {Date.[ALL].[2020],Date.[ALL].[2021],Date.[ALL].[2022]} on 1,
-members([Service Type], LEAFS) on 0
+members([Service Type], LEAF) on 0
 from [Airline Turnover]
 where ([measure].[[p[ro[port]]io]]n]]], [Aircraft Type].[ALL].[Airbus].[Airbus A380]);
 
