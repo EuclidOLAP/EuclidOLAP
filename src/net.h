@@ -11,6 +11,11 @@ void net_init();
 typedef struct sock_intent_thread
 {
 	pthread_t thread_id;
+
+	// When the SockIntentThread object represents a Worker-Node that joins the cluster,
+	// this field stores the ID of the Worker-Node.
+	unsigned long worker_id;
+
 	int sock_fd;
 	intent inte;
 } SockIntentThread;
@@ -25,6 +30,9 @@ int sit_send_command(SockIntentThread *sit, EuclidCommand *ec);
 
 // Randomly obtain a socket corresponding to a downstream node.
 int random_child_sock();
+
+// The socket of the worker node is obtained by worker_id.
+int work_node_sock(unsigned long worker_id);
 
 SockIntentThread *master_sit();
 

@@ -718,7 +718,7 @@ int store_measure(EuclidCommand *ec)
 	return vce_append(ec);
 }
 
-int distribute_store_measure(EuclidCommand *ec)
+int distribute_store_measure(EuclidCommand *ec, unsigned long worker_id)
 {
 	EuclidConfig *cfg = get_cfg();
 
@@ -727,10 +727,14 @@ int distribute_store_measure(EuclidCommand *ec)
 		return store_measure(ec);
 	}
 
-	return send(random_child_sock(), ec->bytes, *((int *)(ec->bytes)), 0) == (ssize_t)(*((int *)(ec->bytes)));
+	if (worker_id) {
+		return send(work_node_sock(worker_id), ec->bytes, *((int *)(ec->bytes)), 0) == (ssize_t)(*((int *)(ec->bytes)));
+	} else {
+		return send(random_child_sock(), ec->bytes, *((int *)(ec->bytes)), 0) == (ssize_t)(*((int *)(ec->bytes)));
+	}
 }
 
-int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
+int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear, unsigned long worker_id)
 {
 	ByteBuf *buf = buf__alloc(64 * 1024);
 
@@ -819,7 +823,7 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear)
 	EuclidCommand *_ec_ = create_command(payload);
 
 	// Store measure values locally or distribute it to downstream nodes for processing
-	int res = distribute_store_measure(_ec_);
+	int res = distribute_store_measure(_ec_, worker_id);
 
 	obj_release(_ec_->bytes);
 	obj_release(_ec_);

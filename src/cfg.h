@@ -28,7 +28,7 @@
 #define DEF_CONF "euclid-svr.conf"
 #define DEF_CLI_CONF "euclid-cli.conf"
 
-#define CFG_WORKERID_LEN_LIMIT 16
+#define CFG_WORKERID_LEN_LIMIT 32
 
 typedef struct euclid_cfg
 {

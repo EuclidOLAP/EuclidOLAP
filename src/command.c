@@ -19,7 +19,7 @@
 
 // CCI - constant command intention
 static EuclidCommand *CCI_ALLOW;
-static EuclidCommand *CCI_CHILD_NODE_JOIN;
+static EuclidCommand *CCI_WORKER_JOINS_CLUSTER;
 static EuclidCommand *CCI_TERML_CTRL;
 static EuclidCommand *CCI_GENERIC_SUCCESS;
 
@@ -42,17 +42,23 @@ static int execute_command(EuclidCommand *ec);
 
 int init_command_module()
 {
+	size_t _sz_ = 0;
+	char *__ptr = NULL;
+	EuclidConfig *cfg = get_cfg();
+
 	// init CCI_ALLOW
 	char *addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
 	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT;
 	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__ALLOW;
 	CCI_ALLOW = create_command(addr);
 
-	// init CCI_CHILD_NODE_JOIN
-	addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
-	*((unsigned int *)addr) = SZOF_USG_INT + SZOF_USG_SHORT;
-	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__CHILD_NODE_JOIN;
-	CCI_CHILD_NODE_JOIN = create_command(addr);
+	// init CCI_WORKER_JOINS_CLUSTER
+	_sz_ = SZOF_USG_INT + SZOF_USG_SHORT + sizeof(unsigned long);
+	addr = obj_alloc(_sz_, OBJ_TYPE__RAW_BYTES);
+	*((unsigned int *)addr) = _sz_;
+	*((unsigned short *)(addr + SZOF_USG_INT)) = INTENT__WORKER_JOINS_CLUSTER;
+	*((unsigned long *)(addr + SZOF_USG_INT + SZOF_USG_SHORT)) = strtoul(cfg->worker_id, &__ptr, 10);
+	CCI_WORKER_JOINS_CLUSTER = create_command(addr);
 
 	// init CCI_TERML_CTRL
 	addr = obj_alloc(SZOF_USG_INT + SZOF_USG_SHORT, OBJ_TYPE__RAW_BYTES);
@@ -101,8 +107,8 @@ EuclidCommand *get_const_command_intent(intent inte)
 	if (inte == INTENT__ALLOW)
 		return CCI_ALLOW;
 
-	if (inte == INTENT__CHILD_NODE_JOIN)
-		return CCI_CHILD_NODE_JOIN;
+	if (inte == INTENT__WORKER_JOINS_CLUSTER)
+		return CCI_WORKER_JOINS_CLUSTER;
 
 	if (inte == INTENT__TERMINAL_CONTROL)
 		return CCI_TERML_CTRL;
@@ -201,7 +207,9 @@ static int execute_command(EuclidCommand *action)
 	intent inte = ec_get_intent(action);
 	if (inte == INTENT__INSERT_CUBE_MEASURE_VALS)
 	{
-		distribute_store_measure(action);
+		// This line of code is executed only when running in worker mode.
+		assert(get_cfg()->mode == MODE_WORKER);
+		distribute_store_measure(action, 0);
 	}
 	else if (inte == INTENT__MDX || inte == INTENT__MDX_EXPECT_RESULT_TXT)
 	{
@@ -259,11 +267,13 @@ static int execute_command(EuclidCommand *action)
 		}
 		else if (ids_type == IDS_CXOBJ_ISRTCUBEMEARS)
 		{
-			ArrayList *ls_vms;
-			char *cube_name;
+			ArrayList *ls_vms = NULL;
+			unsigned long worker_id = 0;
+			char *cube_name = NULL;
 			stack_pop(&stk, (void **)&ls_vms);
+			stack_pop(&stk, (void **)&worker_id);
 			stack_pop(&stk, (void **)&cube_name);
-			insert_cube_measure_vals(cube_name, ls_vms);
+			insert_cube_measure_vals(cube_name, ls_vms, worker_id);
 		}
 		else if (ids_type == IDS_MULTI_DIM_SELECT_DEF)
 		{
