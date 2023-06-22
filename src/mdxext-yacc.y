@@ -44,8 +44,6 @@ Stack AST_STACK = { 0 };
 %token OR			/* or */
 
 %token MAKE			/* make */
-%token EQUIVALENT	/* equivalent */
-%token TO			/* to */
 
 %token COLUMNS		/* columns */
 %token ROWS			/* rows */
