@@ -196,7 +196,7 @@ select
   Date.[ALL].[2021],
   Date.[ALL].[2022]
 } on columns,
-members([Service Type], LEAFS) on rows
+members([Service Type], LEAF) on rows
 from [Airline Turnover]
 where ([measure].proportion, [Aircraft Type].[ALL].[Airbus].[Airbus A380]);
 ```

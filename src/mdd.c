@@ -2261,14 +2261,14 @@ MddSet *SetFnMembers_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTu
 
 		MddMemberRole *mr = NULL;
 
-		if (!strcmp(fn->option, "LEAFS"))
+		if (!strcmp(fn->option, "LEAF"))
 		{
 			if (member->bin_attr & 1) // not leaf
 				continue;
 			goto gtf;
 		}
 
-		if (!strcmp(fn->option, "NOT_LEAFS"))
+		if (!strcmp(fn->option, "NOT_LEAF"))
 		{
 			if ((member->bin_attr & 1) != 1) // it is leaf
 				continue;

@@ -6,13 +6,13 @@ with member [支払い方法].PROPORTION as ([支払い方法].[ALL].[クレジ�
 ---
 select children([コモディティ].[キッチン・ダイニング]) on 0, children([Calendar].[ALL].[2021].[Q4]) on 1 from [オンラインショップ] where (measure.[売上高]);
 ---
-select members([コモディティ], NOT_LEAFS) on 10, members(Calendar, LEAFS) on 100 from [オンラインショップ];
+select members([コモディティ], NOT_LEAF) on 10, members(Calendar, LEAF) on 100 from [オンラインショップ];
 ---
-select { (measure.[売上高]), (measure.[販売台数]) } on 10, crossjoin(members([ショップタイプ], LEAFS), members([支払い方法], ALL)) on 100 from [オンラインショップ];
+select { (measure.[売上高]), (measure.[販売台数]) } on 10, crossjoin(members([ショップタイプ], LEAF), members([支払い方法], ALL)) on 100 from [オンラインショップ];
 ---
-select { (measure.[売上高]), (measure.[販売台数]) } on 10, crossjoin(members([ショップタイプ], LEAFS), members([支払い方法], ALL), children([Calendar].[ALL].[2021].[Q4])) on 100 from [オンラインショップ];
+select { (measure.[売上高]), (measure.[販売台数]) } on 10, crossjoin(members([ショップタイプ], LEAF), members([支払い方法], ALL), children([Calendar].[ALL].[2021].[Q4])) on 100 from [オンラインショップ];
 ---
-select { (measure.[販売台数]), (measure.[売上高]) } on 10, crossjoin(members([ショップタイプ], LEAFS), members([支払い方法], ALL), children([Calendar].[ALL].[2021].[Q4]), children([コモディティ].[ALL])) on 100 from [オンラインショップ];
+select { (measure.[販売台数]), (measure.[売上高]) } on 10, crossjoin(members([ショップタイプ], LEAF), members([支払い方法], ALL), children([Calendar].[ALL].[2021].[Q4]), children([コモディティ].[ALL])) on 100 from [オンラインショップ];
 ---
 select members(measure) on 0, crossjoin(children([ショップタイプ].[ALL]), members([支払い方法])) on 1 from [オンラインショップ];
 ---

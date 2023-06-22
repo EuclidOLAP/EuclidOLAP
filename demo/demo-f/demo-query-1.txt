@@ -10,15 +10,15 @@ select children([Goods].[Kitchen & Dining]) on 0, children([Calendar].[ALL].[202
 ---
 select children([GoodsXXXXXXXXXXXXXX].[Kitchen & Dining]) on 0, children([Calendar].[ALL].[2021].[Q4]) on 1 from [Online Store] where (measure.[sales amount]);
 ---
-select members([Goods], NOT_LEAFS) on 10, members(Calendar, LEAFS) on 100 from [Online Store];
+select members([Goods], NOT_LEAF) on 10, members(Calendar, LEAF) on 100 from [Online Store];
 ---
-select members([Goods], NOT_LEAFS) on 10, members(Calendar, LEAFS) on 100 from [OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO];
+select members([Goods], NOT_LEAF) on 10, members(Calendar, LEAF) on 100 from [OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO];
 ---
-select { (measure.[sales amount]), (measure.[sales quantity]) } on 10, crossjoin(members([Store Type], LEAFS), members([Payment Method], ALL)) on 100 from [Online Store];
+select { (measure.[sales amount]), (measure.[sales quantity]) } on 10, crossjoin(members([Store Type], LEAF), members([Payment Method], ALL)) on 100 from [Online Store];
 ---
-select { (measure.[sales amount]), (measure.[sales quantity]) } on 10, crossjoin(members([Store Type], LEAFS), members([Payment Method], ALL), children([Calendar].[ALL].[2021].[Q4])) on 100 from [Online Store];
+select { (measure.[sales amount]), (measure.[sales quantity]) } on 10, crossjoin(members([Store Type], LEAF), members([Payment Method], ALL), children([Calendar].[ALL].[2021].[Q4])) on 100 from [Online Store];
 ---
-select { (measure.[sales quantity]), (measure.[sales amount]) } on 10, crossjoin(members([Store Type], LEAFS), members([Payment Method], ALL), children([Calendar].[ALL].[2021].[Q4]), children(Goods.[ALL])) on 100 from [Online Store];
+select { (measure.[sales quantity]), (measure.[sales amount]) } on 10, crossjoin(members([Store Type], LEAF), members([Payment Method], ALL), children([Calendar].[ALL].[2021].[Q4]), children(Goods.[ALL])) on 100 from [Online Store];
 ---
 select members(measure) on 0, crossjoin(children([Store Type].[ALL]), members([Payment Method])) on 1 from [Online Store];
 ---
@@ -226,7 +226,7 @@ with member measure.AAA as CoalesceEmpty((measure.[cash back]), (measure.[sales 
 ---
 with member measure.AAA as CoalesceEmpty(CoalesceEmpty((measure.[cash back]), (measure.[cash back], [Store Type].[ALL].[Platform Self-operated Store])), 8760.66) select { (measure.[sales amount]), (measure.[cash back]), (measure.AAA) } on 0, { (Calendar.[ALL]) } on 1 from [Online Store] ;
 ---
-select { (measure.[sales quantity]), (measure.[sales amount]) } on 10, crossjoin(members([Store Type], LEAFS), members([Payment Method], ALL), children([Calendar].[CCCCCCCCCCCCCCCCC].[2021].[Q4]), children(Goods.[ALL])) on 100 from [Online Store];
+select { (measure.[sales quantity]), (measure.[sales amount]) } on 10, crossjoin(members([Store Type], LEAF), members([Payment Method], ALL), children([Calendar].[CCCCCCCCCCCCCCCCC].[2021].[Q4]), children(Goods.[ALL])) on 100 from [Online Store];
 ---
 select { ( [starting region].[ALL].[Asia].[VVVVVVVVVVVVVV], Transport.[ALL].railway ) } on 0, filter({ ( [starting date].[ALL].[2019].[Q4].[M10], Goods.[ALL].[foods].[nut], [measure].[income] ), ( [starting date].[ALL].[2019].[Q4].[M10], Goods.[ALL].[foods].[nut] ), ( [starting date].[ALL].[2019].[Q3].[M9], Goods.[ALL].[foods].[wine] ), ( [ending region].[ALL].[Asia].[China], [starting date].[ALL].[2019].[Q3].[M7], [completion date].[ALL].[2019].[Q3].[M7] ) }, ((Transport.[ALL].railway) > 0) OR (1 < 2)) on 1 from [logistics.test] ;
 ---
@@ -424,13 +424,13 @@ with member [支付方式].PROPORTION as ([支付方式].[ALL].[信用卡]) / ([
 ---
 select children([商品].[厨房和餐厅]) on 0, children([Calendar].[ALL].[2021].[Q4]) on 1 from [在线商店] where (measure.[销售额]);
 ---
-select members([商品], NOT_LEAFS) on 10, members(Calendar, LEAFS) on 100 from [在线商店];
+select members([商品], NOT_LEAF) on 10, members(Calendar, LEAF) on 100 from [在线商店];
 ---
-select { (measure.[销售额]), (measure.[销售数量]) } on 10, crossjoin(members([店铺类型], LEAFS), members([支付方式], ALL)) on 100 from [在线商店];
+select { (measure.[销售额]), (measure.[销售数量]) } on 10, crossjoin(members([店铺类型], LEAF), members([支付方式], ALL)) on 100 from [在线商店];
 ---
-select { (measure.[销售额]), (measure.[销售数量]) } on 10, crossjoin(members([店铺类型], LEAFS), members([支付方式], ALL), children([Calendar].[ALL].[2021].[Q4])) on 100 from [在线商店];
+select { (measure.[销售额]), (measure.[销售数量]) } on 10, crossjoin(members([店铺类型], LEAF), members([支付方式], ALL), children([Calendar].[ALL].[2021].[Q4])) on 100 from [在线商店];
 ---
-select { (measure.[销售数量]), (measure.[销售额]) } on 10, crossjoin(members([店铺类型], LEAFS), members([支付方式], ALL), children([Calendar].[ALL].[2021].[Q4]), children([商品].[ALL])) on 100 from [在线商店];
+select { (measure.[销售数量]), (measure.[销售额]) } on 10, crossjoin(members([店铺类型], LEAF), members([支付方式], ALL), children([Calendar].[ALL].[2021].[Q4]), children([商品].[ALL])) on 100 from [在线商店];
 ---
 select members(measure) on 0, crossjoin(children([店铺类型].[ALL]), members([支付方式])) on 1 from [在线商店];
 ---
