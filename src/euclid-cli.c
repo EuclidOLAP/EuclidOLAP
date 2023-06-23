@@ -7,6 +7,7 @@
 #include "cfg.h"
 #include "command.h"
 #include "utils.h"
+#include "printer.h"
 
 #define __PROMPT_TEXT__ ">>>>>> Please enter a command, exit enter the 'q' >>>>>>"
 #define __RESULT_TEXT__ ">>>>>>>>>>>>>>>>>>>>>>>> RESULT >>>>>>>>>>>>>>>>>>>>>>>>"
@@ -106,7 +107,7 @@ int main(int argc, char *argv[])
 				}
 
 				EuclidCommand *mdx_ec = build_intent_command_mdx(statement);
-				ec_change_intent(mdx_ec, INTENT__MDX_EXPECT_RESULT_TXT);
+				// ec_change_intent(mdx_ec, INTENT__MDX_EXPECT_RESULT_TXT);
 
 				send(sock_fd, mdx_ec->bytes, ec_get_capacity(mdx_ec), 0);
 
@@ -117,6 +118,9 @@ int main(int argc, char *argv[])
 
 				switch (ec_get_intent(result))
 				{
+				case INTENT__MULTIDIM_RESULT_BIN:
+					print_mdrs(result);
+					break;
 				case INTENT__SUCCESSFUL:
 				case INTENT__EXE_RESULT_DESC:
 				case INTENT__FAILURE:
@@ -172,7 +176,7 @@ int main(int argc, char *argv[])
 		}
 
 		EuclidCommand *mdx_ec = build_intent_command_mdx(exe_stat);
-		ec_change_intent(mdx_ec, INTENT__MDX_EXPECT_RESULT_TXT);
+		// ec_change_intent(mdx_ec, INTENT__MDX_EXPECT_RESULT_TXT);
 
 		printf("-----------------------------------------------------------------------------------------------------------\n");
 		if (strlen(exe_stat) < 200)
@@ -192,6 +196,9 @@ int main(int argc, char *argv[])
 
 		switch (ec_get_intent(result))
 		{
+		case INTENT__MULTIDIM_RESULT_BIN:
+			print_mdrs(result);
+			break;
 		case INTENT__SUCCESSFUL:
 		case INTENT__EXE_RESULT_DESC:
 		case INTENT__FAILURE:

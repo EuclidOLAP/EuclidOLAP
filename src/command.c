@@ -211,7 +211,7 @@ static int execute_command(EuclidCommand *action)
 		assert(get_cfg()->mode == MODE_WORKER);
 		distribute_store_measure(action, 0);
 	}
-	else if (inte == INTENT__MDX || inte == INTENT__MDX_EXPECT_RESULT_TXT)
+	else if (inte == INTENT__MDX /* || inte == INTENT__MDX_EXPECT_RESULT_TXT */)
 	{
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
 		// Set the MDX parsing completion flag to 0.
@@ -300,26 +300,11 @@ static int execute_command(EuclidCommand *action)
 
 			if (cur_thrd_mam->exception_desc == NULL)
 			{
-				// MultiDimResult_print(md_rs);
-
-				if (ec_get_intent(action) == INTENT__MDX_EXPECT_RESULT_TXT)
-				{
-					// todo Do not use the allocated memory block directly, replace by ElasticByteBuffer.
-					char *payload = obj_alloc(SZOF_INT + SZOF_SHORT + 0x01UL << 20, OBJ_TYPE__RAW_BYTES);
-
-					*((unsigned int *)payload) = SZOF_INT + SZOF_SHORT + 0x01UL << 20;
-					*((unsigned short *)(payload + SZOF_INT)) = INTENT__SUCCESSFUL;
-					mdrs_to_str(md_rs, payload + SZOF_INT + SZOF_SHORT, 0x01UL << 20);
-					action->result = create_command(payload);
-				}
-				else
-				{
-					ByteBuf *binuf = mdrs_to_bin(md_rs);
-					char *payload = obj_alloc(binuf->index, OBJ_TYPE__RAW_BYTES);
-					memcpy(payload, binuf->buf_addr, binuf->index);
-					buf_release(binuf);
-					action->result = create_command(payload);
-				}
+				ByteBuf *binuf = mdrs_to_bin(md_rs);
+				char *payload = obj_alloc(binuf->index, OBJ_TYPE__RAW_BYTES);
+				memcpy(payload, binuf->buf_addr, binuf->index);
+				buf_release(binuf);
+				action->result = create_command(payload);
 			}
 		}
 		else if (ids_type == IDS_ARRLS_DIMS_LVS_INFO)
