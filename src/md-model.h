@@ -78,6 +78,7 @@ typedef struct _euclid_cube_stct_
 	ArrayList *measure_mbrs;
 } Cube;
 
+#define DR_MEASURE_MASK 0x01
 
 typedef struct _dim_role_stct_
 {
@@ -86,6 +87,11 @@ typedef struct _dim_role_stct_
 	md_gid cube_gid;
 	md_gid dim_gid;
 	int sn; // sequence number
+
+	/*
+	 * lowest bit: 0 - non measure dimension role, 1 - measure
+	 */
+	int bin_attr;
 } DimensionRole;
 
 
