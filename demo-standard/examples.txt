@@ -229,6 +229,39 @@ from [Airline B];
 ---
 
 with
+member [Measures].XXXxxx as name([Date].[all])
+select
+{
+  [Measures].XXXxxx
+} on 0,
+{ Date.[2022].Q1 } on 1
+from [Airline A];
+
+---
+
+with
+member [Measures].XXXxxx as Date.Financial.Name
+select
+{
+  [Measures].XXXxxx
+} on 0,
+{ Date.[2022].Q1 } on 1
+from [Airline A];
+
+---
+
+with
+member [Measures].XXXxxx as [Classes of Service].[Premium Economy Class].name()
+select
+{
+  [Measures].XXXxxx
+} on 0,
+{ Date.[2022].Q1 } on 1
+from [Airline A];
+
+---
+
+with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
 select

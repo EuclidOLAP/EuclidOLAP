@@ -321,9 +321,15 @@ string_function:
 		func->head.interpret = strfn_name_interpreter;
 		stack_push(&AST_STACK, func);
 	}
+  |
+	NAME {
+		ASTStrFunc_Name *func = mam_alloc(sizeof(ASTStrFunc_Name), OBJ_TYPE__ASTStrFunc_Name, NULL, 0);
+		func->head.interpret = strfn_name_interpreter;
+		stack_push(&AST_STACK, func);
+	}
 ;
 
-string_expression:
+/* string_expression:
 	str_token {
 		char *literal = NULL;
 		stack_pop(&AST_STACK, (void **) &literal);
@@ -343,7 +349,7 @@ string_expression:
 		strexp->head.interpret = strexp_interpret;
 		stack_push(&AST_STACK, strexp);
 	}
-;
+; */
 
 expression:
 	term {
@@ -409,15 +415,15 @@ factory:
 		MDMEntityUniversalPath *universal_path = NULL;
 		stack_pop(&AST_STACK, (void **)&universal_path);
 
-		ArrayList *up_ls = als_new(8, "<MDMEntityUniversalPath *>", THREAD_MAM, NULL);
-		als_add(up_ls, universal_path);
+		// ArrayList *up_ls = als_new(8, "<MDMEntityUniversalPath *>", THREAD_MAM, NULL);
+		// als_add(up_ls, universal_path);
 
-		TupleDef *t_def = ids_tupledef_new(TUPLE_DEF__UPATH_LS);
-		t_def->universal_path_ls = up_ls;
+		// TupleDef *t_def = ids_tupledef_new(TUPLE_DEF__UPATH_LS);
+		// t_def->universal_path_ls = up_ls;
 
 		Factory *factory = Factory_creat();
-		factory->t_cons = FACTORY_DEF__TUP_DEF;
-		factory->tuple_def = t_def;
+		factory->t_cons = FACTORY_DEF__EU_PATH;
+		factory->up = universal_path;
 
 		stack_push(&AST_STACK, factory);
 	}
@@ -445,6 +451,14 @@ factory:
 		stack_push(&AST_STACK, factory);
 	}
   |
+	STRING {
+		Factory *fac = Factory_creat();
+		fac->t_cons = FACTORY_DEF__STR_LITERAL;
+		fac->str_literal = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__STRING, NULL, 0);
+		memcpy(fac->str_literal, yytext + 1, strlen(yytext) - 2);
+		stack_push(&AST_STACK, fac);
+	}
+  /* |
 	string_expression {
 		ASTStrExp *strexp = NULL;
 		stack_pop(&AST_STACK, (void **) &strexp);
@@ -454,7 +468,7 @@ factory:
 		fac->strexp = strexp;
 
 		stack_push(&AST_STACK, fac);
-	}
+	} */
   /* | mdm_entity_universal_path {
 
 	} */
@@ -2007,6 +2021,17 @@ mdm_entity_universal_path:
 		stack_push(&AST_STACK, up);
 	}
   |
+	string_function {
+		void *strfunc = NULL;
+		stack_pop(&AST_STACK, (void **) &strfunc);
+
+		MDMEntityUniversalPath *up = mam_alloc(sizeof(MDMEntityUniversalPath), OBJ_TYPE__MDMEntityUniversalPath, NULL, 0);
+		up->list = als_new(8, NULL, THREAD_MAM, NULL);
+
+		als_add(up->list, strfunc);
+		stack_push(&AST_STACK, up);
+	}
+  |
 	mdm_entity_universal_path DOT mdm_entity_up_segment {
 		MdmEntityUpSegment *up_seg = NULL;
 		stack_pop(&AST_STACK, (void **) &up_seg);
@@ -2035,6 +2060,16 @@ mdm_entity_universal_path:
 		stack_pop(&AST_STACK, (void **) &up);
 
 		als_add(up->list, suf_setfn_tpl);
+		stack_push(&AST_STACK, up);
+	}
+  |
+	mdm_entity_universal_path DOT string_function {
+		void *strfunc = NULL;
+		stack_pop(&AST_STACK, (void **) &strfunc);
+		MDMEntityUniversalPath *up = NULL;
+		stack_pop(&AST_STACK, (void **) &up);
+
+		als_add(up->list, strfunc);
 		stack_push(&AST_STACK, up);
 	}
 ;

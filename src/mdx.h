@@ -139,6 +139,8 @@ MDContext *MDContext_creat();
 #define FACTORY_DEF__EXPRESSION 3
 #define FACTORY_DEF__EXP_FN 4
 #define FACTORY_DEF__STREXP 5
+#define FACTORY_DEF__STR_LITERAL 6
+#define FACTORY_DEF__EU_PATH 7
 typedef struct factory_definition
 {
     ids_ct t_cons;
@@ -146,6 +148,8 @@ typedef struct factory_definition
     double decimal;
     void *exp;
     ASTStrExp *strexp;
+    char *str_literal;
+    MDMEntityUniversalPath *up;
 } Factory;
 Factory *Factory_creat();
 
