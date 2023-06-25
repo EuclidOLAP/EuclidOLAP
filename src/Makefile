@@ -1,9 +1,9 @@
 SRC_FILES = cfg.c net.c utils.c command.c mdxext-lex.yy.c mdxext-yacc.tab.c mdx.c mdd.c vce.c rb-tree.c log.c \
 tools/elastic-byte-buffer.c locks/global-locks.c mdm-astmrfn-interpreter.c \
-mdm-astlogifn-interpreter.c printer.c
+mdm-astlogifn-interpreter.c printer.c mdm-ast-str-fn.c math.c
 OBJ_FILES = cfg.o net.o utils.o command.o mdxext-lex.yy.o mdxext-yacc.tab.o mdx.o mdd.o vce.o rb-tree.o log.o \
 tools/elastic-byte-buffer.o locks/global-locks.o mdm-astmrfn-interpreter.o \
-mdm-astlogifn-interpreter.o printer.o
+mdm-astlogifn-interpreter.o printer.o mdm-ast-str-fn.o math.o
 
 euclid : euclid-svr.c euclid-cli.c $(SRC_FILES) euclid-svr.o euclid-cli.o $(OBJ_FILES)
 	cc      $(OBJ_FILES)  euclid-svr.o  -o euclid-svr      -lpthread

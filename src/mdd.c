@@ -8,6 +8,7 @@
 
 #include "log.h"
 #include "mdd.h"
+#include "math.h"
 #include "mdx.h"
 #include "command.h"
 #include "cfg.h"
@@ -1008,33 +1009,41 @@ MultiDimResult *exe_multi_dim_queries(SelectDef *select_def)
 			}
 		}
 
-		md_result->vals = mam_alloc(sizeof(double) * rs_len, OBJ_TYPE__RAW_BYTES, NULL, 0);
-		md_result->null_flags = mam_alloc(sizeof(char) * rs_len, OBJ_TYPE__RAW_BYTES, NULL, 0);
-		md_result->rs_len = rs_len;
+		md_result->axes = axes;
+		md_result->grids = als_new(rs_len, "GridData *", THREAD_MAM, NULL);
+		GridData *gd_arr = mam_alloc(rs_len * sizeof(GridData), OBJ_TYPE__GridData, NULL, 0);
+		// md_result->vals = mam_alloc(sizeof(double) * rs_len, OBJ_TYPE__RAW_BYTES, NULL, 0);
+		// md_result->null_flags = mam_alloc(sizeof(char) * rs_len, OBJ_TYPE__RAW_BYTES, NULL, 0);
+		// md_result->rs_len = rs_len;
 
 		int di = 0, ci = 0;
 		for (int x=0; x<rs_len; x++) {
 			if (als_get(__merge_in__, x) == __dv__) {
-				md_result->vals[x] = md_rs__vals[di];
-				md_result->null_flags[x] = md_rs__null_flags[di];
+				// md_result->vals[x] = md_rs__vals[di];
+				(gd_arr + x)->val = md_rs__vals[di];
+				// md_result->null_flags[x] = md_rs__null_flags[di];
+				(gd_arr + x)->null_flag = md_rs__null_flags[di];
 				++di;
 			} else {
 				GridData *gd = als_get(cal_grids, ci++);
-				md_result->vals[x] = gd->val;
-				md_result->null_flags[x] = gd->null_flag;
+				// md_result->vals[x] = gd->val;
+				(gd_arr + x)->val = gd->val;
+				// md_result->null_flags[x] = gd->null_flag;
+				(gd_arr + x)->null_flag = gd->null_flag;
 			}
+			als_add(md_result->grids, gd_arr + x);
 		}
-
-		md_result->axes = axes;
 
 		return md_result;
 	}
 
-	// 'measure_vals' is equivalent to a double array whose length is 'rs_len'.
-	double *measure_vals = vce_vactors_values(md_ctx, tuples_matrix_h, rs_len, &(md_result->null_flags));
 	md_result->axes = axes;
-	md_result->vals = measure_vals;
-	md_result->rs_len = rs_len;
+	md_result->grids = vce_vactors_values(md_ctx, tuples_matrix_h, rs_len);
+
+	// // 'measure_vals' is equivalent to a double array whose length is 'rs_len'.
+	// double *measure_vals = vce_vactors_values(md_ctx, tuples_matrix_h, rs_len, &(md_result->null_flags));
+	// md_result->vals = measure_vals;
+	// md_result->rs_len = rs_len;
 
 	return md_result;
 }
@@ -1985,8 +1994,8 @@ Member *find_member_by_gid(md_gid m_gid)
 
 void Expression_evaluate(MDContext *md_ctx, Expression *exp, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data)
 {
-	grid_data->val = 0;
-	grid_data->null_flag = 1;
+	// grid_data->val = 0;
+	// grid_data->null_flag = 1;
 
 	int p_sz = als_size(exp->plus_terms);
 	int m_sz = als_size(exp->minus_terms);
@@ -1999,6 +2008,12 @@ void Expression_evaluate(MDContext *md_ctx, Expression *exp, Cube *cube, MddTupl
 		Term *term = als_get(exp->plus_terms, i);
 		// val += Term_evaluate(md_ctx, term, cube, ctx_tuple, &tmp);
 		Term_evaluate(md_ctx, term, cube, ctx_tuple, &tmp);
+
+		if (i == 0) {
+			memcpy(grid_data, &tmp, sizeof(GridData));
+			continue;
+		}
+
 		if (tmp.null_flag == 0)
 		{
 			grid_data->val += tmp.val;
@@ -2031,8 +2046,8 @@ void Expression_evaluate(MDContext *md_ctx, Expression *exp, Cube *cube, MddTupl
 
 void Term_evaluate(MDContext *md_ctx, Term *term, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data)
 {
-	grid_data->val = 1;
-	grid_data->null_flag = 1;
+	// grid_data->val = 1;
+	// grid_data->null_flag = 1;
 
 	int m_sz = als_size(term->mul_factories);
 	int d_sz = als_size(term->div_factories);
@@ -2044,6 +2059,12 @@ void Term_evaluate(MDContext *md_ctx, Term *term, Cube *cube, MddTuple *ctx_tupl
 	{
 		Factory *fac = als_get(term->mul_factories, i);
 		Factory_evaluate(md_ctx, fac, cube, ctx_tuple, &tmp);
+
+		if (i == 0) {
+			memcpy(grid_data, &tmp, sizeof(GridData));
+			continue;
+		}
+
 		if (tmp.null_flag == 0)
 		{
 			grid_data->val *= tmp.val;
@@ -2125,6 +2146,9 @@ void Factory_evaluate(MDContext *md_ctx, Factory *fac, Cube *cube, MddTuple *ctx
 			log_print("[ error ] - Factory_evaluate() - Unknown expression function type.\n");
 			exit(1);
 		}
+	} else if (fac->t_cons == FACTORY_DEF__STREXP) {
+		GridData *gd = fac->strexp->head.interpret(md_ctx, NULL, fac->strexp, ctx_tuple, cube);
+		memcpy(grid_data, gd, sizeof(GridData));
 	}
 	else
 	{
@@ -3339,117 +3363,117 @@ MultiDimResult *MultiDimResult_creat()
 	return mam_alloc(sizeof(MultiDimResult), OBJ_TYPE__MultiDimResult, NULL, 0);
 }
 
-void MultiDimResult_print(MultiDimResult *md_rs)
-{
-	log_print("\n\n\n");
-	log_print("### !!! MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
+// void MultiDimResult_print(MultiDimResult *md_rs)
+// {
+// 	log_print("\n\n\n");
+// 	log_print("### !!! MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
 
-	if (md_rs == NULL)
-	{
-		log_print("##################################################################\n");
-		log_print("##################################################################\n");
-		log_print("##                    MultiDimResult is NULL                    ##\n");
-		log_print("##################################################################\n");
-		log_print("##################################################################\n");
-		goto end;
-	}
+// 	if (md_rs == NULL)
+// 	{
+// 		log_print("##################################################################\n");
+// 		log_print("##################################################################\n");
+// 		log_print("##                    MultiDimResult is NULL                    ##\n");
+// 		log_print("##################################################################\n");
+// 		log_print("##################################################################\n");
+// 		goto end;
+// 	}
 
-	int i, x_sz = als_size(md_rs->axes);
-	for (i = 0; i < x_sz; i++)
-	{
-		MddAxis *axis = als_get(md_rs->axes, i);
-		log_print("axis->posi [ %u ]\n", axis->posi);
-	}
-	if (x_sz != 2)
-	{
-		for (i = 0; i < 10; i++)
-			log_print("***************************************************\n");
-		goto end;
-	}
+// 	int i, x_sz = als_size(md_rs->axes);
+// 	for (i = 0; i < x_sz; i++)
+// 	{
+// 		MddAxis *axis = als_get(md_rs->axes, i);
+// 		log_print("axis->posi [ %u ]\n", axis->posi);
+// 	}
+// 	if (x_sz != 2)
+// 	{
+// 		for (i = 0; i < 10; i++)
+// 			log_print("***************************************************\n");
+// 		goto end;
+// 	}
 
-	MddAxis *col_ax = als_get(md_rs->axes, 0);
-	MddAxis *row_ax = als_get(md_rs->axes, 1);
-	if (col_ax->posi > row_ax->posi)
-	{
-		MddAxis *x_tmp = col_ax;
-		col_ax = row_ax;
-		row_ax = x_tmp;
-	}
+// 	MddAxis *col_ax = als_get(md_rs->axes, 0);
+// 	MddAxis *row_ax = als_get(md_rs->axes, 1);
+// 	if (col_ax->posi > row_ax->posi)
+// 	{
+// 		MddAxis *x_tmp = col_ax;
+// 		col_ax = row_ax;
+// 		row_ax = x_tmp;
+// 	}
 
-	int col_len = als_size(col_ax->set->tuples);
-	int row_len = als_size(row_ax->set->tuples);
-	int col_thickness = als_size(((MddTuple *)als_get(col_ax->set->tuples, 0))->mr_ls);
-	for (i = 1; i < als_size(col_ax->set->tuples); i++)
-	{
-		if (als_size(((MddTuple *)als_get(col_ax->set->tuples, i))->mr_ls) > col_thickness)
-			col_thickness = als_size(((MddTuple *)als_get(col_ax->set->tuples, i))->mr_ls);
-	}
-	int row_thickness = als_size(((MddTuple *)als_get(row_ax->set->tuples, 0))->mr_ls);
-	for (i = 1; i < als_size(row_ax->set->tuples); i++)
-	{
-		if (als_size(((MddTuple *)als_get(row_ax->set->tuples, i))->mr_ls) > row_thickness)
-			row_thickness = als_size(((MddTuple *)als_get(row_ax->set->tuples, i))->mr_ls);
-	}
+// 	int col_len = als_size(col_ax->set->tuples);
+// 	int row_len = als_size(row_ax->set->tuples);
+// 	int col_thickness = als_size(((MddTuple *)als_get(col_ax->set->tuples, 0))->mr_ls);
+// 	for (i = 1; i < als_size(col_ax->set->tuples); i++)
+// 	{
+// 		if (als_size(((MddTuple *)als_get(col_ax->set->tuples, i))->mr_ls) > col_thickness)
+// 			col_thickness = als_size(((MddTuple *)als_get(col_ax->set->tuples, i))->mr_ls);
+// 	}
+// 	int row_thickness = als_size(((MddTuple *)als_get(row_ax->set->tuples, 0))->mr_ls);
+// 	for (i = 1; i < als_size(row_ax->set->tuples); i++)
+// 	{
+// 		if (als_size(((MddTuple *)als_get(row_ax->set->tuples, i))->mr_ls) > row_thickness)
+// 			row_thickness = als_size(((MddTuple *)als_get(row_ax->set->tuples, i))->mr_ls);
+// 	}
 
-	int ri, ci;
-	log_print("\n");
-	for (ri = 0; ri < col_thickness + row_len; ri++)
-	{
-		for (ci = 0; ci < row_thickness + col_len; ci++)
-		{
-			if (ri < col_thickness && ci < row_thickness)
-			{
-				log_print("% 20s", "-");
-			}
-			else if (ri < col_thickness && ci >= row_thickness)
-			{
-				MddTuple *c_tuple = als_get(col_ax->set->tuples, ci - row_thickness);
+// 	int ri, ci;
+// 	log_print("\n");
+// 	for (ri = 0; ri < col_thickness + row_len; ri++)
+// 	{
+// 		for (ci = 0; ci < row_thickness + col_len; ci++)
+// 		{
+// 			if (ri < col_thickness && ci < row_thickness)
+// 			{
+// 				log_print("% 20s", "-");
+// 			}
+// 			else if (ri < col_thickness && ci >= row_thickness)
+// 			{
+// 				MddTuple *c_tuple = als_get(col_ax->set->tuples, ci - row_thickness);
 
-				if (ri < (col_thickness - als_size(c_tuple->mr_ls)))
-				{
-					log_print("% 20s", "[]");
-					continue;
-				}
+// 				if (ri < (col_thickness - als_size(c_tuple->mr_ls)))
+// 				{
+// 					log_print("% 20s", "[]");
+// 					continue;
+// 				}
 
-				MddMemberRole *c_mr = als_get(c_tuple->mr_ls, ri - (col_thickness - als_size(c_tuple->mr_ls)));
-				if (c_mr->member)
-					log_print("% 20s", c_mr->member->name);
-				else
-					log_print("% 20s", als_get(c_mr->member_formula->path, als_size(c_mr->member_formula->path) - 1));
-			}
-			else if (ri >= col_thickness && ci < row_thickness)
-			{
-				MddTuple *r_tuple = als_get(row_ax->set->tuples, ri - col_thickness);
+// 				MddMemberRole *c_mr = als_get(c_tuple->mr_ls, ri - (col_thickness - als_size(c_tuple->mr_ls)));
+// 				if (c_mr->member)
+// 					log_print("% 20s", c_mr->member->name);
+// 				else
+// 					log_print("% 20s", als_get(c_mr->member_formula->path, als_size(c_mr->member_formula->path) - 1));
+// 			}
+// 			else if (ri >= col_thickness && ci < row_thickness)
+// 			{
+// 				MddTuple *r_tuple = als_get(row_ax->set->tuples, ri - col_thickness);
 
-				if (ci < (row_thickness - als_size(r_tuple->mr_ls)))
-				{
-					log_print("% 20s", "[]");
-					continue;
-				}
+// 				if (ci < (row_thickness - als_size(r_tuple->mr_ls)))
+// 				{
+// 					log_print("% 20s", "[]");
+// 					continue;
+// 				}
 
-				MddMemberRole *r_mr = als_get(r_tuple->mr_ls, ci - (row_thickness - als_size(r_tuple->mr_ls)));
-				if (r_mr->member)
-					log_print("% 20s", r_mr->member->name);
-				else
-					log_print("% 20s", als_get(r_mr->member_formula->path, als_size(r_mr->member_formula->path) - 1));
-			}
-			else if (ri >= col_thickness && ci >= row_thickness)
-			{
-				if (md_rs->null_flags[(ri - col_thickness) * col_len + (ci - row_thickness)])
-					log_print("% 20c", '-');
-				else
-					log_print("% 20.2lf", md_rs->vals[(ri - col_thickness) * col_len + (ci - row_thickness)]);
-			}
-		}
-		log_print("\n");
-	}
-	log_print("\n");
+// 				MddMemberRole *r_mr = als_get(r_tuple->mr_ls, ci - (row_thickness - als_size(r_tuple->mr_ls)));
+// 				if (r_mr->member)
+// 					log_print("% 20s", r_mr->member->name);
+// 				else
+// 					log_print("% 20s", als_get(r_mr->member_formula->path, als_size(r_mr->member_formula->path) - 1));
+// 			}
+// 			else if (ri >= col_thickness && ci >= row_thickness)
+// 			{
+// 				if (md_rs->null_flags[(ri - col_thickness) * col_len + (ci - row_thickness)])
+// 					log_print("% 20c", '-');
+// 				else
+// 					log_print("% 20.2lf", md_rs->vals[(ri - col_thickness) * col_len + (ci - row_thickness)]);
+// 			}
+// 		}
+// 		log_print("\n");
+// 	}
+// 	log_print("\n");
 
-end:
-	log_print("### ??? MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
-	log_print("\n\n\n");
-	fflush(stdout);
-}
+// end:
+// 	log_print("### ??? MultiDimResult print( %p ) ----------------------------------------------------------------------------\n", NULL);
+// 	log_print("\n\n\n");
+// 	fflush(stdout);
+// }
 
 int MddAxis_cmp(void *obj, void *other)
 {
@@ -3525,25 +3549,32 @@ void ExpFnCount_evolving(MDContext *md_ctx, ExpFnCount *count, Cube *cube, MddTu
 		tuples_matrix_h[i] = tuple__merge(ctx_tuple, (MddTuple *)(als_get(set->tuples, i)));
 	}
 
-	char *null_flags;
-	double *vals = vce_vactors_values(md_ctx, tuples_matrix_h, tuples_size, &null_flags);
+	// char *null_flags;
+	ArrayList *grids = vce_vactors_values(md_ctx, tuples_matrix_h, tuples_size);
 
 	for (i = 0; i < tuples_size; i++)
 	{
-		if (null_flags[i] == 0)
+		GridData *gd = als_get(grids, i);
+		if (gd->null_flag == 0)
 			grid_data->val += 1;
 	}
 }
 
 void ExpFnLookUpCube_evolving(MDContext *md_ctx, ExpFnLookUpCube *luc, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data)
 {
-	if (luc->exp_str)
-	{
-		Stack stk;
-		char *flag_exp = mam_alloc(strlen(luc->exp_str) + strlen("@@EXP ") + 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
-		sprintf(flag_exp, "@@EXP %s", luc->exp_str);
-		parse_mdx(flag_exp, &stk);
-		stack_pop(&stk, (void **)&(luc->exp));
+	// If the 'exp' attribute is defined by a separate string literal, syntax parsing is required.
+	if (als_size(luc->exp->plus_terms) == 1 && als_size(luc->exp->minus_terms) == 0) {
+		Term *term = als_get(luc->exp->plus_terms, 0);
+		if (als_size(term->mul_factories) == 1 && als_size(term->div_factories) == 0) {
+			Factory *fac = als_get(term->mul_factories, 0);
+			if (fac->t_cons == FACTORY_DEF__STREXP && fac->strexp->type == STR_LITERAL) {
+				Stack stk;
+				char *flag_exp = mam_alloc(strlen(fac->strexp->part.str) + strlen("@@EXP ") + 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
+				sprintf(flag_exp, "@@EXP %s", fac->strexp->part.str);
+				parse_mdx(flag_exp, &stk);
+				stack_pop(&stk, (void **)&(luc->exp));
+			}
+		}
 	}
 
 	Cube *cubeLinked = find_cube_by_name(luc->cube_name);
@@ -4111,135 +4142,135 @@ ArrayList *mdd__lv_ancestor_peer_descendants(Level *ancestor_lv, Member *member)
 	return peer_descendants;
 }
 
-void mdrs_to_str(MultiDimResult *md_rs, char *_cont_buf, size_t buf_len)
-{
+// void mdrs_to_str(MultiDimResult *md_rs, char *_cont_buf, size_t buf_len)
+// {
 
-	char *cont_buf = _cont_buf;
+// 	char *cont_buf = _cont_buf;
 
-	if (md_rs == NULL)
-	{
-		sprintf(cont_buf, "##################################################################\n");
-		cont_buf += strlen(cont_buf);
-		sprintf(cont_buf, "##################################################################\n");
-		cont_buf += strlen(cont_buf);
-		sprintf(cont_buf, "##                    MultiDimResult is NULL                    ##\n");
-		cont_buf += strlen(cont_buf);
-		sprintf(cont_buf, "##################################################################\n");
-		cont_buf += strlen(cont_buf);
-		sprintf(cont_buf, "##################################################################\n");
-		cont_buf += strlen(cont_buf);
-		goto end;
-	}
+// 	if (md_rs == NULL)
+// 	{
+// 		sprintf(cont_buf, "##################################################################\n");
+// 		cont_buf += strlen(cont_buf);
+// 		sprintf(cont_buf, "##################################################################\n");
+// 		cont_buf += strlen(cont_buf);
+// 		sprintf(cont_buf, "##                    MultiDimResult is NULL                    ##\n");
+// 		cont_buf += strlen(cont_buf);
+// 		sprintf(cont_buf, "##################################################################\n");
+// 		cont_buf += strlen(cont_buf);
+// 		sprintf(cont_buf, "##################################################################\n");
+// 		cont_buf += strlen(cont_buf);
+// 		goto end;
+// 	}
 
-	int i, x_sz = als_size(md_rs->axes);
+// 	int i, x_sz = als_size(md_rs->axes);
 
-	if (x_sz != 2)
-	{
-		for (i = 0; i < 10; i++)
-		{
-			sprintf(cont_buf, "***************************************************\n");
-			cont_buf += strlen(cont_buf);
-		}
-		goto end;
-	}
+// 	if (x_sz != 2)
+// 	{
+// 		for (i = 0; i < 10; i++)
+// 		{
+// 			sprintf(cont_buf, "***************************************************\n");
+// 			cont_buf += strlen(cont_buf);
+// 		}
+// 		goto end;
+// 	}
 
-	MddAxis *col_ax = als_get(md_rs->axes, 0);
-	MddAxis *row_ax = als_get(md_rs->axes, 1);
-	if (col_ax->posi > row_ax->posi)
-	{
-		MddAxis *x_tmp = col_ax;
-		col_ax = row_ax;
-		row_ax = x_tmp;
-	}
+// 	MddAxis *col_ax = als_get(md_rs->axes, 0);
+// 	MddAxis *row_ax = als_get(md_rs->axes, 1);
+// 	if (col_ax->posi > row_ax->posi)
+// 	{
+// 		MddAxis *x_tmp = col_ax;
+// 		col_ax = row_ax;
+// 		row_ax = x_tmp;
+// 	}
 
-	int col_len = als_size(col_ax->set->tuples);
-	int row_len = als_size(row_ax->set->tuples);
+// 	int col_len = als_size(col_ax->set->tuples);
+// 	int row_len = als_size(row_ax->set->tuples);
 
-	int col_thickness = mdd_set__max_tuple_len(col_ax->set);
-	int row_thickness = mdd_set__max_tuple_len(row_ax->set);
+// 	int col_thickness = mdd_set__max_tuple_len(col_ax->set);
+// 	int row_thickness = mdd_set__max_tuple_len(row_ax->set);
 
-	int ri, ci;
+// 	int ri, ci;
 
-	for (ri = 0; ri < col_thickness + row_len; ri++)
-	{
-		for (ci = 0; ci < row_thickness + col_len; ci++)
-		{
-			if (ri < col_thickness && ci < row_thickness)
-			{
-				sprintf(cont_buf, "% 20s", "-");
-				cont_buf += strlen(cont_buf);
-			}
-			else if (ri < col_thickness && ci >= row_thickness)
-			{
-				MddTuple *c_tuple = als_get(col_ax->set->tuples, ci - row_thickness);
+// 	for (ri = 0; ri < col_thickness + row_len; ri++)
+// 	{
+// 		for (ci = 0; ci < row_thickness + col_len; ci++)
+// 		{
+// 			if (ri < col_thickness && ci < row_thickness)
+// 			{
+// 				sprintf(cont_buf, "% 20s", "-");
+// 				cont_buf += strlen(cont_buf);
+// 			}
+// 			else if (ri < col_thickness && ci >= row_thickness)
+// 			{
+// 				MddTuple *c_tuple = als_get(col_ax->set->tuples, ci - row_thickness);
 
-				if (ri < (col_thickness - als_size(c_tuple->mr_ls)))
-				{
-					sprintf(cont_buf, "% 20s", "[]");
-					cont_buf += strlen(cont_buf);
-					continue;
-				}
+// 				if (ri < (col_thickness - als_size(c_tuple->mr_ls)))
+// 				{
+// 					sprintf(cont_buf, "% 20s", "[]");
+// 					cont_buf += strlen(cont_buf);
+// 					continue;
+// 				}
 
-				MddMemberRole *c_mr = als_get(c_tuple->mr_ls, ri - (col_thickness - als_size(c_tuple->mr_ls)));
-				if (c_mr->member)
-				{
-					sprintf(cont_buf, "% 20s", c_mr->member->name);
-					cont_buf += strlen(cont_buf);
-				}
-				else
-				{
-					sprintf(cont_buf, "% 20s", als_get(c_mr->member_formula->path, als_size(c_mr->member_formula->path) - 1));
-					cont_buf += strlen(cont_buf);
-				}
-			}
-			else if (ri >= col_thickness && ci < row_thickness)
-			{
-				MddTuple *r_tuple = als_get(row_ax->set->tuples, ri - col_thickness);
+// 				MddMemberRole *c_mr = als_get(c_tuple->mr_ls, ri - (col_thickness - als_size(c_tuple->mr_ls)));
+// 				if (c_mr->member)
+// 				{
+// 					sprintf(cont_buf, "% 20s", c_mr->member->name);
+// 					cont_buf += strlen(cont_buf);
+// 				}
+// 				else
+// 				{
+// 					sprintf(cont_buf, "% 20s", als_get(c_mr->member_formula->path, als_size(c_mr->member_formula->path) - 1));
+// 					cont_buf += strlen(cont_buf);
+// 				}
+// 			}
+// 			else if (ri >= col_thickness && ci < row_thickness)
+// 			{
+// 				MddTuple *r_tuple = als_get(row_ax->set->tuples, ri - col_thickness);
 
-				if (ci < (row_thickness - als_size(r_tuple->mr_ls)))
-				{
-					sprintf(cont_buf, "% 20s", "[]");
-					cont_buf += strlen(cont_buf);
-					continue;
-				}
+// 				if (ci < (row_thickness - als_size(r_tuple->mr_ls)))
+// 				{
+// 					sprintf(cont_buf, "% 20s", "[]");
+// 					cont_buf += strlen(cont_buf);
+// 					continue;
+// 				}
 
-				MddMemberRole *r_mr = als_get(r_tuple->mr_ls, ci - (row_thickness - als_size(r_tuple->mr_ls)));
-				if (r_mr->member)
-				{
-					sprintf(cont_buf, "% 20s", r_mr->member->name);
-					cont_buf += strlen(cont_buf);
-				}
-				else
-				{
-					sprintf(cont_buf, "% 20s", als_get(r_mr->member_formula->path, als_size(r_mr->member_formula->path) - 1));
-					cont_buf += strlen(cont_buf);
-				}
-			}
-			else if (ri >= col_thickness && ci >= row_thickness)
-			{
-				if (md_rs->null_flags[(ri - col_thickness) * col_len + (ci - row_thickness)])
-				{
-					sprintf(cont_buf, "% 20c", '-');
-					cont_buf += strlen(cont_buf);
-				}
-				else
-				{
-					sprintf(cont_buf, "% 20.2lf", md_rs->vals[(ri - col_thickness) * col_len + (ci - row_thickness)]);
-					cont_buf += strlen(cont_buf);
-				}
-			}
-		}
-		sprintf(cont_buf, "\n");
-		cont_buf += strlen(cont_buf);
-	}
+// 				MddMemberRole *r_mr = als_get(r_tuple->mr_ls, ci - (row_thickness - als_size(r_tuple->mr_ls)));
+// 				if (r_mr->member)
+// 				{
+// 					sprintf(cont_buf, "% 20s", r_mr->member->name);
+// 					cont_buf += strlen(cont_buf);
+// 				}
+// 				else
+// 				{
+// 					sprintf(cont_buf, "% 20s", als_get(r_mr->member_formula->path, als_size(r_mr->member_formula->path) - 1));
+// 					cont_buf += strlen(cont_buf);
+// 				}
+// 			}
+// 			else if (ri >= col_thickness && ci >= row_thickness)
+// 			{
+// 				if (md_rs->null_flags[(ri - col_thickness) * col_len + (ci - row_thickness)])
+// 				{
+// 					sprintf(cont_buf, "% 20c", '-');
+// 					cont_buf += strlen(cont_buf);
+// 				}
+// 				else
+// 				{
+// 					sprintf(cont_buf, "% 20.2lf", md_rs->vals[(ri - col_thickness) * col_len + (ci - row_thickness)]);
+// 					cont_buf += strlen(cont_buf);
+// 				}
+// 			}
+// 		}
+// 		sprintf(cont_buf, "\n");
+// 		cont_buf += strlen(cont_buf);
+// 	}
 
-end:
+// end:
 
-	assert(cont_buf < (_cont_buf + buf_len));
+// 	assert(cont_buf < (_cont_buf + buf_len));
 
-	unsigned long used_len = (unsigned long)cont_buf - (unsigned long)_cont_buf;
-	log_print("[ info ] **************** mdrs_to_str(...) >>>>>>>>>>>>>>>>>>>>>  %lu  /  %lu  %f %%\n", used_len, buf_len, used_len * 100.0 / buf_len);
-}
+// 	unsigned long used_len = (unsigned long)cont_buf - (unsigned long)_cont_buf;
+// 	log_print("[ info ] **************** mdrs_to_str(...) >>>>>>>>>>>>>>>>>>>>>  %lu  /  %lu  %f %%\n", used_len, buf_len, used_len * 100.0 / buf_len);
+// }
 
 ByteBuf *mdrs_to_bin(MultiDimResult *md_rs)
 {
@@ -4279,13 +4310,27 @@ ByteBuf *mdrs_to_bin(MultiDimResult *md_rs)
 		}
 	}
 
-	*(long *)buf_cutting(buf, sizeof(long)) = md_rs->rs_len; // RS_LEN
+	int md_rs_len = als_size(md_rs->grids);
+	*(long *)buf_cutting(buf, sizeof(long)) = md_rs_len; // RS_LEN
 
-	double *_vals_ = buf_cutting(buf, sizeof(double) * md_rs->rs_len);
-	memcpy(_vals_, md_rs->vals, sizeof(double) * md_rs->rs_len);
+	double *_vals_ = buf_cutting(buf, sizeof(double) * md_rs_len);
+	char *_null_flags_ = buf_cutting(buf, sizeof(char) * md_rs_len);
+	for (int i=0; i<md_rs_len; i++) {
+		GridData *gd = als_get(md_rs->grids, i);
+		_vals_[i] = gd->val;
+		_null_flags_[i] = gd->null_flag;
 
-	double *_null_flags_ = buf_cutting(buf, sizeof(char) * md_rs->rs_len);
-	memcpy(_null_flags_, md_rs->null_flags, sizeof(char) * md_rs->rs_len);
+		if (gd->type == GRIDDATA_TYPE_STR) {
+			char *ss0 = buf_cutting(buf, strlen(gd->str) + 1);
+			strcpy(ss0, gd->str);
+		} else {
+			*((char *)buf_cutting(buf, sizeof(char))) = 0;
+		}
+	}
+	// memcpy(_vals_, md_rs->vals, sizeof(double) * md_rs_len);
+
+	// double *_null_flags_ = buf_cutting(buf, sizeof(char) * md_rs_len);
+	// memcpy(_null_flags_, md_rs->null_flags, sizeof(char) * md_rs_len);
 
 	*capacity = buf->index;
 

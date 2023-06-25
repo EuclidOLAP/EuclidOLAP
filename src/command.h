@@ -106,6 +106,9 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
  * 8 bytes - RS_LEN: Length of the result measure array.
  * 8 * RS_LEN bytes - measure values array
  * RS_LEN bytes - null flags array
+ * ? bytes - A compact list of strings(including empty strings), 
+ *           it containing the number of strings is RS_LEN, which holds 
+ *           the results of string expressions or string function evaluations.
  */
 #define INTENT__MULTIDIM_RESULT_BIN 8
 

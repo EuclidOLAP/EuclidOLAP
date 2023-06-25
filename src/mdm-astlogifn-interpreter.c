@@ -30,4 +30,5 @@ void *interpret_ast_is_empty(void *md_context, void *grid_data, void *_is_empty,
         grid->boolean = 1;
     }
 
+    return NULL;
 }

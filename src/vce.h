@@ -107,7 +107,10 @@ void space_plan(MeasureSpace *space);
 
 void space__destory(MeasureSpace *);
 
-double *vce_vactors_values(MDContext *md_ctx, MddTuple **tuples_matrix_h, unsigned long v_len, char **null_flags);
+/*
+ * @return ArrayList<GridData *>
+ */
+ArrayList *vce_vactors_values(MDContext *md_ctx, MddTuple **tuples_matrix_h, unsigned long v_len);
 
 void dispatchAggregateMeasure(/*MDContext *md_context,*/ Cube *cube, ArrayList *direct_vectors, double **_measures_, char **_null_flags_, unsigned long *_len_);
 

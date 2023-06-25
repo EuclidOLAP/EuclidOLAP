@@ -123,5 +123,8 @@ typedef short type_obj;
 #define OBJ_TYPE__TupleDef 10081
 #define OBJ_TYPE__Hierarchy 10082
 #define OBJ_TYPE__HierarchyRole 10083
+#define OBJ_TYPE__GridData 10084
+#define OBJ_TYPE__ASTStrFunc_Name 10085
+#define OBJ_TYPE__ASTStrExp 10086
 
 #endif

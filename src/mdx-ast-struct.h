@@ -58,7 +58,7 @@ typedef struct _ast_function_common_head_
      * @param  ast_member_func - AST member function define
      * @param  context_tuple   - MddTuple
      * @param  cube            - Cube
-     * @return MddMemberRole
+     * @return
      */
     void *(* interpret)(void *md_context, void *prefix_option, void *ast_member_func, void *context_tuple, void *cube);
 } ASTFunctionCommonHead;
@@ -80,5 +80,27 @@ typedef struct _ast_logical_func_is_empty_
     ASTFunctionCommonHead head;
     Expression *exp;
 } ASTLogicalFunc_IsEmpty;
+
+typedef struct ast_str_func_name
+{
+    ASTFunctionCommonHead head;
+
+    MDMEntityUniversalPath *up;
+} ASTStrFunc_Name;
+
+typedef enum ast_str_exp_type {
+    STR_LITERAL,
+    STR_FUNC
+} strexptype;
+
+typedef struct ast_str_exp
+{
+    ASTFunctionCommonHead head;
+    strexptype type;
+    union {
+        char *str;
+        void *str_func;
+    } part;
+} ASTStrExp;
 
 #endif
