@@ -63,7 +63,6 @@
 	Item (Member)		(M)
 	LinkMember		(M)
 	Members (String)		(M)
-	Name		(I)
 	NextMember		(I) (M) (O)
 	Properties		(I)
 	StrToMbr		(O)
@@ -194,7 +193,6 @@
 	Lower		(O)
 	LTrim		(O)
 	MemberToStr		(M)
-	Name		(M)
 	NumToStr		(O)
 	Properties		(M)
 	Right		(O)
@@ -268,25 +266,25 @@
 
 
 << Set Functions >>
-	BottomPercent		[E] [I] [M]
+	BottomPercent	[E] [I] [M]
 	Children		[E] [I] [M]
 	CrossJoin		[E] [I] [M] [O]
 	Descendants		[E] [I] [M]
-	Except		[E] [I] [M] [O]
-	Filter		[E] [I] [M]
+	Except			[E] [I] [M] [O]
+	Filter			[E] [I] [M]
 	Intersect		[E] [I] [M] [O]
-	LateralMembers		[E]
-	Members		[E] [I]
-	Order		[E] [I] [M]
-	Tail		[E] [M] [O]
+	LateralMembers	[E]
+	Members			[E] [I]
+	Order			[E] [I] [M]
+	Tail			[E] [M] [O]
 	TopCount		[E] [I] [M]
 	TopPercent		[E] [I] [M]
-	Union		[E] [I] [M] [O]
-	Ytd		[E] [I] [M]
+	Union			[E] [I] [M] [O]
+	Ytd				[E] [I] [M]
 
 
 << String Functions >>
-
+	Name			[E] [I] [M]
 
 << Subcube Functions >>
 
