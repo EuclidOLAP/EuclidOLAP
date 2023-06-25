@@ -137,3 +137,105 @@ Children([Date].[2022].[Q3]) on 1,
 from [Airline A]
 where
 ([Classes of Service].[Premium Business], [Aircraft Models].[Boeing].[Boeing 737]);
+
+---
+
+with
+member [Measures].XXXxxx as "$$Name([Date])" // Name([Date])
+select
+{
+  [Date].[All]
+} on 1,
+{
+  [Measures].XXXxxx
+} on 0
+from [Airline A];
+
+---
+
+with
+member [Measures].XXXxxx as Name([Date].[all])
+select
+{
+  [Date].[All]
+} on 1,
+{
+  [Measures].XXXxxx
+} on 0
+from [Airline A];
+
+---
+
+select
+{ Date.Calendar.[2022].[Q1].M1, Date.Calendar.[2022].[Q1].M2, Date.Calendar.[2022].[Q1].M3 } on columns,
+{ [Measures].Revenue, [Measures].Cost } on rows from [Airline A];
+
+---
+
+with member [Measures]._AR_ as LookupCube([Airline A], "([Measures].Cost, Date.[2022].[Q1].M1)")
+select
+{ Date.Calendar.[2022].[Q1].M1, Date.Calendar.[2022].[Q1].M2, Date.Calendar.[2022].[Q1].M3 } on columns,
+{ [Measures].Revenue, [Measures]._AR_ } on rows from [Airline B];
+
+---
+
+with member [Measures]._AR_ as LookupCube("Airline A", ([Measures].Cost, Date.[2022].[Q1].M3))
+select
+{ Date.Calendar.[2022].[Q1].M1, Date.Calendar.[2022].[Q1].M2, Date.Calendar.[2022].[Q1].M3 } on columns,
+{ [Measures].Revenue, [Measures]._AR_ } on rows from [Airline B];
+
+---
+
+with member [Measures]._AR_ as LookupCube("Airline A", ([Measures].Cost, Date.[2022].[Q1].M3) / 100)
+select
+{ Date.Calendar.[2022].[Q1].M1, Date.Calendar.[2022].[Q1].M2, Date.Calendar.[2022].[Q1].M3 } on columns,
+{ [Measures].Revenue, [Measures]._AR_ } on rows from [Airline B];
+
+---
+
+with
+
+// member [Measures].XXXXXX as "$$Name([Date])" // Name([Date])
+
+member [Measures].XXXXXX as IIf([Measures].Cost > 500000000, "QQQ", IIf([Measures].Cost < 450000000, "LLL", [Measures].Cost))
+
+select
+Children([Date].[All]) on 1,
+{
+  [Measures].Cost,
+  [Measures].XXXXXX
+} on 0
+from [Airline A];
+
+---
+
+with
+// member [Measures].XXXXXX as "$$Name([Date])" // Name([Date])
+member [Measures].XXXXXX as IIf([Measures].Cost > 500000000, "QQQ", IIf([Measures].Cost < 450000000, "LLL", lookupcube("Airline B", [Measures].Cost)))
+select
+Children([Date].[All]) on 1,
+{
+  [Measures].Cost,
+  [Measures].XXXXXX
+} on 0
+from [Airline A];
+
+---
+
+select
+[Measures].Cost on 1, [Measures].Cost on 99999
+from [Airline B];
+
+---
+
+with
+member [Measures].[################ finished ################] as 660880
+member [Measures].[##########################################] as 660880
+select
+{ (Date.[ALL]) } on 0,
+{
+    ([Measures].[##########################################]),
+    ([Measures].[################ finished ################]),
+    ([Measures].[##########################################])
+} on SECTIons
+from [Airline B];

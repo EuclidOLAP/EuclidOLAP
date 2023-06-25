@@ -558,7 +558,10 @@ void space__destory(MeasureSpace *s)
     // _release_mem_(s);
 }
 
-double *vce_vactors_values(MDContext *md_ctx, MddTuple **tuples_matrix_h, unsigned long v_len, char **null_flags)
+/*
+ * @return ArrayList<GridData *>
+ */
+ArrayList *vce_vactors_values(MDContext *md_ctx, MddTuple **tuples_matrix_h, unsigned long v_len)
 {
     /**
      * todo
@@ -592,20 +595,24 @@ double *vce_vactors_values(MDContext *md_ctx, MddTuple **tuples_matrix_h, unsign
         }
     }
 
-    double *result = mam_alloc(v_len * sizeof(double), OBJ_TYPE__RAW_BYTES, NULL, 0);
-    *null_flags = mam_alloc(v_len * sizeof(char), OBJ_TYPE__RAW_BYTES, NULL, 0);
+    // double *result = mam_alloc(v_len * sizeof(double), OBJ_TYPE__RAW_BYTES, NULL, 0);
+    // *null_flags = mam_alloc(v_len * sizeof(char), OBJ_TYPE__RAW_BYTES, NULL, 0);
 
-    GridData tmp;
+    // GridData tmp;
+    GridData *gd_arr = mam_alloc(v_len * sizeof(GridData), OBJ_TYPE__GridData, NULL, 0);
+    ArrayList *gd_list = als_new(v_len, "GridData *", THREAD_MAM, NULL);
+
     for (i = 0; i < v_len; i++)
     {
-        do_calculate_measure_value(md_ctx, cube, tuples_matrix_h[i], &tmp);
-        if (tmp.null_flag)
-            (*null_flags)[i] = 1;
-        else
-            result[i] = tmp.val;
+        do_calculate_measure_value(md_ctx, cube, tuples_matrix_h[i], gd_arr + i);
+        als_add(gd_list, gd_arr + i);
+        // if (tmp.null_flag)
+        //     (*null_flags)[i] = 1;
+        // else
+        //     result[i] = tmp.val;
     }
 
-    return result;
+    return gd_list;
 }
 
 void *__set_ax_max_path_len(RBNode *node, void *param)

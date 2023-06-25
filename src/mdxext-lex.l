@@ -309,6 +309,10 @@ IsEmpty {
 	return IS_EMPTY;
 }
 
+Name {
+	return NAME;
+}
+
 [_a-zA-Z][_a-zA-Z0-9]*	{
 	return VAR;
 }

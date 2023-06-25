@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "command.h"
 #include "md-model.h"
+#include "math.h"
 #include "mdx.h"
 #include "tools/elastic-byte-buffer.h"
 
@@ -91,16 +92,16 @@ int store_measure(EuclidCommand *ec);
 
 int distribute_store_measure(EuclidCommand *ec, unsigned long worker_id);
 
-void MultiDimResult_print(MultiDimResult *);
+// void MultiDimResult_print(MultiDimResult *);
 
-/**
- * Assemble a multi-dimenisonal result set into a string.
- * 
- * @param md_rs
- * @param _cont_buf
- * @param buf_len
- */
-void mdrs_to_str(MultiDimResult *md_rs, char *_cont_buf, size_t buf_len);
+// /**
+//  * Assemble a multi-dimenisonal result set into a string.
+//  * 
+//  * @param md_rs
+//  * @param _cont_buf
+//  * @param buf_len
+//  */
+// void mdrs_to_str(MultiDimResult *md_rs, char *_cont_buf, size_t buf_len);
 
 /**
  * Convert multidimensional query result to binary format.

@@ -8,6 +8,7 @@
 #include "mdx.h"
 #include "mdm-astmrfn-interpreter.h"
 #include "mdm-astlogifn-interpreter.h"
+#include "mdm-ast-str-fn.h"
 
 int yyerror(const char *);
 extern int yylex();
@@ -108,6 +109,9 @@ Stack AST_STACK = { 0 };
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
+
+/* String Functions */
+%token NAME				/* Name */
 
 /* punctuations */
 %token COMMA				/* , */
@@ -302,6 +306,45 @@ member_formula_statement:
 	}
 ;
 
+string_function:
+	NAME ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		MDMEntityUniversalPath *up = NULL;
+		stack_pop(&AST_STACK, (void **) &up);
+		ASTStrFunc_Name *func = mam_alloc(sizeof(ASTStrFunc_Name), OBJ_TYPE__ASTStrFunc_Name, NULL, 0);
+		func->up = up;
+		func->head.interpret = strfn_name_interpreter;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	NAME ROUND_BRACKET_L ROUND_BRACKET_R {
+		ASTStrFunc_Name *func = mam_alloc(sizeof(ASTStrFunc_Name), OBJ_TYPE__ASTStrFunc_Name, NULL, 0);
+		func->head.interpret = strfn_name_interpreter;
+		stack_push(&AST_STACK, func);
+	}
+;
+
+string_expression:
+	str_token {
+		char *literal = NULL;
+		stack_pop(&AST_STACK, (void **) &literal);
+		ASTStrExp *strexp = mam_alloc(sizeof(ASTStrExp), OBJ_TYPE__ASTStrExp, NULL, 0);
+		strexp->type = STR_LITERAL;
+		strexp->part.str = literal;
+		strexp->head.interpret = strexp_interpret;
+		stack_push(&AST_STACK, strexp);
+	}
+  |
+	string_function {
+		void *ast_fn = NULL;
+		stack_pop(&AST_STACK, (void **) &ast_fn);
+		ASTStrExp *strexp = mam_alloc(sizeof(ASTStrExp), OBJ_TYPE__ASTStrExp, NULL, 0);
+		strexp->type = STR_FUNC;
+		strexp->part.str_func = ast_fn;
+		strexp->head.interpret = strexp_interpret;
+		stack_push(&AST_STACK, strexp);
+	}
+;
+
 expression:
 	term {
 		Term *t = NULL;
@@ -401,6 +444,17 @@ factory:
 		stack_pop(&AST_STACK, (void **) &(factory->exp));
 		stack_push(&AST_STACK, factory);
 	}
+  |
+	string_expression {
+		ASTStrExp *strexp = NULL;
+		stack_pop(&AST_STACK, (void **) &strexp);
+
+		Factory *fac = Factory_creat();
+		fac->t_cons = FACTORY_DEF__STREXP;
+		fac->strexp = strexp;
+
+		stack_push(&AST_STACK, fac);
+	}
   /* | mdm_entity_universal_path {
 
 	} */
@@ -463,34 +517,36 @@ exp_fn__iif:
 ;
 
 exp_fn__look_up_cube:
-	LOOK_UP_CUBE ROUND_BRACKET_L str COMMA str ROUND_BRACKET_R {
+	/* LOOK_UP_CUBE ROUND_BRACKET_L str COMMA str ROUND_BRACKET_R {
 		char *exp_str = NULL;
 		stack_pop(&AST_STACK, (void **) &exp_str);
 		char *cube_name = NULL;
 		stack_pop(&AST_STACK, (void **) &cube_name);
 		stack_push(&AST_STACK, ExpFnLookUpCube_creat(cube_name, exp_str, NULL));
 	}
-  | LOOK_UP_CUBE ROUND_BRACKET_L str COMMA expression ROUND_BRACKET_R {
+  | */
+	LOOK_UP_CUBE ROUND_BRACKET_L vbs_token COMMA expression ROUND_BRACKET_R {
 		Expression *exp = NULL;
 		stack_pop(&AST_STACK, (void **) &exp);
 		char *cube_name = NULL;
 		stack_pop(&AST_STACK, (void **) &cube_name);
 		stack_push(&AST_STACK, ExpFnLookUpCube_creat(cube_name, NULL, exp));
 	}
-  | LOOK_UP_CUBE ROUND_BRACKET_L var_or_block COMMA str ROUND_BRACKET_R {
+  /* | LOOK_UP_CUBE ROUND_BRACKET_L var_or_block COMMA str ROUND_BRACKET_R {
 		char *exp_str = NULL;
 		stack_pop(&AST_STACK, (void **) &exp_str);
 		char *cube_name = NULL;
 		stack_pop(&AST_STACK, (void **) &cube_name);
 		stack_push(&AST_STACK, ExpFnLookUpCube_creat(cube_name, exp_str, NULL));
-	}
-  | LOOK_UP_CUBE ROUND_BRACKET_L var_or_block COMMA expression ROUND_BRACKET_R {
+	} */
+  /* | 
+	LOOK_UP_CUBE ROUND_BRACKET_L var_or_block COMMA expression ROUND_BRACKET_R {
 		Expression *exp = NULL;
 		stack_pop(&AST_STACK, (void **) &exp);
 		char *cube_name = NULL;
 		stack_pop(&AST_STACK, (void **) &cube_name);
 		stack_push(&AST_STACK, ExpFnLookUpCube_creat(cube_name, NULL, exp));
-	}
+	} */
 ;
 
 exp_fn_count:
@@ -2037,7 +2093,7 @@ up_list:
 
 
 mdm_entity_up_segment:
-	chain_ring {
+	var_or_block {
 		MdmEntityUpSegment *up_seg = mam_alloc(sizeof(MdmEntityUpSegment), OBJ_TYPE__MdmEntityUpSegment, NULL, 0);
 		up_seg->type = MEU_SEG_TYPE_TXT;
 
@@ -2099,8 +2155,7 @@ mdm_entity_up_segment:
 	} BLOCK
 ;
 
-
-str:
+str_token:
 	STRING {
 		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__STRING, NULL, 0);
 		memcpy(str, yytext + 1, strlen(yytext) - 2);
@@ -2153,10 +2208,16 @@ var_or_block:
 	}
 ;
 
-chain_ring:
+/* chain_ring:
 	var_or_block {
 		// do nothing
 	}
+; */
+
+vbs_token:
+	var_or_block {}
+  |
+	str_token {}
 ;
 
 %%

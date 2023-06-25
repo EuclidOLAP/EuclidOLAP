@@ -6,20 +6,6 @@
 #include "mdx.h"
 // #include "tools/elastic-byte-buffer.h"
 
-
-#define GRIDDATA_TYPE_NUM 0
-#define GRIDDATA_TYPE_BOOL 1
-#define GRIDDATA_BOOL_TRUE 1
-#define GRIDDATA_BOOL_FALSE 0
-typedef struct _Grid_Data_
-{
-	char null_flag;
-	char type;
-	char boolean;
-	double val;
-} GridData;
-
-
 typedef long md_gid;
 
 #define MD_ENTITY_NAME_BYTSZ 128
@@ -99,9 +85,10 @@ typedef struct _dim_role_stct_
 typedef struct multidimensional_result
 {
 	ArrayList *axes;
-	double *vals;
-	char *null_flags;
-	unsigned long rs_len;
+	ArrayList *grids;
+	// double *vals;
+	// char *null_flags;
+	// unsigned long rs_len;
 } MultiDimResult;
 MultiDimResult *MultiDimResult_creat();
 

@@ -138,12 +138,14 @@ MDContext *MDContext_creat();
 #define FACTORY_DEF__DECIMAL 2
 #define FACTORY_DEF__EXPRESSION 3
 #define FACTORY_DEF__EXP_FN 4
+#define FACTORY_DEF__STREXP 5
 typedef struct factory_definition
 {
     ids_ct t_cons;
     TupleDef *tuple_def;
     double decimal;
     void *exp;
+    ASTStrExp *strexp;
 } Factory;
 Factory *Factory_creat();
 

@@ -62,8 +62,19 @@ void _print_mdrs_table(EuclidCommand *ddrs)
 
     unsigned long rs_len = *(unsigned long *)idx;
     idx += sizeof(unsigned long);
-    char *null_flag_arr = idx + sizeof(double) * rs_len;
+
     double *values = (double *)idx;
+    idx += sizeof(double) * rs_len;
+
+    char *null_flag_arr = idx;
+    idx += sizeof(char) * rs_len;
+
+    char **gdstrs = mam_alloc(rs_len * sizeof(char *), OBJ_TYPE__RAW_BYTES, mam, 0);
+    for (int i=0;i<rs_len;i++) {
+        gdstrs[i] = idx;
+        // printf("@>>>>>> [%s]\n", idx);
+        idx += strlen(idx) + 1;
+    }
 
     char **measure_values_str = mam_alloc(rs_len * sizeof(char *), OBJ_TYPE__RAW_BYTES, mam, 0);
 
@@ -104,7 +115,12 @@ void _print_mdrs_table(EuclidCommand *ddrs)
                 continue;
             }
 
-            table[i * tb_w + j] = measure_values_str[(i - col_h) * col_w + j - row_w];
+            if (*gdstrs[(i - col_h) * col_w + j - row_w]) {
+                table[i * tb_w + j] = gdstrs[(i - col_h) * col_w + j - row_w];
+            } else {
+                table[i * tb_w + j] = measure_values_str[(i - col_h) * col_w + j - row_w];
+            }
+            
         }
     }
 
