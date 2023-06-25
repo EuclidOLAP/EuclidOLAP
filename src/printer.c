@@ -160,6 +160,7 @@ void _print_mdrs_table(EuclidCommand *ddrs)
 
 void print_mdrs(EuclidCommand *mdrs)
 {
+    printf("\n\n");
     char *idx = mdrs->bytes + sizeof(int);
     assert(*(unsigned short *)idx == INTENT__MULTIDIM_RESULT_BIN);
     idx += sizeof(short);

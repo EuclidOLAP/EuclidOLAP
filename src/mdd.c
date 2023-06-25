@@ -2146,9 +2146,30 @@ void Factory_evaluate(MDContext *md_ctx, Factory *fac, Cube *cube, MddTuple *ctx
 			log_print("[ error ] - Factory_evaluate() - Unknown expression function type.\n");
 			exit(1);
 		}
-	} else if (fac->t_cons == FACTORY_DEF__STREXP) {
-		GridData *gd = fac->strexp->head.interpret(md_ctx, NULL, fac->strexp, ctx_tuple, cube);
-		memcpy(grid_data, gd, sizeof(GridData));
+	} else if (fac->t_cons == FACTORY_DEF__STR_LITERAL) {
+		grid_data->type = GRIDDATA_TYPE_STR;
+		grid_data->str = mam_alloc(strlen(fac->str_literal) + 1, OBJ_TYPE__STRING, NULL, 0);
+		strcpy(grid_data->str, fac->str_literal);
+	} else if (fac->t_cons == FACTORY_DEF__EU_PATH) {
+		void *obj = up_evolving(md_ctx, fac->up, cube, ctx_tuple);
+		short type = obj_type_of(obj);
+		switch (type)
+		{
+		case OBJ_TYPE__GridData:
+			memcpy(grid_data, obj, sizeof(GridData));
+			break;
+		case OBJ_TYPE__MddMemberRole:
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, obj);
+			tuple = tuple__merge(ctx_tuple, tuple);
+			do_calculate_measure_value(md_ctx, cube, tuple, grid_data);
+			break;
+		default:
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: Factory <FACTORY_DEF__EU_PATH> unknown type.";
+			longjmp(thrd_mam->excep_ctx_env, -1);			
+			break;
+		}
 	}
 	else
 	{
@@ -3567,13 +3588,23 @@ void ExpFnLookUpCube_evolving(MDContext *md_ctx, ExpFnLookUpCube *luc, Cube *cub
 		Term *term = als_get(luc->exp->plus_terms, 0);
 		if (als_size(term->mul_factories) == 1 && als_size(term->div_factories) == 0) {
 			Factory *fac = als_get(term->mul_factories, 0);
-			if (fac->t_cons == FACTORY_DEF__STREXP && fac->strexp->type == STR_LITERAL) {
+
+			if (fac->t_cons == FACTORY_DEF__STR_LITERAL) {
 				Stack stk;
-				char *flag_exp = mam_alloc(strlen(fac->strexp->part.str) + strlen("@@EXP ") + 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
-				sprintf(flag_exp, "@@EXP %s", fac->strexp->part.str);
+				char *flag_exp = mam_alloc(strlen(fac->str_literal) + strlen("@@EXP ") + 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
+				sprintf(flag_exp, "@@EXP %s", fac->str_literal);
 				parse_mdx(flag_exp, &stk);
 				stack_pop(&stk, (void **)&(luc->exp));
 			}
+
+			// if (fac->t_cons == FACTORY_DEF__STREXP && fac->strexp->type == STR_LITERAL) {
+			// 	Stack stk;
+			// 	char *flag_exp = mam_alloc(strlen(fac->strexp->part.str) + strlen("@@EXP ") + 1, OBJ_TYPE__RAW_BYTES, NULL, 0);
+			// 	sprintf(flag_exp, "@@EXP %s", fac->strexp->part.str);
+			// 	parse_mdx(flag_exp, &stk);
+			// 	stack_pop(&stk, (void **)&(luc->exp));
+			// }
+
 		}
 	}
 
@@ -3709,6 +3740,10 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 		
 	} else if (_type == OBJ_TYPE__SetFnIntersect) {
 		return SetFnIntersect_evolving(md_ctx, seg_0, cube, ctx_tuple);
+	}
+
+	if (is_type_ast_str_func(_type)) {
+		return ((ASTFunctionCommonHead *)seg_0)->interpret(md_ctx, NULL, seg_0, ctx_tuple, cube);
 	}
 
 	MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
@@ -4074,6 +4109,11 @@ void *up_evolving(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube *cube, Mdd
 		// TODO elei is a define of AST member function.
 		if (is_type_astmemberfunc(_type)) {
 			// entity = _up_interpret_astmrfn(md_ctx, entity, elei, cube, ctx_tuple);
+			entity = ((ASTFunctionCommonHead *)elei)->interpret(md_ctx, entity, elei, ctx_tuple, cube);
+			continue;
+		}
+
+		if (is_type_ast_str_func(_type)) {
 			entity = ((ASTFunctionCommonHead *)elei)->interpret(md_ctx, entity, elei, ctx_tuple, cube);
 			continue;
 		}

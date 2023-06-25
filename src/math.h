@@ -1,6 +1,7 @@
 #ifndef EUCLID__MATH__H
 #define EUCLID__MATH__H 1
 
+
 #define GRIDDATA_TYPE_NUM 0
 #define GRIDDATA_TYPE_BOOL 1
 #define GRIDDATA_TYPE_STR 2

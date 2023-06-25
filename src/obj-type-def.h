@@ -10,6 +10,7 @@ typedef short type_obj;
 
 #define is_type_astmemberfunc(obj_type) (obj_type >= OBJ_TYPE__ASTMEMBERFUNC__MIN && obj_type <= OBJ_TYPE__ASTMEMBERFUNC__MAX)
 #define is_type_astlogicalfunc(obj_type) (obj_type >= OBJ_TYPE__ASTLOGICALFUNC__MIN && obj_type <= OBJ_TYPE__ASTLOGICALFUNC__MAX)
+#define is_type_ast_str_func(obj_type) (obj_type >= OBJ_TYPE__AST_STR_FUNC__MIN && obj_type <= OBJ_TYPE__AST_STR_FUNC__MAX)
 
 
 // The range reserved for the member functions of the AST is 1 ~ 200.
@@ -36,6 +37,12 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTLogicalFunc_IsEmpty    201
 
 #define OBJ_TYPE__ASTLOGICALFUNC__MAX       300
+
+
+// The range reserved for the string functions of the AST is 301 ~ 400.
+#define OBJ_TYPE__AST_STR_FUNC__MIN       301
+#define OBJ_TYPE__ASTStrFunc_Name         301
+#define OBJ_TYPE__AST_STR_FUNC__MAX       400
 
 
 #define OBJ_TYPE__RAW_BYTES 10001
@@ -124,7 +131,6 @@ typedef short type_obj;
 #define OBJ_TYPE__Hierarchy 10082
 #define OBJ_TYPE__HierarchyRole 10083
 #define OBJ_TYPE__GridData 10084
-#define OBJ_TYPE__ASTStrFunc_Name 10085
-#define OBJ_TYPE__ASTStrExp 10086
+#define OBJ_TYPE__ASTStrExp 10085
 
 #endif
