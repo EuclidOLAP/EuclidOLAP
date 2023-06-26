@@ -261,6 +261,13 @@ from [Airline A];
 
 ---
 
+select
+crossjoin(members([Classes of Service]), members([Aircraft Models])) on 0,
+members(Date) on 1
+from [Airline A];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

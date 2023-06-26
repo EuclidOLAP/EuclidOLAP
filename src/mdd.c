@@ -4316,7 +4316,10 @@ ByteBuf *mdrs_to_bin(MultiDimResult *md_rs)
 {
 
 	ByteBuf *buf = buf__alloc(128 * 1024); // 128k
-	unsigned int *capacity = buf_cutting(buf, sizeof(int));
+	
+	// Reserve the location of an int, where the function will eventually fill the entire packet size.
+	buf_cutting(buf, sizeof(int));
+	
 	*(unsigned short *)buf_cutting(buf, sizeof(short)) = INTENT__MULTIDIM_RESULT_BIN;
 	*(int *)buf_cutting(buf, sizeof(int)) = als_size(md_rs->axes); // AX_COUNT
 
@@ -4353,13 +4356,16 @@ ByteBuf *mdrs_to_bin(MultiDimResult *md_rs)
 	int md_rs_len = als_size(md_rs->grids);
 	*(long *)buf_cutting(buf, sizeof(long)) = md_rs_len; // RS_LEN
 
-	double *_vals_ = buf_cutting(buf, sizeof(double) * md_rs_len);
-	char *_null_flags_ = buf_cutting(buf, sizeof(char) * md_rs_len);
+	double *_vals_ = buf_cutting(buf, (sizeof(double) + sizeof(char)) * md_rs_len);
+	char *_null_flags_ = (char *)(_vals_ + md_rs_len);
 	for (int i=0; i<md_rs_len; i++) {
 		GridData *gd = als_get(md_rs->grids, i);
 		_vals_[i] = gd->val;
 		_null_flags_[i] = gd->null_flag;
+	}
 
+	for (int i=0; i<md_rs_len; i++) {
+		GridData *gd = als_get(md_rs->grids, i);
 		if (gd->type == GRIDDATA_TYPE_STR) {
 			char *ss0 = buf_cutting(buf, strlen(gd->str) + 1);
 			strcpy(ss0, gd->str);
@@ -4367,12 +4373,14 @@ ByteBuf *mdrs_to_bin(MultiDimResult *md_rs)
 			*((char *)buf_cutting(buf, sizeof(char))) = 0;
 		}
 	}
+
 	// memcpy(_vals_, md_rs->vals, sizeof(double) * md_rs_len);
 
 	// double *_null_flags_ = buf_cutting(buf, sizeof(char) * md_rs_len);
 	// memcpy(_null_flags_, md_rs->null_flags, sizeof(char) * md_rs_len);
 
-	*capacity = buf->index;
+	// *capacity = buf->index;
+	*(unsigned int *)buf_starting(buf) = buf->index;
 
 	return buf;
 }
