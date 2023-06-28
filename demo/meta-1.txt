@@ -1,1 +1,0 @@
-create levels [Calendar] (1:year, 2:quarter, 3:month), [Region] (1:[continent], 2:[country]), [Date] (1:Year, 2:Quarter, 3:Month);

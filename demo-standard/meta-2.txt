@@ -1,5 +1,0 @@
-create levels
-[Aircraft Models] (1:[Manufacturer], 2:[Model]),
-[Aircraft Models].[Aircraft Size] (1:[Size], 2:[Model]),
-[Date].[Calendar] (1:[Year], 2:[Quarter], 3:[Month]),
-[Date].[Financial] (1:[Financial Year], 2:[Financial Quarter], 3:[Financial Month]);
