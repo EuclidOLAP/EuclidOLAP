@@ -275,6 +275,39 @@ from [Airline B];
 
 ---
 
+select
+{ Date.[2020], Date.[2021], Date.[2022] } on columns,
+{ [Measures].Revenue } on rows
+from [Airline A];
+
+---
+
+select
+{
+  [Measures].Revenue
+} on columns,
+Children([Classes of Service].Root) on rows
+from [Airline A];
+
+---
+
+select
+  Children([Aircraft Models].[Boeing]) on rows,
+  CrossJoin(Children(Date.Root), { [Measures].Cost }) on columns
+from [Airline A];
+
+---
+
+with
+member [Measures].proportion as ([Measures].Revenue) / ([Classes of Service].[Root], [Measures].Revenue)
+select
+{ Date.[2019], Date.[2020], Date.[2021], Date.[2022] } on columns,
+members([Classes of Service], LEAF) on rows
+from [Airline A]
+where ([Measures].proportion, [Aircraft Models].[Airbus]);
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
