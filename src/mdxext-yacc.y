@@ -219,6 +219,14 @@ script_content:
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0003;
 	}
+  |
+	multi_dim_query EOF_ {
+		stack_push(&AST_STACK, IDS_MULTI_DIM_SELECT_DEF);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0003;
+	}
   | FLAG_EXP expression {
 		// do nothing
 
