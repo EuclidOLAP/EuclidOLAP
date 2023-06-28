@@ -1,3 +1,0 @@
-create Hierarchy [Date].[Financial];
----
-create Hierarchy [Aircraft Models].[Aircraft Size];
