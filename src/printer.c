@@ -138,10 +138,18 @@ void _print_mdrs_table(EuclidCommand *ddrs)
 
     for (int i = 0; i < tb_h; i++)
     {
+        for (int j = 0; j < tb_w; j++) {
+            printf("+");
+            for (int x = 0; x < max_len_arr[j] + 2; x++)
+            {
+                printf("-");
+            }
+        }
+        printf("+\n");
 
         for (int j = 0; j < tb_w; j++)
         {
-            printf(" ");
+            printf("| ");
             char *str = table[i * tb_w + j];
             printf("%s", str);
             for (int x = 0; x < max_len_arr[j] - strlen(str); x++)
@@ -150,8 +158,17 @@ void _print_mdrs_table(EuclidCommand *ddrs)
             }
             printf(" ");
         }
-        printf("\n");
+        printf("|\n");
     }
+
+    for (int j = 0; j < tb_w; j++) {
+        printf("+");
+        for (int x = 0; x < max_len_arr[j] + 2; x++)
+        {
+            printf("-");
+        }
+    }
+    printf("+\n");
 
     mam_reset(mam);
     obj_release(mam->current_block);

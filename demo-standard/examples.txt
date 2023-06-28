@@ -268,6 +268,13 @@ from [Airline A];
 
 ---
 
+select
+CrossJoin(Children(Date.Calendar.[ALL]), {[Measures].Revenue, [Measures].Cost}) on 0,
+CrossJoin(Children([Classes of Service].[ALL]), Children([Aircraft Models].Root)) on 1
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
