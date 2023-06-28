@@ -28,7 +28,7 @@ An in-memory multidimensional database.
 # 2. Features <a name="features"></a>
 - Authentic multidimensional data model.
 - Provide real-time aggregate computing capabilities for data of any granularity.
-- Support for MDX(Multi-Dimensional Expressions).
+- Support for SQL-like language MDX(Multi-Dimensional Expressions).
 - An EuclidOLAP service instance can be deployed in as little as one minute.
 - Stand-alone mode or distributed architecture.
 
@@ -41,31 +41,25 @@ Run an EuclidOLAP service process on Linux by starting a Docker container or dir
 ### 3.1.1. Docker
 Run the following command, quickly launch a Docker container of EuclidOLAP service.
 ```bash
-$ docker run -d -p 8760:8760 -p 8761:8761 --name olap euclidolap/euclidolap:v0.1.3-beta
+$ docker run -d -p 8760:8760 -p 8761:8761 --name olapd euclidolap/euclidolap:v0.1.5-beta
 ```
 
 ### 3.1.2. Executing binary
 Launch an EuclidOLAP service by executing binary on Linux.
 
-On **Centos** or **RedHat** platform, execute the following code:
-```bash
-$ wget https://github.com/EuclidOLAP/EuclidOLAP/releases/download/v0.1.2-beta/EuclidOLAP_v0.1.2-beta_centos.tar.gz
-$ tar zxf EuclidOLAP_v0.1.2-beta_centos.tar.gz
-$ cd EuclidOLAP_v0.1.2-beta_centos
-$ ./euclid-svr
-```
+EuclidOLAP currently supports running on **Redhat/CentOS** and **Debian/Ubuntu** operating systems.
 
-On **Ubuntu** or **Debian** platform, execute the following code:
+Execute the following code:
 ```bash
-$ wget https://github.com/EuclidOLAP/EuclidOLAP/releases/download/v0.1.2-beta/EuclidOLAP_v0.1.2-beta_ubuntu.tar.gz
-$ tar zxf EuclidOLAP_v0.1.2-beta_ubuntu.tar.gz
-$ cd EuclidOLAP_v0.1.2-beta_ubuntu/
-$ ./euclid-svr
+$ wget https://github.com/EuclidOLAP/EuclidOLAP/releases/download/v0.1.5-beta/EuclidOLAP-v0.1.5-beta.tar.gz
+$ tar zxf EuclidOLAP-v0.1.5-beta.tar.gz
+$ cd EuclidOLAP/bin
+$ ./start.h
 ```
 
 ## 3.2. Demo model <a name="demo_model"></a>
-The EuclidOLAP service is preset with a sample data model, which is a cube of airline turnover data that correlates three dimensions: Aircraft Type Dimension, Service Type Dimension, and Date Dimension.
-![](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/github-readme/demo-model-cube.webp)
+The EuclidOLAP service is preset with a sample data model, which is a cube of airline turnover data that correlates three dimensions: Aircraft Models Dimension, Classes of Service Dimension, and Date Dimension.
+![](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/github-readme/measure.png)
 For more details on this demo, refer to <a href="http://www.euclidolap.com/doc/concepts/md-model" target="_blank">Multidimensional Model</a> and <a href="http://www.euclidolap.com/doc/concepts/demo-example" target="_blank">Demo Example</a>.
 
 ## 3.3. Query examples <a name="query_examples"></a>
@@ -73,184 +67,127 @@ You can now execute multidimensional queries based on this sample model.
 
 EuclidOLAP uses MDX(Multi-Dimensional Expressions) as query language, for more details on MDX please refer to <a href="http://www.euclidolap.com/doc/mdx-manual" target="_blank">MDX Manual</a>.
 
-If you are running the EuclidOLAP service by starting a Docker container, execute the `docker exec -it olap /bin/bash` command to enter the Docker container first.
+If you are running the EuclidOLAP service by starting a Docker container, execute the `docker exec -it olapd /bin/bash` command to enter the Docker container first.
 
 Execute the EuclidOLAP client tool.
 
 ```bash
-$ ./euclid-cli
+$ ./olap-cli
 ```
 
 ### 3.3.1. Example 1
 
-The following MDX statement will query the turnover for the three years 2020 ~ 2022, run it in the EuclidOLAP client tool, and you will see the results in the table below.
+The following MDX statement will query the revenue for the three years 2020 ~ 2022, run it in the EuclidOLAP client tool, and you will see the results in the table below.
+
+```sql
+select
+  { Date.[2020], Date.[2021], Date.[2022] } on columns,
+  { [Measures].Revenue } on rows
+from [Airline A];
+```
 
 ```
-select
-{
-  Date.[ALL].[2020],
-  Date.[ALL].[2021],
-  Date.[ALL].[2022]
-} on columns,
-{
-  [measure].Turnover
-} on rows
-from [Airline Turnover];
++---------+--------------+--------------+--------------+
+|         | 2020         | 2021         | 2022         |
++---------+--------------+--------------+--------------+
+| Revenue | 494849380.00 | 590103250.00 | 622211200.00 |
++---------+--------------+--------------+--------------+
 ```
-<table>
-    <tr>
-        <td></td>
-        <td>2020</td>
-        <td>2021</td>
-        <td>2022</td>
-    </tr>
-    <tr>
-        <td>Turnover</td>
-        <td>5475632678</td>
-        <td>6559193037</td>
-        <td>7444450321</td>
-    </tr>
-</table>
 
 ### 3.3.2. Example 2
-The following MDX statement will query the turnover corresponding to each service type in 2022.
+The following MDX statement will query the revenue corresponding to each service type in 2022.
+
+```sql
+select
+  { [Measures].Revenue } on columns,
+  Children([Classes of Service].Root) on rows
+from [Airline A]
+where (Date.[2022]);
+```
 
 ```
-select
-{
-  [measure].Turnover
-} on columns,
-{
-  [Service Type].[ALL].[Premium Economy Class],
-  [Service Type].[ALL].[Basic Economy Class],
-  [Service Type].[ALL].[Economy Plus],
-  [Service Type].[ALL].[Business Suite],
-  [Service Type].[ALL].[Premium Business],
-  [Service Type].[ALL].[First Class Suite],
-  [Service Type].[ALL].[Private Jet Charter]
-} on rows
-from [Airline Turnover];
++-----------------------+--------------+
+|                       | Revenue      |
++-----------------------+--------------+
+| Premium Economy Class | 105711510.00 |
++-----------------------+--------------+
+| Basic Economy Class   | 167196360.00 |
++-----------------------+--------------+
+| Economy Plus          | 171715940.00 |
++-----------------------+--------------+
+| Business Suite        | 85372600.00  |
++-----------------------+--------------+
+| Premium Business      | 48876700.00  |
++-----------------------+--------------+
+| First Class Suite     | 25656480.00  |
++-----------------------+--------------+
+| Private Jet Charter   | 17681610.00  |
++-----------------------+--------------+
 ```
-<table>
-    <tr><td></td><td>Turnover</td></tr>
-    <tr><td>Premium Economy Class</td><td>3873331625</td></tr>
-    <tr><td>Basic Economy Class</td><td>5495863584</td></tr>
-    <tr><td>Economy Plus</td><td>4941650730</td></tr>
-    <tr><td>Business Suite</td><td>2189850692</td></tr>
-    <tr><td>Premium Business</td><td>1376448022</td></tr>
-    <tr><td>First Class Suite</td><td>1053424586</td></tr>
-    <tr><td>Private Jet Charter</td><td>548706797</td></tr>
-</table>
 
 ### 3.3.3. Example 3
-The following MDX statement queries the annual turnover of each Boeing aircraft type, aircraft types was displayed on rows, and years was displayed on columns, since the cube has only one measure that is Turnover, it is displayed by default.
-```
+The following MDX statement queries the annual operating costs for each Boeing aircraft models, with the aircraft models displayed on the row, the years and costs on the column.
+```sql
 select
-{
-  [Date].[ALL].[2020],
-  [Date].[ALL].[2021],
-  [Date].[ALL].[2022]
-} on rows,
-{
-  [Aircraft Type].[ALL].Boeing.[Boeing 747], 
-  [Aircraft Type].[ALL].Boeing.[Boeing 777], 
-  [Aircraft Type].[ALL].Boeing.[Boeing 787 Dreamliner]
-} on columns
-from [Airline Turnover];
+  Children([Aircraft Models].[Boeing]) on rows,
+  CrossJoin(Children(Date.Root), { [Measures].Cost }) on columns
+from [Airline A];
 ```
-<table>
-    <tr>
-        <td></td>
-        <td>Boeing 747</td>
-        <td>Boeing 777</td>
-        <td>Boeing 787 Dreamliner</td>
-    </tr>
-    <tr>
-        <td>2020</td>
-        <td>514564410</td>
-        <td>709722281</td>
-        <td>886223969</td>
-    </tr>
-    <tr>
-        <td>2021</td>
-        <td>604367094</td>
-        <td>871148561</td>
-        <td>1070311455</td>
-    </tr>
-    <tr>
-        <td>2022</td>
-        <td>705093902</td>
-        <td>985844701</td>
-        <td>1197908493</td>
-    </tr>
-</table>
+
+```
++------------+-------------+-------------+-------------+-------------+
+|            | 2019        | 2020        | 2021        | 2022        |
++------------+-------------+-------------+-------------+-------------+
+|            | Cost        | Cost        | Cost        | Cost        |
++------------+-------------+-------------+-------------+-------------+
+| Boeing 737 | 34293040.00 | 29375880.00 | 32928770.00 | 37168600.00 |
++------------+-------------+-------------+-------------+-------------+
+| Boeing 747 | 39327910.00 | 27147380.00 | 30939760.00 | 36922360.00 |
++------------+-------------+-------------+-------------+-------------+
+| Boeing 757 | 24053550.00 | 19976340.00 | 22849460.00 | 23636330.00 |
++------------+-------------+-------------+-------------+-------------+
+| Boeing 767 | 26722080.00 | 20026930.00 | 24037450.00 | 24239440.00 |
++------------+-------------+-------------+-------------+-------------+
+| Boeing 777 | 29321340.00 | 22490630.00 | 26517600.00 | 31237380.00 |
++------------+-------------+-------------+-------------+-------------+
+| Boeing 787 | 32728610.00 | 21476270.00 | 29365880.00 | 26310350.00 |
++------------+-------------+-------------+-------------+-------------+
+```
 
 ### 3.3.4. Example 4
-The following MDX statement will calculate the percentage of total turnover that comes from each service type, broken down by year. This will be done using a custom formula, the formula will be defined as a member in the query language.
-```
+The following MDX will calculate the revenue percentage for each service class for all Airbus aircraft each year, which will be done using a custom formula that will be defined as a member in the query language.
+```sql
 with
-member [measure].proportion as ([measure].Turnover) / ([Service Type].[ALL], [measure].Turnover)
+member [Measures].proportion
+  as ([Measures].Revenue) / ([Classes of Service].[Root], [Measures].Revenue)
 select
-{
-  Date.[ALL].[2020],
-  Date.[ALL].[2021],
-  Date.[ALL].[2022]
-} on columns,
-members([Service Type], LEAF) on rows
-from [Airline Turnover]
-where ([measure].proportion, [Aircraft Type].[ALL].[Airbus].[Airbus A380]);
+  { Date.[2019], Date.[2020], Date.[2021], Date.[2022] } on columns,
+  members([Classes of Service]) on rows
+from [Airline A]
+where ([Measures].proportion, [Aircraft Models].[Airbus]);
 ```
 
-<table>
-    <tr>
-        <td></td>
-        <td>2020</td>
-        <td>2021</td>
-        <td>2022</td>
-    </tr>
-    <tr>
-        <td>Premium Economy Class</td>
-        <td>0.20</td>
-        <td>0.20</td>
-        <td>0.20</td>
-    </tr>
-    <tr>
-        <td>Basic Economy Class</td>
-        <td>0.29</td>
-        <td>0.28</td>
-        <td>0.27</td>
-    </tr>
-    <tr>
-        <td>Economy Plus</td>
-        <td>0.25</td>
-        <td>0.25</td>
-        <td>0.26</td>
-    </tr>
-    <tr>
-        <td>Business Suite</td>
-        <td>0.11</td>
-        <td>0.12</td>
-        <td>0.12</td>
-    </tr>
-    <tr>
-        <td>Premium Business</td>
-        <td>0.07</td>
-        <td>0.07</td>
-        <td>0.07</td>
-    </tr>
-    <tr>
-        <td>First Class Suite</td>
-        <td>0.05</td>
-        <td>0.05</td>
-        <td>0.06</td>
-    </tr>
-    <tr>
-        <td>Private Jet Charter</td>
-        <td>0.03</td>
-        <td>0.03</td>
-        <td>0.03</td>
-    </tr>
-</table>
+```
++-----------------------+------+------+------+------+
+|                       | 2019 | 2020 | 2021 | 2022 |
++-----------------------+------+------+------+------+
+| Root                  | 1.00 | 1.00 | 1.00 | 1.00 |
++-----------------------+------+------+------+------+
+| Premium Economy Class | 0.18 | 0.19 | 0.17 | 0.16 |
++-----------------------+------+------+------+------+
+| Basic Economy Class   | 0.27 | 0.27 | 0.26 | 0.27 |
++-----------------------+------+------+------+------+
+| Economy Plus          | 0.28 | 0.26 | 0.28 | 0.27 |
++-----------------------+------+------+------+------+
+| Business Suite        | 0.13 | 0.14 | 0.14 | 0.14 |
++-----------------------+------+------+------+------+
+| Premium Business      | 0.08 | 0.08 | 0.07 | 0.09 |
++-----------------------+------+------+------+------+
+| First Class Suite     | 0.04 | 0.04 | 0.04 | 0.04 |
++-----------------------+------+------+------+------+
+| Private Jet Charter   | 0.03 | 0.03 | 0.03 | 0.03 |
++-----------------------+------+------+------+------+
+```
 
 # 4. Why use EuclidOLAP? <a name="why_use_euclidolap"></a>
 Deploying the EuclidOLAP service is very simple, there is no need to rely on a running environment other than the Linux operating system, by starting a Docker container you can immediately run an EuclidOLAP stand-alone service, and it only takes a few minutes to build an EuclidOLAP distributed cluster service.
