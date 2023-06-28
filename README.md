@@ -54,7 +54,7 @@ Execute the following code:
 $ wget https://github.com/EuclidOLAP/EuclidOLAP/releases/download/v0.1.5-beta/EuclidOLAP-v0.1.5-beta.tar.gz
 $ tar zxf EuclidOLAP-v0.1.5-beta.tar.gz
 $ cd EuclidOLAP/bin
-$ ./start.h
+$ ./start.sh &
 ```
 
 ## 3.2. Demo model <a name="demo_model"></a>
