@@ -5,6 +5,7 @@
 
 #include <dirent.h>
 
+#include "env.h"
 #include "log.h"
 #include "cfg.h"
 #include "mdd.h"
@@ -13,6 +14,8 @@
 #include "net.h"
 
 #include "tools/elastic-byte-buffer.h"
+
+extern OLAPEnv olap_env;
 
 static MemAllocMng *vce_mam;
 static ArrayList *space_mam_ls;
@@ -37,16 +40,18 @@ void vce_load()
 {
 
     DIR *dir = NULL;
-    struct dirent *entry;
+    struct dirent *entry = NULL;
     char *prefix = "data-";
     int prefix_len = strlen(prefix);
-    char *suffix, *endptr;
-    long cube_id;
+    char *suffix = NULL, *endptr = NULL;
+    long cube_id = 0;
 
+    assert(strlen(olap_env.OLAP_HOME) + 32 < 128);
     char f[128];
     memset(f, 0, 128);
-    getcwd(f, 80);
-    strcat(f, "/data");
+    // getcwd(f, 80);
+    // strcat(f, "/data");
+    sprintf(f, "%s%s", olap_env.OLAP_HOME, "/data");
 
     dir = opendir(f);
 
@@ -99,29 +104,46 @@ int vce_append(EuclidCommand *action)
     unsigned int axes_count = *((unsigned int *)slide_over_mem(bytes, sizeof(int), &i));
     unsigned int vals_count = *((unsigned int *)slide_over_mem(bytes, sizeof(int), &i));
 
-    char src_dir[128];
-    memset(src_dir, 0, 128);
-    getcwd(src_dir, 80);
+    // char src_dir[128];
+    // memset(src_dir, 0, 128);
+    // getcwd(src_dir, 80);
 
-    char profile[128];
-    memset(profile, 0, 128);
-    sprintf(profile, "data/profile-%lu", cs_id);
+    // char profile[128];
+    // memset(profile, 0, 128);
+    // sprintf(profile, "data/profile-%lu", cs_id);
 
-    char profile_path[128];
-    memset(profile_path, 0, 128);
-    sprintf(profile_path, "%s/%s", src_dir, profile);
+    // char profile_path[128];
+    // memset(profile_path, 0, 128);
+    // sprintf(profile_path, "%s/%s", src_dir, profile);
 
-    if (access(profile_path, F_OK) != 0)
+    // if (access(profile_path, F_OK) != 0)
+    // {
+    //     // create persistent file about the CoordinateSystem
+    //     append_file_data(profile, (void *)&cs_id, sizeof(cs_id));
+    //     append_file_data(profile, (void *)&axes_count, sizeof(axes_count));
+    //     append_file_data(profile, (void *)&vals_count, sizeof(vals_count));
+    // }
+
+    char cube_prof[256];
+    assert(strlen(olap_env.OLAP_HOME) < 200);
+    memset(cube_prof, 0, 256);
+    sprintf(cube_prof, "%s/data/profile-%lu", olap_env.OLAP_HOME, cs_id);
+
+    if (access(cube_prof, F_OK) != 0)
     {
         // create persistent file about the CoordinateSystem
-        append_file_data(profile, (void *)&cs_id, sizeof(cs_id));
-        append_file_data(profile, (void *)&axes_count, sizeof(axes_count));
-        append_file_data(profile, (void *)&vals_count, sizeof(vals_count));
+        append_file_data(cube_prof, (void *)&cs_id, sizeof(cs_id));
+        append_file_data(cube_prof, (void *)&axes_count, sizeof(axes_count));
+        append_file_data(cube_prof, (void *)&vals_count, sizeof(vals_count));
     }
 
+
     // Store the newly added measure data and its positioning information in the data file.
-    char data_file[128];
-    sprintf(data_file, "data/data-%lu", cs_id);
+    char data_file[256];
+    assert(strlen(olap_env.OLAP_HOME) < 200);
+    memset(data_file, 0, 256);
+    sprintf(data_file, "%s/data/data-%lu", olap_env.OLAP_HOME, cs_id);
+    // sprintf(data_file, "data/data-%lu", cs_id);
     int _offset = sizeof(pkg_capacity) + sizeof(intent) + sizeof(cs_id) + sizeof(axes_count) + sizeof(vals_count);
     append_file_data(data_file, (void *)(bytes + _offset), pkg_capacity - _offset);
 
@@ -147,13 +169,17 @@ void reload_space(unsigned long cs_id)
 
     ByteBuf *tmp_buf = buf__alloc(0x01UL << 10);
 
-    char profile[128];
-    sprintf(profile, "data/profile-%lu", cs_id);
+    char profile[256];
+    assert(strlen(olap_env.OLAP_HOME) < 200);
+    memset(profile, 0, 256);
+    sprintf(profile, "%s/data/profile-%lu", olap_env.OLAP_HOME, cs_id);
+    // sprintf(profile, "data/profile-%lu", cs_id);
 
     unsigned int axes_count;
     unsigned int vals_count;
 
-    FILE *pfd = open_file(profile, "r");
+    // FILE *pfd = open_file(profile, "r");
+    FILE *pfd = fopen(profile, "a+");
 
     // fread(tmpbuf, sizeof(cs_id), 1, pfd);
     fread(buf_cutting(tmp_buf, sizeof(cs_id)), sizeof(cs_id), 1, pfd);
@@ -169,9 +195,13 @@ void reload_space(unsigned long cs_id)
     CoordinateSystem *cs = coosys_new(cs_id, axes_count, cs_mam);
     als_add(coor_sys_ls, cs);
 
-    char data_file[128];
-    sprintf(data_file, "data/data-%lu", cs_id);
-    FILE *data_fd = open_file(data_file, "r");
+    char data_file[256];
+    assert(strlen(olap_env.OLAP_HOME) < 200);
+    memset(data_file, 0, 256);
+    sprintf(data_file, "%s/data/data-%lu", olap_env.OLAP_HOME, cs_id);
+    // sprintf(data_file, "data/data-%lu", cs_id);
+
+    FILE *data_fd = fopen(data_file, "a+");
     int coor_pointer_len;
 
     while (fread(&coor_pointer_len, sizeof(int), 1, data_fd) > 0)
@@ -261,7 +291,7 @@ void reload_space(unsigned long cs_id)
     MeasureSpace *space = space_new(cs_id, space_partition_count, SPACE_DEF_PARTITION_SPAN_MIN, vals_count, cs_mam);
 
     // Traverse the data file and insert all measure data into the logical multidimensional array.
-    data_fd = open_file(data_file, "r");
+    data_fd = fopen(data_file, "a+");
 
     unsigned long load_meval_count = 0;
     char *cellcm = NULL;

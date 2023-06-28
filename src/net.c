@@ -137,9 +137,6 @@ static void *sit_startup(void *sit_addr)
 
 	// check first command.
 	intent inte = ec_get_intent(command);
-	// ec_release(command);
-	obj_release(command->bytes);
-	obj_release(command);
 
 	if (inte == INTENT__TERMINAL_CONTROL) {
 		log_print("[ info ] A terminal was connected < sock_fd : %d >\n", sit->sock_fd);
@@ -156,6 +153,10 @@ static void *sit_startup(void *sit_addr)
 		log_print("[ error] <Fail fast!!!> Process was killed cause by unknown command intent.\n");
 		exit(EXIT_FAILURE);
 	}
+
+	// ec_release(command);
+	obj_release(command->bytes);
+	obj_release(command);
 
 	// send allow intention to terminal or child.
 	sit_send_command(sit, get_const_command_intent(INTENT__ALLOW));

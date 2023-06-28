@@ -430,6 +430,10 @@ Name {
 	return STRING;
 }
 
+<<EOF>> {
+	return EOF_;
+}
+
 . {
 	// do nothing
 	// TODO An MDX lexical parsing-related exception should be thrown here.

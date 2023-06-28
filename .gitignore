@@ -57,3 +57,7 @@ test/
 tests/
 _tests/
 _private/
+bin/
+data/
+log/
+profiles/

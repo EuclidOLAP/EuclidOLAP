@@ -8,11 +8,11 @@
 #include "mdx.h"
 #include "tools/elastic-byte-buffer.h"
 
-#define META_DEF_DIMS_FILE_PATH "/meta/dims"
-#define META_DEF_MBRS_FILE_PATH "/meta/mbrs"
-#define META_DEF_LEVELS_FILE_PATH "/meta/levels"
-#define META_DEF_CUBES_FILE_PATH "/meta/cubes"
-#define META_DEF_HIERARCHIES_FILE_PATH "/meta/hierarchies"
+// #define META_DEF_DIMS_FILE_PATH "/meta/dims"
+// #define META_DEF_MBRS_FILE_PATH "/meta/mbrs"
+// #define META_DEF_LEVELS_FILE_PATH "/meta/levels"
+// #define META_DEF_CUBES_FILE_PATH "/meta/cubes"
+// #define META_DEF_HIERARCHIES_FILE_PATH "/meta/hierarchies"
 
 #define STANDARD_MEASURE_DIMENSION "Measures"
 

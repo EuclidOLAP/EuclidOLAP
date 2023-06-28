@@ -1,38 +1,43 @@
 #ifndef EUCLID__CFG_H
 #define EUCLID__CFG_H 1
 
+
+#define PROFILES_MAX_LEN     300
+
+#define PROFILE_DIMENSIONS   "/profiles/dimensions"
+#define PROFILE_MEMBERS      "/profiles/members"
+#define PROFILE_LEVELS       "/profiles/levels"
+#define PROFILE_CUBES        "/profiles/cubes"
+#define PROFILE_HIERARCHIES  "/profiles/hierarchies"
+#define PROFILE_CUBE_PREFIX  "/profiles/cube_"
+
+
 // #define PARAM_KEY__MODE "--p:mode"
 // #define PARAM_KEY__PORT "--p:port"
 // #define PARAM_KEY__JOIN "--p:join"
 
-/*
- * stand-alone
- */
+
+// stand-alone
 #define MODE_STAND_ALONE 's'
-
-/*
- * master
- */
+// master
 #define MODE_MASTER 'm'
-
-/*
- * worker
- */
+// worker
 #define MODE_WORKER 'w'
-
-/*
- * client
- */
+// client
 #define MODE_CLIENT 'c'
 
-#define DEF_CONF "euclid-svr.conf"
-#define DEF_CLI_CONF "euclid-cli.conf"
+
+#define OLAP_SERVER_CONF "/config/euclid-svr.conf"
+// #define DEF_CONF "euclid-svr.conf"
+// #define DEF_CLI_CONF "euclid-cli.conf"
+
 
 #define CFG_WORKERID_LEN_LIMIT 32
 
 typedef struct euclid_cfg
 {
-	char *program_path;
+	// char *program_path;
+
 	char *host; // the IP or domain of server, be used when client mode
 	char *file; // the file be executed, be used when client mode
 
@@ -48,6 +53,17 @@ typedef struct euclid_cfg
 	int cli_ctrl_node_port;
 
 	char mode;
+
+	struct
+	{
+		char dimensions[PROFILES_MAX_LEN + 1];
+		char members[PROFILES_MAX_LEN + 1];
+		char levels[PROFILES_MAX_LEN + 1];
+		char hierarchies[PROFILES_MAX_LEN + 1];
+		char cubes[PROFILES_MAX_LEN + 1];
+		char cube_prefix[PROFILES_MAX_LEN + 1];
+	} profiles;
+
 } EuclidConfig;
 
 int init_cfg(int argc, char *argv[]);

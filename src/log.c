@@ -7,21 +7,17 @@
 #include <time.h>
 // #include <errno.h>
 
+#include "env.h"
 #include "utils.h"
 
 static char *def_log_file = NULL;
 
 static void __log_prt__(const char *fmt, va_list ap);
 
+extern OLAPEnv olap_env;
+
 void log_print(const char *fmt, ...)
 {
-
-	if (access("log", F_OK) != 0)
-	{
-		// create the log folder
-		mkdir("log", S_IRWXU);
-	}
-
 	va_list ap;
 	va_start(ap, fmt);
 	__log_prt__(fmt, ap);
@@ -36,8 +32,9 @@ void log__set_log_file(char *file)
 		exit(EXIT_FAILURE);
 	}
 
-	def_log_file = obj_alloc(strlen(file) + 1, OBJ_TYPE__RAW_BYTES);
-	strcpy(def_log_file, file);
+	def_log_file = obj_alloc(strlen(olap_env.OLAP_HOME) + strlen(file) + 1, OBJ_TYPE__RAW_BYTES);
+	sprintf(def_log_file, "%s%s", olap_env.OLAP_HOME, file);
+	// strcpy(def_log_file, file);
 }
 
 static void __log_prt__(const char *fmt, va_list ap)

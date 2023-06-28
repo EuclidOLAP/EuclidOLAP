@@ -72,7 +72,8 @@ int mdd_init()
 
 static int load_dimensions()
 {
-	FILE *dims_file = open_file(META_DEF_DIMS_FILE_PATH, "r");
+	// FILE *dims_file = open_file(get_cfg()->profiles.dimensions, "r");
+	FILE *dims_file = fopen(get_cfg()->profiles.dimensions, "a+");
 	Dimension dim;
 	while (1)
 	{
@@ -87,7 +88,8 @@ static int load_dimensions()
 }
 
 static int load_hierarchies() {
-	FILE *file = open_file(META_DEF_HIERARCHIES_FILE_PATH, "r");
+	// FILE *file = open_file(get_cfg()->profiles.hierarchies , "r");
+	FILE *file = fopen(get_cfg()->profiles.hierarchies , "a+");
 	Hierarchy hier;
 	while (1)
 	{
@@ -103,7 +105,8 @@ static int load_hierarchies() {
 
 static int load_levels()
 {
-	FILE *levels_file = open_file(META_DEF_LEVELS_FILE_PATH, "r");
+	// FILE *levels_file = open_file(get_cfg()->profiles.levels, "r");
+	FILE *levels_file = fopen(get_cfg()->profiles.levels, "a+");
 	Level level;
 	while (1)
 	{
@@ -119,7 +122,8 @@ static int load_levels()
 
 static int load_members()
 {
-	FILE *members_file = open_file(META_DEF_MBRS_FILE_PATH, "r");
+	// FILE *members_file = open_file(get_cfg()->profiles.members, "r");
+	FILE *members_file = fopen(get_cfg()->profiles.members, "a+");
 	Member memb;
 	while (1)
 	{
@@ -159,18 +163,21 @@ static int load_members()
 
 static int load_cubes()
 {
-	FILE *cubes_fd = open_file(META_DEF_CUBES_FILE_PATH, "r");
+	// FILE *cubes_fd = open_file(get_cfg()->profiles.cubes, "r");
+	FILE *cubes_fd = fopen(get_cfg()->profiles.cubes, "a+");
 
-	char cube_stru_file[128];
+	int _cube_stru_file_len_ = strlen(get_cfg()->profiles.cube_prefix) + 64;
+	char cube_stru_file[_cube_stru_file_len_];
 	md_gid cube_id;
 
 	while (fread((void *)&cube_id, sizeof(md_gid), 1, cubes_fd) > 0)
 	{
 		// als_add(cube_id_arr, *((void **)&cube_id));
-		memset(cube_stru_file, 0, 128);
-		sprintf(cube_stru_file, "/meta/cube_%lu", cube_id);
+		memset(cube_stru_file, 0, _cube_stru_file_len_);
+		sprintf(cube_stru_file, "%s%lu", get_cfg()->profiles.cube_prefix, cube_id);
 
-		FILE *cube_fd = open_file(cube_stru_file, "r");
+		// FILE *cube_fd = open_file(cube_stru_file, "r");
+		FILE *cube_fd = fopen(cube_stru_file, "a+");
 
 		Cube *cube = mam_alloc(sizeof(Cube), OBJ_TYPE__Cube, meta_mam, 0);
 		fread(cube, sizeof(Cube), 1, cube_fd);
@@ -239,7 +246,7 @@ Hierarchy *create_hierarchy(Dimension *dimension, char *hierarchy_name) {
 	memcpy(hierarchy->name, hierarchy_name, strlen(hierarchy_name));
 
 	// 2 - save the dim-obj into a persistent file.
-	append_file_data(META_DEF_HIERARCHIES_FILE_PATH, (char *)hierarchy, sizeof(Hierarchy));
+	append_file_data(get_cfg()->profiles.hierarchies, (char *)hierarchy, sizeof(Hierarchy));
 
 	als_add(hierarchies_pool, hierarchy);
 
@@ -256,7 +263,7 @@ Hierarchy *create_hierarchy(Dimension *dimension, char *hierarchy_name) {
 	member->p_gid = 0;
 	member->lv = 0;
 
-	append_file_data(META_DEF_MBRS_FILE_PATH, (char *)member, sizeof(Member));
+	append_file_data(get_cfg()->profiles.members, (char *)member, sizeof(Member));
 	als_add(member_pool, member);
 
 	return hierarchy;
@@ -288,7 +295,7 @@ static Dimension *create_dimension(char *dim_name, char *hierarchy_name, int def
 		dim->def_hierarchy_gid = hierarchy->gid;
 
 	// 2 - save the dim-obj into a persistent file.
-	append_file_data(META_DEF_DIMS_FILE_PATH, (char *)dim, sizeof(Dimension));
+	append_file_data(get_cfg()->profiles.dimensions, (char *)dim, sizeof(Dimension));
 
 	als_add(dims_pool, dim);
 
@@ -372,7 +379,7 @@ Level *Level_creat(char *name_, Dimension *dim, Hierarchy *hierarchy, unsigned i
 
 void mdd__save_level(Level *lv)
 {
-	append_file_data(META_DEF_LEVELS_FILE_PATH, (char *)lv, sizeof(Level));
+	append_file_data(get_cfg()->profiles.levels, (char *)lv, sizeof(Level));
 }
 
 void mdd__use_level(Level *lv)
@@ -413,7 +420,7 @@ do_create:
 	member->p_gid = parent->gid;
 	member->lv = parent->lv + 1;
 
-	append_file_data(META_DEF_MBRS_FILE_PATH, (char *)member, sizeof(Member));
+	append_file_data(get_cfg()->profiles.members, (char *)member, sizeof(Member));
 	als_add(member_pool, member);
 
 	return member;
@@ -687,8 +694,8 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 	}
 
 	// Each cube uses a persistent file separately.
-	char cube_file[128];
-	sprintf(cube_file, "/meta/cube_%lu", cube->gid);
+	char cube_file[strlen(get_cfg()->profiles.cube_prefix) + 64];
+	sprintf(cube_file, "%s%lu", get_cfg()->profiles.cube_prefix, cube->gid);
 	append_file_data(cube_file, (char *)cube, sizeof(Cube));
 	append_file_uint(cube_file, als_size(cube->dim_role_ls));
 	__uint32_t r_sz = als_size(cube->dim_role_ls);
@@ -706,7 +713,7 @@ int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures)
 		append_file_data(cube_file, (char *)mea_mbr, sizeof(Member));
 	}
 
-	append_file_data(META_DEF_CUBES_FILE_PATH, (char *)&(cube->gid), sizeof(cube->gid));
+	append_file_data(get_cfg()->profiles.cubes, (char *)&(cube->gid), sizeof(cube->gid));
 	als_add(cubes_pool, cube);
 
 	return 0;

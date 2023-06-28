@@ -6,6 +6,7 @@
 #include "net.h"
 #include "command.h"
 #include "vce.h"
+#include "env.h"
 
 #include "locks/global-locks.h"
 
@@ -13,10 +14,12 @@
 
 int main(int argc, char *argv[])
 {
+	olap_env_init();
+
 	// pthread_mutex_init(&mutex_AAA, NULL);
 	global_locks_init();
 
-	log__set_log_file("log/euclid.log");
+	log__set_log_file("/log/euclid.log");
 
 	init_cfg(argc, argv);
 
