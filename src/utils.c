@@ -460,28 +460,29 @@ long now_microseconds()
 
 int append_file_data(char *file_path, char *data, size_t sz)
 {
-	char f[128];
-	memset(f, 0, 128);
-	getcwd(f, 80);
-	if (*file_path != '/')
-		strcat(f, "/");
-	strcat(f, file_path);
-	FILE *fp = fopen(f, "a+");
+	// char f[128];
+	// memset(f, 0, 128);
+	// getcwd(f, 80);
+	// if (*file_path != '/')
+	// 	strcat(f, "/");
+	// strcat(f, file_path);
+
+	FILE *fp = fopen(file_path, "a+");
 	fwrite(data, sz, 1, fp);
 	fclose(fp);
 	return 0;
 }
 
-FILE *open_file(char *r_path, char *modes)
-{
-	char f[128];
-	memset(f, 0, 128);
-	getcwd(f, 80);
-	if (*r_path != '/')
-		strcat(f, "/");
-	strcat(f, r_path);
-	return fopen(f, "a+");
-}
+// FILE *open_file(char *r_path, char *modes)
+// {
+// 	char f[128];
+// 	memset(f, 0, 128);
+// 	getcwd(f, 80);
+// 	if (*r_path != '/')
+// 		strcat(f, "/");
+// 	strcat(f, r_path);
+// 	return fopen(f, "a+");
+// }
 
 int append_file_uint(char *file_path, __uint32_t val)
 {

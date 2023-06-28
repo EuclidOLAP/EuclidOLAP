@@ -24,6 +24,8 @@ Stack AST_STACK = { 0 };
 // yacc_f_002
 %}
 
+%token EOF_			/* <<EOF>> */
+
 /* key words */
 %token CREATE		/* create */
 %token DIMENSIONS	/* dimensions */
@@ -210,7 +212,7 @@ script_content:
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
 	}
-  | multi_dim_query SEMICOLON {
+  | multi_dim_query SEMICOLON EOF_ {
 		stack_push(&AST_STACK, IDS_MULTI_DIM_SELECT_DEF);
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.

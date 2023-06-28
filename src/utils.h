@@ -221,7 +221,7 @@ void *als_rm_index(ArrayList *als, unsigned int idx);
 
 void *slide_over_mem(void *addr, ssize_t range, size_t *idx);
 
-FILE *open_file(char *r_path, char *modes);
+// FILE *open_file(char *r_path, char *modes);
 
 // void file_stat(char *data_file, struct stat *f_stat);
 

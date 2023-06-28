@@ -357,7 +357,7 @@ static int execute_command(EuclidCommand *action)
 				assert(obj_type_of(md) == OBJ_TYPE__Member);
 
 				ms->link = md->gid;
-				append_file_data(META_DEF_MBRS_FILE_PATH, (char *)ms, sizeof(Member));
+				append_file_data(get_cfg()->profiles.members, (char *)ms, sizeof(Member));
 			}
 		}
 		else

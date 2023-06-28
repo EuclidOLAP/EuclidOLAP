@@ -5,9 +5,12 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include "env.h"
 #include "log.h"
 #include "cfg.h"
 #include "utils.h"
+
+extern OLAPEnv olap_env;
 
 static char __program_mode__ = 0;
 
@@ -33,7 +36,51 @@ int init_cfg(int argc, char *argv[])
 	cfg.mode = __program_mode__ ? __program_mode__ : MODE_STAND_ALONE;
 	cfg.port = 8760;
 	cfg.ec_threads_count = 1;
-	cfg.program_path = argv[0];
+	// cfg.program_path = argv[0];
+
+	if (cfg.mode != MODE_CLIENT) {
+		if (strlen(olap_env.OLAP_HOME) + strlen(PROFILE_DIMENSIONS) > PROFILES_MAX_LEN) {
+			fprintf(stderr, "[exit cause by error] '%s%s' length over %d.\n", olap_env.OLAP_HOME, PROFILE_DIMENSIONS, PROFILES_MAX_LEN);
+			exit(EXIT_FAILURE);
+		} else {
+			sprintf(cfg.profiles.dimensions, "%s%s", olap_env.OLAP_HOME, PROFILE_DIMENSIONS);
+		}
+		
+		if (strlen(olap_env.OLAP_HOME) + strlen(PROFILE_HIERARCHIES) > PROFILES_MAX_LEN) {
+			fprintf(stderr, "[exit cause by error] '%s%s' length over %d.\n", olap_env.OLAP_HOME, PROFILE_HIERARCHIES, PROFILES_MAX_LEN);
+			exit(EXIT_FAILURE);
+		} else {
+			sprintf(cfg.profiles.hierarchies, "%s%s", olap_env.OLAP_HOME, PROFILE_HIERARCHIES);
+		}
+		
+		if (strlen(olap_env.OLAP_HOME) + strlen(PROFILE_LEVELS) > PROFILES_MAX_LEN) {
+			fprintf(stderr, "[exit cause by error] '%s%s' length over %d.\n", olap_env.OLAP_HOME, PROFILE_LEVELS, PROFILES_MAX_LEN);
+			exit(EXIT_FAILURE);
+		} else {
+			sprintf(cfg.profiles.levels, "%s%s", olap_env.OLAP_HOME, PROFILE_LEVELS);
+		}
+		
+		if (strlen(olap_env.OLAP_HOME) + strlen(PROFILE_MEMBERS) > PROFILES_MAX_LEN) {
+			fprintf(stderr, "[exit cause by error] '%s%s' length over %d.\n", olap_env.OLAP_HOME, PROFILE_MEMBERS, PROFILES_MAX_LEN);
+			exit(EXIT_FAILURE);
+		} else {
+			sprintf(cfg.profiles.members, "%s%s", olap_env.OLAP_HOME, PROFILE_MEMBERS);
+		}
+		
+		if (strlen(olap_env.OLAP_HOME) + strlen(PROFILE_CUBES) > PROFILES_MAX_LEN) {
+			fprintf(stderr, "[exit cause by error] '%s%s' length over %d.\n", olap_env.OLAP_HOME, PROFILE_CUBES, PROFILES_MAX_LEN);
+			exit(EXIT_FAILURE);
+		} else {
+			sprintf(cfg.profiles.cubes, "%s%s", olap_env.OLAP_HOME, PROFILE_CUBES);
+		}
+		
+		if (strlen(olap_env.OLAP_HOME) + strlen(PROFILE_CUBE_PREFIX) > PROFILES_MAX_LEN) {
+			fprintf(stderr, "[exit cause by error] '%s%s' length over %d.\n", olap_env.OLAP_HOME, PROFILE_CUBE_PREFIX, PROFILES_MAX_LEN);
+			exit(EXIT_FAILURE);
+		} else {
+			sprintf(cfg.profiles.cube_prefix, "%s%s", olap_env.OLAP_HOME, PROFILE_CUBE_PREFIX);
+		}
+	}
 
 	// values of configuration file
 	load_conf_files();
@@ -47,12 +94,12 @@ int init_cfg(int argc, char *argv[])
 		fetch_param(argv[i]);
 	}
 
-	// create meta and data folders
-	if (access("meta", F_OK) != 0)
-		mkdir("meta", S_IRWXU);
+	// // create meta and data folders
+	// if (access("meta", F_OK) != 0)
+	// 	mkdir("meta", S_IRWXU);
 
-	if (access("data", F_OK) != 0)
-		mkdir("data", S_IRWXU);
+	// if (access("data", F_OK) != 0)
+	// 	mkdir("data", S_IRWXU);
 
 	switch (cfg.mode)
 	{
@@ -170,47 +217,63 @@ EuclidConfig *get_cfg()
 
 static int load_conf_files()
 {
-	char *cfg_file_name;
+	// char *cfg_file_name;
+	// if (cfg.mode == MODE_CLIENT)
+	// {
+	// 	cfg_file_name = DEF_CLI_CONF;
+	// }
+	// else
+	// {
+	// 	cfg_file_name = DEF_CONF;
+	// }
+
+	// int len = strlen(cfg.program_path) + 32;
+	// char conf_path[len];
+	// memset(conf_path, 0, len);
+	// strcpy(conf_path, cfg.program_path);
+
+	// int i;
+	// for (i = len - 1; i >= 0; i--)
+	// {
+	// 	if (conf_path[i] != '/')
+	// 		conf_path[i] = '\0';
+	// 	else
+	// 		break;
+	// }
+
+	// char cfg_file_name[512];
+	// sprintf(cfg_file_name, "%s%s", olap_env.OLAP_HOME, OLAP_SERVER_CONF);
+
+	// strcat(conf_path, cfg_file_name);
+
+	// if (access(conf_path, F_OK) != 0)
+	// {
+	// 	// the config file was not existed.
+
+	// 	if (cfg.mode == MODE_CLIENT)
+	// 	{
+	// 		// set the default ip and port of euclid-olap server, when it's client mode.
+	// 		cfg.cli_ctrl_node_port = 8760;
+	// 		strcpy(cfg.cli_ctrl_node_host, "127.0.0.1");
+	// 	}
+
+	// 	return 0;
+	// }
+
 	if (cfg.mode == MODE_CLIENT)
 	{
-		cfg_file_name = DEF_CLI_CONF;
-	}
-	else
-	{
-		cfg_file_name = DEF_CONF;
-	}
-
-	int len = strlen(cfg.program_path) + 32;
-	char conf_path[len];
-	memset(conf_path, 0, len);
-	strcpy(conf_path, cfg.program_path);
-
-	int i;
-	for (i = len - 1; i >= 0; i--)
-	{
-		if (conf_path[i] != '/')
-			conf_path[i] = '\0';
-		else
-			break;
-	}
-
-	strcat(conf_path, cfg_file_name);
-
-	if (access(conf_path, F_OK) != 0)
-	{
-		// the config file was not existed.
-
-		if (cfg.mode == MODE_CLIENT)
-		{
-			// set the default ip and port of euclid-olap server, when it's client mode.
-			cfg.cli_ctrl_node_port = 8760;
-			strcpy(cfg.cli_ctrl_node_host, "127.0.0.1");
-		}
-
+		// set the default ip and port of euclid-olap server, when it's client mode.
+		cfg.cli_ctrl_node_port = 8760;
+		strcpy(cfg.cli_ctrl_node_host, "127.0.0.1");
 		return 0;
 	}
 
-	FILE *conf_fp = fopen(conf_path, "r");
+	char server_conf[512];
+	assert(strlen(olap_env.OLAP_HOME) + strlen(OLAP_SERVER_CONF) < 511);
+	memset(server_conf, 0, 512);
+	sprintf(server_conf, "%s%s", olap_env.OLAP_HOME, OLAP_SERVER_CONF);
+
+	FILE *conf_fp = fopen(server_conf, "r");
 
 	int buf_len = 256;
 	char buf_arr[buf_len];
