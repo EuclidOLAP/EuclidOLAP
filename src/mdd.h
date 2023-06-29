@@ -32,7 +32,6 @@ ArrayList *Member__descendants(Member *ancestor);
 
 Member *Member_find_posi_descmbr(Member *ancestor, ArrayList *desc_posi);
 
-// TODO parameter 'parent' may be redundant
 int Member_child_position(Member *parent, Member *child);
 
 void Member_print(Member *);
