@@ -580,7 +580,6 @@ Member *Member_find_posi_descmbr(Member *ancestor, ArrayList *desc_posi)
 	return descmbr;
 }
 
-// TODO parameter 'parent' may be redundant
 int Member_child_position(Member *parent, Member *child)
 {
 	int i, posi = 0, sz = als_size(member_pool);

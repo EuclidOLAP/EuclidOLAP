@@ -415,11 +415,11 @@ static int execute_command(EuclidCommand *action)
 	}
 	else if (inte == INTENT__AGGREGATE_TASK_RESULT)
 	{
-		log_print("// todo at once ............................ INTENT__AGGREGATE_TASK_RESULT\n");
+		log_print("execute_command:: inte is INTENT__AGGREGATE_TASK_RESULT.\n");
 	}
 	else if (inte == INTENT__SUCCESSFUL)
 	{
-		log_print("// todo at once ............................ INTENT__SUCCESSFUL\n");
+		log_print("execute_command:: inte is INTENT__SUCCESSFUL.\n");
 	}
 	else
 	{
