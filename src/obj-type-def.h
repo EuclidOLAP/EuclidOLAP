@@ -11,6 +11,7 @@ typedef short type_obj;
 #define is_type_astmemberfunc(obj_type) (obj_type >= OBJ_TYPE__ASTMEMBERFUNC__MIN && obj_type <= OBJ_TYPE__ASTMEMBERFUNC__MAX)
 #define is_type_astlogicalfunc(obj_type) (obj_type >= OBJ_TYPE__ASTLOGICALFUNC__MIN && obj_type <= OBJ_TYPE__ASTLOGICALFUNC__MAX)
 #define is_type_ast_str_func(obj_type) (obj_type >= OBJ_TYPE__AST_STR_FUNC__MIN && obj_type <= OBJ_TYPE__AST_STR_FUNC__MAX)
+#define is_type_ast_set_func(obj_type) (obj_type >= OBJ_TYPE__AST_SET_FUNC_MIN && obj_type <= OBJ_TYPE__AST_SET_FUNC_MAX)
 
 
 // The range reserved for the member functions of the AST is 1 ~ 200.
@@ -43,6 +44,13 @@ typedef short type_obj;
 #define OBJ_TYPE__AST_STR_FUNC__MIN       301
 #define OBJ_TYPE__ASTStrFunc_Name         301
 #define OBJ_TYPE__AST_STR_FUNC__MAX       400
+
+
+// The range reserved for the set functions of the AST is 401 ~ 500.
+#define OBJ_TYPE__AST_SET_FUNC_MIN        401
+#define OBJ_TYPE__ASTSetFunc_Children     401
+#define OBJ_TYPE__ASTSetFunc_Members      402
+#define OBJ_TYPE__AST_SET_FUNC_MAX        500
 
 
 #define OBJ_TYPE__RAW_BYTES 10001
@@ -107,21 +115,21 @@ typedef short type_obj;
 #define OBJ_TYPE__SelectDef 10058
 #define OBJ_TYPE__SetDef 10059
 #define OBJ_TYPE__SetFnBottomOrTopPercent 10060
-#define OBJ_TYPE__SetFnChildren 10061
+// #define OBJ_TYPE__SetFnChildren 10061
 #define OBJ_TYPE__SetFnCrossJoin 10062
 #define OBJ_TYPE__SetFnDescendants 10063
 #define OBJ_TYPE__SetFnExcept 10064
 #define OBJ_TYPE__SetFnFilter 10065
 #define OBJ_TYPE__SetFnIntersect 10066
 #define OBJ_TYPE__SetFnLateralMembers 10067
-#define OBJ_TYPE__SetFnMembers 10068
+// #define OBJ_TYPE__SetFnMembers 10068
 #define OBJ_TYPE__SetFnOrder 10069
 #define OBJ_TYPE__SetFnTail 10070
 #define OBJ_TYPE__SetFnTopCount 10071
 #define OBJ_TYPE__SetFnUnion 10072
 #define OBJ_TYPE__SetFnYTD 10073
 #define OBJ_TYPE__SetFormula 10074
-#define OBJ_TYPE__SetFuncChildren 10075
+// #define OBJ_TYPE__SetFuncChildren 10075
 #define OBJ_TYPE__SetFuncMembers 10076
 #define OBJ_TYPE__SockIntentThread 10077
 #define OBJ_TYPE__StrArr 10078

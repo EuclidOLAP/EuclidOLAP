@@ -16,7 +16,8 @@ SRC_FILES = src/cfg.c \
 	src/printer.c \
 	src/mdm-ast-str-fn.c \
 	src/math.c \
-	src/env.c
+	src/env.c \
+	src/mdm-ast-set-func.c
 OBJ_FILES = src/cfg.o \
 	src/net.o \
 	src/utils.o \
@@ -35,7 +36,8 @@ OBJ_FILES = src/cfg.o \
 	src/printer.o \
 	src/mdm-ast-str-fn.o \
 	src/math.o \
-	src/env.o
+	src/env.o \
+	src/mdm-ast-set-func.o
 
 euclid: src/euclid-svr.c src/euclid-cli.c $(SRC_FILES) src/euclid-svr.o src/euclid-cli.o $(OBJ_FILES)
 	cc      $(OBJ_FILES)  src/euclid-svr.o  -o src/euclid-svr      -lpthread
