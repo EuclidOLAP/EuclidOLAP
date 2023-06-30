@@ -184,7 +184,7 @@ void BooleanTerm_evaluate(MDContext *md_ctx, BooleanTerm *boolTerm, Cube *cube, 
 
 void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data);
 
-MddSet *SetFnChildren_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple);
+// MddSet *SetFnChildren_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple);
 
 MddSet *SetFnMembers_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple);
 

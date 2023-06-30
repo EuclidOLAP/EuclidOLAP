@@ -202,12 +202,12 @@ MDContext *MDContext_creat()
     return mam_alloc(sizeof(MDContext), OBJ_TYPE__MDContext, NULL, 0);
 }
 
-SetFnChildren *SetFnChildren_creat(MemberDef *m_def)
-{
-    SetFnChildren *fn = mam_alloc(sizeof(SetFnChildren), OBJ_TYPE__SetFnChildren, NULL, 0);
-    fn->m_def = m_def;
-    return fn;
-}
+// SetFnChildren *SetFnChildren_creat(MemberDef *m_def)
+// {
+//     SetFnChildren *fn = mam_alloc(sizeof(SetFnChildren), OBJ_TYPE__SetFnChildren, NULL, 0);
+//     fn->m_def = m_def;
+//     return fn;
+// }
 
 ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def)
 {

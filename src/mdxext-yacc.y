@@ -1,5 +1,4 @@
 %{
-// yacc_f_001
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -9,19 +8,18 @@
 #include "mdm-astmrfn-interpreter.h"
 #include "mdm-astlogifn-interpreter.h"
 #include "mdm-ast-str-fn.h"
+#include "mdm-ast-set-func.h"
 
 int yyerror(const char *);
+
 extern int yylex();
 extern int yyparse();
-
 extern int eucparser_scan_string(const char *s);
 extern void eucparser_cleanup();
 
 extern char *yytext;
 
 Stack AST_STACK = { 0 };
-
-// yacc_f_002
 %}
 
 %token EOF_			/* <<EOF>> */
@@ -57,20 +55,20 @@ Stack AST_STACK = { 0 };
 %token NIL			/* null */
 
 /* set functions key words */
-%token SET			/* set */
-%token CHILDREN		/* children */
-%token CROSS_JOIN	/* crossjoin */
-%token FILTER		/* filter */
+%token SET				/* set */
+%token CHILDREN			/* children */
+%token CROSS_JOIN		/* crossjoin */
+%token FILTER			/* filter */
 %token LATERAL_MEMBERS	/* lateralMembers */
-%token ORDER		/* order */
-%token ASC			/* ASC */
-%token DESC			/* DESC */
-%token BASC			/* BASC */
-%token BDESC		/* BDESC */
-%token TOP_COUNT	/* topCount */
-%token EXCEPT		/* except */
-%token ALL			/* ALL */
-%token YTD			/* Ytd */
+%token ORDER			/* order */
+%token ASC				/* ASC */
+%token DESC				/* DESC */
+%token BASC				/* BASC */
+%token BDESC			/* BDESC */
+%token TOP_COUNT		/* topCount */
+%token EXCEPT			/* except */
+%token ALL				/* ALL */
+%token YTD				/* Ytd */
 %token DESCENDANTS
 %token SELF
 %token AFTER
@@ -100,7 +98,7 @@ Stack AST_STACK = { 0 };
 %token LAG				/* Lag */
 %token LEAD				/* Lead */
 
-/* expression functions key words */
+/* Numeric Functions key words */
 %token SUM				/* sum */
 %token COUNT			/* count */
 %token EXCLUDEEMPTY		/* EXCLUDEEMPTY */
@@ -154,8 +152,8 @@ Stack AST_STACK = { 0 };
 
 %%
 
-script_content:
-	create_dimensions SEMICOLON {
+euclidolap_mdx:
+	create_dimensions SEMICOLON EOF_ {
 		stack_push(&AST_STACK, IDS_STRLS_CRTDIMS);
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
@@ -164,7 +162,16 @@ script_content:
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
 	}
   |
-	create_hierarchy SEMICOLON {
+	create_dimensions EOF_ {
+		stack_push(&AST_STACK, IDS_STRLS_CRTDIMS);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
+	}
+  |
+	create_hierarchy SEMICOLON EOF_ {
 		stack_push(&AST_STACK, IDS_CREATE_HIERARCHY);
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
@@ -172,7 +179,17 @@ script_content:
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
 	}
-  | create_levels SEMICOLON {
+  |
+	create_hierarchy EOF_ {
+		stack_push(&AST_STACK, IDS_CREATE_HIERARCHY);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
+	}
+  |
+	create_levels SEMICOLON EOF_ {
 		stack_push(&AST_STACK, IDS_ARRLS_DIMS_LVS_INFO);
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
@@ -180,7 +197,17 @@ script_content:
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
  	}
-  |	create_members SEMICOLON {
+  |
+	create_levels EOF_ {
+		stack_push(&AST_STACK, IDS_ARRLS_DIMS_LVS_INFO);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
+ 	}
+  |
+	create_members SEMICOLON EOF_ {
 		stack_push(&AST_STACK, IDS_STRLS_CRTMBRS);
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
@@ -188,7 +215,17 @@ script_content:
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
 	}
-  |	build_cube SEMICOLON {
+  |
+	create_members EOF_ {
+		stack_push(&AST_STACK, IDS_STRLS_CRTMBRS);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
+	}
+  |
+	build_cube SEMICOLON EOF_ {
 		stack_push(&AST_STACK, IDS_OBJLS_BIUCUBE);
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
@@ -196,7 +233,17 @@ script_content:
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
 	}
-  | make_equivalent SEMICOLON {
+  |
+	build_cube EOF_ {
+		stack_push(&AST_STACK, IDS_OBJLS_BIUCUBE);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
+	}
+  |
+	make_equivalent SEMICOLON EOF_ {
 		stack_push(&AST_STACK, IDS_MAKE_EQUIVALENT);
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
@@ -204,7 +251,17 @@ script_content:
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
 	}
-  | insert_cube_measures SEMICOLON {
+  |
+	make_equivalent EOF_ {
+		stack_push(&AST_STACK, IDS_MAKE_EQUIVALENT);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
+	}
+  |
+	insert_cube_measures SEMICOLON EOF_ {
 	  	stack_push(&AST_STACK, IDS_CXOBJ_ISRTCUBEMEARS);
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
@@ -212,7 +269,17 @@ script_content:
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
 	}
-  | multi_dim_query SEMICOLON EOF_ {
+  |
+	insert_cube_measures EOF_ {
+	  	stack_push(&AST_STACK, IDS_CXOBJ_ISRTCUBEMEARS);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
+	}
+  |
+	multi_dim_query SEMICOLON EOF_ {
 		stack_push(&AST_STACK, IDS_MULTI_DIM_SELECT_DEF);
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
@@ -227,7 +294,8 @@ script_content:
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0003;
 	}
-  | FLAG_EXP expression {
+  |
+	FLAG_EXP expression EOF_ {
 		// do nothing
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
@@ -317,6 +385,10 @@ member_formula_statement:
 ;
 
 string_function:
+	string_func_name {}
+;
+
+string_func_name:
 	NAME ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
 		MDMEntityUniversalPath *up = NULL;
 		stack_pop(&AST_STACK, (void **) &up);
@@ -338,28 +410,6 @@ string_function:
 		stack_push(&AST_STACK, func);
 	}
 ;
-
-/* string_expression:
-	str_token {
-		char *literal = NULL;
-		stack_pop(&AST_STACK, (void **) &literal);
-		ASTStrExp *strexp = mam_alloc(sizeof(ASTStrExp), OBJ_TYPE__ASTStrExp, NULL, 0);
-		strexp->type = STR_LITERAL;
-		strexp->part.str = literal;
-		strexp->head.interpret = strexp_interpret;
-		stack_push(&AST_STACK, strexp);
-	}
-  |
-	string_function {
-		void *ast_fn = NULL;
-		stack_pop(&AST_STACK, (void **) &ast_fn);
-		ASTStrExp *strexp = mam_alloc(sizeof(ASTStrExp), OBJ_TYPE__ASTStrExp, NULL, 0);
-		strexp->type = STR_FUNC;
-		strexp->part.str_func = ast_fn;
-		strexp->head.interpret = strexp_interpret;
-		stack_push(&AST_STACK, strexp);
-	}
-; */
 
 expression:
 	term {
@@ -425,12 +475,6 @@ factory:
 		MDMEntityUniversalPath *universal_path = NULL;
 		stack_pop(&AST_STACK, (void **)&universal_path);
 
-		// ArrayList *up_ls = als_new(8, "<MDMEntityUniversalPath *>", THREAD_MAM, NULL);
-		// als_add(up_ls, universal_path);
-
-		// TupleDef *t_def = ids_tupledef_new(TUPLE_DEF__UPATH_LS);
-		// t_def->universal_path_ls = up_ls;
-
 		Factory *factory = Factory_creat();
 		factory->t_cons = FACTORY_DEF__EU_PATH;
 		factory->up = universal_path;
@@ -468,20 +512,6 @@ factory:
 		memcpy(fac->str_literal, yytext + 1, strlen(yytext) - 2);
 		stack_push(&AST_STACK, fac);
 	}
-  /* |
-	string_expression {
-		ASTStrExp *strexp = NULL;
-		stack_pop(&AST_STACK, (void **) &strexp);
-
-		Factory *fac = Factory_creat();
-		fac->t_cons = FACTORY_DEF__STREXP;
-		fac->strexp = strexp;
-
-		stack_push(&AST_STACK, fac);
-	} */
-  /* | mdm_entity_universal_path {
-
-	} */
 ;
 
 expression_function:
@@ -541,14 +571,6 @@ exp_fn__iif:
 ;
 
 exp_fn__look_up_cube:
-	/* LOOK_UP_CUBE ROUND_BRACKET_L str COMMA str ROUND_BRACKET_R {
-		char *exp_str = NULL;
-		stack_pop(&AST_STACK, (void **) &exp_str);
-		char *cube_name = NULL;
-		stack_pop(&AST_STACK, (void **) &cube_name);
-		stack_push(&AST_STACK, ExpFnLookUpCube_creat(cube_name, exp_str, NULL));
-	}
-  | */
 	LOOK_UP_CUBE ROUND_BRACKET_L vbs_token COMMA expression ROUND_BRACKET_R {
 		Expression *exp = NULL;
 		stack_pop(&AST_STACK, (void **) &exp);
@@ -556,21 +578,6 @@ exp_fn__look_up_cube:
 		stack_pop(&AST_STACK, (void **) &cube_name);
 		stack_push(&AST_STACK, ExpFnLookUpCube_creat(cube_name, NULL, exp));
 	}
-  /* | LOOK_UP_CUBE ROUND_BRACKET_L var_or_block COMMA str ROUND_BRACKET_R {
-		char *exp_str = NULL;
-		stack_pop(&AST_STACK, (void **) &exp_str);
-		char *cube_name = NULL;
-		stack_pop(&AST_STACK, (void **) &cube_name);
-		stack_push(&AST_STACK, ExpFnLookUpCube_creat(cube_name, exp_str, NULL));
-	} */
-  /* | 
-	LOOK_UP_CUBE ROUND_BRACKET_L var_or_block COMMA expression ROUND_BRACKET_R {
-		Expression *exp = NULL;
-		stack_pop(&AST_STACK, (void **) &exp);
-		char *cube_name = NULL;
-		stack_pop(&AST_STACK, (void **) &cube_name);
-		stack_push(&AST_STACK, ExpFnLookUpCube_creat(cube_name, NULL, exp));
-	} */
 ;
 
 exp_fn_count:
@@ -699,14 +706,64 @@ set_statement:
 	}
 ;
 
-set_function_template:
-	CHILDREN ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		MemberDef *mbr_def = NULL;
-		stack_pop(&AST_STACK, (void **) &mbr_def);
-		SetFnChildren *fn = SetFnChildren_creat(mbr_def);
-		stack_push(&AST_STACK, fn);
+set_function:
+	set_func_children {}
+  |
+	set_func_members {}
+  |
+	set_func_crossjoin {}
+  |
+	set_func_filter {}
+  |
+	set_func_lateralmembers {}
+  |
+	set_func_order {}
+  |
+	set_func_topcount {}
+  |
+	set_func_except {}
+  |
+	set_func_ytd {}
+  |
+	set_func_descendants {}
+  |
+	set_func_tail {}
+  |
+	set_func_bottompercent {}
+  |
+	set_func_toppercent {}
+  |
+	set_func_union {}
+  |
+	set_func_intersect {}
+;
+
+set_func_children:
+	CHILDREN ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		MDMEntityUniversalPath *eup = NULL;
+		stack_pop(&AST_STACK, (void **)&eup);
+		ASTSetFunc_Children *mr_func = mam_alloc(sizeof(ASTSetFunc_Children), OBJ_TYPE__ASTSetFunc_Children, NULL, 0);
+		mr_func->head.interpret = interpret_children;
+		mr_func->mrole_sep = eup;
+		stack_push(&AST_STACK, mr_func);
 	}
-  | MEMBERS ROUND_BRACKET_L dimension_statement ROUND_BRACKET_R {
+  |
+	CHILDREN ROUND_BRACKET_L ROUND_BRACKET_R {
+		ASTSetFunc_Children *mr_func = mam_alloc(sizeof(ASTSetFunc_Children), OBJ_TYPE__ASTSetFunc_Children, NULL, 0);
+		mr_func->head.interpret = interpret_children;
+		stack_push(&AST_STACK, mr_func);
+	}
+  |
+	CHILDREN {
+		ASTSetFunc_Children *mr_func = mam_alloc(sizeof(ASTSetFunc_Children), OBJ_TYPE__ASTSetFunc_Children, NULL, 0);
+		mr_func->head.interpret = interpret_children;
+		stack_push(&AST_STACK, mr_func);
+	}
+;
+
+// todo redo +suffix
+set_func_members:
+	MEMBERS ROUND_BRACKET_L dimension_statement ROUND_BRACKET_R {
 		SetFnMembers *fn_ms = SetFnMembers_creat();
 		stack_pop(&AST_STACK, (void **) &(fn_ms->dr_def));
 		stack_push(&AST_STACK, fn_ms);
@@ -725,7 +782,21 @@ set_function_template:
 		stack_pop(&AST_STACK, (void **) &(fn_ms->dr_def));
 		stack_push(&AST_STACK, fn_ms);
 	}
-  | CROSS_JOIN ROUND_BRACKET_L set_list ROUND_BRACKET_R {
+  |
+	MEMBERS {
+		// SetFuncMembers *mr_func = mam_alloc(sizeof(SetFuncMembers), OBJ_TYPE__SetFuncMembers, NULL, 0);
+		// mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
+		// stack_push(&AST_STACK, mr_func);
+	}
+  |
+	MEMBERS ROUND_BRACKET_L ROUND_BRACKET_R {
+		// todo
+	}
+;
+
+// todo redo +suffix
+set_func_crossjoin:
+	CROSS_JOIN ROUND_BRACKET_L set_list ROUND_BRACKET_R {
 		SetFnCrossJoin *cross_join = SetFnCrossJoin_creat();
 		ArrayList *set_def_ls = NULL;
 		stack_pop(&AST_STACK, (void **) &set_def_ls);
@@ -735,7 +806,11 @@ set_function_template:
 		}
 		stack_push(&AST_STACK, cross_join);
 	}
-  | FILTER ROUND_BRACKET_L set_statement COMMA boolean_expression ROUND_BRACKET_R {
+;
+
+// todo redo +suffix
+set_func_filter:
+	FILTER ROUND_BRACKET_L set_statement COMMA boolean_expression ROUND_BRACKET_R {
 		BooleanExpression *bool_exp = NULL;
 		SetDef *set_def = NULL;
 		stack_pop(&AST_STACK, (void **) &bool_exp);
@@ -743,13 +818,21 @@ set_function_template:
 		SetFnFilter *filter = SetFnFilter_creat(set_def, bool_exp);
 		stack_push(&AST_STACK, filter);
 	}
-  | LATERAL_MEMBERS ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
+;
+
+// todo redo +suffix
+set_func_lateralmembers:
+	LATERAL_MEMBERS ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
 		MemberDef *mbr_def = NULL;
 		stack_pop(&AST_STACK, (void **) &mbr_def);
 		SetFnLateralMembers *lateral_ms = SetFnLateralMembers_creat(mbr_def);
 		stack_push(&AST_STACK, lateral_ms);
 	}
-  | ORDER ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+;
+
+// todo redo +suffix
+set_func_order:
+	ORDER ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
 		Expression *exp = NULL;
 		stack_pop(&AST_STACK, (void **) &exp);
 		SetDef *set = NULL;
@@ -789,7 +872,11 @@ set_function_template:
 		SetFnOrder *order = SetFnOrder_creat(set, exp, SET_FN__ORDER_BDESC);
 		stack_push(&AST_STACK, order);
 	}
-  | TOP_COUNT ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+;
+
+// todo redo +suffix
+set_func_topcount:
+	TOP_COUNT ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
 		Expression *count_exp;
 		stack_pop(&AST_STACK, (void **) &count_exp);
 		SetDef *set;
@@ -807,7 +894,11 @@ set_function_template:
 		SetFnTopCount *top_count = SetFnTopCount_creat(set, count_exp, num_exp);
 		stack_push(&AST_STACK, top_count);
 	}
-  | EXCEPT ROUND_BRACKET_L set_statement COMMA set_statement ROUND_BRACKET_R {
+;
+
+// todo redo +suffix
+set_func_except:
+	EXCEPT ROUND_BRACKET_L set_statement COMMA set_statement ROUND_BRACKET_R {
 		SetDef *set_2;
 		stack_pop(&AST_STACK, (void **) &set_2);
 		SetDef *set_1;
@@ -823,7 +914,11 @@ set_function_template:
 		SetFnExcept *except = SetFnExcept_creat(set_1, set_2, SET_FN__EXCEPT_ALL);
 		stack_push(&AST_STACK, except);
 	}
-  | YTD ROUND_BRACKET_L ROUND_BRACKET_R {
+;
+
+// todo redo +suffix
+set_func_ytd:
+	YTD ROUND_BRACKET_L ROUND_BRACKET_R {
 		stack_push(&AST_STACK, SetFnYTD_creat(NULL));
 	}
   | YTD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
@@ -831,7 +926,11 @@ set_function_template:
 		stack_pop(&AST_STACK, (void **) &mbr_def);
 		stack_push(&AST_STACK, SetFnYTD_creat(mbr_def));
 	}
-  | DESCENDANTS ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
+;
+
+// todo redo +suffix
+set_func_descendants:
+	DESCENDANTS ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
 		MemberDef *mbr_def;
 		stack_pop(&AST_STACK, (void **) &mbr_def);
 		stack_push(&AST_STACK, SetFnDescendants_creat(mbr_def, NULL, NULL, SET_FN__DESCENDANTS_OPT_SELF));
@@ -897,56 +996,6 @@ set_function_template:
 
 		stack_push(&AST_STACK, SetFnDescendants_creat(mbr_def, NULL, distance, flag));
 	}
-  | TAIL ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		stack_push(&AST_STACK, SetFnTail_creat(set, NULL));
-	}
-  | TAIL ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
-		Expression *count;
-		stack_pop(&AST_STACK, (void **) &count);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		stack_push(&AST_STACK, SetFnTail_creat(set, count));
-	}
-  | BOTTOM_PERCENT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
-		Expression *exp;
-		stack_pop(&AST_STACK, (void **) &exp);
-		Expression *percentage;
-		stack_pop(&AST_STACK, (void **) &percentage);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		stack_push(&AST_STACK, SetFnBottomOrTopPercent_creat(SET_FN__BOTTOM_PERCENT, set, percentage, exp));
-	}
-  | TOP_PERCENT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
-		Expression *exp;
-		stack_pop(&AST_STACK, (void **) &exp);
-		Expression *percentage;
-		stack_pop(&AST_STACK, (void **) &percentage);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		stack_push(&AST_STACK, SetFnBottomOrTopPercent_creat(SET_FN__TOP_PERCENT, set, percentage, exp));
-	}
-  | UNION ROUND_BRACKET_L set_list ROUND_BRACKET_R {
-		ArrayList *set_def_ls;
-		stack_pop(&AST_STACK, (void **) &set_def_ls);
-		stack_push(&AST_STACK, SetFnUnion_creat(set_def_ls, 0));
-	}
-  | UNION ROUND_BRACKET_L set_list COMMA ALL ROUND_BRACKET_R {
-		ArrayList *set_def_ls;
-		stack_pop(&AST_STACK, (void **) &set_def_ls);
-		stack_push(&AST_STACK, SetFnUnion_creat(set_def_ls, SET_FN__UNION_ALL));
-	}
-  | INTERSECT ROUND_BRACKET_L set_list ROUND_BRACKET_R {
-		ArrayList *set_def_ls;
-		stack_pop(&AST_STACK, (void **) &set_def_ls);
-		stack_push(&AST_STACK, SetFnIntersect_creat(set_def_ls, 0));
-	}
-  | INTERSECT ROUND_BRACKET_L set_list COMMA ALL ROUND_BRACKET_R {
-		ArrayList *set_def_ls;
-		stack_pop(&AST_STACK, (void **) &set_def_ls);
-		stack_push(&AST_STACK, SetFnIntersect_creat(set_def_ls, SET_FN__INTERSECT_ALL));
-	}
 ;
 
 desc_flag:
@@ -983,6 +1032,80 @@ desc_flag:
 		stack_push(&AST_STACK, *((void **)&flag));
 	}
 ;
+
+// todo redo +suffix
+set_func_tail:
+	TAIL ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		SetDef *set;
+		stack_pop(&AST_STACK, (void **) &set);
+		stack_push(&AST_STACK, SetFnTail_creat(set, NULL));
+	}
+  | TAIL ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		Expression *count;
+		stack_pop(&AST_STACK, (void **) &count);
+		SetDef *set;
+		stack_pop(&AST_STACK, (void **) &set);
+		stack_push(&AST_STACK, SetFnTail_creat(set, count));
+	}
+;
+
+// todo redo +suffix
+set_func_bottompercent:
+	BOTTOM_PERCENT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		Expression *exp;
+		stack_pop(&AST_STACK, (void **) &exp);
+		Expression *percentage;
+		stack_pop(&AST_STACK, (void **) &percentage);
+		SetDef *set;
+		stack_pop(&AST_STACK, (void **) &set);
+		stack_push(&AST_STACK, SetFnBottomOrTopPercent_creat(SET_FN__BOTTOM_PERCENT, set, percentage, exp));
+	}
+;
+
+// todo redo +suffix
+set_func_toppercent:
+	TOP_PERCENT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		Expression *exp;
+		stack_pop(&AST_STACK, (void **) &exp);
+		Expression *percentage;
+		stack_pop(&AST_STACK, (void **) &percentage);
+		SetDef *set;
+		stack_pop(&AST_STACK, (void **) &set);
+		stack_push(&AST_STACK, SetFnBottomOrTopPercent_creat(SET_FN__TOP_PERCENT, set, percentage, exp));
+	}
+;
+
+// todo redo +suffix
+set_func_union:
+	UNION ROUND_BRACKET_L set_list ROUND_BRACKET_R {
+		ArrayList *set_def_ls;
+		stack_pop(&AST_STACK, (void **) &set_def_ls);
+		stack_push(&AST_STACK, SetFnUnion_creat(set_def_ls, 0));
+	}
+  | UNION ROUND_BRACKET_L set_list COMMA ALL ROUND_BRACKET_R {
+		ArrayList *set_def_ls;
+		stack_pop(&AST_STACK, (void **) &set_def_ls);
+		stack_push(&AST_STACK, SetFnUnion_creat(set_def_ls, SET_FN__UNION_ALL));
+	}
+;
+
+// todo redo +suffix
+set_func_intersect:
+	INTERSECT ROUND_BRACKET_L set_list ROUND_BRACKET_R {
+		ArrayList *set_def_ls;
+		stack_pop(&AST_STACK, (void **) &set_def_ls);
+		stack_push(&AST_STACK, SetFnIntersect_creat(set_def_ls, 0));
+	}
+  | INTERSECT ROUND_BRACKET_L set_list COMMA ALL ROUND_BRACKET_R {
+		ArrayList *set_def_ls;
+		stack_pop(&AST_STACK, (void **) &set_def_ls);
+		stack_push(&AST_STACK, SetFnIntersect_creat(set_def_ls, SET_FN__INTERSECT_ALL));
+	}
+;
+
+// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 
 boolean_expression:
 	boolean_term {
@@ -1954,48 +2077,6 @@ member_function_template_suffix:
 	}
 ;
 
-setfn_Children_suftpl:
-	CHILDREN {
-		SetFuncChildren *mr_func = mam_alloc(sizeof(SetFuncChildren), OBJ_TYPE__SetFuncChildren, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		stack_push(&AST_STACK, mr_func);
-
-	}
-  |
-	CHILDREN ROUND_BRACKET_L ROUND_BRACKET_R {
-		SetFuncChildren *mr_func = mam_alloc(sizeof(SetFuncChildren), OBJ_TYPE__SetFuncChildren, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		stack_push(&AST_STACK, mr_func);
-
-	}
-;
-
-setfn_Members_suftpl:
-	MEMBERS {
-		SetFuncMembers *mr_func = mam_alloc(sizeof(SetFuncMembers), OBJ_TYPE__SetFuncMembers, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		stack_push(&AST_STACK, mr_func);
-
-	}
-  |
-	MEMBERS ROUND_BRACKET_L ROUND_BRACKET_R {
-		SetFuncMembers *mr_func = mam_alloc(sizeof(SetFuncMembers), OBJ_TYPE__SetFuncMembers, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		stack_push(&AST_STACK, mr_func);
-
-	}
-;
-
-set_function_template_suffix:
-	setfn_Children_suftpl {
-		// Don't do anything
-	}
-  |
-	setfn_Members_suftpl {
-		// Don't do anything
-	}
-;
-
 mdm_entity_universal_path:
 	mdm_entity_up_segment {
 		MdmEntityUpSegment *up_seg = NULL;
@@ -2020,7 +2101,7 @@ mdm_entity_universal_path:
 
 	}
   |
-	set_function_template {
+	set_function {
 		void *set_func_tpl = NULL;
 		stack_pop(&AST_STACK, (void **) &set_func_tpl);
 
@@ -2063,7 +2144,7 @@ mdm_entity_universal_path:
 		stack_push(&AST_STACK, up);
 	}
   |
-	mdm_entity_universal_path DOT set_function_template_suffix {
+	mdm_entity_universal_path DOT set_function {
 		void *suf_setfn_tpl = NULL;
 		stack_pop(&AST_STACK, (void **) &suf_setfn_tpl);
 		MDMEntityUniversalPath *up = NULL;

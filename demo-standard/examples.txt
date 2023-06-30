@@ -308,6 +308,36 @@ where ([Measures].proportion, [Aircraft Models].[Airbus]);
 
 ---
 
+select
+children([Aircraft Models].[ALL]) on rows,
+children([Date].[ALL]) on columns
+from [Airline A]
+where ([Measures].Revenue);
+
+---
+
+with
+member [Measures].XXXxxx as [Date].[all].Name()
+member [Measures].YYYyyy as [Date].[2022].Q3.Name
+select
+{
+  [Date].[All]
+} on 1,
+{
+  [Measures].XXXxxx, [Measures].YYYyyy
+} on 0
+from [Airline A];
+
+---
+
+select
+[Aircraft Models].[ALL].children on rows,
+[Date].[ALL].children() on columns
+from [Airline A]
+where ([Measures].Revenue);
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

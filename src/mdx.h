@@ -189,11 +189,11 @@ typedef struct formula_context
 } FormulaContext;
 FormulaContext *FormulaContext_creat();
 
-typedef struct set_fn_children
-{
-    MemberDef *m_def;
-} SetFnChildren;
-SetFnChildren *SetFnChildren_creat(MemberDef *m_def);
+// typedef struct set_fn_children
+// {
+//     MemberDef *m_def;
+// } SetFnChildren;
+// SetFnChildren *SetFnChildren_creat(MemberDef *m_def);
 
 
 ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def);
@@ -532,9 +532,9 @@ typedef struct _member_role_func_lead_ {
 /*************************************************************************************
  * set function templates                                                            *
  *************************************************************************************/
-typedef struct _set_func_children_ {
-    char suf_flag;
-} SetFuncChildren;
+// typedef struct _set_func_children_ {
+//     char suf_flag;
+// } SetFuncChildren;
 
 typedef struct _set_func_members_ {
     char suf_flag;

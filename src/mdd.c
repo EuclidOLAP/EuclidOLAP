@@ -24,11 +24,11 @@
 
 static md_gid lastest_md_gid = -1;
 
-static ArrayList *dims_pool = NULL;
-static ArrayList *hierarchies_pool = NULL;
-static ArrayList *member_pool = NULL;
-static ArrayList *cubes_pool = NULL;
-static ArrayList *levels_pool = NULL;
+ArrayList *dims_pool = NULL;
+ArrayList *hierarchies_pool = NULL;
+ArrayList *member_pool = NULL;
+ArrayList *cubes_pool = NULL;
+ArrayList *levels_pool = NULL;
 
 static MemAllocMng *meta_mam;
 
@@ -1287,12 +1287,13 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 	}
 	else if (set_def->t_cons == SET_DEF__SET_FUNCTION)
 	{
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnChildren)
-		{
-			MddSet *set = SetFnChildren_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
-			return als_get(set->tuples, 0);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnMembers)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnChildren)
+		// {
+		// 	MddSet *set = SetFnChildren_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
+		// 	return als_get(set->tuples, 0);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnMembers)
 		{
 			MddSet *set = SetFnMembers_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
 			return als_get(set->tuples, 0);
@@ -1734,11 +1735,12 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 	}
 	else if (set_def->t_cons == SET_DEF__SET_FUNCTION)
 	{
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnChildren)
-		{
-			return SetFnChildren_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnMembers)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnChildren)
+		// {
+		// 	return SetFnChildren_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnMembers)
 		{
 			return SetFnMembers_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		}
@@ -2252,24 +2254,24 @@ void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *c
 	}
 }
 
-MddSet *SetFnChildren_evolving(MDContext *md_ctx, void *fn, Cube *cube, MddTuple *ctx_tuple)
-{
-	MddMemberRole *parent_mr = ids_mbrsdef__build(md_ctx, ((SetFnChildren *)fn)->m_def, ctx_tuple, cube);
-	Member *parent = parent_mr->member;
-	MddSet *set = mdd_set__create();
-	int i, sz = als_size(member_pool);
-	for (i = 0; i < sz; i++)
-	{
-		Member *m = als_get(member_pool, i);
-		if (m->p_gid == parent->gid)
-		{
-			MddTuple *tuple = mdd_tp__create();
-			mdd_tp__add_mbrole(tuple, mdd_mr__create(m, parent_mr->dim_role));
-			mddset__add_tuple(set, tuple);
-		}
-	}
-	return set;
-}
+// MddSet *SetFnChildren_evolving(MDContext *md_ctx, void *fn, Cube *cube, MddTuple *ctx_tuple)
+// {
+// 	MddMemberRole *parent_mr = ids_mbrsdef__build(md_ctx, ((SetFnChildren *)fn)->m_def, ctx_tuple, cube);
+// 	Member *parent = parent_mr->member;
+// 	MddSet *set = mdd_set__create();
+// 	int i, sz = als_size(member_pool);
+// 	for (i = 0; i < sz; i++)
+// 	{
+// 		Member *m = als_get(member_pool, i);
+// 		if (m->p_gid == parent->gid)
+// 		{
+// 			MddTuple *tuple = mdd_tp__create();
+// 			mdd_tp__add_mbrole(tuple, mdd_mr__create(m, parent_mr->dim_role));
+// 			mddset__add_tuple(set, tuple);
+// 		}
+// 	}
+// 	return set;
+// }
 
 MddSet *SetFnMembers_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
 {
@@ -3705,8 +3707,8 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 
 	if (_type == OBJ_TYPE__MemberDef) {
 		return ids_mbrsdef__build(md_ctx, (MemberDef *)seg_0, ctx_tuple, cube);
-	} else if (_type == OBJ_TYPE__SetFnChildren) {
-		return SetFnChildren_evolving(md_ctx, seg_0, cube, ctx_tuple);
+	// } else if (_type == OBJ_TYPE__SetFnChildren) {
+	// 	return SetFnChildren_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
 	} else if (_type == OBJ_TYPE__SetFnMembers) {
 		return SetFnMembers_evolving(md_ctx, seg_0, cube, ctx_tuple);
@@ -4128,6 +4130,11 @@ void *up_evolving(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube *cube, Mdd
 		}
 
 		if (is_type_ast_str_func(_type)) {
+			entity = ((ASTFunctionCommonHead *)elei)->interpret(md_ctx, entity, elei, ctx_tuple, cube);
+			continue;
+		}
+
+		if (is_type_ast_set_func(_type)) {
 			entity = ((ASTFunctionCommonHead *)elei)->interpret(md_ctx, entity, elei, ctx_tuple, cube);
 			continue;
 		}
