@@ -761,36 +761,28 @@ set_func_children:
 	}
 ;
 
-// todo redo +suffix
 set_func_members:
-	MEMBERS ROUND_BRACKET_L dimension_statement ROUND_BRACKET_R {
-		SetFnMembers *fn_ms = SetFnMembers_creat();
-		stack_pop(&AST_STACK, (void **) &(fn_ms->dr_def));
-		stack_push(&AST_STACK, fn_ms);
-	}
-  | MEMBERS ROUND_BRACKET_L dimension_statement COMMA var_or_block ROUND_BRACKET_R {
-		SetFnMembers *fn_ms = SetFnMembers_creat();
-		char *option = NULL;
-		stack_pop(&AST_STACK, (void **) &option);
-		strcpy(fn_ms->option, option);
-		stack_pop(&AST_STACK, (void **) &(fn_ms->dr_def));
-		stack_push(&AST_STACK, fn_ms);
-	}
-  | MEMBERS ROUND_BRACKET_L dimension_statement COMMA ALL ROUND_BRACKET_R {
-		SetFnMembers *fn_ms = SetFnMembers_creat();
-		strcpy(fn_ms->option, "ALL");
-		stack_pop(&AST_STACK, (void **) &(fn_ms->dr_def));
-		stack_push(&AST_STACK, fn_ms);
-	}
-  |
-	MEMBERS {
-		// SetFuncMembers *mr_func = mam_alloc(sizeof(SetFuncMembers), OBJ_TYPE__SetFuncMembers, NULL, 0);
-		// mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		// stack_push(&AST_STACK, mr_func);
+	MEMBERS ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		MDMEntityUniversalPath *eup = NULL;
+		stack_pop(&AST_STACK, (void **)&eup);
+
+		ASTSetFunc_Members *func = mam_alloc(sizeof(ASTSetFunc_Members), OBJ_TYPE__ASTSetFunc_Members, NULL, 0);
+		func->head.interpret = interpret_members;
+		func->eup = eup;
+
+		stack_push(&AST_STACK, func);
 	}
   |
 	MEMBERS ROUND_BRACKET_L ROUND_BRACKET_R {
-		// todo
+		ASTSetFunc_Members *func = mam_alloc(sizeof(ASTSetFunc_Members), OBJ_TYPE__ASTSetFunc_Members, NULL, 0);
+		func->head.interpret = interpret_members;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	MEMBERS {
+		ASTSetFunc_Members *func = mam_alloc(sizeof(ASTSetFunc_Members), OBJ_TYPE__ASTSetFunc_Members, NULL, 0);
+		func->head.interpret = interpret_members;
+		stack_push(&AST_STACK, func);
 	}
 ;
 

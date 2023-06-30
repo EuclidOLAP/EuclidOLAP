@@ -225,12 +225,12 @@ typedef struct ExpFn_LookUpCube
 ExpFnLookUpCube *ExpFnLookUpCube_creat(char *cube_name, char *exp_str, Expression *exp);
 
 
-typedef struct set_fn_members
-{
-    DimRoleDef *dr_def;
-    char option[128];
-} SetFnMembers;
-SetFnMembers *SetFnMembers_creat();
+// typedef struct set_fn_members
+// {
+//     DimRoleDef *dr_def;
+//     char option[128];
+// } SetFnMembers;
+// SetFnMembers *SetFnMembers_creat();
 
 typedef struct Set_Fn_CrossJoin
 {

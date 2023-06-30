@@ -269,10 +269,10 @@ DimRoleDef *DimRoleDef_creat()
     return mam_alloc(sizeof(DimRoleDef), OBJ_TYPE__DimRoleDef, NULL, 0);
 }
 
-SetFnMembers *SetFnMembers_creat()
-{
-    return mam_alloc(sizeof(SetFnMembers), OBJ_TYPE__SetFnMembers, NULL, 0);
-}
+// SetFnMembers *SetFnMembers_creat()
+// {
+//     return mam_alloc(sizeof(SetFnMembers), OBJ_TYPE__SetFnMembers, NULL, 0);
+// }
 
 SetFnCrossJoin *SetFnCrossJoin_creat()
 {
