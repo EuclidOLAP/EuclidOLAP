@@ -3699,7 +3699,7 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 		}
 
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-		thrd_mam->exception_desc = "exception: // TODO _up_interpret_0 :: Code is missing(0).";
+		thrd_mam->exception_desc = "ERR: Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
 		longjmp(thrd_mam->excep_ctx_env, -1);
 	}
 
@@ -3753,7 +3753,7 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	}
 
 	MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-	thrd_mam->exception_desc = "exception: // TODO _up_interpret_0 :: Code is missing(1).";
+	thrd_mam->exception_desc = "ERR: An unknown multidimensional entity definition prevents MDX from being resolved.";
 	longjmp(thrd_mam->excep_ctx_env, -1);
 }
 
@@ -3780,12 +3780,16 @@ static void *_up_interpret_segment_hr
 	}
 
 	if (seg->type == MEU_SEG_TYPE_ID) {
-		// TODO
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "ERR: Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
 		return NULL;
 	}
 
 	if (seg->type == MEU_SEG_TYPE_STAMP) {
-		// TODO
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "ERR: Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
 		return NULL;
 	}
 
@@ -3815,12 +3819,16 @@ static void *_up_interpret_segment_hier
 	}
 
 	if (seg->type == MEU_SEG_TYPE_ID) {
-		// TODO
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "ERR: Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
 		return NULL;
 	}
 
 	if (seg->type == MEU_SEG_TYPE_STAMP) {
-		// TODO
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "ERR: Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
 		return NULL;
 	}
 
