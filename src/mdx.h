@@ -271,12 +271,12 @@ typedef struct Boolean_Expression_
 BooleanExpression *BooleanExpression_creat();
 void BooleanExpression_addTerm(BooleanExpression *, BooleanTerm *);
 
-typedef struct Set_Fn_Filter_
-{
-    SetDef *set_def;
-    BooleanExpression *boolExp;
-} SetFnFilter;
-SetFnFilter *SetFnFilter_creat(SetDef *, BooleanExpression *);
+// typedef struct Set_Fn_Filter_
+// {
+//     SetDef *set_def;
+//     BooleanExpression *boolExp;
+// } SetFnFilter;
+// SetFnFilter *SetFnFilter_creat(SetDef *, BooleanExpression *);
 
 typedef struct Member_Fn_Current_Member_
 {
@@ -350,11 +350,11 @@ typedef struct Member_Role_Fn_Lag_
 ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index);
 
 
-typedef struct SetFn_LateralMembers
-{
-    MemberDef *mr_def;
-} SetFnLateralMembers;
-SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *);
+// typedef struct SetFn_LateralMembers
+// {
+//     MemberDef *mr_def;
+// } SetFnLateralMembers;
+// SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *);
 
 
 #define SET_FN__ORDER_ASC   1

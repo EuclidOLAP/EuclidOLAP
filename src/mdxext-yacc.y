@@ -795,25 +795,22 @@ set_func_crossjoin:
 	}
 ;
 
-// todo redo +suffix
 set_func_filter:
 	FILTER ROUND_BRACKET_L set_statement COMMA boolean_expression ROUND_BRACKET_R {
-		BooleanExpression *bool_exp = NULL;
-		SetDef *set_def = NULL;
-		stack_pop(&AST_STACK, (void **) &bool_exp);
-		stack_pop(&AST_STACK, (void **) &set_def);
-		SetFnFilter *filter = SetFnFilter_creat(set_def, bool_exp);
-		stack_push(&AST_STACK, filter);
+		ASTSetFunc_Filter *func = mam_alloc(sizeof(ASTSetFunc_Filter), OBJ_TYPE__ASTSetFunc_Filter, NULL, 0);
+		func->head.interpret = interpret_filter;
+		stack_pop(&AST_STACK, (void **)&(func->boolExp));
+		stack_pop(&AST_STACK, (void **)&(func->set_def));
+		stack_push(&AST_STACK, func);
 	}
 ;
 
-// todo redo +suffix
 set_func_lateralmembers:
-	LATERAL_MEMBERS ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		MemberDef *mbr_def = NULL;
-		stack_pop(&AST_STACK, (void **) &mbr_def);
-		SetFnLateralMembers *lateral_ms = SetFnLateralMembers_creat(mbr_def);
-		stack_push(&AST_STACK, lateral_ms);
+	LATERAL_MEMBERS ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTSetFunc_LateralMembers *func = mam_alloc(sizeof(ASTSetFunc_LateralMembers), OBJ_TYPE__ASTSetFunc_LateralMembers, NULL, 0);
+		func->head.interpret = interpret_lateralmembers;
+		stack_pop(&AST_STACK, (void **)&(func->mrole_up));
+		stack_push(&AST_STACK, func);
 	}
 ;
 

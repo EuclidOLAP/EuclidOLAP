@@ -368,6 +368,14 @@ where ([Measures].proportion, [Aircraft Models].[Airbus]);
 
 ---
 
+select
+lateralMembers
+(Date.[2022].Q1.M1) on 100,
+{ [Measures].Revenue } on rows
+from [Airline A];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
