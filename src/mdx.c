@@ -274,17 +274,17 @@ DimRoleDef *DimRoleDef_creat()
 //     return mam_alloc(sizeof(SetFnMembers), OBJ_TYPE__SetFnMembers, NULL, 0);
 // }
 
-SetFnCrossJoin *SetFnCrossJoin_creat()
-{
-    SetFnCrossJoin *fn = mam_alloc(sizeof(SetFnCrossJoin), OBJ_TYPE__SetFnCrossJoin, NULL, 0);
-    fn->set_def_ls = als_new(8, "SetDef *", THREAD_MAM, NULL);
-    return fn;
-}
+// SetFnCrossJoin *SetFnCrossJoin_creat()
+// {
+//     SetFnCrossJoin *fn = mam_alloc(sizeof(SetFnCrossJoin), OBJ_TYPE__SetFnCrossJoin, NULL, 0);
+//     fn->set_def_ls = als_new(8, "SetDef *", THREAD_MAM, NULL);
+//     return fn;
+// }
 
-void SetFnCrossJoin_add_set(SetFnCrossJoin *fn, SetDef *set_def)
-{
-    als_add(fn->set_def_ls, set_def);
-}
+// void SetFnCrossJoin_add_set(SetFnCrossJoin *fn, SetDef *set_def)
+// {
+//     als_add(fn->set_def_ls, set_def);
+// }
 
 BooleanFactory *BooleanFactory_creat(Expression *le, char ops, Expression *re)
 {

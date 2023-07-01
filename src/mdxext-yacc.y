@@ -786,17 +786,12 @@ set_func_members:
 	}
 ;
 
-// todo redo +suffix
 set_func_crossjoin:
 	CROSS_JOIN ROUND_BRACKET_L set_list ROUND_BRACKET_R {
-		SetFnCrossJoin *cross_join = SetFnCrossJoin_creat();
-		ArrayList *set_def_ls = NULL;
-		stack_pop(&AST_STACK, (void **) &set_def_ls);
-		int i, len = als_size(set_def_ls);
-		for (i=0;i<len;i++) {
-			SetFnCrossJoin_add_set(cross_join, als_get(set_def_ls, i));
-		}
-		stack_push(&AST_STACK, cross_join);
+		ASTSetFunc_CrossJoin *func = mam_alloc(sizeof(ASTSetFunc_CrossJoin), OBJ_TYPE__ASTSetFunc_CrossJoin, NULL, 0);
+		func->head.interpret = interpret_crossjoin;
+		stack_pop(&AST_STACK, (void **)&(func->setdefs));
+		stack_push(&AST_STACK, func);
 	}
 ;
 

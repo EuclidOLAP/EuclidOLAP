@@ -232,12 +232,12 @@ ExpFnLookUpCube *ExpFnLookUpCube_creat(char *cube_name, char *exp_str, Expressio
 // } SetFnMembers;
 // SetFnMembers *SetFnMembers_creat();
 
-typedef struct Set_Fn_CrossJoin
-{
-    ArrayList *set_def_ls;
-} SetFnCrossJoin;
-SetFnCrossJoin *SetFnCrossJoin_creat();
-void SetFnCrossJoin_add_set(SetFnCrossJoin *, SetDef *);
+// typedef struct Set_Fn_CrossJoin
+// {
+//     ArrayList *set_def_ls;
+// } SetFnCrossJoin;
+// SetFnCrossJoin *SetFnCrossJoin_creat();
+// void SetFnCrossJoin_add_set(SetFnCrossJoin *, SetDef *);
 
 #define BOOL_FAC_OPS__LESS 1
 #define BOOL_FAC_OPS__LESS_EQ 2
