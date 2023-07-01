@@ -126,3 +126,37 @@ void *interpret_members(void *md_ctx_, void *entity_, void *ast_members_, void *
 
 	return set;
 }
+
+// for ASTSetFunc_CrossJoin
+void *interpret_crossjoin(void *md_ctx_, void *nil, void *crossjoin_, void *ctx_tuple_, void *cube_) {
+
+    ArrayList *setdefs = ((ASTSetFunc_CrossJoin *)crossjoin_)->setdefs;
+
+	MddSet *set_ctx = ids_setdef__build(md_ctx_, als_get(setdefs, 0), ctx_tuple_, cube_);
+	ArrayList *ctx_tuple_ls = set_ctx->tuples;
+	int i, ls_len = als_size(setdefs);
+	for (i = 1; i < ls_len; i++)
+	{
+		MddSet *set = ids_setdef__build(md_ctx_, als_get(setdefs, i), ctx_tuple_, cube_);
+		ArrayList *tuple_ls = als_new(512, "MddTuple *", THREAD_MAM, NULL);
+		int j, k, ctx_sz = als_size(ctx_tuple_ls), set_sz = als_size(set->tuples);
+
+		for (j = 0; j < ctx_sz; j++)
+		{
+			for (k = 0; k < set_sz; k++)
+			{
+				MddTuple *ctx_tuple = als_get(ctx_tuple_ls, j);
+				MddTuple *tuple_frag = als_get(set->tuples, k);
+				MddTuple *merged_tuple = tuple__merge(ctx_tuple, tuple_frag);
+				als_add(tuple_ls, merged_tuple);
+			}
+		}
+
+		ctx_tuple_ls = tuple_ls;
+	}
+
+	MddSet *join_set = mdd_set__create();
+    join_set->tuples = ctx_tuple_ls;
+
+	return join_set;
+}
