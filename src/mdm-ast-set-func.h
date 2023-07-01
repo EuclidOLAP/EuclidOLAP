@@ -32,4 +32,16 @@ typedef struct
 // for ASTSetFunc_CrossJoin
 void *interpret_crossjoin(void *md_ctx_, void *nil, void *crossjoin_, void *ctx_tuple_, void *cube_);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *set_def;
+    BooleanExpression *boolExp;
+} ASTSetFunc_Filter;
+
+// for ASTSetFunc_Filter
+void *interpret_filter(void *md_ctx_, void *nil, void *filter_, void *ctx_tuple_, void *cube_);
+
+
 #endif

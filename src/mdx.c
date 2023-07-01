@@ -324,13 +324,13 @@ void BooleanExpression_addTerm(BooleanExpression *exp, BooleanTerm *term)
     als_add(exp->terms, term);
 }
 
-SetFnFilter *SetFnFilter_creat(SetDef *setDef, BooleanExpression *boolExp)
-{
-    SetFnFilter *filter = mam_alloc(sizeof(SetFnFilter), OBJ_TYPE__SetFnFilter, NULL, 0);
-    filter->set_def = setDef;
-    filter->boolExp = boolExp;
-    return filter;
-}
+// SetFnFilter *SetFnFilter_creat(SetDef *setDef, BooleanExpression *boolExp)
+// {
+//     SetFnFilter *filter = mam_alloc(sizeof(SetFnFilter), OBJ_TYPE__SetFnFilter, NULL, 0);
+//     filter->set_def = setDef;
+//     filter->boolExp = boolExp;
+//     return filter;
+// }
 
 ASTMemberFunc_CurrentMember *ASTMemberFunc_CurrentMember_creat()
 {

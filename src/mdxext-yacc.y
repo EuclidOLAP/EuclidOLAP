@@ -795,15 +795,13 @@ set_func_crossjoin:
 	}
 ;
 
-// todo redo +suffix
 set_func_filter:
 	FILTER ROUND_BRACKET_L set_statement COMMA boolean_expression ROUND_BRACKET_R {
-		BooleanExpression *bool_exp = NULL;
-		SetDef *set_def = NULL;
-		stack_pop(&AST_STACK, (void **) &bool_exp);
-		stack_pop(&AST_STACK, (void **) &set_def);
-		SetFnFilter *filter = SetFnFilter_creat(set_def, bool_exp);
-		stack_push(&AST_STACK, filter);
+		ASTSetFunc_Filter *func = mam_alloc(sizeof(ASTSetFunc_Filter), OBJ_TYPE__ASTSetFunc_Filter, NULL, 0);
+		func->head.interpret = interpret_filter;
+		stack_pop(&AST_STACK, (void **)&(func->boolExp));
+		stack_pop(&AST_STACK, (void **)&(func->set_def));
+		stack_push(&AST_STACK, func);
 	}
 ;
 

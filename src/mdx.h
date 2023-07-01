@@ -271,12 +271,12 @@ typedef struct Boolean_Expression_
 BooleanExpression *BooleanExpression_creat();
 void BooleanExpression_addTerm(BooleanExpression *, BooleanTerm *);
 
-typedef struct Set_Fn_Filter_
-{
-    SetDef *set_def;
-    BooleanExpression *boolExp;
-} SetFnFilter;
-SetFnFilter *SetFnFilter_creat(SetDef *, BooleanExpression *);
+// typedef struct Set_Fn_Filter_
+// {
+//     SetDef *set_def;
+//     BooleanExpression *boolExp;
+// } SetFnFilter;
+// SetFnFilter *SetFnFilter_creat(SetDef *, BooleanExpression *);
 
 typedef struct Member_Fn_Current_Member_
 {

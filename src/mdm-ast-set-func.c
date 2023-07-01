@@ -160,3 +160,22 @@ void *interpret_crossjoin(void *md_ctx_, void *nil, void *crossjoin_, void *ctx_
 
 	return join_set;
 }
+
+// for ASTSetFunc_Filter
+void *interpret_filter(void *md_ctx_, void *nil, void *filter_, void *ctx_tuple_, void *cube_) {
+
+    ASTSetFunc_Filter *filter = filter_;
+	MddSet *result = mdd_set__create();
+
+	MddSet *set = ids_setdef__build(md_ctx_, filter->set_def, ctx_tuple_, cube_);
+	GridData data;
+	int i, len = als_size(set->tuples);
+	for (i = 0; i < len; i++)
+	{
+		MddTuple *tuple = als_get(set->tuples, i);
+		BooleanExpression_evaluate(md_ctx_, filter->boolExp, cube_, tuple__merge(ctx_tuple_, tuple), &data);
+		if (data.boolean == GRIDDATA_BOOL_TRUE)
+			mddset__add_tuple(result, tuple);
+	}
+	return result;
+}
