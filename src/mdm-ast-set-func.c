@@ -179,3 +179,44 @@ void *interpret_filter(void *md_ctx_, void *nil, void *filter_, void *ctx_tuple_
 	}
 	return result;
 }
+
+// for ASTSetFunc_LateralMembers
+void *interpret_lateralmembers(void *md_ctx_, void *nil, void *lateral_, void *ctx_tuple_, void *cube_) {
+
+    MddMemberRole *mr = up_evolving(md_ctx_, ((ASTSetFunc_LateralMembers *)lateral_)->mrole_up, cube_, ctx_tuple_);
+    if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole) {
+        MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+        thrd_mam->exception_desc = "Function interpret_lateralmembers throws an exception.";
+        longjmp(thrd_mam->excep_ctx_env, -1);
+    }
+
+    Cube *cube = cube_;
+
+	MddSet *set = mdd_set__create();
+	int i, sz;
+
+	if (mr->member->dim_gid == cube->measure_dim->gid)
+	{
+		sz = als_size(cube->measure_mbrs);
+		for (i = 0; i < sz; i++)
+		{
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, mdd_mr__create(als_get(cube->measure_mbrs, i), mr->dim_role));
+			mddset__add_tuple(set, tuple);
+		}
+		return set;
+	}
+
+	sz = als_size(member_pool);
+	for (i = 0; i < sz; i++)
+	{
+		Member *m = als_get(member_pool, i);
+		if (m->dim_gid == mr->member->dim_gid && m->lv == mr->member->lv)
+		{
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, mdd_mr__create(m, mr->dim_role));
+			mddset__add_tuple(set, tuple);
+		}
+	}
+	return set;
+}

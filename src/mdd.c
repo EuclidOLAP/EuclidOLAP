@@ -1310,12 +1310,13 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 		// 	return als_get(set->tuples, 0);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnLateralMembers)
-		{
-			MddSet *set = SetFnLateralMembers_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
-			return als_get(set->tuples, 0);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnOrder)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnLateralMembers)
+		// {
+		// 	MddSet *set = SetFnLateralMembers_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
+		// 	return als_get(set->tuples, 0);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnOrder)
 		{
 			MddSet *set = SetFnOrder_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
 			return als_get(set->tuples, 0);
@@ -1756,11 +1757,12 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 		// 	return SetFnCrossJoin_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnLateralMembers)
-		{
-			return SetFnLateralMembers_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnOrder)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnLateralMembers)
+		// {
+		// 	return SetFnLateralMembers_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnOrder)
 		{
 			return SetFnOrder_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		}
@@ -2398,38 +2400,38 @@ void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *c
 // 	return result;
 // }
 
-MddSet *SetFnLateralMembers_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
-{
-	SetFnLateralMembers *latmbrs = (SetFnLateralMembers *)set_fn;
-	MddMemberRole *mr = ids_mbrsdef__build(md_ctx, latmbrs->mr_def, ctx_tuple, cube);
-	MddSet *set = mdd_set__create();
-	int i, sz;
+// MddSet *SetFnLateralMembers_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
+// {
+// 	SetFnLateralMembers *latmbrs = (SetFnLateralMembers *)set_fn;
+// 	MddMemberRole *mr = ids_mbrsdef__build(md_ctx, latmbrs->mr_def, ctx_tuple, cube);
+// 	MddSet *set = mdd_set__create();
+// 	int i, sz;
 
-	if (mr->member->dim_gid == cube->measure_dim->gid)
-	{
-		sz = als_size(cube->measure_mbrs);
-		for (i = 0; i < sz; i++)
-		{
-			MddTuple *tuple = mdd_tp__create();
-			mdd_tp__add_mbrole(tuple, mdd_mr__create(als_get(cube->measure_mbrs, i), mr->dim_role));
-			mddset__add_tuple(set, tuple);
-		}
-		return set;
-	}
+// 	if (mr->member->dim_gid == cube->measure_dim->gid)
+// 	{
+// 		sz = als_size(cube->measure_mbrs);
+// 		for (i = 0; i < sz; i++)
+// 		{
+// 			MddTuple *tuple = mdd_tp__create();
+// 			mdd_tp__add_mbrole(tuple, mdd_mr__create(als_get(cube->measure_mbrs, i), mr->dim_role));
+// 			mddset__add_tuple(set, tuple);
+// 		}
+// 		return set;
+// 	}
 
-	sz = als_size(member_pool);
-	for (i = 0; i < sz; i++)
-	{
-		Member *m = als_get(member_pool, i);
-		if (m->dim_gid == mr->member->dim_gid && m->lv == mr->member->lv)
-		{
-			MddTuple *tuple = mdd_tp__create();
-			mdd_tp__add_mbrole(tuple, mdd_mr__create(m, mr->dim_role));
-			mddset__add_tuple(set, tuple);
-		}
-	}
-	return set;
-}
+// 	sz = als_size(member_pool);
+// 	for (i = 0; i < sz; i++)
+// 	{
+// 		Member *m = als_get(member_pool, i);
+// 		if (m->dim_gid == mr->member->dim_gid && m->lv == mr->member->lv)
+// 		{
+// 			MddTuple *tuple = mdd_tp__create();
+// 			mdd_tp__add_mbrole(tuple, mdd_mr__create(m, mr->dim_role));
+// 			mddset__add_tuple(set, tuple);
+// 		}
+// 	}
+// 	return set;
+// }
 
 MddSet *SetFnOrder_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
 {
@@ -3723,8 +3725,8 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	// } else if (_type == OBJ_TYPE__SetFnFilter) {
 	// 	return SetFnFilter_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
-	} else if (_type == OBJ_TYPE__SetFnLateralMembers) {
-		return SetFnLateralMembers_evolving(md_ctx, seg_0, cube, ctx_tuple);
+	// } else if (_type == OBJ_TYPE__SetFnLateralMembers) {
+	// 	return SetFnLateralMembers_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
 	} else if (_type == OBJ_TYPE__SetFnOrder) {
 		return SetFnOrder_evolving(md_ctx, seg_0, cube, ctx_tuple);

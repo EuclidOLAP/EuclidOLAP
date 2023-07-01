@@ -44,4 +44,13 @@ typedef struct
 void *interpret_filter(void *md_ctx_, void *nil, void *filter_, void *ctx_tuple_, void *cube_);
 
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mrole_up;
+} ASTSetFunc_LateralMembers;
+
+// for ASTSetFunc_LateralMembers
+void *interpret_lateralmembers(void *md_ctx_, void *nil, void *lateral_, void *ctx_tuple_, void *cube_);
+
 #endif

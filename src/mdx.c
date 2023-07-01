@@ -403,12 +403,12 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
 }
 
 
-SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *mdef)
-{
-    SetFnLateralMembers *latmbr = mam_alloc(sizeof(SetFnLateralMembers), OBJ_TYPE__SetFnLateralMembers, NULL, 0);
-    latmbr->mr_def = mdef;
-    return latmbr;
-}
+// SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *mdef)
+// {
+//     SetFnLateralMembers *latmbr = mam_alloc(sizeof(SetFnLateralMembers), OBJ_TYPE__SetFnLateralMembers, NULL, 0);
+//     latmbr->mr_def = mdef;
+//     return latmbr;
+// }
 
 SetFnOrder *SetFnOrder_creat(SetDef *set, Expression *exp, char opt)
 {

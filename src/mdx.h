@@ -350,11 +350,11 @@ typedef struct Member_Role_Fn_Lag_
 ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index);
 
 
-typedef struct SetFn_LateralMembers
-{
-    MemberDef *mr_def;
-} SetFnLateralMembers;
-SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *);
+// typedef struct SetFn_LateralMembers
+// {
+//     MemberDef *mr_def;
+// } SetFnLateralMembers;
+// SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *);
 
 
 #define SET_FN__ORDER_ASC   1
