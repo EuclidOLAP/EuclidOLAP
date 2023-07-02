@@ -371,14 +371,14 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index);
 
 // SetFnOrder *SetFnOrder_creat(SetDef *, Expression *, char);
 
-typedef struct SetFn_TopCount
-{
-    SetDef *set;
-    Expression *count_exp;
-    Expression *num_exp;
-} SetFnTopCount;
+// typedef struct SetFn_TopCount
+// {
+//     SetDef *set;
+//     Expression *count_exp;
+//     Expression *num_exp;
+// } SetFnTopCount;
 
-SetFnTopCount *SetFnTopCount_creat(SetDef *set, Expression *count_exp, Expression *num_exp);
+// SetFnTopCount *SetFnTopCount_creat(SetDef *set, Expression *count_exp, Expression *num_exp);
 
 #define SET_FN__EXCEPT_ALL  1
 

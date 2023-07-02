@@ -72,4 +72,16 @@ typedef struct
 // for ASTSetFunc_Order
 void *interpret_order(void *md_ctx_, void *nil, void *order_, void *ctx_tuple_, void *cube_);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *set_def;
+    Expression *count_exp;
+    Expression *num_exp;
+} ASTSetFunc_TopCount;
+
+// for ASTSetFunc_TopCount
+void *interpret_topcount(void *md_ctx_, void *setdef_, void *topcount_, void *ctx_tuple_, void *cube_);
+
 #endif

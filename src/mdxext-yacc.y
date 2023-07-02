@@ -849,25 +849,26 @@ set_func_order:
 	} ROUND_BRACKET_R
 ;
 
-// todo redo +suffix
 set_func_topcount:
 	TOP_COUNT ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
-		Expression *count_exp;
-		stack_pop(&AST_STACK, (void **) &count_exp);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		SetFnTopCount *top_count = SetFnTopCount_creat(set, count_exp, NULL);
-		stack_push(&AST_STACK, top_count);
+		ASTSetFunc_TopCount *func = mam_alloc(sizeof(ASTSetFunc_TopCount), OBJ_TYPE__ASTSetFunc_TopCount, NULL, 0);
+		func->head.interpret = interpret_topcount;
+
+		stack_pop(&AST_STACK, (void **)&(func->count_exp));
+		stack_pop(&AST_STACK, (void **)&(func->set_def));
+
+		stack_push(&AST_STACK, func);
 	}
-  | TOP_COUNT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
-		Expression *num_exp;
-		stack_pop(&AST_STACK, (void **) &num_exp);
-		Expression *count_exp;
-		stack_pop(&AST_STACK, (void **) &count_exp);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		SetFnTopCount *top_count = SetFnTopCount_creat(set, count_exp, num_exp);
-		stack_push(&AST_STACK, top_count);
+  |
+	TOP_COUNT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTSetFunc_TopCount *func = mam_alloc(sizeof(ASTSetFunc_TopCount), OBJ_TYPE__ASTSetFunc_TopCount, NULL, 0);
+		func->head.interpret = interpret_topcount;
+
+		stack_pop(&AST_STACK, (void **)&(func->num_exp));
+		stack_pop(&AST_STACK, (void **)&(func->count_exp));
+		stack_pop(&AST_STACK, (void **)&(func->set_def));
+
+		stack_push(&AST_STACK, func);
 	}
 ;
 

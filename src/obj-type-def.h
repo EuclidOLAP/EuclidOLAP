@@ -54,6 +54,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTSetFunc_Filter       404
 #define OBJ_TYPE__ASTSetFunc_LateralMembers       405
 #define OBJ_TYPE__ASTSetFunc_Order        406
+#define OBJ_TYPE__ASTSetFunc_TopCount     407
 #define OBJ_TYPE__AST_SET_FUNC_MAX        500
 
 
@@ -129,7 +130,7 @@ typedef short type_obj;
 // #define OBJ_TYPE__SetFnMembers 10068
 // #define OBJ_TYPE__SetFnOrder 10069
 #define OBJ_TYPE__SetFnTail 10070
-#define OBJ_TYPE__SetFnTopCount 10071
+// #define OBJ_TYPE__SetFnTopCount 10071
 #define OBJ_TYPE__SetFnUnion 10072
 #define OBJ_TYPE__SetFnYTD 10073
 #define OBJ_TYPE__SetFormula 10074

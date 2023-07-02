@@ -58,6 +58,8 @@ void *interpret_members(void *md_ctx_, void *entity_, void *ast_members_, void *
 
     ASTSetFunc_Members *members = ast_members_;
 
+	Cube *cube = cube_;
+
     if (!entity_)
     {
         if (!members->eup)
@@ -81,16 +83,26 @@ void *interpret_members(void *md_ctx_, void *entity_, void *ast_members_, void *
 
     if (obj_type_of(entity_) == OBJ_TYPE__DimensionRole) {
         DimensionRole *dimrole = entity_;
-        for (int i=0; i<msz; i++) {
-            Member *member = als_get(member_pool, i);
 
-            if (member->dim_gid != dimrole->dim_gid)
-                continue;
+		ArrayList *targetls = NULL;
 
-            MddTuple *tuple = mdd_tp__create();
-            mdd_tp__add_mbrole(tuple, mdd_mr__create(member, dimrole));
-            mddset__add_tuple(set, tuple);
-        }
+		if (dimrole->bin_attr & DR_MEASURE_MASK) {
+			// dimrole is a measure dimension role
+			msz = als_size(cube->measure_mbrs);
+			targetls = cube->measure_mbrs;
+		} else {
+			// dimrole is not a measure dimension role
+			targetls = member_pool;
+		}
+
+		for (int i=0; i<msz; i++) {
+			Member *member = als_get(targetls, i);
+			if ((dimrole->bin_attr & DR_MEASURE_MASK) || member->dim_gid == dimrole->dim_gid) {
+				MddTuple *tuple = mdd_tp__create();
+				mdd_tp__add_mbrole(tuple, mdd_mr__create(member, dimrole));
+				mddset__add_tuple(set, tuple);
+			}
+		}
 
     } else if (obj_type_of(entity_) == OBJ_TYPE__HierarchyRole) {
         HierarchyRole *hierole = entity_;
@@ -275,4 +287,70 @@ void *interpret_order(void *md_ctx_, void *nil, void *order_, void *ctx_tuple_, 
 	}
 
 	return set;
+}
+
+// for ASTSetFunc_TopCount
+void *interpret_topcount(void *md_ctx_, void *setdef_, void *topcount_, void *ctx_tuple_, void *cube_) {
+
+	ASTSetFunc_TopCount *topcount = topcount_;
+	MddSet *set = NULL;
+	if (setdef_ && obj_type_of(setdef_) == OBJ_TYPE__MddSet) {
+		set = setdef_;
+	} else {
+		set = ids_setdef__build(md_ctx_, topcount->set_def, ctx_tuple_, cube_);
+	}
+
+	GridData data;
+	Expression_evaluate(md_ctx_, topcount->count_exp, cube_, ctx_tuple_, &data);
+	int count = data.val;
+
+	int i, j, sz = als_size(set->tuples);
+
+	if (topcount->num_exp)
+	{
+		ArrayList *val_ls = als_new(als_size(set->tuples), "double", THREAD_MAM, NULL);
+		for (i = 0; i < sz; i++)
+		{
+			MddTuple *tuple = als_get(set->tuples, i);
+			tuple = tuple__merge(ctx_tuple_, tuple);
+			GridData data;
+			Expression_evaluate(md_ctx_, topcount->num_exp, cube_, tuple, &data);
+			als_add(val_ls, *((void **)&(data.val)));
+		}
+
+		for (i = 0; i < sz - 1; i++)
+		{
+			for (j = i + 1; j < sz; j++)
+			{
+				void *vi = als_get(val_ls, i);
+				void *vj = als_get(val_ls, j);
+				void **vi_p = &vi;
+				void **vj_p = &vj;
+				double val_i = *((double *)vi_p);
+				double val_j = *((double *)vj_p);
+
+				if (val_j > val_i)
+				{
+					ArrayList_set(val_ls, i, vj);
+					ArrayList_set(val_ls, j, vi);
+
+					MddTuple *tmptp = als_get(set->tuples, i);
+					ArrayList_set(set->tuples, i, als_get(set->tuples, j));
+					ArrayList_set(set->tuples, j, tmptp);
+				}
+			}
+		}
+	}
+
+	if (count >= als_size(set->tuples))
+		return set;
+
+	MddSet *result = mdd_set__create();
+	for (i = 0; i < count; i++)
+	{
+		MddTuple *tuple = als_get(set->tuples, i);
+		mddset__add_tuple(result, tuple);
+	}
+
+	return result;
 }

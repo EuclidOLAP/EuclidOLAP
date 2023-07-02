@@ -390,6 +390,46 @@ from [Airline A] ;
 
 ---
 
+select 
+{ (Date.[Calendar].[ALL].[2021]) } on 0, 
+topCount(
+    crossjoin( // members([Measures]), 
+    children([Classes of Service].root), 
+    lateralMembers([Aircraft Models].[Boeing].[Boeing 737])), 
+    10, 
+    (Date.[Calendar].[ALL].[2021])
+) on 1 
+from [Airline B] ;
+
+---
+
+select 
+{ (Date.[Calendar].[ALL].[2021]) } on 0, 
+topCount(
+    crossjoin(members([Measures]), 
+    children([Classes of Service].root), 
+    lateralMembers([Aircraft Models].[Boeing].[Boeing 737])), 
+    10, 
+    (Date.[Calendar].[ALL].[2021])
+) on 1 
+from [Airline B] ;
+
+---
+
+select 
+{ (Date.[Calendar].[ALL].[2021]) } on 0, 
+members([Measures]) on 1 
+from [Airline B] ;
+
+---
+
+select 
+{ (Date.[Calendar].[ALL].[2021]) } on 0, 
+members([Measures]) on 1 
+from [Airline A] ;
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

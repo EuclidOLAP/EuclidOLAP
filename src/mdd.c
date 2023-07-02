@@ -1322,12 +1322,13 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 		// 	return als_get(set->tuples, 0);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnTopCount)
-		{
-			MddSet *set = SetFnTopCount_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
-			return als_get(set->tuples, 0);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnExcept)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnTopCount)
+		// {
+		// 	MddSet *set = SetFnTopCount_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
+		// 	return als_get(set->tuples, 0);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnExcept)
 		{
 			MddSet *set = SetFnExcept_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
 			return als_get(set->tuples, 0);
@@ -1768,11 +1769,12 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 		// 	return SetFnOrder_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnTopCount)
-		{
-			return SetFnTopCount_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnExcept)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnTopCount)
+		// {
+		// 	return SetFnTopCount_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnExcept)
 		{
 			return SetFnExcept_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		}
@@ -2491,65 +2493,65 @@ void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *c
 // 	return set;
 // }
 
-MddSet *SetFnTopCount_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
-{
-	SetFnTopCount *top_count = set_fn;
+// MddSet *SetFnTopCount_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
+// {
+// 	SetFnTopCount *top_count = set_fn;
 
-	MddSet *set = ids_setdef__build(md_ctx, top_count->set, ctx_tuple, cube);
-	GridData data;
-	Expression_evaluate(md_ctx, top_count->count_exp, cube, ctx_tuple, &data);
-	int count = data.val;
+// 	MddSet *set = ids_setdef__build(md_ctx, top_count->set, ctx_tuple, cube);
+// 	GridData data;
+// 	Expression_evaluate(md_ctx, top_count->count_exp, cube, ctx_tuple, &data);
+// 	int count = data.val;
 
-	int i, j, sz = als_size(set->tuples);
+// 	int i, j, sz = als_size(set->tuples);
 
-	if (top_count->num_exp)
-	{
-		ArrayList *val_ls = als_new(als_size(set->tuples), "double", THREAD_MAM, NULL);
-		for (i = 0; i < sz; i++)
-		{
-			MddTuple *tuple = als_get(set->tuples, i);
-			tuple = tuple__merge(ctx_tuple, tuple);
-			GridData data;
-			Expression_evaluate(md_ctx, top_count->num_exp, cube, tuple, &data);
-			als_add(val_ls, *((void **)&(data.val)));
-		}
+// 	if (top_count->num_exp)
+// 	{
+// 		ArrayList *val_ls = als_new(als_size(set->tuples), "double", THREAD_MAM, NULL);
+// 		for (i = 0; i < sz; i++)
+// 		{
+// 			MddTuple *tuple = als_get(set->tuples, i);
+// 			tuple = tuple__merge(ctx_tuple, tuple);
+// 			GridData data;
+// 			Expression_evaluate(md_ctx, top_count->num_exp, cube, tuple, &data);
+// 			als_add(val_ls, *((void **)&(data.val)));
+// 		}
 
-		for (i = 0; i < sz - 1; i++)
-		{
-			for (j = i + 1; j < sz; j++)
-			{
-				void *vi = als_get(val_ls, i);
-				void *vj = als_get(val_ls, j);
-				void **vi_p = &vi;
-				void **vj_p = &vj;
-				double val_i = *((double *)vi_p);
-				double val_j = *((double *)vj_p);
+// 		for (i = 0; i < sz - 1; i++)
+// 		{
+// 			for (j = i + 1; j < sz; j++)
+// 			{
+// 				void *vi = als_get(val_ls, i);
+// 				void *vj = als_get(val_ls, j);
+// 				void **vi_p = &vi;
+// 				void **vj_p = &vj;
+// 				double val_i = *((double *)vi_p);
+// 				double val_j = *((double *)vj_p);
 
-				if (val_j > val_i)
-				{
-					ArrayList_set(val_ls, i, vj);
-					ArrayList_set(val_ls, j, vi);
+// 				if (val_j > val_i)
+// 				{
+// 					ArrayList_set(val_ls, i, vj);
+// 					ArrayList_set(val_ls, j, vi);
 
-					MddTuple *tmptp = als_get(set->tuples, i);
-					ArrayList_set(set->tuples, i, als_get(set->tuples, j));
-					ArrayList_set(set->tuples, j, tmptp);
-				}
-			}
-		}
-	}
+// 					MddTuple *tmptp = als_get(set->tuples, i);
+// 					ArrayList_set(set->tuples, i, als_get(set->tuples, j));
+// 					ArrayList_set(set->tuples, j, tmptp);
+// 				}
+// 			}
+// 		}
+// 	}
 
-	if (count >= als_size(set->tuples))
-		return set;
+// 	if (count >= als_size(set->tuples))
+// 		return set;
 
-	MddSet *result = mdd_set__create();
-	for (i = 0; i < count; i++)
-	{
-		MddTuple *tuple = als_get(set->tuples, i);
-		mddset__add_tuple(result, tuple);
-	}
+// 	MddSet *result = mdd_set__create();
+// 	for (i = 0; i < count; i++)
+// 	{
+// 		MddTuple *tuple = als_get(set->tuples, i);
+// 		mddset__add_tuple(result, tuple);
+// 	}
 
-	return result;
-}
+// 	return result;
+// }
 
 MddSet *SetFnExcept_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
 {
@@ -3699,6 +3701,7 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 			// it is a measure dimension role
 			if (strcmp(up_seg->info.seg_str, STANDARD_MEASURE_DIMENSION) == 0) {
 				DimensionRole *measure_dr = mam_alloc(sizeof(DimensionRole), OBJ_TYPE__DimensionRole, NULL, 0);
+				measure_dr->bin_attr |= DR_MEASURE_MASK;
 				strcpy(measure_dr->name, STANDARD_MEASURE_DIMENSION);
 				return measure_dr;
 			}
@@ -3733,8 +3736,8 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	// } else if (_type == OBJ_TYPE__SetFnOrder) {
 	// 	return SetFnOrder_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
-	} else if (_type == OBJ_TYPE__SetFnTopCount) {
-		return SetFnTopCount_evolving(md_ctx, seg_0, cube, ctx_tuple);
+	// } else if (_type == OBJ_TYPE__SetFnTopCount) {
+	// 	return SetFnTopCount_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
 	} else if (_type == OBJ_TYPE__SetFnExcept) {
 		return SetFnExcept_evolving(md_ctx, seg_0, cube, ctx_tuple);
