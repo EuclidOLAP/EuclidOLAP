@@ -376,6 +376,20 @@ from [Airline A];
 
 ---
 
+select 
+order(members(Date.Calendar), ([Measures].[Cost]), DESC) on 10, 
+{ ([Measures].[Cost]) } on 1 
+from [Airline B] ;
+
+---
+
+select
+[Measures].[Cost] on 0, 
+order(members(Date), ([Measures].Revenue), basc) on 1 
+from [Airline A] ;
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

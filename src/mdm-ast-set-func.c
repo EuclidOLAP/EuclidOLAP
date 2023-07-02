@@ -220,3 +220,59 @@ void *interpret_lateralmembers(void *md_ctx_, void *nil, void *lateral_, void *c
 	}
 	return set;
 }
+
+// for ASTSetFunc_Order
+void *interpret_order(void *md_ctx_, void *nil, void *order_, void *ctx_tuple_, void *cube_) {
+
+	ASTSetFunc_Order *order = order_;
+
+	MddSet *set = ids_setdef__build(md_ctx_, order->setsep, ctx_tuple_, cube_);
+	int i, j, sz = als_size(set->tuples);
+
+	ArrayList *val_ls = als_new(als_size(set->tuples), "double", THREAD_MAM, NULL);
+	for (i = 0; i < sz; i++)
+	{
+		MddTuple *tuple = als_get(set->tuples, i);
+		tuple = tuple__merge(ctx_tuple_, tuple);
+		GridData data;
+		Expression_evaluate(md_ctx_, order->expsep, cube_, tuple, &data);
+
+		als_add(val_ls, *((void **)&(data.val)));
+	}
+
+	// Insertion Sort Algorithm
+	for (i = 1; i < sz; i++)
+	{
+		for (j = i; j > 0; j--)
+		{
+			void *va = als_get(val_ls, j - 1);
+			void *vb = als_get(val_ls, j);
+			double val_a = *((double *)&va);
+			double val_b = *((double *)&vb);
+
+			if (order->option == ASC || order->option == BASC)
+			{
+				if (val_b < val_a)
+					goto transpose;
+				continue;
+			}
+			else
+			{
+				// order->option == DESC || order->option == BDESC
+				if (val_b > val_a)
+					goto transpose;
+				continue;
+			}
+
+		transpose:
+			ArrayList_set(val_ls, j - 1, vb);
+			ArrayList_set(val_ls, j, va);
+
+			MddTuple *tmptp = als_get(set->tuples, j - 1);
+			ArrayList_set(set->tuples, j - 1, als_get(set->tuples, j));
+			ArrayList_set(set->tuples, j, tmptp);
+		}
+	}
+
+	return set;
+}

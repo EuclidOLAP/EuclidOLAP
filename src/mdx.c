@@ -410,14 +410,14 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
 //     return latmbr;
 // }
 
-SetFnOrder *SetFnOrder_creat(SetDef *set, Expression *exp, char opt)
-{
-    SetFnOrder *order = mam_alloc(sizeof(SetFnOrder), OBJ_TYPE__SetFnOrder, NULL, 0);
-    order->set = set;
-    order->exp = exp;
-    order->option = opt;
-    return order;
-}
+// SetFnOrder *SetFnOrder_creat(SetDef *set, Expression *exp, char opt)
+// {
+//     SetFnOrder *order = mam_alloc(sizeof(SetFnOrder), OBJ_TYPE__SetFnOrder, NULL, 0);
+//     order->set = set;
+//     order->exp = exp;
+//     order->option = opt;
+//     return order;
+// }
 
 SetFnTopCount *SetFnTopCount_creat(SetDef *set, Expression *count_exp, Expression *num_exp)
 {

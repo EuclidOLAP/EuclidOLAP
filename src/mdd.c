@@ -1316,12 +1316,13 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 		// 	return als_get(set->tuples, 0);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnOrder)
-		{
-			MddSet *set = SetFnOrder_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
-			return als_get(set->tuples, 0);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnTopCount)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnOrder)
+		// {
+		// 	MddSet *set = SetFnOrder_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
+		// 	return als_get(set->tuples, 0);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnTopCount)
 		{
 			MddSet *set = SetFnTopCount_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
 			return als_get(set->tuples, 0);
@@ -1762,11 +1763,12 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 		// 	return SetFnLateralMembers_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnOrder)
-		{
-			return SetFnOrder_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnTopCount)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnOrder)
+		// {
+		// 	return SetFnOrder_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnTopCount)
 		{
 			return SetFnTopCount_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		}
@@ -2433,61 +2435,61 @@ void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *c
 // 	return set;
 // }
 
-MddSet *SetFnOrder_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
-{
+// MddSet *SetFnOrder_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
+// {
 
-	SetFnOrder *order = set_fn;
+// 	SetFnOrder *order = set_fn;
 
-	MddSet *set = ids_setdef__build(md_ctx, order->set, ctx_tuple, cube);
-	int i, j, sz = als_size(set->tuples);
+// 	MddSet *set = ids_setdef__build(md_ctx, order->set, ctx_tuple, cube);
+// 	int i, j, sz = als_size(set->tuples);
 
-	ArrayList *val_ls = als_new(als_size(set->tuples), "double", THREAD_MAM, NULL);
-	for (i = 0; i < sz; i++)
-	{
-		MddTuple *tuple = als_get(set->tuples, i);
-		tuple = tuple__merge(ctx_tuple, tuple);
-		GridData data;
-		Expression_evaluate(md_ctx, order->exp, cube, tuple, &data);
+// 	ArrayList *val_ls = als_new(als_size(set->tuples), "double", THREAD_MAM, NULL);
+// 	for (i = 0; i < sz; i++)
+// 	{
+// 		MddTuple *tuple = als_get(set->tuples, i);
+// 		tuple = tuple__merge(ctx_tuple, tuple);
+// 		GridData data;
+// 		Expression_evaluate(md_ctx, order->exp, cube, tuple, &data);
 
-		als_add(val_ls, *((void **)&(data.val)));
-	}
+// 		als_add(val_ls, *((void **)&(data.val)));
+// 	}
 
-	// Insertion Sort Algorithm
-	for (i = 1; i < sz; i++)
-	{
-		for (j = i; j > 0; j--)
-		{
-			void *va = als_get(val_ls, j - 1);
-			void *vb = als_get(val_ls, j);
-			double val_a = *((double *)&va);
-			double val_b = *((double *)&vb);
+// 	// Insertion Sort Algorithm
+// 	for (i = 1; i < sz; i++)
+// 	{
+// 		for (j = i; j > 0; j--)
+// 		{
+// 			void *va = als_get(val_ls, j - 1);
+// 			void *vb = als_get(val_ls, j);
+// 			double val_a = *((double *)&va);
+// 			double val_b = *((double *)&vb);
 
-			if (order->option == SET_FN__ORDER_ASC || order->option == SET_FN__ORDER_BASC)
-			{
-				if (val_b < val_a)
-					goto transpose;
-				continue;
-			}
-			else
-			{
-				// order->option == SET_FN__ORDER_DESC || order->option == SET_FN__ORDER_BDESC
-				if (val_b > val_a)
-					goto transpose;
-				continue;
-			}
+// 			if (order->option == SET_FN__ORDER_ASC || order->option == SET_FN__ORDER_BASC)
+// 			{
+// 				if (val_b < val_a)
+// 					goto transpose;
+// 				continue;
+// 			}
+// 			else
+// 			{
+// 				// order->option == SET_FN__ORDER_DESC || order->option == SET_FN__ORDER_BDESC
+// 				if (val_b > val_a)
+// 					goto transpose;
+// 				continue;
+// 			}
 
-		transpose:
-			ArrayList_set(val_ls, j - 1, vb);
-			ArrayList_set(val_ls, j, va);
+// 		transpose:
+// 			ArrayList_set(val_ls, j - 1, vb);
+// 			ArrayList_set(val_ls, j, va);
 
-			MddTuple *tmptp = als_get(set->tuples, j - 1);
-			ArrayList_set(set->tuples, j - 1, als_get(set->tuples, j));
-			ArrayList_set(set->tuples, j, tmptp);
-		}
-	}
+// 			MddTuple *tmptp = als_get(set->tuples, j - 1);
+// 			ArrayList_set(set->tuples, j - 1, als_get(set->tuples, j));
+// 			ArrayList_set(set->tuples, j, tmptp);
+// 		}
+// 	}
 
-	return set;
-}
+// 	return set;
+// }
 
 MddSet *SetFnTopCount_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
 {
@@ -3728,8 +3730,8 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	// } else if (_type == OBJ_TYPE__SetFnLateralMembers) {
 	// 	return SetFnLateralMembers_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
-	} else if (_type == OBJ_TYPE__SetFnOrder) {
-		return SetFnOrder_evolving(md_ctx, seg_0, cube, ctx_tuple);
+	// } else if (_type == OBJ_TYPE__SetFnOrder) {
+	// 	return SetFnOrder_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
 	} else if (_type == OBJ_TYPE__SetFnTopCount) {
 		return SetFnTopCount_evolving(md_ctx, seg_0, cube, ctx_tuple);

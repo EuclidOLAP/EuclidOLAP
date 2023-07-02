@@ -53,4 +53,23 @@ typedef struct
 // for ASTSetFunc_LateralMembers
 void *interpret_lateralmembers(void *md_ctx_, void *nil, void *lateral_, void *ctx_tuple_, void *cube_);
 
+
+typedef enum fn_order_opt {
+    ASC,
+    DESC,
+    BASC,
+    BDESC
+} FnOrderOpt;
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setsep;
+    Expression *expsep;
+    FnOrderOpt option;
+} ASTSetFunc_Order;
+
+// for ASTSetFunc_Order
+void *interpret_order(void *md_ctx_, void *nil, void *order_, void *ctx_tuple_, void *cube_);
+
 #endif
