@@ -262,13 +262,6 @@ from [Airline A];
 ---
 
 select
-crossjoin(members([Classes of Service]), members([Aircraft Models])) on 0,
-members(Date) on 1
-from [Airline A];
-
----
-
-select
 CrossJoin(Children(Date.Calendar.[ALL]), {[Measures].Revenue, [Measures].Cost}) on 0,
 CrossJoin(Children([Classes of Service].[ALL]), Children([Aircraft Models].Root)) on 1
 from [Airline B];
@@ -427,6 +420,32 @@ select
 { (Date.[Calendar].[ALL].[2021]) } on 0, 
 members([Measures]) on 1 
 from [Airline A] ;
+
+---
+
+select 
+except(members(Date), children(Date.[Root])) on 1, 
+except(members( [Measures] ), {([Measures].Cost), ([Measures].Revenue)}) on 0 
+from [Airline B] 
+where ( [Aircraft Models].[Bombardier] );
+
+---
+
+select 
+except(members(Date), children(Date.[Root])) on 1, 
+except(members( [Measures] ), {([Measures].Cost), ([Measures].Revenue)}) on 0 
+// except(members( [Measures] ), {([Measures].Revenue)}) on 0 
+from [Airline B] 
+where ( [Aircraft Models].[Bombardier] );
+
+---
+
+select 
+except(members(Date), children(Date.[Root])) on 1, 
+// except(members( [Measures] ), {([Measures].Cost), ([Measures].Revenue)}) on 0 
+except(members( [Measures] ), {([Measures].Revenue)}) on 0 
+from [Airline B] 
+where ( [Aircraft Models].[Bombardier] );
 
 ---
 

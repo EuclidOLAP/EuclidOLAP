@@ -872,23 +872,25 @@ set_func_topcount:
 	}
 ;
 
-// todo redo +suffix
 set_func_except:
 	EXCEPT ROUND_BRACKET_L set_statement COMMA set_statement ROUND_BRACKET_R {
-		SetDef *set_2;
-		stack_pop(&AST_STACK, (void **) &set_2);
-		SetDef *set_1;
-		stack_pop(&AST_STACK, (void **) &set_1);
-		SetFnExcept *except = SetFnExcept_creat(set_1, set_2, -1);
-		stack_push(&AST_STACK, except);
+		ASTSetFunc_Except *func = mam_alloc(sizeof(ASTSetFunc_Except), OBJ_TYPE__ASTSetFunc_Except, NULL, 0);
+		func->head.interpret = interpret_except;
+
+		stack_pop(&AST_STACK, (void **)&(func->setdef_2));
+		stack_pop(&AST_STACK, (void **)&(func->setdef_1));
+
+		stack_push(&AST_STACK, func);
 	}
   | EXCEPT ROUND_BRACKET_L set_statement COMMA set_statement COMMA ALL ROUND_BRACKET_R {
-		SetDef *set_2;
-		stack_pop(&AST_STACK, (void **) &set_2);
-		SetDef *set_1;
-		stack_pop(&AST_STACK, (void **) &set_1);
-		SetFnExcept *except = SetFnExcept_creat(set_1, set_2, SET_FN__EXCEPT_ALL);
-		stack_push(&AST_STACK, except);
+		ASTSetFunc_Except *func = mam_alloc(sizeof(ASTSetFunc_Except), OBJ_TYPE__ASTSetFunc_Except, NULL, 0);
+		func->head.interpret = interpret_except;
+
+		stack_pop(&AST_STACK, (void **)&(func->setdef_2));
+		stack_pop(&AST_STACK, (void **)&(func->setdef_1));
+		func->all = 1;
+
+		stack_push(&AST_STACK, func);
 	}
 ;
 

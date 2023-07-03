@@ -354,3 +354,30 @@ void *interpret_topcount(void *md_ctx_, void *setdef_, void *topcount_, void *ct
 
 	return result;
 }
+
+// for ASTSetFunc_Except
+void *interpret_except(void *md_ctx_, void *nil, void *except_, void *ctx_tuple_, void *cube_) {
+
+	ASTSetFunc_Except *except = except_;
+
+	MddSet *set_1 = ids_setdef__build(md_ctx_, except->setdef_1, ctx_tuple_, cube_);
+	MddSet *set_2 = ids_setdef__build(md_ctx_, except->setdef_2, ctx_tuple_, cube_);
+
+	int i, j, s1_sz = als_size(set_1->tuples), s2_sz = als_size(set_2->tuples);
+	MddSet *result = mdd_set__create();
+	for (i = 0; i < s1_sz; i++)
+	{
+		MddTuple *tuple_1 = als_get(set_1->tuples, i);
+		for (j = 0; j < s2_sz; j++)
+		{
+			MddTuple *tuple_2 = als_get(set_2->tuples, j);
+			if (Tuple__cmp(tuple_1, tuple_2) == 0)
+				goto skip;
+		}
+		mddset__add_tuple(result, tuple_1);
+	skip:
+		i = i;
+	}
+
+	return result;
+}

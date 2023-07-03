@@ -428,14 +428,14 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
 //     return tc;
 // }
 
-SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option)
-{
-    SetFnExcept *except = mam_alloc(sizeof(SetFnExcept), OBJ_TYPE__SetFnExcept, NULL, 0);
-    except->set_1 = set_1;
-    except->set_2 = set_2;
-    except->option = option;
-    return except;
-}
+// SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option)
+// {
+//     SetFnExcept *except = mam_alloc(sizeof(SetFnExcept), OBJ_TYPE__SetFnExcept, NULL, 0);
+//     except->set_1 = set_1;
+//     except->set_2 = set_2;
+//     except->option = option;
+//     return except;
+// }
 
 SetFnYTD *SetFnYTD_creat(MemberDef *mdef)
 {

@@ -382,14 +382,14 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index);
 
 #define SET_FN__EXCEPT_ALL  1
 
-typedef struct SetFn_Except
-{
-    SetDef *set_1;
-    SetDef *set_2;
-    char option;
-} SetFnExcept;
+// typedef struct SetFn_Except
+// {
+//     SetDef *set_1;
+//     SetDef *set_2;
+//     char option;
+// } SetFnExcept;
 
-SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option);
+// SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option);
 
 
 typedef struct SetFn_YTD

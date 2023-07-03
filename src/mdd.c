@@ -133,6 +133,10 @@ static int load_members()
 		Member *member = mam_alloc(sizeof(Member), OBJ_TYPE__Member, meta_mam, 0);
 		memcpy(member, &memb, sizeof(Member));
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+log_print(">>> MEMBER: gid <%lu> name <%s> dim_gid <%lu> hierarchy_gid <%lu> lv <%u> p_gid <%lu>\n", member->gid, member->name, member->dim_gid, member->hierarchy_gid, member->lv, member->p_gid);
+// ??????????????????????????????
+
 		/* TODO
 		 * In order to eliminate the duplicate data in the dimension member file, a bad method is used here,
 		 * which needs to be solved in the subsequent optimization.
@@ -1125,7 +1129,15 @@ static MddTuple *cube__basic_ref_vector(Cube *cube)
 		}
 	}
 
-	MddMemberRole *measure_mr = mdd_mr__create(als_get(cube->measure_mbrs, 0), NULL);
+	DimensionRole *meadr = mam_alloc(sizeof(DimensionRole), OBJ_TYPE__DimensionRole, NULL, 0);
+	meadr->bin_attr |= DR_MEASURE_MASK;
+	meadr->cube_gid = cube->gid;
+	meadr->dim_gid = cube->measure_dim->gid;
+	meadr->gid = 0;
+
+	MddMemberRole *measure_mr = mdd_mr__create(als_get(cube->measure_mbrs, 0), meadr);
+	// MddMemberRole *measure_mr = mdd_mr__create(als_get(cube->measure_mbrs, 0), NULL);
+
 	mdd_tp__add_mbrole(tuple, measure_mr);
 	return tuple;
 }
@@ -1159,15 +1171,21 @@ MddTuple *tuple__merge(MddTuple *ctx_tuple, MddTuple *tuple_frag)
 		{
 			MddMemberRole *f_mr = (MddMemberRole *)als_get(tuple_frag->mr_ls, j);
 
-			if ((ctx_mr->dim_role != NULL && f_mr->dim_role != NULL) && (ctx_mr->dim_role->gid == f_mr->dim_role->gid))
-			{
-				goto jump_a;
-			}
+			DimensionRole *c_dimr = ctx_mr->dim_role;
+			DimensionRole *f_dimr = f_mr->dim_role;
 
-			if (ctx_mr->dim_role == NULL && f_mr->dim_role == NULL)
-			{
+			if (c_dimr->gid == f_dimr->gid)
 				goto jump_a;
-			}
+
+			// if ((ctx_mr->dim_role != NULL && f_mr->dim_role != NULL) && (ctx_mr->dim_role->gid == f_mr->dim_role->gid))
+			// {
+			// 	goto jump_a;
+			// }
+
+			// if (ctx_mr->dim_role == NULL && f_mr->dim_role == NULL)
+			// {
+			// 	goto jump_a;
+			// }
 		}
 		mdd_tp__add_mbrole(tp, ctx_mr);
 	jump_a:
@@ -1328,12 +1346,13 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 		// 	return als_get(set->tuples, 0);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnExcept)
-		{
-			MddSet *set = SetFnExcept_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
-			return als_get(set->tuples, 0);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnYTD)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnExcept)
+		// {
+		// 	MddSet *set = SetFnExcept_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
+		// 	return als_get(set->tuples, 0);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnYTD)
 		{
 			SetFnYTD *ytd = set_def->set_fn;
 			if (ytd->mbr_def == NULL)
@@ -1774,11 +1793,12 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 		// 	return SetFnTopCount_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnExcept)
-		{
-			return SetFnExcept_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnYTD)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnExcept)
+		// {
+		// 	return SetFnExcept_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnYTD)
 		{
 			return SetFnYTD_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		}
@@ -1920,17 +1940,21 @@ void Tuple_print(MddTuple *tuple)
 
 int MddMemberRole_cmp(void *mr, void *oth)
 {
-	MddMemberRole *mr_a = (MddMemberRole *)mr;
-	MddMemberRole *mr_o = (MddMemberRole *)oth;
-	if (mr_a->dim_role && mr_o->dim_role)
+	// MddMemberRole *mr_a = (MddMemberRole *)mr;
+	// MddMemberRole *mr_o = (MddMemberRole *)oth;
+
+	DimensionRole *dr_a = ((MddMemberRole *)mr)->dim_role;
+	DimensionRole *dr_o = ((MddMemberRole *)oth)->dim_role;
+
+	if (dr_a->gid && dr_o->gid)
 	{
-		return mr_o->dim_role->sn - mr_a->dim_role->sn;
+		return dr_o->sn - dr_a->sn;
 	}
-	else if (mr_a->dim_role && !mr_o->dim_role)
+	else if (dr_a->gid && !dr_o->gid)
 	{
 		return 1;
 	}
-	else if (mr_o->dim_role && !mr_a->dim_role)
+	else if (!dr_a->gid && dr_o->gid)
 	{
 		return -1;
 	}
@@ -2553,32 +2577,32 @@ void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *c
 // 	return result;
 // }
 
-MddSet *SetFnExcept_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
-{
+// MddSet *SetFnExcept_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
+// {
 
-	SetFnExcept *except = set_fn;
+// 	SetFnExcept *except = set_fn;
 
-	MddSet *set_1 = ids_setdef__build(md_ctx, except->set_1, ctx_tuple, cube);
-	MddSet *set_2 = ids_setdef__build(md_ctx, except->set_2, ctx_tuple, cube);
+// 	MddSet *set_1 = ids_setdef__build(md_ctx, except->set_1, ctx_tuple, cube);
+// 	MddSet *set_2 = ids_setdef__build(md_ctx, except->set_2, ctx_tuple, cube);
 
-	int i, j, s1_sz = als_size(set_1->tuples), s2_sz = als_size(set_2->tuples);
-	MddSet *result = mdd_set__create();
-	for (i = 0; i < s1_sz; i++)
-	{
-		MddTuple *tuple_1 = als_get(set_1->tuples, i);
-		for (j = 0; j < s2_sz; j++)
-		{
-			MddTuple *tuple_2 = als_get(set_2->tuples, j);
-			if (Tuple__cmp(tuple_1, tuple_2) == 0)
-				goto skip;
-		}
-		mddset__add_tuple(result, tuple_1);
-	skip:
-		i = i;
-	}
+// 	int i, j, s1_sz = als_size(set_1->tuples), s2_sz = als_size(set_2->tuples);
+// 	MddSet *result = mdd_set__create();
+// 	for (i = 0; i < s1_sz; i++)
+// 	{
+// 		MddTuple *tuple_1 = als_get(set_1->tuples, i);
+// 		for (j = 0; j < s2_sz; j++)
+// 		{
+// 			MddTuple *tuple_2 = als_get(set_2->tuples, j);
+// 			if (Tuple__cmp(tuple_1, tuple_2) == 0)
+// 				goto skip;
+// 		}
+// 		mddset__add_tuple(result, tuple_1);
+// 	skip:
+// 		i = i;
+// 	}
 
-	return result;
-}
+// 	return result;
+// }
 
 MddSet *SetFnYTD_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
 {
@@ -3529,7 +3553,7 @@ Cube *Tuple_ctx_cube(MddTuple *tuple)
 	for (i = 0; i < len; i++)
 	{
 		MddMemberRole *mr_0 = als_get(tuple->mr_ls, i);
-		if (mr_0->dim_role)
+		if (!(mr_0->dim_role->bin_attr & DR_MEASURE_MASK))
 			return find_cube_by_gid(mr_0->dim_role->cube_gid);
 	}
 	return NULL;
@@ -3702,6 +3726,7 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 			if (strcmp(up_seg->info.seg_str, STANDARD_MEASURE_DIMENSION) == 0) {
 				DimensionRole *measure_dr = mam_alloc(sizeof(DimensionRole), OBJ_TYPE__DimensionRole, NULL, 0);
 				measure_dr->bin_attr |= DR_MEASURE_MASK;
+				measure_dr->gid = 0;
 				strcpy(measure_dr->name, STANDARD_MEASURE_DIMENSION);
 				return measure_dr;
 			}
@@ -3712,7 +3737,7 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 		}
 
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-		thrd_mam->exception_desc = "ERR: Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
+		thrd_mam->exception_desc = "ERR: (1)Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
 		longjmp(thrd_mam->excep_ctx_env, -1);
 	}
 
@@ -3739,8 +3764,8 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	// } else if (_type == OBJ_TYPE__SetFnTopCount) {
 	// 	return SetFnTopCount_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
-	} else if (_type == OBJ_TYPE__SetFnExcept) {
-		return SetFnExcept_evolving(md_ctx, seg_0, cube, ctx_tuple);
+	// } else if (_type == OBJ_TYPE__SetFnExcept) {
+	// 	return SetFnExcept_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
 	} else if (_type == OBJ_TYPE__SetFnYTD) {
 		return SetFnYTD_evolving(md_ctx, seg_0, cube, ctx_tuple);
@@ -3798,14 +3823,14 @@ static void *_up_interpret_segment_hr
 
 	if (seg->type == MEU_SEG_TYPE_ID) {
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-		thrd_mam->exception_desc = "ERR: Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
+		thrd_mam->exception_desc = "ERR: (2)Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
 		longjmp(thrd_mam->excep_ctx_env, -1);
 		return NULL;
 	}
 
 	if (seg->type == MEU_SEG_TYPE_STAMP) {
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-		thrd_mam->exception_desc = "ERR: Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
+		thrd_mam->exception_desc = "ERR: (3)Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
 		longjmp(thrd_mam->excep_ctx_env, -1);
 		return NULL;
 	}
@@ -3837,14 +3862,14 @@ static void *_up_interpret_segment_hier
 
 	if (seg->type == MEU_SEG_TYPE_ID) {
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-		thrd_mam->exception_desc = "ERR: Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
+		thrd_mam->exception_desc = "ERR: (4)Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
 		longjmp(thrd_mam->excep_ctx_env, -1);
 		return NULL;
 	}
 
 	if (seg->type == MEU_SEG_TYPE_STAMP) {
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-		thrd_mam->exception_desc = "ERR: Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
+		thrd_mam->exception_desc = "ERR: (5)Program logic flaw: It is not yet possible to parse the ID and timestamp of multidimensional entities.";
 		longjmp(thrd_mam->excep_ctx_env, -1);
 		return NULL;
 	}
@@ -3976,7 +4001,7 @@ static void *_up_interpret_segment_dr(MDContext *md_ctx, DimensionRole *dr, MdmE
 			for (int i=0; i<mmsize; i++) {
 				Member *m = als_get(cube->measure_mbrs, i);
 				if (strcmp(seg->info.seg_str, m->name) == 0)
-					return mdd_mr__create(m, NULL);
+					return mdd_mr__create(m, dr);
 			}
 			// It is possible to correspond to a formula member of the measure dimension, so no exception can be thrown here.
 		}
@@ -3989,8 +4014,8 @@ static void *_up_interpret_segment_dr(MDContext *md_ctx, DimensionRole *dr, MdmE
 				if ((!strcmp(dr->name, als_get(formula->path, 0))) && (!strcmp(seg->info.seg_str, als_get(formula->path, 1)))) {
 					MddMemberRole *f_mr = mam_alloc(sizeof(MddMemberRole), OBJ_TYPE__MddMemberRole, NULL, 0);
 
-					if (strcmp(dr->name, STANDARD_MEASURE_DIMENSION))
-						f_mr->dim_role = dr;
+					// if (strcmp(dr->name, STANDARD_MEASURE_DIMENSION))
+					f_mr->dim_role = dr;
 
 					f_mr->member_formula = formula;
 					return f_mr;
