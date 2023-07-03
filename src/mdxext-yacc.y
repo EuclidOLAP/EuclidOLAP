@@ -61,10 +61,10 @@ Stack AST_STACK = { 0 };
 %token FILTER			/* filter */
 %token LATERAL_MEMBERS	/* lateralMembers */
 %token ORDER			/* order */
-%token ASC				/* ASC */
-%token DESC				/* DESC */
-%token BASC				/* BASC */
-%token BDESC			/* BDESC */
+// %token ASC				/* ASC */
+// %token DESC				/* DESC */
+// %token BASC				/* BASC */
+// %token BDESC			/* BDESC */
 %token TOP_COUNT		/* topCount */
 %token EXCEPT			/* except */
 %token ALL				/* ALL */
@@ -814,89 +814,83 @@ set_func_lateralmembers:
 	}
 ;
 
-// todo redo +suffix
 set_func_order:
 	ORDER ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
-		Expression *exp = NULL;
-		stack_pop(&AST_STACK, (void **) &exp);
-		SetDef *set = NULL;
-		stack_pop(&AST_STACK, (void **) &set);
-		SetFnOrder *order = SetFnOrder_creat(set, exp, SET_FN__ORDER_ASC);
-		stack_push(&AST_STACK, order);
+		ASTSetFunc_Order *func = mam_alloc(sizeof(ASTSetFunc_Order), OBJ_TYPE__ASTSetFunc_Order, NULL, 0);
+		func->head.interpret = interpret_order;
+
+		stack_pop(&AST_STACK, (void **)&(func->expsep));
+		stack_pop(&AST_STACK, (void **)&(func->setsep));
+
+		func->option = ASC;
+
+		stack_push(&AST_STACK, func);
 	}
-  | ORDER ROUND_BRACKET_L set_statement COMMA expression COMMA ASC ROUND_BRACKET_R {
-		Expression *exp = NULL;
-		stack_pop(&AST_STACK, (void **) &exp);
-		SetDef *set = NULL;
-		stack_pop(&AST_STACK, (void **) &set);
-		SetFnOrder *order = SetFnOrder_creat(set, exp, SET_FN__ORDER_ASC);
-		stack_push(&AST_STACK, order);
-	}
-  | ORDER ROUND_BRACKET_L set_statement COMMA expression COMMA DESC ROUND_BRACKET_R {
-		Expression *exp = NULL;
-		stack_pop(&AST_STACK, (void **) &exp);
-		SetDef *set = NULL;
-		stack_pop(&AST_STACK, (void **) &set);
-		SetFnOrder *order = SetFnOrder_creat(set, exp, SET_FN__ORDER_DESC);
-		stack_push(&AST_STACK, order);
-	}
-  | ORDER ROUND_BRACKET_L set_statement COMMA expression COMMA BASC ROUND_BRACKET_R {
-		Expression *exp = NULL;
-		stack_pop(&AST_STACK, (void **) &exp);
-		SetDef *set = NULL;
-		stack_pop(&AST_STACK, (void **) &set);
-		SetFnOrder *order = SetFnOrder_creat(set, exp, SET_FN__ORDER_BASC);
-		stack_push(&AST_STACK, order);
-	}
-  | ORDER ROUND_BRACKET_L set_statement COMMA expression COMMA BDESC ROUND_BRACKET_R {
-		Expression *exp;
-		stack_pop(&AST_STACK, (void **) &exp);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		SetFnOrder *order = SetFnOrder_creat(set, exp, SET_FN__ORDER_BDESC);
-		stack_push(&AST_STACK, order);
-	}
+  |
+	ORDER ROUND_BRACKET_L set_statement COMMA expression COMMA VAR {
+		ASTSetFunc_Order *func = mam_alloc(sizeof(ASTSetFunc_Order), OBJ_TYPE__ASTSetFunc_Order, NULL, 0);
+		func->head.interpret = interpret_order;
+
+		stack_pop(&AST_STACK, (void **)&(func->expsep));
+		stack_pop(&AST_STACK, (void **)&(func->setsep));
+
+		if (!strcasecmp(yytext, "DESC")) {
+			func->option = DESC;
+		} else if (!strcasecmp(yytext, "BASC")) {
+			func->option = BASC;
+		} else if (!strcasecmp(yytext, "BDESC")) {
+			func->option = BDESC;
+		} else {
+			// default ASC
+			func->option = ASC;
+		}
+
+		stack_push(&AST_STACK, func);
+	} ROUND_BRACKET_R
 ;
 
-// todo redo +suffix
 set_func_topcount:
 	TOP_COUNT ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
-		Expression *count_exp;
-		stack_pop(&AST_STACK, (void **) &count_exp);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		SetFnTopCount *top_count = SetFnTopCount_creat(set, count_exp, NULL);
-		stack_push(&AST_STACK, top_count);
+		ASTSetFunc_TopCount *func = mam_alloc(sizeof(ASTSetFunc_TopCount), OBJ_TYPE__ASTSetFunc_TopCount, NULL, 0);
+		func->head.interpret = interpret_topcount;
+
+		stack_pop(&AST_STACK, (void **)&(func->count_exp));
+		stack_pop(&AST_STACK, (void **)&(func->set_def));
+
+		stack_push(&AST_STACK, func);
 	}
-  | TOP_COUNT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
-		Expression *num_exp;
-		stack_pop(&AST_STACK, (void **) &num_exp);
-		Expression *count_exp;
-		stack_pop(&AST_STACK, (void **) &count_exp);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		SetFnTopCount *top_count = SetFnTopCount_creat(set, count_exp, num_exp);
-		stack_push(&AST_STACK, top_count);
+  |
+	TOP_COUNT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTSetFunc_TopCount *func = mam_alloc(sizeof(ASTSetFunc_TopCount), OBJ_TYPE__ASTSetFunc_TopCount, NULL, 0);
+		func->head.interpret = interpret_topcount;
+
+		stack_pop(&AST_STACK, (void **)&(func->num_exp));
+		stack_pop(&AST_STACK, (void **)&(func->count_exp));
+		stack_pop(&AST_STACK, (void **)&(func->set_def));
+
+		stack_push(&AST_STACK, func);
 	}
 ;
 
-// todo redo +suffix
 set_func_except:
 	EXCEPT ROUND_BRACKET_L set_statement COMMA set_statement ROUND_BRACKET_R {
-		SetDef *set_2;
-		stack_pop(&AST_STACK, (void **) &set_2);
-		SetDef *set_1;
-		stack_pop(&AST_STACK, (void **) &set_1);
-		SetFnExcept *except = SetFnExcept_creat(set_1, set_2, -1);
-		stack_push(&AST_STACK, except);
+		ASTSetFunc_Except *func = mam_alloc(sizeof(ASTSetFunc_Except), OBJ_TYPE__ASTSetFunc_Except, NULL, 0);
+		func->head.interpret = interpret_except;
+
+		stack_pop(&AST_STACK, (void **)&(func->setdef_2));
+		stack_pop(&AST_STACK, (void **)&(func->setdef_1));
+
+		stack_push(&AST_STACK, func);
 	}
   | EXCEPT ROUND_BRACKET_L set_statement COMMA set_statement COMMA ALL ROUND_BRACKET_R {
-		SetDef *set_2;
-		stack_pop(&AST_STACK, (void **) &set_2);
-		SetDef *set_1;
-		stack_pop(&AST_STACK, (void **) &set_1);
-		SetFnExcept *except = SetFnExcept_creat(set_1, set_2, SET_FN__EXCEPT_ALL);
-		stack_push(&AST_STACK, except);
+		ASTSetFunc_Except *func = mam_alloc(sizeof(ASTSetFunc_Except), OBJ_TYPE__ASTSetFunc_Except, NULL, 0);
+		func->head.interpret = interpret_except;
+
+		stack_pop(&AST_STACK, (void **)&(func->setdef_2));
+		stack_pop(&AST_STACK, (void **)&(func->setdef_1));
+		func->all = 1;
+
+		stack_push(&AST_STACK, func);
 	}
 ;
 

@@ -262,13 +262,6 @@ from [Airline A];
 ---
 
 select
-crossjoin(members([Classes of Service]), members([Aircraft Models])) on 0,
-members(Date) on 1
-from [Airline A];
-
----
-
-select
 CrossJoin(Children(Date.Calendar.[ALL]), {[Measures].Revenue, [Measures].Cost}) on 0,
 CrossJoin(Children([Classes of Service].[ALL]), Children([Aircraft Models].Root)) on 1
 from [Airline B];
@@ -373,6 +366,86 @@ lateralMembers
 (Date.[2022].Q1.M1) on 100,
 { [Measures].Revenue } on rows
 from [Airline A];
+
+---
+
+select 
+order(members(Date.Calendar), ([Measures].[Cost]), DESC) on 10, 
+{ ([Measures].[Cost]) } on 1 
+from [Airline B] ;
+
+---
+
+select
+[Measures].[Cost] on 0, 
+order(members(Date), ([Measures].Revenue), basc) on 1 
+from [Airline A] ;
+
+---
+
+select 
+{ (Date.[Calendar].[ALL].[2021]) } on 0, 
+topCount(
+    crossjoin( // members([Measures]), 
+    children([Classes of Service].root), 
+    lateralMembers([Aircraft Models].[Boeing].[Boeing 737])), 
+    10, 
+    (Date.[Calendar].[ALL].[2021])
+) on 1 
+from [Airline B] ;
+
+---
+
+select 
+{ (Date.[Calendar].[ALL].[2021]) } on 0, 
+topCount(
+    crossjoin(members([Measures]), 
+    children([Classes of Service].root), 
+    lateralMembers([Aircraft Models].[Boeing].[Boeing 737])), 
+    10, 
+    (Date.[Calendar].[ALL].[2021])
+) on 1 
+from [Airline B] ;
+
+---
+
+select 
+{ (Date.[Calendar].[ALL].[2021]) } on 0, 
+members([Measures]) on 1 
+from [Airline B] ;
+
+---
+
+select 
+{ (Date.[Calendar].[ALL].[2021]) } on 0, 
+members([Measures]) on 1 
+from [Airline A] ;
+
+---
+
+select 
+except(members(Date), children(Date.[Root])) on 1, 
+except(members( [Measures] ), {([Measures].Cost), ([Measures].Revenue)}) on 0 
+from [Airline B] 
+where ( [Aircraft Models].[Bombardier] );
+
+---
+
+select 
+except(members(Date), children(Date.[Root])) on 1, 
+except(members( [Measures] ), {([Measures].Cost), ([Measures].Revenue)}) on 0 
+// except(members( [Measures] ), {([Measures].Revenue)}) on 0 
+from [Airline B] 
+where ( [Aircraft Models].[Bombardier] );
+
+---
+
+select 
+except(members(Date), children(Date.[Root])) on 1, 
+// except(members( [Measures] ), {([Measures].Cost), ([Measures].Revenue)}) on 0 
+except(members( [Measures] ), {([Measures].Revenue)}) on 0 
+from [Airline B] 
+where ( [Aircraft Models].[Bombardier] );
 
 ---
 

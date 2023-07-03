@@ -803,7 +803,9 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
         DimensionRole *dr = mr->dim_role;
 
         // continue measure member role
-        if (dr == NULL)
+
+        if (dr->bin_attr & DR_MEASURE_MASK)
+        // if (dr == NULL)
         {
             measure_mr = mr;
             continue;

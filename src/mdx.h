@@ -357,39 +357,39 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index);
 // SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *);
 
 
-#define SET_FN__ORDER_ASC   1
-#define SET_FN__ORDER_DESC  2
-#define SET_FN__ORDER_BASC  3
-#define SET_FN__ORDER_BDESC 4
+// #define SET_FN__ORDER_ASC   1
+// #define SET_FN__ORDER_DESC  2
+// #define SET_FN__ORDER_BASC  3
+// #define SET_FN__ORDER_BDESC 4
 
-typedef struct SetFn_Order
-{
-    SetDef *set;
-    Expression *exp;
-    char option;
-} SetFnOrder;
+// typedef struct SetFn_Order
+// {
+//     SetDef *set;
+//     Expression *exp;
+//     char option;
+// } SetFnOrder;
 
-SetFnOrder *SetFnOrder_creat(SetDef *, Expression *, char);
+// SetFnOrder *SetFnOrder_creat(SetDef *, Expression *, char);
 
-typedef struct SetFn_TopCount
-{
-    SetDef *set;
-    Expression *count_exp;
-    Expression *num_exp;
-} SetFnTopCount;
+// typedef struct SetFn_TopCount
+// {
+//     SetDef *set;
+//     Expression *count_exp;
+//     Expression *num_exp;
+// } SetFnTopCount;
 
-SetFnTopCount *SetFnTopCount_creat(SetDef *set, Expression *count_exp, Expression *num_exp);
+// SetFnTopCount *SetFnTopCount_creat(SetDef *set, Expression *count_exp, Expression *num_exp);
 
 #define SET_FN__EXCEPT_ALL  1
 
-typedef struct SetFn_Except
-{
-    SetDef *set_1;
-    SetDef *set_2;
-    char option;
-} SetFnExcept;
+// typedef struct SetFn_Except
+// {
+//     SetDef *set_1;
+//     SetDef *set_2;
+//     char option;
+// } SetFnExcept;
 
-SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option);
+// SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option);
 
 
 typedef struct SetFn_YTD

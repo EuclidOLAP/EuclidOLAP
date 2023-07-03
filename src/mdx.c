@@ -410,32 +410,32 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
 //     return latmbr;
 // }
 
-SetFnOrder *SetFnOrder_creat(SetDef *set, Expression *exp, char opt)
-{
-    SetFnOrder *order = mam_alloc(sizeof(SetFnOrder), OBJ_TYPE__SetFnOrder, NULL, 0);
-    order->set = set;
-    order->exp = exp;
-    order->option = opt;
-    return order;
-}
+// SetFnOrder *SetFnOrder_creat(SetDef *set, Expression *exp, char opt)
+// {
+//     SetFnOrder *order = mam_alloc(sizeof(SetFnOrder), OBJ_TYPE__SetFnOrder, NULL, 0);
+//     order->set = set;
+//     order->exp = exp;
+//     order->option = opt;
+//     return order;
+// }
 
-SetFnTopCount *SetFnTopCount_creat(SetDef *set, Expression *count_exp, Expression *num_exp)
-{
-    SetFnTopCount *tc = mam_alloc(sizeof(SetFnTopCount), OBJ_TYPE__SetFnTopCount, NULL, 0);
-    tc->set = set;
-    tc->count_exp = count_exp;
-    tc->num_exp = num_exp;
-    return tc;
-}
+// SetFnTopCount *SetFnTopCount_creat(SetDef *set, Expression *count_exp, Expression *num_exp)
+// {
+//     SetFnTopCount *tc = mam_alloc(sizeof(SetFnTopCount), OBJ_TYPE__SetFnTopCount, NULL, 0);
+//     tc->set = set;
+//     tc->count_exp = count_exp;
+//     tc->num_exp = num_exp;
+//     return tc;
+// }
 
-SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option)
-{
-    SetFnExcept *except = mam_alloc(sizeof(SetFnExcept), OBJ_TYPE__SetFnExcept, NULL, 0);
-    except->set_1 = set_1;
-    except->set_2 = set_2;
-    except->option = option;
-    return except;
-}
+// SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option)
+// {
+//     SetFnExcept *except = mam_alloc(sizeof(SetFnExcept), OBJ_TYPE__SetFnExcept, NULL, 0);
+//     except->set_1 = set_1;
+//     except->set_2 = set_2;
+//     except->option = option;
+//     return except;
+// }
 
 SetFnYTD *SetFnYTD_creat(MemberDef *mdef)
 {

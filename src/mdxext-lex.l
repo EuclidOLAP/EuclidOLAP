@@ -205,22 +205,6 @@ order {
 	return ORDER;
 }
 
-ASC {
-	return ASC;
-}
-
-DESC {
-	return DESC;
-}
-
-BASC {
-	return BASC;
-}
-
-BDESC {
-	return BDESC;
-}
-
 topCount {
 	return TOP_COUNT;
 }

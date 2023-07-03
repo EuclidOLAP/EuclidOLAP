@@ -300,11 +300,15 @@ static int execute_command(EuclidCommand *action)
 
 			if (cur_thrd_mam->exception_desc == NULL)
 			{
-				ByteBuf *binuf = mdrs_to_bin(md_rs);
-				char *payload = obj_alloc(binuf->index, OBJ_TYPE__RAW_BYTES);
-				memcpy(payload, binuf->buf_addr, binuf->index);
-				buf_release(binuf);
-				action->result = create_command(payload);
+				if (!md_rs) {
+					cur_thrd_mam->exception_desc = "Exception: Result is empty.";
+				} else {
+					ByteBuf *binuf = mdrs_to_bin(md_rs);
+					char *payload = obj_alloc(binuf->index, OBJ_TYPE__RAW_BYTES);
+					memcpy(payload, binuf->buf_addr, binuf->index);
+					buf_release(binuf);
+					action->result = create_command(payload);
+				}
 			}
 		}
 		else if (ids_type == IDS_ARRLS_DIMS_LVS_INFO)
