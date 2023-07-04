@@ -623,6 +623,13 @@ from [Airline B];
 
 ---
 
+select 
+members([Measures]) on 1, 
+[Date].[ALL].[2020].LastChild on 10 
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

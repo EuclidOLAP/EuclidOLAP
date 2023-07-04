@@ -343,11 +343,11 @@ ASTMemberFunc_OpeningPeriod *ASTMemberFunc_OpeningPeriod_creat(LevelRoleDef *lvr
 //     return mr_fn;
 // }
 
-ASTMemberFunc_LastChild *ASTMemberFunc_LastChild_creat(MemberDef *mr) {
-    ASTMemberFunc_LastChild *mr_fn = mam_alloc(sizeof(ASTMemberFunc_LastChild), OBJ_TYPE__ASTMemberFunc_LastChild, NULL, 0);
-    mr_fn->mr_def = mr;
-    return mr_fn;
-}
+// ASTMemberFunc_LastChild *ASTMemberFunc_LastChild_creat(MemberDef *mr) {
+//     ASTMemberFunc_LastChild *mr_fn = mam_alloc(sizeof(ASTMemberFunc_LastChild), OBJ_TYPE__ASTMemberFunc_LastChild, NULL, 0);
+//     mr_fn->mr_def = mr;
+//     return mr_fn;
+// }
 
 
 ASTMemberFunc_FirstSibling *ASTMemberFunc_FirstSibling_creat(MemberDef *mr) {

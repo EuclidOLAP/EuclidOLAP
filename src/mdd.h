@@ -201,7 +201,7 @@ MddMemberRole *ASTMemberFunc_OpeningPeriod_evolving(MDContext *md_ctx, ASTMember
 
 // MddMemberRole *ASTMemberFunc_FirstChild_evolving(MDContext *md_ctx, ASTMemberFunc_FirstChild *mr_fn, MddTuple *context_tuple, Cube *cube);
 
-MddMemberRole *ASTMemberFunc_LastChild_evolving(MDContext *md_ctx, ASTMemberFunc_LastChild *mr_fn, MddTuple *context_tuple, Cube *cube);
+// MddMemberRole *ASTMemberFunc_LastChild_evolving(MDContext *md_ctx, ASTMemberFunc_LastChild *mr_fn, MddTuple *context_tuple, Cube *cube);
 
 MddMemberRole *ASTMemberFunc_FirstSibling_evolving(MDContext *md_ctx, ASTMemberFunc_FirstSibling *mr_fn, MddTuple *context_tuple, Cube *cube);
 
