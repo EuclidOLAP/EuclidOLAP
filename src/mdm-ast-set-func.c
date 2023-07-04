@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "md-model.h"
 #include "mdd.h"
 #include "mdm-ast-set-func.h"
@@ -377,6 +379,68 @@ void *interpret_except(void *md_ctx_, void *nil, void *except_, void *ctx_tuple_
 		mddset__add_tuple(result, tuple_1);
 	skip:
 		i = i;
+	}
+
+	return result;
+}
+
+// for ASTSetFunc_YTD
+void *interpret_ytd(void *md_ctx_, void *mrole_, void *ytd_, void *ctx_tuple_, void *cube_) {
+
+	ASTSetFunc_YTD *ytd = ytd_;
+	MddMemberRole *date_mr;
+	Dimension *date_dim;
+	MddTuple *ctx_tuple = ctx_tuple_;
+
+	if (ytd->mrole_def)
+	{
+		// mr = ids_mbrsdef__build(md_ctx, ytd->mbr_def, ctx_tuple, cube);
+		date_mr = up_evolving(md_ctx_, ytd->mrole_def, cube_, ctx_tuple_);
+		// dim = find_dim_by_gid(mr->dim_role->dim_gid);
+		date_dim = find_dim_by_gid(date_mr->dim_role->dim_gid);
+	}
+	else
+	{
+		int i, sz = als_size(ctx_tuple->mr_ls);
+		for (i = 0; i < sz; i++)
+		{
+			date_mr = als_get(ctx_tuple->mr_ls, i);
+
+			if (date_mr->dim_role->bin_attr & DR_MEASURE_MASK)
+			{
+				// skip the measure dimension
+				date_mr = NULL;
+				continue;
+			}
+
+			date_dim = find_dim_by_gid(date_mr->dim_role->dim_gid);
+			if (strcmp(date_dim->name, "Time") == 0 || strcmp(date_dim->name, "Date") == 0)
+				break;
+
+			date_mr = NULL;
+		}
+	}
+
+	Level *year_lv;
+	int i, sz = als_size(levels_pool);
+	for (i = 0; i < sz; i++)
+	{
+		year_lv = als_get(levels_pool, i);
+		if (year_lv->dim_gid == date_dim->gid && strcmp(year_lv->name, "Year") == 0)
+			break;
+		year_lv = NULL;
+	}
+
+	ArrayList *descendants = mdd__lv_ancestor_peer_descendants(year_lv, date_mr->member);
+	sz = als_size(descendants);
+	MddSet *result = mdd_set__create();
+	for (i = 0; i < sz; i++)
+	{
+		MddTuple *tuple = mdd_tp__create();
+		mdd_tp__add_mbrole(tuple, mdd_mr__create(als_get(descendants, i), date_mr->dim_role));
+		mddset__add_tuple(result, tuple);
+		if (((Member *)als_get(descendants, i))->gid == date_mr->member->gid)
+			break;
 	}
 
 	return result;

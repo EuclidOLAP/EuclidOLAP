@@ -392,12 +392,12 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index);
 // SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option);
 
 
-typedef struct SetFn_YTD
-{
-    MemberDef *mbr_def;
-} SetFnYTD;
+// typedef struct SetFn_YTD
+// {
+//     MemberDef *mbr_def;
+// } SetFnYTD;
 
-SetFnYTD *SetFnYTD_creat(MemberDef *);
+// SetFnYTD *SetFnYTD_creat(MemberDef *);
 
 #define SET_FN__DESCENDANTS_OPT_SELF                1
 #define SET_FN__DESCENDANTS_OPT_AFTER               2

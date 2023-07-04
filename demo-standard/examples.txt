@@ -449,6 +449,17 @@ where ( [Aircraft Models].[Bombardier] );
 
 ---
 
+with 
+member [Measures].SSSSSS 
+    as sum(Ytd(), ([Measures].[Cost])) 
+select 
+    { ([Measures].[Cost]), ([Measures].SSSSSS)} on 1, 
+    YTD() on 10 
+from [Airline B] 
+where (Date.[ALL].[2021].Q4.M12);
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

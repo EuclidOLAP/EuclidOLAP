@@ -437,12 +437,12 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
 //     return except;
 // }
 
-SetFnYTD *SetFnYTD_creat(MemberDef *mdef)
-{
-    SetFnYTD *ytd = mam_alloc(sizeof(SetFnYTD), OBJ_TYPE__SetFnYTD, NULL, 0);
-    ytd->mbr_def = mdef;
-    return ytd;
-}
+// SetFnYTD *SetFnYTD_creat(MemberDef *mdef)
+// {
+//     SetFnYTD *ytd = mam_alloc(sizeof(SetFnYTD), OBJ_TYPE__SetFnYTD, NULL, 0);
+//     ytd->mbr_def = mdef;
+//     return ytd;
+// }
 
 SetFnDescendants *SetFnDescendants_creat(MemberDef *mbr_def, LevelRoleDef *lvr_def, Expression *distance, char flag)
 {

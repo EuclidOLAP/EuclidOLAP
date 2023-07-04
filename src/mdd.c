@@ -16,6 +16,7 @@
 #include "vce.h"
 #include "utils.h"
 #include "obj-type-def.h"
+#include "mdm-ast-set-func.h"
 #include "mdm-astlogifn-interpreter.h"
 
 // extern Stack AST_STACK;
@@ -1352,15 +1353,16 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 		// 	return als_get(set->tuples, 0);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnYTD)
-		{
-			SetFnYTD *ytd = set_def->set_fn;
-			if (ytd->mbr_def == NULL)
-				return NULL;
-			MddSet *set = SetFnYTD_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
-			return als_get(set->tuples, 0);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnDescendants)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnYTD)
+		// {
+		// 	SetFnYTD *ytd = set_def->set_fn;
+		// 	if (ytd->mbr_def == NULL)
+		// 		return NULL;
+		// 	MddSet *set = SetFnYTD_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
+		// 	return als_get(set->tuples, 0);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnDescendants)
 		{
 			MddSet *set = SetFnDescendants_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
 			return als_get(set->tuples, 0);
@@ -1413,7 +1415,7 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 			enum_oms _strat;
 			MemAllocMng *_mam;
 			obj_info(obj, &_type, &_strat, &_mam);
-			if (_type == OBJ_TYPE__SetFnYTD && ((SetFnYTD *)obj)->mbr_def == NULL) {
+			if (_type == OBJ_TYPE__ASTSetFunc_YTD && ((ASTSetFunc_YTD *)obj)->mrole_def == NULL) {
 				return NULL;
 			}
 		}
@@ -1798,11 +1800,12 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 		// 	return SetFnExcept_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnYTD)
-		{
-			return SetFnYTD_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnDescendants)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnYTD)
+		// {
+		// 	return SetFnYTD_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnDescendants)
 		{
 			return SetFnDescendants_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		}
@@ -2604,62 +2607,62 @@ void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *c
 // 	return result;
 // }
 
-MddSet *SetFnYTD_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
-{
-	SetFnYTD *ytd = set_fn;
+// MddSet *SetFnYTD_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
+// {
+// 	SetFnYTD *ytd = set_fn;
 
-	MddMemberRole *mr;
-	Dimension *dim;
+// 	MddMemberRole *mr;
+// 	Dimension *dim;
 
-	if (ytd->mbr_def)
-	{
-		mr = ids_mbrsdef__build(md_ctx, ytd->mbr_def, ctx_tuple, cube);
-		dim = find_dim_by_gid(mr->dim_role->dim_gid);
-	}
-	else
-	{
-		int i, sz = als_size(ctx_tuple->mr_ls);
-		for (i = 0; i < sz; i++)
-		{
-			mr = als_get(ctx_tuple->mr_ls, i);
-			if (mr->dim_role == NULL)
-			{
-				mr = NULL;
-				continue;
-			}
+// 	if (ytd->mbr_def)
+// 	{
+// 		mr = ids_mbrsdef__build(md_ctx, ytd->mbr_def, ctx_tuple, cube);
+// 		dim = find_dim_by_gid(mr->dim_role->dim_gid);
+// 	}
+// 	else
+// 	{
+// 		int i, sz = als_size(ctx_tuple->mr_ls);
+// 		for (i = 0; i < sz; i++)
+// 		{
+// 			mr = als_get(ctx_tuple->mr_ls, i);
+// 			if (mr->dim_role == NULL)
+// 			{
+// 				mr = NULL;
+// 				continue;
+// 			}
 
-			dim = find_dim_by_gid(mr->dim_role->dim_gid);
-			if (strcmp(dim->name, "Calendar") == 0 || strcmp(dim->name, "Date") == 0)
-				break;
+// 			dim = find_dim_by_gid(mr->dim_role->dim_gid);
+// 			if (strcmp(dim->name, "Calendar") == 0 || strcmp(dim->name, "Date") == 0)
+// 				break;
 
-			mr = NULL;
-		}
-	}
+// 			mr = NULL;
+// 		}
+// 	}
 
-	Level *year_lv;
-	int i, sz = als_size(levels_pool);
-	for (i = 0; i < sz; i++)
-	{
-		year_lv = als_get(levels_pool, i);
-		if (year_lv->dim_gid == dim->gid && strcmp(year_lv->name, "year") == 0)
-			break;
-		year_lv = NULL;
-	}
+// 	Level *year_lv;
+// 	int i, sz = als_size(levels_pool);
+// 	for (i = 0; i < sz; i++)
+// 	{
+// 		year_lv = als_get(levels_pool, i);
+// 		if (year_lv->dim_gid == dim->gid && strcmp(year_lv->name, "year") == 0)
+// 			break;
+// 		year_lv = NULL;
+// 	}
 
-	ArrayList *descendants = mdd__lv_ancestor_peer_descendants(year_lv, mr->member);
-	sz = als_size(descendants);
-	MddSet *result = mdd_set__create();
-	for (i = 0; i < sz; i++)
-	{
-		MddTuple *tuple = mdd_tp__create();
-		mdd_tp__add_mbrole(tuple, mdd_mr__create(als_get(descendants, i), mr->dim_role));
-		mddset__add_tuple(result, tuple);
-		if (((Member *)als_get(descendants, i))->gid == mr->member->gid)
-			break;
-	}
+// 	ArrayList *descendants = mdd__lv_ancestor_peer_descendants(year_lv, mr->member);
+// 	sz = als_size(descendants);
+// 	MddSet *result = mdd_set__create();
+// 	for (i = 0; i < sz; i++)
+// 	{
+// 		MddTuple *tuple = mdd_tp__create();
+// 		mdd_tp__add_mbrole(tuple, mdd_mr__create(als_get(descendants, i), mr->dim_role));
+// 		mddset__add_tuple(result, tuple);
+// 		if (((Member *)als_get(descendants, i))->gid == mr->member->gid)
+// 			break;
+// 	}
 
-	return result;
-}
+// 	return result;
+// }
 
 MddSet *SetFnDescendants_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
 {
@@ -3767,8 +3770,8 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	// } else if (_type == OBJ_TYPE__SetFnExcept) {
 	// 	return SetFnExcept_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
-	} else if (_type == OBJ_TYPE__SetFnYTD) {
-		return SetFnYTD_evolving(md_ctx, seg_0, cube, ctx_tuple);
+	// } else if (_type == OBJ_TYPE__SetFnYTD) {
+	// 	return SetFnYTD_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
 	} else if (_type == OBJ_TYPE__SetFnDescendants) {
 		return SetFnDescendants_evolving(md_ctx, seg_0, cube, ctx_tuple);

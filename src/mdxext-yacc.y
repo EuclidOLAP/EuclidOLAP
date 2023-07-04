@@ -894,15 +894,17 @@ set_func_except:
 	}
 ;
 
-// todo redo +suffix
 set_func_ytd:
 	YTD ROUND_BRACKET_L ROUND_BRACKET_R {
-		stack_push(&AST_STACK, SetFnYTD_creat(NULL));
+		ASTSetFunc_YTD *func = mam_alloc(sizeof(ASTSetFunc_YTD), OBJ_TYPE__ASTSetFunc_YTD, NULL, 0);
+		func->head.interpret = interpret_ytd;
+		stack_push(&AST_STACK, func);
 	}
-  | YTD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		MemberDef *mbr_def;
-		stack_pop(&AST_STACK, (void **) &mbr_def);
-		stack_push(&AST_STACK, SetFnYTD_creat(mbr_def));
+  | YTD ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTSetFunc_YTD *func = mam_alloc(sizeof(ASTSetFunc_YTD), OBJ_TYPE__ASTSetFunc_YTD, NULL, 0);
+		func->head.interpret = interpret_ytd;
+		stack_pop(&AST_STACK, (void **)&(func->mrole_def));
+		stack_push(&AST_STACK, func);
 	}
 ;
 
