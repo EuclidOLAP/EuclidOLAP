@@ -588,3 +588,30 @@ void *interpret_descendants(void *md_ctx_, void *nil, void *desc_, void *ctx_tup
 		return result;
 	}
 }
+
+// for ASTSetFunc_Tail
+void *interpret_tail(void *md_ctx_, void *nil, void *tail_, void *ctx_tuple_, void *cube_) {
+
+	// SetFnTail *tail = set_fn;
+	ASTSetFunc_Tail *tail = tail_;
+
+	MddSet *set = ids_setdef__build(md_ctx_, tail->setdef, ctx_tuple_, cube_);
+
+	int count = 1;
+	if (tail->countexp)
+	{
+		GridData data;
+		Expression_evaluate(md_ctx_, tail->countexp, cube_, ctx_tuple_, &data);
+		count = data.val;
+	}
+	if (count >= als_size(set->tuples))
+		return set;
+
+	MddSet *result = mdd_set__create();
+	int i, sz = als_size(set->tuples);
+	for (i = sz - count; i < sz; i++)
+	{
+		mddset__add_tuple(result, als_get(set->tuples, i));
+	}
+	return result;
+}

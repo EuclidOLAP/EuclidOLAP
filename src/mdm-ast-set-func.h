@@ -131,4 +131,16 @@ typedef struct
 // for ASTSetFunc_Descendants
 void *interpret_descendants(void *md_ctx_, void *nil, void *desc_, void *ctx_tuple_, void *cube_);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *countexp;
+} ASTSetFunc_Tail;
+
+// for ASTSetFunc_Tail
+void *interpret_tail(void *md_ctx_, void *nil, void *tail_, void *ctx_tuple_, void *cube_);
+
+
 #endif

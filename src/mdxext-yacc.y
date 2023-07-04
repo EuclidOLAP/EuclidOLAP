@@ -61,23 +61,11 @@ Stack AST_STACK = { 0 };
 %token FILTER			/* filter */
 %token LATERAL_MEMBERS	/* lateralMembers */
 %token ORDER			/* order */
-// %token ASC				/* ASC */
-// %token DESC				/* DESC */
-// %token BASC				/* BASC */
-// %token BDESC			/* BDESC */
 %token TOP_COUNT		/* topCount */
 %token EXCEPT			/* except */
 %token ALL				/* ALL */
 %token YTD				/* Ytd */
 %token DESCENDANTS
-/* %token SELF
-%token AFTER
-%token BEFORE
-%token BEFORE_AND_AFTER
-%token SELF_AND_AFTER
-%token SELF_AND_BEFORE
-%token SELF_BEFORE_AFTER
-%token LEAVES */
 %token TAIL
 %token BOTTOM_PERCENT
 %token TOP_PERCENT
@@ -1018,54 +1006,20 @@ set_func_descendants:
 	} ROUND_BRACKET_R
 ;
 
-/* desc_flag:
-	SELF {
-		long flag = SET_FN__DESCENDANTS_OPT_SELF;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | AFTER {
-		long flag = SET_FN__DESCENDANTS_OPT_AFTER;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | BEFORE {
-		long flag = SET_FN__DESCENDANTS_OPT_BEFORE;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | BEFORE_AND_AFTER {
-		long flag = SET_FN__DESCENDANTS_OPT_BEFORE_AND_AFTER;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | SELF_AND_AFTER {
-		long flag = SET_FN__DESCENDANTS_OPT_SELF_AND_AFTER;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | SELF_AND_BEFORE {
-		long flag = SET_FN__DESCENDANTS_OPT_SELF_AND_BEFORE;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | SELF_BEFORE_AFTER {
-		long flag = SET_FN__DESCENDANTS_OPT_SELF_BEFORE_AFTER;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | LEAVES {
-		long flag = SET_FN__DESCENDANTS_OPT_LEAVES;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-; */
 
-// todo redo +suffix
 set_func_tail:
 	TAIL ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		stack_push(&AST_STACK, SetFnTail_creat(set, NULL));
+		ASTSetFunc_Tail *func = mam_alloc(sizeof(ASTSetFunc_Tail), OBJ_TYPE__ASTSetFunc_Tail, NULL, 0);
+		func->head.interpret = interpret_tail;
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
 	}
   | TAIL ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
-		Expression *count;
-		stack_pop(&AST_STACK, (void **) &count);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		stack_push(&AST_STACK, SetFnTail_creat(set, count));
+		ASTSetFunc_Tail *func = mam_alloc(sizeof(ASTSetFunc_Tail), OBJ_TYPE__ASTSetFunc_Tail, NULL, 0);
+		func->head.interpret = interpret_tail;
+		stack_pop(&AST_STACK, (void **)&(func->countexp));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
 	}
 ;
 

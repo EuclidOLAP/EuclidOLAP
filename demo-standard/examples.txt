@@ -484,6 +484,16 @@ from [Airline B] ;
 
 ---
 
+with 
+set SSSSSS 
+  as tail( crossjoin(LATERALMEMBERS([Starting Point].[ALL].[Europe]), LATERALMEMBERS([Measures].Cost)), 8 ) 
+SELECT 
+  SSSSSS On 10, 
+  LATERALMEMBERS([Ending Point].[ALL]) On 1 
+frOM [Airline B] ;
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

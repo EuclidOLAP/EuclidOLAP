@@ -58,6 +58,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTSetFunc_Except       408
 #define OBJ_TYPE__ASTSetFunc_YTD          409
 #define OBJ_TYPE__ASTSetFunc_Descendants          410
+#define OBJ_TYPE__ASTSetFunc_Tail         411
 #define OBJ_TYPE__AST_SET_FUNC_MAX        500
 
 
@@ -123,21 +124,9 @@ typedef short type_obj;
 #define OBJ_TYPE__SelectDef 10058
 #define OBJ_TYPE__SetDef 10059
 #define OBJ_TYPE__SetFnBottomOrTopPercent 10060
-// #define OBJ_TYPE__SetFnChildren 10061
-// #define OBJ_TYPE__SetFnCrossJoin 10062
-// #define OBJ_TYPE__SetFnDescendants 10063
-// #define OBJ_TYPE__SetFnExcept 10064
-// #define OBJ_TYPE__SetFnFilter 10065
 #define OBJ_TYPE__SetFnIntersect 10066
-// #define OBJ_TYPE__SetFnLateralMembers 10067
-// #define OBJ_TYPE__SetFnMembers 10068
-// #define OBJ_TYPE__SetFnOrder 10069
-#define OBJ_TYPE__SetFnTail 10070
-// #define OBJ_TYPE__SetFnTopCount 10071
 #define OBJ_TYPE__SetFnUnion 10072
-// #define OBJ_TYPE__SetFnYTD 10073
 #define OBJ_TYPE__SetFormula 10074
-// #define OBJ_TYPE__SetFuncChildren 10075
 #define OBJ_TYPE__SetFuncMembers 10076
 #define OBJ_TYPE__SockIntentThread 10077
 #define OBJ_TYPE__StrArr 10078
