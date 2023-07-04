@@ -289,24 +289,24 @@ typedef struct Member_Role_Fn_Opening_Period_
 ASTMemberFunc_OpeningPeriod *ASTMemberFunc_OpeningPeriod_creat(LevelRoleDef *lvr, MemberDef *mr);
 
 
-typedef struct Member_Role_Fn_FirstChild_
-{
-    MemberDef *mr_def;
-} ASTMemberFunc_FirstChild;
-ASTMemberFunc_FirstChild *ASTMemberFunc_FirstChild_creat(MemberDef *mr);
+// typedef struct Member_Role_Fn_FirstChild_
+// {
+//     MemberDef *mr_def;
+// } ASTMemberFunc_FirstChild;
+// ASTMemberFunc_FirstChild *ASTMemberFunc_FirstChild_creat(MemberDef *mr);
 
-typedef struct Member_Role_Fn_LastChild_
-{
-    MemberDef *mr_def;
-} ASTMemberFunc_LastChild;
-ASTMemberFunc_LastChild *ASTMemberFunc_LastChild_creat(MemberDef *mr);
+// typedef struct Member_Role_Fn_LastChild_
+// {
+//     MemberDef *mr_def;
+// } ASTMemberFunc_LastChild;
+// ASTMemberFunc_LastChild *ASTMemberFunc_LastChild_creat(MemberDef *mr);
 
 
-typedef struct Member_Role_Fn_FirstSibling_
-{
-    MemberDef *mr_def;
-} ASTMemberFunc_FirstSibling;
-ASTMemberFunc_FirstSibling *ASTMemberFunc_FirstSibling_creat(MemberDef *mr);
+// typedef struct Member_Role_Fn_FirstSibling_
+// {
+//     MemberDef *mr_def;
+// } ASTMemberFunc_FirstSibling;
+// ASTMemberFunc_FirstSibling *ASTMemberFunc_FirstSibling_creat(MemberDef *mr);
 
 typedef struct Member_Role_Fn_LastSibling_
 {
@@ -360,21 +360,21 @@ ExpFnCoalesceEmpty *ExpFnCoalesceEmpty_creat(ArrayList *exp_ls);
 
 // } MemberRoleFuncPrevMember;
 
-typedef struct _member_role_func_firstchild_ {
-    char suf_flag;
+// typedef struct _member_role_func_firstchild_ {
+//     char suf_flag;
 
-} MemberRoleFuncFirstChild;
+// } MemberRoleFuncFirstChild;
 
-typedef struct _member_role_func_lastchild_ {
-    char suf_flag;
+// typedef struct _member_role_func_lastchild_ {
+//     char suf_flag;
 
-} MemberRoleFuncLastChild;
+// } MemberRoleFuncLastChild;
 
-typedef struct _member_role_func_firstsibling_ {
-    char suf_flag;
-    MDMEntityUniversalPath *hierarchy;
+// typedef struct _member_role_func_firstsibling_ {
+//     char suf_flag;
+//     MDMEntityUniversalPath *hierarchy;
 
-} MemberRoleFuncFirstSibling;
+// } MemberRoleFuncFirstSibling;
 
 typedef struct _member_role_func_lastsibling_ {
     char suf_flag;

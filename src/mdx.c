@@ -337,24 +337,24 @@ ASTMemberFunc_OpeningPeriod *ASTMemberFunc_OpeningPeriod_creat(LevelRoleDef *lvr
 }
 
 
-ASTMemberFunc_FirstChild *ASTMemberFunc_FirstChild_creat(MemberDef *mr) {
-    ASTMemberFunc_FirstChild *mr_fn = mam_alloc(sizeof(ASTMemberFunc_FirstChild), OBJ_TYPE__ASTMemberFunc_FirstChild, NULL, 0);
-    mr_fn->mr_def = mr;
-    return mr_fn;
-}
+// ASTMemberFunc_FirstChild *ASTMemberFunc_FirstChild_creat(MemberDef *mr) {
+//     ASTMemberFunc_FirstChild *mr_fn = mam_alloc(sizeof(ASTMemberFunc_FirstChild), OBJ_TYPE__ASTMemberFunc_FirstChild, NULL, 0);
+//     mr_fn->mr_def = mr;
+//     return mr_fn;
+// }
 
-ASTMemberFunc_LastChild *ASTMemberFunc_LastChild_creat(MemberDef *mr) {
-    ASTMemberFunc_LastChild *mr_fn = mam_alloc(sizeof(ASTMemberFunc_LastChild), OBJ_TYPE__ASTMemberFunc_LastChild, NULL, 0);
-    mr_fn->mr_def = mr;
-    return mr_fn;
-}
+// ASTMemberFunc_LastChild *ASTMemberFunc_LastChild_creat(MemberDef *mr) {
+//     ASTMemberFunc_LastChild *mr_fn = mam_alloc(sizeof(ASTMemberFunc_LastChild), OBJ_TYPE__ASTMemberFunc_LastChild, NULL, 0);
+//     mr_fn->mr_def = mr;
+//     return mr_fn;
+// }
 
 
-ASTMemberFunc_FirstSibling *ASTMemberFunc_FirstSibling_creat(MemberDef *mr) {
-    ASTMemberFunc_FirstSibling *mr_fn = mam_alloc(sizeof(ASTMemberFunc_FirstSibling), OBJ_TYPE__ASTMemberFunc_FirstSibling, NULL, 0);
-    mr_fn->mr_def = mr;
-    return mr_fn;
-}
+// ASTMemberFunc_FirstSibling *ASTMemberFunc_FirstSibling_creat(MemberDef *mr) {
+//     ASTMemberFunc_FirstSibling *mr_fn = mam_alloc(sizeof(ASTMemberFunc_FirstSibling), OBJ_TYPE__ASTMemberFunc_FirstSibling, NULL, 0);
+//     mr_fn->mr_def = mr;
+//     return mr_fn;
+// }
 
 ASTMemberFunc_LastSibling *ASTMemberFunc_LastSibling_creat(MemberDef *mr) {
     ASTMemberFunc_LastSibling *mr_fn = mam_alloc(sizeof(ASTMemberFunc_LastSibling), OBJ_TYPE__ASTMemberFunc_LastSibling, NULL, 0);

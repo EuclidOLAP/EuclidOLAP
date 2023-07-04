@@ -616,6 +616,41 @@ where ( [Classes of Service].[Premium Business], [Aircraft Models].[Boeing].[Boe
 
 ---
 
+select 
+members([Measures]) on 1, 
+{ [Date].[ALL].[2020].FirstChild() } on 0 
+from [Airline B];
+
+---
+
+select 
+members([Measures]) on 1, 
+[Date].[ALL].[2020].LastChild on 10 
+from [Airline B];
+
+---
+
+select 
+{ ( FirstSibling([Date].[2020]) ) } on 0,
+{ ([Measures].Revenue), ([Measures].Cost) } on 100 
+from [Airline A];
+
+---
+
+select 
+{ [Date].[2020].FirstSibling() } on 0,
+{ ([Measures].Revenue), ([Measures].Cost) } on 100 
+from [Airline A];
+
+---
+
+select 
+( [Date].[2020].FirstSibling() ) on 0,
+{ ([Measures].Revenue), ([Measures].Cost) } on 100 
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
