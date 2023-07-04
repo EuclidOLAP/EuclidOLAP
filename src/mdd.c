@@ -1318,16 +1318,16 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 		// 	return als_get(set->tuples, 0);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnIntersect)
-		{
-			MddSet *set = SetFnIntersect_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
-			return als_get(set->tuples, 0);
-		}
-		else
-		{
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnIntersect)
+		// {
+		// 	MddSet *set = SetFnIntersect_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
+		// 	return als_get(set->tuples, 0);
+		// }
+		// else
+		// {
+		// }
 			log_print("[ error ] - ids_setdef__head_ref_tuple() obj_type_of(set_def->set_fn) = %d\n", obj_type_of(set_def->set_fn));
 			exit(1);
-		}
 	}
 	else if (set_def->t_cons == SET_DEF__VAR_OR_BLOCK)
 	{
@@ -1707,15 +1707,15 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 		// 	return SetFnUnion_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnIntersect)
-		{
-			return SetFnIntersect_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
-		}
-		else
-		{
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnIntersect)
+		// {
+		// 	return SetFnIntersect_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
+		// }
+		// else
+		// {
+		// }
 			log_print("[warn] - ids_setdef__build() obj_type_of(set_def->set_fn) = %d\n", obj_type_of(set_def->set_fn));
 			exit(1);
-		}
 	}
 	else if (set_def->t_cons == SET_DEF__VAR_OR_BLOCK)
 	{
@@ -2292,27 +2292,27 @@ void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *c
 // 	return result;
 // }
 
-MddSet *SetFnIntersect_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
-{
-	SetFnIntersect *inter = set_fn;
-	MddSet *set_0 = ids_setdef__build(md_ctx, als_get(inter->set_def_ls, 0), ctx_tuple, cube);
-	if (als_size(inter->set_def_ls) < 2)
-		return set_0;
-	MddSet *set_1 = ids_setdef__build(md_ctx, als_get(inter->set_def_ls, 1), ctx_tuple, cube);
-	MddSet *result = mdd_set__create();
-	int i, j, len_0 = als_size(set_0->tuples), len_1 = als_size(set_1->tuples);
-	for (i = 0; i < len_0; i++)
-	{
-		MddTuple *tuple = als_get(set_0->tuples, i);
-		for (j = 0; j < len_1; j++)
-		{
-			MddTuple *tp = als_get(set_1->tuples, j);
-			if (Tuple__cmp(tuple, tp) == 0)
-				mddset__add_tuple(result, tuple);
-		}
-	}
-	return result;
-}
+// MddSet *SetFnIntersect_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
+// {
+// 	SetFnIntersect *inter = set_fn;
+// 	MddSet *set_0 = ids_setdef__build(md_ctx, als_get(inter->set_def_ls, 0), ctx_tuple, cube);
+// 	if (als_size(inter->set_def_ls) < 2)
+// 		return set_0;
+// 	MddSet *set_1 = ids_setdef__build(md_ctx, als_get(inter->set_def_ls, 1), ctx_tuple, cube);
+// 	MddSet *result = mdd_set__create();
+// 	int i, j, len_0 = als_size(set_0->tuples), len_1 = als_size(set_1->tuples);
+// 	for (i = 0; i < len_0; i++)
+// 	{
+// 		MddTuple *tuple = als_get(set_0->tuples, i);
+// 		for (j = 0; j < len_1; j++)
+// 		{
+// 			MddTuple *tp = als_get(set_1->tuples, j);
+// 			if (Tuple__cmp(tuple, tp) == 0)
+// 				mddset__add_tuple(result, tuple);
+// 		}
+// 	}
+// 	return result;
+// }
 
 MddMemberRole *ASTMemberFunc_Parent_evolving(MDContext *md_ctx, ASTMemberFunc_Parent *fn_parent, MddTuple *context_tuple, Cube *cube)
 {
@@ -3002,8 +3002,8 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	// } else if (_type == OBJ_TYPE__SetFnUnion) {
 	// 	return SetFnUnion_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
-	} else if (_type == OBJ_TYPE__SetFnIntersect) {
-		return SetFnIntersect_evolving(md_ctx, seg_0, cube, ctx_tuple);
+	// } else if (_type == OBJ_TYPE__SetFnIntersect) {
+	// 	return SetFnIntersect_evolving(md_ctx, seg_0, cube, ctx_tuple);
 	}
 
 	if (is_type_ast_str_func(_type)) {

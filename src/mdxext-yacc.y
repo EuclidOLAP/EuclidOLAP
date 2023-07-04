@@ -1063,17 +1063,19 @@ set_func_union:
 	}
 ;
 
-// todo redo +suffix
 set_func_intersect:
 	INTERSECT ROUND_BRACKET_L set_list ROUND_BRACKET_R {
-		ArrayList *set_def_ls;
-		stack_pop(&AST_STACK, (void **) &set_def_ls);
-		stack_push(&AST_STACK, SetFnIntersect_creat(set_def_ls, 0));
+		ASTSetFunc_Intersect *func = mam_alloc(sizeof(ASTSetFunc_Intersect), OBJ_TYPE__ASTSetFunc_Intersect, NULL, 0);
+		func->head.interpret = interpret_intersect;
+		stack_pop(&AST_STACK, (void **)&(func->set_def_ls));
+		stack_push(&AST_STACK, func);
 	}
   | INTERSECT ROUND_BRACKET_L set_list COMMA ALL ROUND_BRACKET_R {
-		ArrayList *set_def_ls;
-		stack_pop(&AST_STACK, (void **) &set_def_ls);
-		stack_push(&AST_STACK, SetFnIntersect_creat(set_def_ls, SET_FN__INTERSECT_ALL));
+		ASTSetFunc_Intersect *func = mam_alloc(sizeof(ASTSetFunc_Intersect), OBJ_TYPE__ASTSetFunc_Intersect, NULL, 0);
+		func->head.interpret = interpret_intersect;
+		stack_pop(&AST_STACK, (void **)&(func->set_def_ls));
+		func->all_opt = 1;
+		stack_push(&AST_STACK, func);
 	}
 ;
 
