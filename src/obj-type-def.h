@@ -23,7 +23,7 @@ typedef short type_obj;
 // #define OBJ_TYPE__ASTMemberFunc_FirstSibling 4
 #define OBJ_TYPE__ASTMemberFunc_Lag 5
 // #define OBJ_TYPE__ASTMemberFunc_LastChild 6
-#define OBJ_TYPE__ASTMemberFunc_LastSibling 7
+// #define OBJ_TYPE__ASTMemberFunc_LastSibling 7
 #define OBJ_TYPE__ASTMemberFunc_OpeningPeriod 8
 #define OBJ_TYPE__ASTMemberFunc_ParallelPeriod 9
 // #define OBJ_TYPE__ASTMemberFunc_Parent 10
@@ -34,6 +34,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTMemberFn_FirstChild 15
 #define OBJ_TYPE__ASTMemberFn_LastChild 16
 #define OBJ_TYPE__ASTMemberFn_FirstSibling 17
+#define OBJ_TYPE__ASTMemberFn_LastSibling 18
 
 #define OBJ_TYPE__ASTMEMBERFUNC__MAX 200
 
@@ -120,7 +121,7 @@ typedef short type_obj;
 // #define OBJ_TYPE__MemberRoleFuncFirstSibling 10045
 #define OBJ_TYPE__MemberRoleFuncLag 10046
 // #define OBJ_TYPE__MemberRoleFuncLastChild 10047
-#define OBJ_TYPE__MemberRoleFuncLastSibling 10048
+// #define OBJ_TYPE__MemberRoleFuncLastSibling 10048
 #define OBJ_TYPE__MemberRoleFuncLead 10049
 #define OBJ_TYPE__MemberRoleFuncParent 10050
 // #define OBJ_TYPE__MemberRoleFuncPrevMember 10051

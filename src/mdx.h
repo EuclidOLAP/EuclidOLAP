@@ -308,11 +308,11 @@ ASTMemberFunc_OpeningPeriod *ASTMemberFunc_OpeningPeriod_creat(LevelRoleDef *lvr
 // } ASTMemberFunc_FirstSibling;
 // ASTMemberFunc_FirstSibling *ASTMemberFunc_FirstSibling_creat(MemberDef *mr);
 
-typedef struct Member_Role_Fn_LastSibling_
-{
-    MemberDef *mr_def;
-} ASTMemberFunc_LastSibling;
-ASTMemberFunc_LastSibling *ASTMemberFunc_LastSibling_creat(MemberDef *mr);
+// typedef struct Member_Role_Fn_LastSibling_
+// {
+//     MemberDef *mr_def;
+// } ASTMemberFunc_LastSibling;
+// ASTMemberFunc_LastSibling *ASTMemberFunc_LastSibling_creat(MemberDef *mr);
 
 
 typedef struct Member_Role_Fn_Lag_
@@ -376,11 +376,11 @@ ExpFnCoalesceEmpty *ExpFnCoalesceEmpty_creat(ArrayList *exp_ls);
 
 // } MemberRoleFuncFirstSibling;
 
-typedef struct _member_role_func_lastsibling_ {
-    char suf_flag;
-    MDMEntityUniversalPath *hierarchy;
+// typedef struct _member_role_func_lastsibling_ {
+//     char suf_flag;
+//     MDMEntityUniversalPath *hierarchy;
 
-} MemberRoleFuncLastSibling;
+// } MemberRoleFuncLastSibling;
 
 typedef struct _member_role_func_lag_ {
     char suf_flag;
