@@ -202,13 +202,6 @@ MDContext *MDContext_creat()
     return mam_alloc(sizeof(MDContext), OBJ_TYPE__MDContext, NULL, 0);
 }
 
-// SetFnChildren *SetFnChildren_creat(MemberDef *m_def)
-// {
-//     SetFnChildren *fn = mam_alloc(sizeof(SetFnChildren), OBJ_TYPE__SetFnChildren, NULL, 0);
-//     fn->m_def = m_def;
-//     return fn;
-// }
-
 ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def)
 {
     ASTMemberFunc_Parent *fn = mam_alloc(sizeof(ASTMemberFunc_Parent), OBJ_TYPE__ASTMemberFunc_Parent, NULL, 0);
@@ -269,23 +262,6 @@ DimRoleDef *DimRoleDef_creat()
     return mam_alloc(sizeof(DimRoleDef), OBJ_TYPE__DimRoleDef, NULL, 0);
 }
 
-// SetFnMembers *SetFnMembers_creat()
-// {
-//     return mam_alloc(sizeof(SetFnMembers), OBJ_TYPE__SetFnMembers, NULL, 0);
-// }
-
-// SetFnCrossJoin *SetFnCrossJoin_creat()
-// {
-//     SetFnCrossJoin *fn = mam_alloc(sizeof(SetFnCrossJoin), OBJ_TYPE__SetFnCrossJoin, NULL, 0);
-//     fn->set_def_ls = als_new(8, "SetDef *", THREAD_MAM, NULL);
-//     return fn;
-// }
-
-// void SetFnCrossJoin_add_set(SetFnCrossJoin *fn, SetDef *set_def)
-// {
-//     als_add(fn->set_def_ls, set_def);
-// }
-
 BooleanFactory *BooleanFactory_creat(Expression *le, char ops, Expression *re)
 {
     BooleanFactory *fac = mam_alloc(sizeof(BooleanFactory), OBJ_TYPE__BooleanFactory, NULL, 0);
@@ -323,14 +299,6 @@ void BooleanExpression_addTerm(BooleanExpression *exp, BooleanTerm *term)
 {
     als_add(exp->terms, term);
 }
-
-// SetFnFilter *SetFnFilter_creat(SetDef *setDef, BooleanExpression *boolExp)
-// {
-//     SetFnFilter *filter = mam_alloc(sizeof(SetFnFilter), OBJ_TYPE__SetFnFilter, NULL, 0);
-//     filter->set_def = setDef;
-//     filter->boolExp = boolExp;
-//     return filter;
-// }
 
 ASTMemberFunc_CurrentMember *ASTMemberFunc_CurrentMember_creat()
 {
@@ -402,83 +370,23 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
     return mr_fn;
 }
 
-
-// SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *mdef)
+// SetFnBottomOrTopPercent *SetFnBottomOrTopPercent_creat(char type, SetDef *set, Expression *percentage, Expression *exp)
 // {
-//     SetFnLateralMembers *latmbr = mam_alloc(sizeof(SetFnLateralMembers), OBJ_TYPE__SetFnLateralMembers, NULL, 0);
-//     latmbr->mr_def = mdef;
-//     return latmbr;
+//     SetFnBottomOrTopPercent *percent = mam_alloc(sizeof(SetFnBottomOrTopPercent), OBJ_TYPE__SetFnBottomOrTopPercent, NULL, 0);
+//     percent->type = type;
+//     percent->set = set;
+//     percent->percentage = percentage;
+//     percent->exp = exp;
+//     return percent;
 // }
 
-// SetFnOrder *SetFnOrder_creat(SetDef *set, Expression *exp, char opt)
+// SetFnUnion *SetFnUnion_creat(ArrayList *setDefs, char opt)
 // {
-//     SetFnOrder *order = mam_alloc(sizeof(SetFnOrder), OBJ_TYPE__SetFnOrder, NULL, 0);
-//     order->set = set;
-//     order->exp = exp;
-//     order->option = opt;
-//     return order;
+//     SetFnUnion *union_ = mam_alloc(sizeof(SetFnUnion), OBJ_TYPE__SetFnUnion, NULL, 0);
+//     union_->set_def_ls = setDefs;
+//     union_->option = opt;
+//     return union_;
 // }
-
-// SetFnTopCount *SetFnTopCount_creat(SetDef *set, Expression *count_exp, Expression *num_exp)
-// {
-//     SetFnTopCount *tc = mam_alloc(sizeof(SetFnTopCount), OBJ_TYPE__SetFnTopCount, NULL, 0);
-//     tc->set = set;
-//     tc->count_exp = count_exp;
-//     tc->num_exp = num_exp;
-//     return tc;
-// }
-
-// SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option)
-// {
-//     SetFnExcept *except = mam_alloc(sizeof(SetFnExcept), OBJ_TYPE__SetFnExcept, NULL, 0);
-//     except->set_1 = set_1;
-//     except->set_2 = set_2;
-//     except->option = option;
-//     return except;
-// }
-
-SetFnYTD *SetFnYTD_creat(MemberDef *mdef)
-{
-    SetFnYTD *ytd = mam_alloc(sizeof(SetFnYTD), OBJ_TYPE__SetFnYTD, NULL, 0);
-    ytd->mbr_def = mdef;
-    return ytd;
-}
-
-SetFnDescendants *SetFnDescendants_creat(MemberDef *mbr_def, LevelRoleDef *lvr_def, Expression *distance, char flag)
-{
-    SetFnDescendants *desc = mam_alloc(sizeof(SetFnDescendants), OBJ_TYPE__SetFnDescendants, NULL, 0);
-    desc->mbr_def = mbr_def;
-    desc->lvr_def = lvr_def;
-    desc->distance = distance;
-    desc->flag = flag;
-    return desc;
-}
-
-SetFnTail *SetFnTail_creat(SetDef *set, Expression *count)
-{
-    SetFnTail *tail = mam_alloc(sizeof(SetFnTail), OBJ_TYPE__SetFnTail, NULL, 0);
-    tail->set = set;
-    tail->count = count;
-    return tail;
-}
-
-SetFnBottomOrTopPercent *SetFnBottomOrTopPercent_creat(char type, SetDef *set, Expression *percentage, Expression *exp)
-{
-    SetFnBottomOrTopPercent *percent = mam_alloc(sizeof(SetFnBottomOrTopPercent), OBJ_TYPE__SetFnBottomOrTopPercent, NULL, 0);
-    percent->type = type;
-    percent->set = set;
-    percent->percentage = percentage;
-    percent->exp = exp;
-    return percent;
-}
-
-SetFnUnion *SetFnUnion_creat(ArrayList *setDefs, char opt)
-{
-    SetFnUnion *union_ = mam_alloc(sizeof(SetFnUnion), OBJ_TYPE__SetFnUnion, NULL, 0);
-    union_->set_def_ls = setDefs;
-    union_->option = opt;
-    return union_;
-}
 
 SetFnIntersect *SetFnIntersect_creat(ArrayList *set_def_ls, char option)
 {

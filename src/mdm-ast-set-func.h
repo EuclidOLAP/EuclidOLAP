@@ -97,4 +97,79 @@ typedef struct
 // for ASTSetFunc_Except
 void *interpret_except(void *md_ctx_, void *nil, void *except_, void *ctx_tuple_, void *cube_);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mrole_def;
+} ASTSetFunc_YTD;
+
+// for ASTSetFunc_YTD
+void *interpret_ytd(void *md_ctx_, void *mrole_, void *ytd_, void *ctx_tuple_, void *cube_);
+
+
+typedef enum {
+    SELF,
+    AFTER,
+    BEFORE,
+    BEFORE_AND_AFTER,
+    SELF_AND_AFTER,
+    SELF_AND_BEFORE,
+    SELF_BEFORE_AFTER,
+    LEAVES
+} FnDescendantsOpt;
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mrole_def;
+    MDMEntityUniversalPath *lvrole_def;
+    Expression *disexp;
+    FnDescendantsOpt opt;
+} ASTSetFunc_Descendants;
+
+// for ASTSetFunc_Descendants
+void *interpret_descendants(void *md_ctx_, void *nil, void *desc_, void *ctx_tuple_, void *cube_);
+
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *countexp;
+} ASTSetFunc_Tail;
+
+// for ASTSetFunc_Tail
+void *interpret_tail(void *md_ctx_, void *nil, void *tail_, void *ctx_tuple_, void *cube_);
+
+
+typedef enum
+{
+    BOTTOM_PER,
+    TOP_PER
+} FnBottomTopPercentOpt;
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *set;
+    Expression *percentage;
+    Expression *exp;
+    FnBottomTopPercentOpt option;
+} ASTSetFunc_BottomOrTopPercent;
+
+// for ASTSetFunc_BottomOrTopPercent
+void *interpret_bottomortoppercent(void *md_ctx_, void *nil, void *percent_, void *ctx_tuple_, void *cube_);
+
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    ArrayList *set_def_ls;
+    char all_opt;
+} ASTSetFunc_Union;
+
+// for ASTSetFunc_Union
+void *interpret_union(void *md_ctx_, void *nil, void *union_, void *ctx_tuple_, void *cube_);
+
 #endif

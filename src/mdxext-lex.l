@@ -225,38 +225,6 @@ descendants {
 	return DESCENDANTS;
 }
 
-SELF {
-	return SELF;
-}
-
-AFTER {
-	return AFTER;
-}
-
-BEFORE {
-	return BEFORE;
-}
-
-BEFORE_AND_AFTER {
-	return BEFORE_AND_AFTER;
-}
-
-SELF_AND_AFTER {
-	return SELF_AND_AFTER;
-}
-
-SELF_AND_BEFORE {
-	return SELF_AND_BEFORE;
-}
-
-SELF_BEFORE_AFTER {
-	return SELF_BEFORE_AFTER;
-}
-
-LEAVES {
-	return LEAVES;
-}
-
 Tail {
 	return TAIL;
 }

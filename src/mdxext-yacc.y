@@ -61,23 +61,11 @@ Stack AST_STACK = { 0 };
 %token FILTER			/* filter */
 %token LATERAL_MEMBERS	/* lateralMembers */
 %token ORDER			/* order */
-// %token ASC				/* ASC */
-// %token DESC				/* DESC */
-// %token BASC				/* BASC */
-// %token BDESC			/* BDESC */
 %token TOP_COUNT		/* topCount */
 %token EXCEPT			/* except */
 %token ALL				/* ALL */
 %token YTD				/* Ytd */
 %token DESCENDANTS
-%token SELF
-%token AFTER
-%token BEFORE
-%token BEFORE_AND_AFTER
-%token SELF_AND_AFTER
-%token SELF_AND_BEFORE
-%token SELF_BEFORE_AFTER
-%token LEAVES
 %token TAIL
 %token BOTTOM_PERCENT
 %token TOP_PERCENT
@@ -894,45 +882,68 @@ set_func_except:
 	}
 ;
 
-// todo redo +suffix
 set_func_ytd:
 	YTD ROUND_BRACKET_L ROUND_BRACKET_R {
-		stack_push(&AST_STACK, SetFnYTD_creat(NULL));
+		ASTSetFunc_YTD *func = mam_alloc(sizeof(ASTSetFunc_YTD), OBJ_TYPE__ASTSetFunc_YTD, NULL, 0);
+		func->head.interpret = interpret_ytd;
+		stack_push(&AST_STACK, func);
 	}
-  | YTD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		MemberDef *mbr_def;
-		stack_pop(&AST_STACK, (void **) &mbr_def);
-		stack_push(&AST_STACK, SetFnYTD_creat(mbr_def));
+  | YTD ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTSetFunc_YTD *func = mam_alloc(sizeof(ASTSetFunc_YTD), OBJ_TYPE__ASTSetFunc_YTD, NULL, 0);
+		func->head.interpret = interpret_ytd;
+		stack_pop(&AST_STACK, (void **)&(func->mrole_def));
+		stack_push(&AST_STACK, func);
 	}
 ;
 
-// todo redo +suffix
 set_func_descendants:
-	DESCENDANTS ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		MemberDef *mbr_def;
-		stack_pop(&AST_STACK, (void **) &mbr_def);
-		stack_push(&AST_STACK, SetFnDescendants_creat(mbr_def, NULL, NULL, SET_FN__DESCENDANTS_OPT_SELF));
-	}
-  | DESCENDANTS ROUND_BRACKET_L member_statement COMMA level_role_statement ROUND_BRACKET_R {
-		LevelRoleDef *lvr_def;
-		stack_pop(&AST_STACK, (void **) &lvr_def);
-		MemberDef *mbr_def;
-		stack_pop(&AST_STACK, (void **) &mbr_def);
-		stack_push(&AST_STACK, SetFnDescendants_creat(mbr_def, lvr_def, NULL, SET_FN__DESCENDANTS_OPT_SELF));
-	}
-  | DESCENDANTS ROUND_BRACKET_L member_statement COMMA level_role_statement COMMA desc_flag ROUND_BRACKET_R {
-		void *vf;
-		stack_pop(&AST_STACK, (void **) &vf);
-		long *lflag = (long *)&vf;
-		char flag = *lflag;
-		LevelRoleDef *lvr_def;
-		stack_pop(&AST_STACK, (void **) &lvr_def);
-		MemberDef *mbr_def;
-		stack_pop(&AST_STACK, (void **) &mbr_def);
-		stack_push(&AST_STACK, SetFnDescendants_creat(mbr_def, lvr_def, NULL, flag));
+	DESCENDANTS ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTSetFunc_Descendants *func = mam_alloc(sizeof(ASTSetFunc_Descendants), OBJ_TYPE__ASTSetFunc_Descendants, NULL, 0);
+		func->head.interpret = interpret_descendants;
+		stack_pop(&AST_STACK, (void **)&(func->mrole_def));
+		func->opt = SELF;
+		stack_push(&AST_STACK, func);
 	}
   |
-	DESCENDANTS ROUND_BRACKET_L member_statement COMMA DECIMAL {
+	DESCENDANTS ROUND_BRACKET_L mdm_entity_universal_path COMMA mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTSetFunc_Descendants *func = mam_alloc(sizeof(ASTSetFunc_Descendants), OBJ_TYPE__ASTSetFunc_Descendants, NULL, 0);
+		func->head.interpret = interpret_descendants;
+		stack_pop(&AST_STACK, (void **)&(func->lvrole_def));
+		stack_pop(&AST_STACK, (void **)&(func->mrole_def));
+		func->opt = SELF;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	DESCENDANTS ROUND_BRACKET_L mdm_entity_universal_path COMMA mdm_entity_universal_path COMMA VAR {
+		ASTSetFunc_Descendants *func = mam_alloc(sizeof(ASTSetFunc_Descendants), OBJ_TYPE__ASTSetFunc_Descendants, NULL, 0);
+		func->head.interpret = interpret_descendants;
+		stack_pop(&AST_STACK, (void **)&(func->lvrole_def));
+		stack_pop(&AST_STACK, (void **)&(func->mrole_def));
+
+		if (!strcasecmp(yytext, "SELF")) {
+			func->opt = SELF;
+		} else if (!strcasecmp(yytext, "AFTER")) {
+			func->opt = AFTER;
+		} else if (!strcasecmp(yytext, "BEFORE")) {
+			func->opt = BEFORE;
+		} else if (!strcasecmp(yytext, "BEFORE_AND_AFTER")) {
+			func->opt = BEFORE_AND_AFTER;
+		} else if (!strcasecmp(yytext, "SELF_AND_AFTER")) {
+			func->opt = SELF_AND_AFTER;
+		} else if (!strcasecmp(yytext, "SELF_AND_BEFORE")) {
+			func->opt = SELF_AND_BEFORE;
+		} else if (!strcasecmp(yytext, "SELF_BEFORE_AFTER")) {
+			func->opt = SELF_BEFORE_AFTER;
+		} else if (!strcasecmp(yytext, "LEAVES")) {
+			func->opt = LEAVES;
+		} else {
+			func->opt = SELF;
+		}
+
+		stack_push(&AST_STACK, func);
+	} ROUND_BRACKET_R
+  |
+	DESCENDANTS ROUND_BRACKET_L mdm_entity_universal_path COMMA DECIMAL {
 		Factory *f = Factory_creat();
 		f->t_cons = FACTORY_DEF__DECIMAL;
 		f->decimal = strtod(yytext, NULL);
@@ -943,12 +954,16 @@ set_func_descendants:
 		Expression *distance = Expression_creat();
 		Expression_plus_term(distance, t);
 
-		MemberDef *mbr_def = NULL;
-		stack_pop(&AST_STACK, (void **)&mbr_def);
-		stack_push(&AST_STACK, SetFnDescendants_creat(mbr_def, NULL, distance, SET_FN__DESCENDANTS_OPT_SELF));
+		ASTSetFunc_Descendants *func = mam_alloc(sizeof(ASTSetFunc_Descendants), OBJ_TYPE__ASTSetFunc_Descendants, NULL, 0);
+		func->head.interpret = interpret_descendants;
+		stack_pop(&AST_STACK, (void **)&(func->mrole_def));
+
+		func->disexp = distance;
+		func->opt = SELF;
+		stack_push(&AST_STACK, func);
 	} ROUND_BRACKET_R
   |
-	DESCENDANTS ROUND_BRACKET_L member_statement COMMA DECIMAL {
+	DESCENDANTS ROUND_BRACKET_L mdm_entity_universal_path COMMA DECIMAL {
 		Factory *f = Factory_creat();
 		f->t_cons = FACTORY_DEF__DECIMAL;
 		f->decimal = strtod(yytext, NULL);
@@ -960,110 +975,91 @@ set_func_descendants:
 		Expression_plus_term(distance, t);
 
 		stack_push(&AST_STACK, distance);
-	} COMMA desc_flag ROUND_BRACKET_R {
-		void *vf;
-		stack_pop(&AST_STACK, (void **) &vf);
-		long *lflag = (long *)&vf;
-		char flag = *lflag;
+	} COMMA VAR {
+		ASTSetFunc_Descendants *func = mam_alloc(sizeof(ASTSetFunc_Descendants), OBJ_TYPE__ASTSetFunc_Descendants, NULL, 0);
+		func->head.interpret = interpret_descendants;
 
-		Expression *distance = NULL;
-		stack_pop(&AST_STACK, (void **) &distance);
+		if (!strcasecmp(yytext, "SELF")) {
+			func->opt = SELF;
+		} else if (!strcasecmp(yytext, "AFTER")) {
+			func->opt = AFTER;
+		} else if (!strcasecmp(yytext, "BEFORE")) {
+			func->opt = BEFORE;
+		} else if (!strcasecmp(yytext, "BEFORE_AND_AFTER")) {
+			func->opt = BEFORE_AND_AFTER;
+		} else if (!strcasecmp(yytext, "SELF_AND_AFTER")) {
+			func->opt = SELF_AND_AFTER;
+		} else if (!strcasecmp(yytext, "SELF_AND_BEFORE")) {
+			func->opt = SELF_AND_BEFORE;
+		} else if (!strcasecmp(yytext, "SELF_BEFORE_AFTER")) {
+			func->opt = SELF_BEFORE_AFTER;
+		} else if (!strcasecmp(yytext, "LEAVES")) {
+			func->opt = LEAVES;
+		} else {
+			func->opt = SELF;
+		}
 
-		MemberDef *mbr_def = NULL;
-		stack_pop(&AST_STACK, (void **) &mbr_def);
+		stack_pop(&AST_STACK, (void **)&(func->disexp));
+		stack_pop(&AST_STACK, (void **)&(func->mrole_def));
 
-		stack_push(&AST_STACK, SetFnDescendants_creat(mbr_def, NULL, distance, flag));
-	}
+		stack_push(&AST_STACK, func);
+	} ROUND_BRACKET_R
 ;
 
-desc_flag:
-	SELF {
-		long flag = SET_FN__DESCENDANTS_OPT_SELF;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | AFTER {
-		long flag = SET_FN__DESCENDANTS_OPT_AFTER;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | BEFORE {
-		long flag = SET_FN__DESCENDANTS_OPT_BEFORE;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | BEFORE_AND_AFTER {
-		long flag = SET_FN__DESCENDANTS_OPT_BEFORE_AND_AFTER;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | SELF_AND_AFTER {
-		long flag = SET_FN__DESCENDANTS_OPT_SELF_AND_AFTER;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | SELF_AND_BEFORE {
-		long flag = SET_FN__DESCENDANTS_OPT_SELF_AND_BEFORE;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | SELF_BEFORE_AFTER {
-		long flag = SET_FN__DESCENDANTS_OPT_SELF_BEFORE_AFTER;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-  | LEAVES {
-		long flag = SET_FN__DESCENDANTS_OPT_LEAVES;
-		stack_push(&AST_STACK, *((void **)&flag));
-	}
-;
 
-// todo redo +suffix
 set_func_tail:
 	TAIL ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		stack_push(&AST_STACK, SetFnTail_creat(set, NULL));
+		ASTSetFunc_Tail *func = mam_alloc(sizeof(ASTSetFunc_Tail), OBJ_TYPE__ASTSetFunc_Tail, NULL, 0);
+		func->head.interpret = interpret_tail;
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
 	}
   | TAIL ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
-		Expression *count;
-		stack_pop(&AST_STACK, (void **) &count);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		stack_push(&AST_STACK, SetFnTail_creat(set, count));
+		ASTSetFunc_Tail *func = mam_alloc(sizeof(ASTSetFunc_Tail), OBJ_TYPE__ASTSetFunc_Tail, NULL, 0);
+		func->head.interpret = interpret_tail;
+		stack_pop(&AST_STACK, (void **)&(func->countexp));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
 	}
 ;
 
-// todo redo +suffix
 set_func_bottompercent:
 	BOTTOM_PERCENT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
-		Expression *exp;
-		stack_pop(&AST_STACK, (void **) &exp);
-		Expression *percentage;
-		stack_pop(&AST_STACK, (void **) &percentage);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		stack_push(&AST_STACK, SetFnBottomOrTopPercent_creat(SET_FN__BOTTOM_PERCENT, set, percentage, exp));
+		ASTSetFunc_BottomOrTopPercent *func = mam_alloc(sizeof(ASTSetFunc_BottomOrTopPercent), OBJ_TYPE__ASTSetFunc_BottomOrTopPercent, NULL, 0);
+		func->head.interpret = interpret_bottomortoppercent;
+		stack_pop(&AST_STACK, (void **)&(func->exp));
+		stack_pop(&AST_STACK, (void **)&(func->percentage));
+		stack_pop(&AST_STACK, (void **)&(func->set));
+		func->option = BOTTOM_PER;
+		stack_push(&AST_STACK, func);
 	}
 ;
 
-// todo redo +suffix
 set_func_toppercent:
 	TOP_PERCENT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
-		Expression *exp;
-		stack_pop(&AST_STACK, (void **) &exp);
-		Expression *percentage;
-		stack_pop(&AST_STACK, (void **) &percentage);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		stack_push(&AST_STACK, SetFnBottomOrTopPercent_creat(SET_FN__TOP_PERCENT, set, percentage, exp));
+		ASTSetFunc_BottomOrTopPercent *func = mam_alloc(sizeof(ASTSetFunc_BottomOrTopPercent), OBJ_TYPE__ASTSetFunc_BottomOrTopPercent, NULL, 0);
+		func->head.interpret = interpret_bottomortoppercent;
+		stack_pop(&AST_STACK, (void **)&(func->exp));
+		stack_pop(&AST_STACK, (void **)&(func->percentage));
+		stack_pop(&AST_STACK, (void **)&(func->set));
+		func->option = TOP_PER;
+		stack_push(&AST_STACK, func);
 	}
 ;
 
-// todo redo +suffix
 set_func_union:
 	UNION ROUND_BRACKET_L set_list ROUND_BRACKET_R {
-		ArrayList *set_def_ls;
-		stack_pop(&AST_STACK, (void **) &set_def_ls);
-		stack_push(&AST_STACK, SetFnUnion_creat(set_def_ls, 0));
+		ASTSetFunc_Union *func = mam_alloc(sizeof(ASTSetFunc_Union), OBJ_TYPE__ASTSetFunc_Union, NULL, 0);
+		func->head.interpret = interpret_union;
+		stack_pop(&AST_STACK, (void **)&(func->set_def_ls));
+		stack_push(&AST_STACK, func);
 	}
   | UNION ROUND_BRACKET_L set_list COMMA ALL ROUND_BRACKET_R {
-		ArrayList *set_def_ls;
-		stack_pop(&AST_STACK, (void **) &set_def_ls);
-		stack_push(&AST_STACK, SetFnUnion_creat(set_def_ls, SET_FN__UNION_ALL));
+		ASTSetFunc_Union *func = mam_alloc(sizeof(ASTSetFunc_Union), OBJ_TYPE__ASTSetFunc_Union, NULL, 0);
+		func->head.interpret = interpret_union;
+		stack_pop(&AST_STACK, (void **)&(func->set_def_ls));
+		func->all_opt = 1;
+		stack_push(&AST_STACK, func);
 	}
 ;
 

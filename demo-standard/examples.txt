@@ -449,6 +449,82 @@ where ( [Aircraft Models].[Bombardier] );
 
 ---
 
+with 
+member [Measures].SSSSSS 
+    as sum(Ytd(), ([Measures].[Cost])) 
+select 
+    { ([Measures].[Cost]), ([Measures].SSSSSS)} on 1, 
+    YTD() on 10 
+from [Airline B] 
+where (Date.[ALL].[2021].Q4.M12);
+
+---
+
+with 
+set SSSSSS 
+    as filter(descendants(Date.Calendar.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].[Cost]) > 1) 
+member [Measures].XXXXXX 
+    as ([Measures].[Cost]) - 20000 
+select 
+    topPercent(SSSSSS, 25, ([Measures].[Cost])) on 10, 
+    {([Measures].XXXXXX)} on 1 
+from [Airline A] ;
+
+---
+
+with 
+set SSSSSS 
+    as filter(descendants(Date.Calendar.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].[Revenue]) > 1) 
+member [Measures].XXXXXX 
+    as ([Measures].[Revenue]) - 20000 
+select 
+    topPercent(SSSSSS, 25, ([Measures].[Revenue])) on 10, 
+    {([Measures].XXXXXX)} on 1 
+from [Airline B] ;
+
+---
+
+with 
+set SSSSSS 
+  as tail( crossjoin(LATERALMEMBERS([Starting Point].[ALL].[Europe]), LATERALMEMBERS([Measures].Cost)), 8 ) 
+SELECT 
+  SSSSSS On 10, 
+  LATERALMEMBERS([Ending Point].[ALL]) On 1 
+frOM [Airline B] ;
+
+---
+
+with 
+set SSSSSS 
+    as filter(descendants(Date.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].Revenue) > 1) 
+member [Measures].XXXXXX 
+    as ([Measures].Revenue) - 18000 
+select 
+    bottomPercent(SSSSSS, 53, ([Measures].[XXXXXX])) on 10, 
+    {([Measures].[XXXXXX])} on 1 
+from [Airline B] ;
+
+---
+
+with 
+set SSSSSS 
+    as filter(descendants(Date.Calendar.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].Cost) > 1) 
+member [Measures].XXXXXX as 
+    ([Measures].Cost) - 20000 
+select 
+    topPercent(SSSSSS, 55, ([Measures].Cost)) on 10, 
+    {([Measures].Cost)} on 1 
+from [Airline A] ;
+
+---
+
+select 
+  members([Measures]) on 0, 
+  intersect(members(Date.[Calendar]), UNION(children(Date.[ALL].[2021]), children(Date.[ALL].[2021].Q3))) on 1 
+from [Airline B] ;
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

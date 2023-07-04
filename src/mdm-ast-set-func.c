@@ -1,5 +1,8 @@
+#include <string.h>
+
 #include "md-model.h"
 #include "mdd.h"
+#include "log.h"
 #include "mdm-ast-set-func.h"
 
 extern ArrayList *dims_pool;
@@ -379,5 +382,350 @@ void *interpret_except(void *md_ctx_, void *nil, void *except_, void *ctx_tuple_
 		i = i;
 	}
 
+	return result;
+}
+
+// for ASTSetFunc_YTD
+void *interpret_ytd(void *md_ctx_, void *mrole_, void *ytd_, void *ctx_tuple_, void *cube_) {
+
+	ASTSetFunc_YTD *ytd = ytd_;
+	MddMemberRole *date_mr;
+	Dimension *date_dim;
+	MddTuple *ctx_tuple = ctx_tuple_;
+
+	if (ytd->mrole_def)
+	{
+		// mr = ids_mbrsdef__build(md_ctx, ytd->mbr_def, ctx_tuple, cube);
+		date_mr = up_evolving(md_ctx_, ytd->mrole_def, cube_, ctx_tuple_);
+		// dim = find_dim_by_gid(mr->dim_role->dim_gid);
+		date_dim = find_dim_by_gid(date_mr->dim_role->dim_gid);
+	}
+	else
+	{
+		int i, sz = als_size(ctx_tuple->mr_ls);
+		for (i = 0; i < sz; i++)
+		{
+			date_mr = als_get(ctx_tuple->mr_ls, i);
+
+			if (date_mr->dim_role->bin_attr & DR_MEASURE_MASK)
+			{
+				// skip the measure dimension
+				date_mr = NULL;
+				continue;
+			}
+
+			date_dim = find_dim_by_gid(date_mr->dim_role->dim_gid);
+			if (strcmp(date_dim->name, "Time") == 0 || strcmp(date_dim->name, "Date") == 0)
+				break;
+
+			date_mr = NULL;
+		}
+	}
+
+	Level *year_lv;
+	int i, sz = als_size(levels_pool);
+	for (i = 0; i < sz; i++)
+	{
+		year_lv = als_get(levels_pool, i);
+		if (year_lv->dim_gid == date_dim->gid && strcmp(year_lv->name, "Year") == 0)
+			break;
+		year_lv = NULL;
+	}
+
+	ArrayList *descendants = mdd__lv_ancestor_peer_descendants(year_lv, date_mr->member);
+	sz = als_size(descendants);
+	MddSet *result = mdd_set__create();
+	for (i = 0; i < sz; i++)
+	{
+		MddTuple *tuple = mdd_tp__create();
+		mdd_tp__add_mbrole(tuple, mdd_mr__create(als_get(descendants, i), date_mr->dim_role));
+		mddset__add_tuple(result, tuple);
+		if (((Member *)als_get(descendants, i))->gid == date_mr->member->gid)
+			break;
+	}
+
+	return result;
+}
+
+// for ASTSetFunc_Descendants
+void *interpret_descendants(void *md_ctx_, void *nil, void *desc_, void *ctx_tuple_, void *cube_) {
+
+	ASTSetFunc_Descendants *descfn = desc_;
+
+	// MddMemberRole *mr = ids_mbrsdef__build(md_ctx, desc->mbr_def, ctx_tuple, cube);
+	MddMemberRole *mrole = up_evolving(md_ctx_, descfn->mrole_def, cube_, ctx_tuple_);
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
+        MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+        thrd_mam->exception_desc = "Function interpret_descendants throws an exception.";
+        longjmp(thrd_mam->excep_ctx_env, -1);
+	}
+
+	MddSet *result = mdd_set__create();
+
+	ArrayList *descendants = Member__descendants(mrole->member);
+
+	if (descfn->lvrole_def == NULL && descfn->disexp == NULL)
+	{
+
+		int i, sz = als_size(descendants);
+		for (i = 0; i < sz; i++)
+		{
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, mdd_mr__create(als_get(descendants, i), mrole->dim_role));
+			mddset__add_tuple(result, tuple);
+		}
+		return result;
+	}
+
+	if (descfn->lvrole_def)
+	{
+		LevelRole *lvrole = up_evolving(md_ctx_, descfn->lvrole_def, cube_, ctx_tuple_);
+		if (!lvrole || obj_type_of(lvrole) != OBJ_TYPE__LevelRole) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "Function interpret_descendants throws an exception.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+
+		int i, sz = als_size(descendants);
+		for (i = 0; i < sz; i++)
+		{
+			Member *mbr = als_get(descendants, i);
+			switch (descfn->opt)
+			{
+			case SELF:
+				if (mbr->lv != lvrole->lv->level)
+					continue;
+				break;
+			case AFTER:
+				if (mbr->lv <= lvrole->lv->level)
+					continue;
+				break;
+			case BEFORE:
+				if (mbr->lv >= lvrole->lv->level)
+					continue;
+				break;
+			case BEFORE_AND_AFTER:
+				if (mbr->lv == lvrole->lv->level)
+					continue;
+				break;
+			case SELF_AND_AFTER:
+				if (mbr->lv < lvrole->lv->level)
+					continue;
+				break;
+			case SELF_AND_BEFORE:
+				if (mbr->lv > lvrole->lv->level)
+					continue;
+				break;
+			case SELF_BEFORE_AFTER:
+				// do nothing
+				break;
+			case LEAVES:
+				if (mdd_mbr__is_leaf(mbr) == 0 || mbr->lv > lvrole->lv->level)
+					continue;
+				break;
+			default:
+				log_print("[ error ] program exit, cause by: worry value of set function Descendants option.\n");
+				exit(1);
+			}
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, mdd_mr__create(mbr, mrole->dim_role));
+			mddset__add_tuple(result, tuple);
+		}
+		return result;
+	}
+
+	if (descfn->disexp)
+	{
+		GridData data;
+		Expression_evaluate(md_ctx_, descfn->disexp, cube_, ctx_tuple_, &data);
+		int stan_lv = mrole->member->lv + data.val;
+
+		int i, sz = als_size(descendants);
+		for (i = 0; i < sz; i++)
+		{
+			Member *mbr = als_get(descendants, i);
+			switch (descfn->opt)
+			{
+			case SELF:
+				if (mbr->lv != stan_lv)
+					continue;
+				break;
+			case AFTER:
+				if (mbr->lv <= stan_lv)
+					continue;
+				break;
+			case BEFORE:
+				if (mbr->lv >= stan_lv)
+					continue;
+				break;
+			case BEFORE_AND_AFTER:
+				if (mbr->lv == stan_lv)
+					continue;
+				break;
+			case SELF_AND_AFTER:
+				if (mbr->lv < stan_lv)
+					continue;
+				break;
+			case SELF_AND_BEFORE:
+				if (mbr->lv > stan_lv)
+					continue;
+				break;
+			case SELF_BEFORE_AFTER:
+				// do nothing
+				break;
+			case LEAVES:
+				if (mdd_mbr__is_leaf(mbr) == 0 || mbr->lv > stan_lv)
+					continue;
+				break;
+			default:
+				log_print("[ error ] program exit, cause by: worry value of set function Descendants option.\n");
+				exit(1);
+			}
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, mdd_mr__create(mbr, mrole->dim_role));
+			mddset__add_tuple(result, tuple);
+		}
+		return result;
+	}
+}
+
+// for ASTSetFunc_Tail
+void *interpret_tail(void *md_ctx_, void *nil, void *tail_, void *ctx_tuple_, void *cube_) {
+
+	// SetFnTail *tail = set_fn;
+	ASTSetFunc_Tail *tail = tail_;
+
+	MddSet *set = ids_setdef__build(md_ctx_, tail->setdef, ctx_tuple_, cube_);
+
+	int count = 1;
+	if (tail->countexp)
+	{
+		GridData data;
+		Expression_evaluate(md_ctx_, tail->countexp, cube_, ctx_tuple_, &data);
+		count = data.val;
+	}
+	if (count >= als_size(set->tuples))
+		return set;
+
+	MddSet *result = mdd_set__create();
+	int i, sz = als_size(set->tuples);
+	for (i = sz - count; i < sz; i++)
+	{
+		mddset__add_tuple(result, als_get(set->tuples, i));
+	}
+	return result;
+}
+
+// for ASTSetFunc_BottomOrTopPercent
+void *interpret_bottomortoppercent(void *md_ctx_, void *nil, void *percent_, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_BottomOrTopPercent *per = percent_;
+	MddSet *set = ids_setdef__build(md_ctx_, per->set, ctx_tuple_, cube_);
+	GridData data;
+	Expression_evaluate(md_ctx_, per->percentage, cube_, ctx_tuple_, &data);
+	double global = 0, percent = data.val / 100;
+	ArrayList *vals = als_new(128, "double", THREAD_MAM, NULL);
+	int i, j, sz = als_size(set->tuples);
+	for (i = 0; i < sz; i++)
+	{
+		Expression_evaluate(md_ctx_, per->exp, cube_, tuple__merge(ctx_tuple_, als_get(set->tuples, i)), &data);
+		als_add(vals, *((void **)&data.val));
+		global += data.val;
+	}
+
+	for (i = 1; i < sz; i++)
+	{
+		for (j = i; j > 0; j--)
+		{
+			void *va = als_get(vals, j - 1);
+			void *vb = als_get(vals, j);
+
+			double val_a = *((double *)&va);
+			double val_b = *((double *)&vb);
+
+			if (per->option == BOTTOM_PER)
+			{
+				if (val_a <= val_b)
+					continue;
+			}
+			else
+			{ // per->option == TOP_PER
+				if (val_a >= val_b)
+					continue;
+			}
+			ArrayList_set(vals, j - 1, vb);
+			ArrayList_set(vals, j, va);
+			MddTuple *tmp = als_get(set->tuples, j - 1);
+			ArrayList_set(set->tuples, j - 1, als_get(set->tuples, j));
+			ArrayList_set(set->tuples, j, tmp);
+		}
+	}
+
+	MddSet *result = mdd_set__create();
+	if (als_size(set->tuples) < 1)
+		return result;
+
+	if (global <= 0)
+	{
+		mddset__add_tuple(result, als_get(set->tuples, 0));
+		return result;
+	}
+
+	double part = 0;
+	for (i = 0; i < sz; i++)
+	{
+		mddset__add_tuple(result, als_get(set->tuples, i));
+		void *vi = als_get(vals, i);
+		part += *((double *)&vi);
+		if (part >= percent * global)
+		{ // part / global >= percent
+			return result;
+		}
+	}
+
+	return result;
+}
+
+// for ASTSetFunc_Union
+void *interpret_union(void *md_ctx_, void *nil, void *union_, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_Union *uni = union_;
+	ArrayList *tuples = als_new(64, "MddTuple *", THREAD_MAM, NULL);
+	int i, j, len = als_size(uni->set_def_ls);
+	for (i = len - 1; i >= 0; i--)
+	{
+		MddSet *set = ids_setdef__build(md_ctx_, als_get(uni->set_def_ls, i), ctx_tuple_, cube_);
+		len = als_size(set->tuples);
+		for (j = len - 1; j >= 0; j--)
+			als_add(tuples, als_get(set->tuples, j));
+	}
+	MddSet *result = mdd_set__create();
+	if (uni->all_opt)
+	{
+		for (i = als_size(tuples) - 1; i >= 0; i--)
+		{
+			mddset__add_tuple(result, als_get(tuples, i));
+		}
+	}
+	else
+	{
+		ArrayList *nonredundant = als_new(64, "MddTuple *", THREAD_MAM, NULL);
+		len = als_size(tuples);
+		for (i = 0; i < len; i++)
+		{
+			MddTuple *tuple_i = als_get(tuples, i);
+			for (j = i + 1; j < len; j++)
+			{
+				MddTuple *tuple_j = als_get(tuples, j);
+				if (Tuple__cmp(tuple_i, tuple_j) == 0)
+					goto skip;
+			}
+			als_add(nonredundant, tuple_i);
+		skip:
+			i = i;
+		}
+		for (i = als_size(nonredundant) - 1; i >= 0; i--)
+		{
+			mddset__add_tuple(result, als_get(nonredundant, i));
+		}
+	}
 	return result;
 }

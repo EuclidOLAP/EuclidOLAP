@@ -189,12 +189,6 @@ typedef struct formula_context
 } FormulaContext;
 FormulaContext *FormulaContext_creat();
 
-// typedef struct set_fn_children
-// {
-//     MemberDef *m_def;
-// } SetFnChildren;
-// SetFnChildren *SetFnChildren_creat(MemberDef *m_def);
-
 
 ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def);
 
@@ -224,20 +218,6 @@ typedef struct ExpFn_LookUpCube
 
 ExpFnLookUpCube *ExpFnLookUpCube_creat(char *cube_name, char *exp_str, Expression *exp);
 
-
-// typedef struct set_fn_members
-// {
-//     DimRoleDef *dr_def;
-//     char option[128];
-// } SetFnMembers;
-// SetFnMembers *SetFnMembers_creat();
-
-// typedef struct Set_Fn_CrossJoin
-// {
-//     ArrayList *set_def_ls;
-// } SetFnCrossJoin;
-// SetFnCrossJoin *SetFnCrossJoin_creat();
-// void SetFnCrossJoin_add_set(SetFnCrossJoin *, SetDef *);
 
 #define BOOL_FAC_OPS__LESS 1
 #define BOOL_FAC_OPS__LESS_EQ 2
@@ -270,13 +250,6 @@ typedef struct Boolean_Expression_
 } BooleanExpression;
 BooleanExpression *BooleanExpression_creat();
 void BooleanExpression_addTerm(BooleanExpression *, BooleanTerm *);
-
-// typedef struct Set_Fn_Filter_
-// {
-//     SetDef *set_def;
-//     BooleanExpression *boolExp;
-// } SetFnFilter;
-// SetFnFilter *SetFnFilter_creat(SetDef *, BooleanExpression *);
 
 typedef struct Member_Fn_Current_Member_
 {
@@ -350,104 +323,28 @@ typedef struct Member_Role_Fn_Lag_
 ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index);
 
 
-// typedef struct SetFn_LateralMembers
-// {
-//     MemberDef *mr_def;
-// } SetFnLateralMembers;
-// SetFnLateralMembers *SetFnLateralMembers_creat(MemberDef *);
+// #define SET_FN__BOTTOM_PERCENT  1
+// #define SET_FN__TOP_PERCENT     2
 
-
-// #define SET_FN__ORDER_ASC   1
-// #define SET_FN__ORDER_DESC  2
-// #define SET_FN__ORDER_BASC  3
-// #define SET_FN__ORDER_BDESC 4
-
-// typedef struct SetFn_Order
+// typedef struct SetFn_Bottom_Or_Top_Percent
 // {
 //     SetDef *set;
+//     Expression *percentage;
 //     Expression *exp;
-//     char option;
-// } SetFnOrder;
+//     char type;
+// } SetFnBottomOrTopPercent;
 
-// SetFnOrder *SetFnOrder_creat(SetDef *, Expression *, char);
+// SetFnBottomOrTopPercent *SetFnBottomOrTopPercent_creat(char type, SetDef *set, Expression *percentage, Expression *exp);
 
-// typedef struct SetFn_TopCount
+// #define SET_FN__UNION_ALL  1
+
+// typedef struct SetFn_Union
 // {
-//     SetDef *set;
-//     Expression *count_exp;
-//     Expression *num_exp;
-// } SetFnTopCount;
-
-// SetFnTopCount *SetFnTopCount_creat(SetDef *set, Expression *count_exp, Expression *num_exp);
-
-#define SET_FN__EXCEPT_ALL  1
-
-// typedef struct SetFn_Except
-// {
-//     SetDef *set_1;
-//     SetDef *set_2;
+//     ArrayList *set_def_ls;
 //     char option;
-// } SetFnExcept;
+// } SetFnUnion;
 
-// SetFnExcept *SetFnExcept_creat(SetDef *set_1, SetDef *set_2, char option);
-
-
-typedef struct SetFn_YTD
-{
-    MemberDef *mbr_def;
-} SetFnYTD;
-
-SetFnYTD *SetFnYTD_creat(MemberDef *);
-
-#define SET_FN__DESCENDANTS_OPT_SELF                1
-#define SET_FN__DESCENDANTS_OPT_AFTER               2
-#define SET_FN__DESCENDANTS_OPT_BEFORE              3
-#define SET_FN__DESCENDANTS_OPT_BEFORE_AND_AFTER    4
-#define SET_FN__DESCENDANTS_OPT_SELF_AND_AFTER      5
-#define SET_FN__DESCENDANTS_OPT_SELF_AND_BEFORE     6
-#define SET_FN__DESCENDANTS_OPT_SELF_BEFORE_AFTER   7
-#define SET_FN__DESCENDANTS_OPT_LEAVES              8
-
-typedef struct SetFn_Descendants
-{
-    MemberDef *mbr_def;
-    LevelRoleDef *lvr_def;
-    Expression *distance;
-    char flag;
-} SetFnDescendants;
-
-SetFnDescendants *SetFnDescendants_creat(MemberDef *, LevelRoleDef *, Expression *, char);
-
-typedef struct SetFn_Tail
-{
-    SetDef *set;
-    Expression *count;
-} SetFnTail;
-
-SetFnTail *SetFnTail_creat(SetDef *, Expression *);
-
-#define SET_FN__BOTTOM_PERCENT  1
-#define SET_FN__TOP_PERCENT     2
-
-typedef struct SetFn_Bottom_Or_Top_Percent
-{
-    SetDef *set;
-    Expression *percentage;
-    Expression *exp;
-    char type;
-} SetFnBottomOrTopPercent;
-
-SetFnBottomOrTopPercent *SetFnBottomOrTopPercent_creat(char type, SetDef *set, Expression *percentage, Expression *exp);
-
-#define SET_FN__UNION_ALL  1
-
-typedef struct SetFn_Union
-{
-    ArrayList *set_def_ls;
-    char option;
-} SetFnUnion;
-
-SetFnUnion *SetFnUnion_creat(ArrayList *, char);
+// SetFnUnion *SetFnUnion_creat(ArrayList *, char);
 
 #define SET_FN__INTERSECT_ALL  1
 
