@@ -202,12 +202,12 @@ MDContext *MDContext_creat()
     return mam_alloc(sizeof(MDContext), OBJ_TYPE__MDContext, NULL, 0);
 }
 
-ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def)
-{
-    ASTMemberFunc_Parent *fn = mam_alloc(sizeof(ASTMemberFunc_Parent), OBJ_TYPE__ASTMemberFunc_Parent, NULL, 0);
-    fn->ast_member = child_def;
-    return fn;
-}
+// ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def)
+// {
+//     ASTMemberFunc_Parent *fn = mam_alloc(sizeof(ASTMemberFunc_Parent), OBJ_TYPE__ASTMemberFunc_Parent, NULL, 0);
+//     fn->ast_member = child_def;
+//     return fn;
+// }
 
 ExpFnSum *ExpFnSum_creat(SetDef *_set, Expression *_exp)
 {

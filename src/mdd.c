@@ -1503,12 +1503,13 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 	}
 	else if (m_def->t_cons == MEMBER_DEF__MBR_FUNCTION)
 	{
-		if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_Parent)
-		{
-			member_role_ = ASTMemberFunc_Parent_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
-			return member_role_;
-		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_CurrentMember)
+		// if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_Parent)
+		// {
+		// 	member_role_ = ASTMemberFunc_Parent_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+		// 	return member_role_;
+		// }
+		// else 
+		if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_CurrentMember)
 		{
 			member_role_ = ASTMemberFunc_CurrentMember_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
@@ -2132,15 +2133,15 @@ void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *c
 }
 
 
-MddMemberRole *ASTMemberFunc_Parent_evolving(MDContext *md_ctx, ASTMemberFunc_Parent *fn_parent, MddTuple *context_tuple, Cube *cube)
-{
-	// when current member has no parent, return itself.
-	MddMemberRole *child_mr = ids_mbrsdef__build(md_ctx, fn_parent->ast_member, context_tuple, cube);
-	if (child_mr->member->p_gid)
-		return mdd_mr__create(find_member_by_gid(child_mr->member->p_gid), child_mr->dim_role);
-	else
-		return child_mr;
-}
+// MddMemberRole *ASTMemberFunc_Parent_evolving(MDContext *md_ctx, ASTMemberFunc_Parent *fn_parent, MddTuple *context_tuple, Cube *cube)
+// {
+// 	// when current member has no parent, return itself.
+// 	MddMemberRole *child_mr = ids_mbrsdef__build(md_ctx, fn_parent->ast_member, context_tuple, cube);
+// 	if (child_mr->member->p_gid)
+// 		return mdd_mr__create(find_member_by_gid(child_mr->member->p_gid), child_mr->dim_role);
+// 	else
+// 		return child_mr;
+// }
 
 MddMemberRole *ASTMemberFunc_CurrentMember_evolving(MDContext *md_ctx, ASTMemberFunc_CurrentMember *cm, MddTuple *context_tuple, Cube *cube)
 {
@@ -2814,6 +2815,10 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	if (_type == OBJ_TYPE__MemberDef) {
 		return ids_mbrsdef__build(md_ctx, (MemberDef *)seg_0, ctx_tuple, cube);
 
+	}
+
+	if (is_type_astmemberfunc(_type)) {
+		return ((ASTFunctionCommonHead *)seg_0)->interpret(md_ctx, NULL, seg_0, ctx_tuple, cube);
 	}
 
 	if (is_type_ast_str_func(_type)) {

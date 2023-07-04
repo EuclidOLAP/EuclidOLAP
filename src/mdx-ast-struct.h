@@ -63,11 +63,11 @@ typedef struct _ast_function_common_head_
     void *(* interpret)(void *md_context, void *prefix_option, void *ast_member_func, void *context_tuple, void *cube);
 } ASTFunctionCommonHead;
 
-typedef struct _ast_member_func_parent_
-{
-    ASTFunctionCommonHead head;
-    MemberDef *ast_member;
-} ASTMemberFunc_Parent;
+// typedef struct _ast_member_func_parent_
+// {
+//     ASTFunctionCommonHead head;
+//     MemberDef *ast_member;
+// } ASTMemberFunc_Parent;
 
 // TODO Schedule removal
 typedef struct _member_role_func_parent_ {

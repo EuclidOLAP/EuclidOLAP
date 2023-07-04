@@ -190,7 +190,7 @@ typedef struct formula_context
 FormulaContext *FormulaContext_creat();
 
 
-ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def);
+// ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def);
 
 typedef struct exp_fn_sum
 {

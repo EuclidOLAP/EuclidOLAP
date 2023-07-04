@@ -532,6 +532,32 @@ from [Airline B] ;
 
 ---
 
+select
+{
+    Date.[ALL].[2020],
+    ( Parent(Date.[ALL].[2020].Q1) ),
+    Date.[ALL].[2020].Q1,
+    ( Parent(Date.[ALL].[2020].Q1.M3) )
+} on 10,
+{ [Measures].Revenue } on 1
+from [Airline A];
+
+---
+
+select
+Date.[ALL].[2020].Q1.Parent on 10,
+{ [Measures].Revenue } on 1
+from [Airline B];
+
+---
+
+select
+Date.[ALL].[2020].Q1.Parent().Parent on 10,
+{ [Measures].Revenue } on 1
+from [Airline A];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
