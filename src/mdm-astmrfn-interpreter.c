@@ -7,6 +7,12 @@
 #include "mdd.h"
 #include "mdm-astmrfn-interpreter.h"
 
+extern ArrayList *dims_pool;
+extern ArrayList *hierarchies_pool;
+extern ArrayList *member_pool;
+extern ArrayList *cubes_pool;
+extern ArrayList *levels_pool;
+
 // void *interpret_ast_mrf_parent
 //     (void *__md_context, void *__prefix_option, void *__ast_member_func, void *__context_tuple, void *__cube)
 // {
@@ -110,4 +116,59 @@ void *interpret_currentmember(void *md_ctx, void *drole, void *curmbr, void *ctx
 
 	log_print("[ error ] - ASTMemberFn_CurrentMember do not matching DimensionRole - < %s >\n", dimrole->name);
 	return NULL;
+}
+
+// for ASTMemberFn_PrevMember
+void *interpret_prevmember(void *md_ctx, void *mrole, void *prembr, void *ctx_tuple, void *cube) {
+    ASTMemberFn_PrevMember *func = prembr;
+    MddMemberRole *mr = mrole;
+
+    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
+        if (!func->mr_up) {
+            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+            thrd_mam->exception_desc = "exception: function: interpret_prevmember.";
+            longjmp(thrd_mam->excep_ctx_env, -1);
+        }
+
+        mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
+        if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole) {
+            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+            thrd_mam->exception_desc = "exception: function: interpret_prevmember.";
+            longjmp(thrd_mam->excep_ctx_env, -1);
+        }
+    }
+
+	int i, len;
+	Member *prev = NULL;
+
+	if (mr->dim_role->gid)
+	{
+		// measure
+		len = als_size(((Cube *)cube)->measure_mbrs);
+		if (len < 2)
+			return mr;
+
+		for (i = 0; i < len; i++)
+		{
+			Member *mea_m = als_get(((Cube *)cube)->measure_mbrs, i);
+			if (mea_m->gid >= mr->member->gid)
+				continue;
+			if (prev == NULL || mea_m->gid > prev->gid)
+				prev = mea_m;
+		}
+		return prev ? mdd_mr__create(prev, mr->dim_role) : mr;
+	}
+
+	len = als_size(member_pool);
+	for (i = 0; i < len; i++)
+	{
+		Member *member = als_get(member_pool, i);
+		if ((member->dim_gid != mr->member->dim_gid) || (member->lv != mr->member->lv))
+			continue;
+		if (member->gid >= mr->member->gid)
+			continue;
+		if (prev == NULL || member->gid > prev->gid)
+			prev = member;
+	}
+	return prev ? mdd_mr__create(prev, mr->dim_role) : mr;
 }

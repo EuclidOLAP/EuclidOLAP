@@ -305,12 +305,12 @@ void BooleanExpression_addTerm(BooleanExpression *exp, BooleanTerm *term)
 //     return mam_alloc(sizeof(ASTMemberFunc_CurrentMember), OBJ_TYPE__ASTMemberFunc_CurrentMember, NULL, 0);
 // }
 
-ASTMemberFunc_PrevMember *ASTMemberFunc_PrevMember_creat(MemberDef *m_def)
-{
-    ASTMemberFunc_PrevMember *fn = mam_alloc(sizeof(ASTMemberFunc_PrevMember), OBJ_TYPE__ASTMemberFunc_PrevMember, NULL, 0);
-    fn->curr_mr = m_def;
-    return fn;
-}
+// ASTMemberFunc_PrevMember *ASTMemberFunc_PrevMember_creat(MemberDef *m_def)
+// {
+//     ASTMemberFunc_PrevMember *fn = mam_alloc(sizeof(ASTMemberFunc_PrevMember), OBJ_TYPE__ASTMemberFunc_PrevMember, NULL, 0);
+//     fn->curr_mr = m_def;
+//     return fn;
+// }
 
 ASTMemberFunc_ParallelPeriod *ASTMemberFunc_ParallelPeriod_creat(LevelRoleDef *lvDef, Expression *idx, MemberDef *mDef)
 {

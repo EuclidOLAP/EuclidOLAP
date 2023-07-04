@@ -24,4 +24,14 @@ typedef struct
 // for ASTMemberFn_CurrentMember
 void *interpret_currentmember(void *md_ctx, void *drole, void *curmbr, void *ctx_tuple, void *cube);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mr_up;
+} ASTMemberFn_PrevMember;
+
+// for ASTMemberFn_PrevMember
+void *interpret_prevmember(void *md_ctx, void *mrole, void *prembr, void *ctx_tuple, void *cube);
+
 #endif
