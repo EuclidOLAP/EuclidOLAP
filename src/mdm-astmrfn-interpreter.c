@@ -76,3 +76,38 @@ void *interpret_parent(void *md_ctx, void *mrole, void *parent, void *ctx_tuple,
     else
         return mr;
 }
+
+// for ASTMemberFn_CurrentMember
+void *interpret_currentmember(void *md_ctx, void *drole, void *curmbr, void *ctx_tuple, void *cube) {
+
+    ASTMemberFn_CurrentMember *func = curmbr;
+    DimensionRole *dimrole = drole;
+
+    if (!dimrole || obj_type_of(dimrole) != OBJ_TYPE__DimensionRole) {
+        if (!func->dr_up) {
+            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+            thrd_mam->exception_desc = "exception: function: interpret_currentmember.";
+            longjmp(thrd_mam->excep_ctx_env, -1);
+        }
+
+        dimrole = up_evolving(md_ctx, func->dr_up, cube, ctx_tuple);
+        if (!dimrole || obj_type_of(dimrole) != OBJ_TYPE__DimensionRole) {
+            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+            thrd_mam->exception_desc = "exception: function: interpret_currentmember.";
+            longjmp(thrd_mam->excep_ctx_env, -1);
+        }
+    }
+
+    MddTuple *context_tuple = ctx_tuple;
+	int mrs_count = als_size(context_tuple->mr_ls);
+
+	for (int i = 0; i < mrs_count; i++)
+	{
+		MddMemberRole *mbrRole = als_get(context_tuple->mr_ls, i);
+        if (dimrole->gid == mbrRole->dim_role->gid)
+            return mbrRole;
+	}
+
+	log_print("[ error ] - ASTMemberFn_CurrentMember do not matching DimensionRole - < %s >\n", dimrole->name);
+	return NULL;
+}

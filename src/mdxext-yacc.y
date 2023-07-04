@@ -1277,11 +1277,32 @@ member_func_parent:
 	}
 ;
 
+member_func_current_member:
+	CURRENT_MEMBER ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_CurrentMember *func = mam_alloc(sizeof(ASTMemberFn_CurrentMember), OBJ_TYPE__ASTMemberFn_CurrentMember, NULL, 0);
+		func->head.interpret = interpret_currentmember;
+		stack_pop(&AST_STACK, (void **) &(func->dr_up));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	CURRENT_MEMBER ROUND_BRACKET_L ROUND_BRACKET_R {
+		ASTMemberFn_CurrentMember *func = mam_alloc(sizeof(ASTMemberFn_CurrentMember), OBJ_TYPE__ASTMemberFn_CurrentMember, NULL, 0);
+		func->head.interpret = interpret_currentmember;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	CURRENT_MEMBER {
+		ASTMemberFn_CurrentMember *func = mam_alloc(sizeof(ASTMemberFn_CurrentMember), OBJ_TYPE__ASTMemberFn_CurrentMember, NULL, 0);
+		func->head.interpret = interpret_currentmember;
+		stack_push(&AST_STACK, func);
+	}
+;
+
 member_function:
 	member_func_parent {}
-  /* |
-	member_func_current_member {}
   |
+	member_func_current_member {}
+  /*
 	member_func_prev_member {}
   |
 	member_func_first_child {}
@@ -1308,14 +1329,8 @@ member_function:
 // ----------------------------------------------------------------------------------------------------
 
 member_function_template:
-	CURRENT_MEMBER ROUND_BRACKET_L dimension_statement ROUND_BRACKET_R {
-		ASTMemberFunc_CurrentMember *cm = ASTMemberFunc_CurrentMember_creat();
-		stack_pop(&AST_STACK, (void **) &(cm->dr_def));
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = cm;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | PREV_MEMBER ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
+
+	PREV_MEMBER ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
 		MemberDef *curr_mr;
 		stack_pop(&AST_STACK, (void **) &curr_mr);
 		ASTMemberFunc_PrevMember *fn = ASTMemberFunc_PrevMember_creat(curr_mr);
@@ -1492,10 +1507,6 @@ member_role_fn_opening_period:
 ;
 
 member_function_template_suffix:
-	mrfn_CurrentMember_suftpl {
-		// Don't do anything
-	}
-  |
 	mrfn_PrevMember_suftpl {
 		// Don't do anything
 	}
@@ -1526,19 +1537,6 @@ member_function_template_suffix:
 ;
 
 
-mrfn_CurrentMember_suftpl:
-	CURRENT_MEMBER {
-		MemberRoleFuncCurrentMember *mr_func = mam_alloc(sizeof(MemberRoleFuncCurrentMember), OBJ_TYPE__MemberRoleFuncCurrentMember, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		stack_push(&AST_STACK, mr_func);
-	}
-  |
-	CURRENT_MEMBER ROUND_BRACKET_L ROUND_BRACKET_R {
-		MemberRoleFuncCurrentMember *mr_func = mam_alloc(sizeof(MemberRoleFuncCurrentMember), OBJ_TYPE__MemberRoleFuncCurrentMember, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		stack_push(&AST_STACK, mr_func);
-	}
-;
 
 mrfn_PrevMember_suftpl:
 	PREV_MEMBER {

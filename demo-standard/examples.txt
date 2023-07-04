@@ -558,6 +558,40 @@ from [Airline A];
 
 ---
 
+with 
+MEmber [Measures].XXX 
+  as ([Measures].[Revenue]) / (paREnt(CurrentMember(Date)), [Measures].[Cost]) 
+select 
+  { ([Measures].[Cost]), ([Measures].XXX) } ON 0, 
+  FIlter(members(Date), ([Measures].[Revenue]) > 350000000) on 1 
+from [Airline A];
+
+---
+
+with 
+member [Starting Point].PPPPPP 
+  as ([Starting Point].Asia) + [Starting Point].[North America]
+member [Measures].MMMMMM 
+  as (paREnt([Starting Point].currentMember), [Measures].Cost) 
+select
+  { ([Measures].Cost), ([Measures].MMMMMM) } on 1,
+  filter(members([Starting Point]), ([Measures].Cost) > 1) on 200 
+from [Airline B] ;
+// where ( [Goods].[ALL].[electronic product].[computer] , Transport.[ALL].railway, [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [completion date].[ALL].[2020].[Q1].[M3] );
+
+---
+
+with 
+member [Aircraft Models].XXX 
+  as (paREnt([Measures].currentMember()), [Aircraft Models].[Boeing]) 
+select 
+  members([Measures]) on 1, 
+  { ( [Aircraft Models].[ATR] ), ([Aircraft Models].XXX) } on 0 
+from [Airline B] 
+where ([Ending Point].[South America]);
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

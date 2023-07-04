@@ -5,7 +5,6 @@
 // void * interpret_ast_mrf_parent
 //     (void *md_context, void *prefix_option, void *ast_member_func, void *context_tuple, void *cube);
 
-
 typedef struct
 {
     ASTFunctionCommonHead head;
@@ -13,7 +12,16 @@ typedef struct
 } ASTMemberFn_Parent;
 
 // for ASTMemberFn_Parent
-void * interpret_parent
-    (void *md_ctx, void *mrole, void *parent, void *ctx_tuple, void *cube);
+void *interpret_parent(void *md_ctx, void *mrole, void *parent, void *ctx_tuple, void *cube);
+
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *dr_up;
+} ASTMemberFn_CurrentMember;
+
+// for ASTMemberFn_CurrentMember
+void *interpret_currentmember(void *md_ctx, void *drole, void *curmbr, void *ctx_tuple, void *cube);
 
 #endif

@@ -300,10 +300,10 @@ void BooleanExpression_addTerm(BooleanExpression *exp, BooleanTerm *term)
     als_add(exp->terms, term);
 }
 
-ASTMemberFunc_CurrentMember *ASTMemberFunc_CurrentMember_creat()
-{
-    return mam_alloc(sizeof(ASTMemberFunc_CurrentMember), OBJ_TYPE__ASTMemberFunc_CurrentMember, NULL, 0);
-}
+// ASTMemberFunc_CurrentMember *ASTMemberFunc_CurrentMember_creat()
+// {
+//     return mam_alloc(sizeof(ASTMemberFunc_CurrentMember), OBJ_TYPE__ASTMemberFunc_CurrentMember, NULL, 0);
+// }
 
 ASTMemberFunc_PrevMember *ASTMemberFunc_PrevMember_creat(MemberDef *m_def)
 {
