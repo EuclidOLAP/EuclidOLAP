@@ -369,29 +369,3 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
     mr_fn->index = _index;
     return mr_fn;
 }
-
-// SetFnBottomOrTopPercent *SetFnBottomOrTopPercent_creat(char type, SetDef *set, Expression *percentage, Expression *exp)
-// {
-//     SetFnBottomOrTopPercent *percent = mam_alloc(sizeof(SetFnBottomOrTopPercent), OBJ_TYPE__SetFnBottomOrTopPercent, NULL, 0);
-//     percent->type = type;
-//     percent->set = set;
-//     percent->percentage = percentage;
-//     percent->exp = exp;
-//     return percent;
-// }
-
-// SetFnUnion *SetFnUnion_creat(ArrayList *setDefs, char opt)
-// {
-//     SetFnUnion *union_ = mam_alloc(sizeof(SetFnUnion), OBJ_TYPE__SetFnUnion, NULL, 0);
-//     union_->set_def_ls = setDefs;
-//     union_->option = opt;
-//     return union_;
-// }
-
-// SetFnIntersect *SetFnIntersect_creat(ArrayList *set_def_ls, char option)
-// {
-//     SetFnIntersect *intersect = mam_alloc(sizeof(SetFnIntersect), OBJ_TYPE__SetFnIntersect, NULL, 0);
-//     intersect->set_def_ls = set_def_ls;
-//     intersect->option = option;
-//     return intersect;
-// }
