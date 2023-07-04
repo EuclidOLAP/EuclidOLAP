@@ -399,24 +399,24 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index);
 
 // SetFnYTD *SetFnYTD_creat(MemberDef *);
 
-#define SET_FN__DESCENDANTS_OPT_SELF                1
-#define SET_FN__DESCENDANTS_OPT_AFTER               2
-#define SET_FN__DESCENDANTS_OPT_BEFORE              3
-#define SET_FN__DESCENDANTS_OPT_BEFORE_AND_AFTER    4
-#define SET_FN__DESCENDANTS_OPT_SELF_AND_AFTER      5
-#define SET_FN__DESCENDANTS_OPT_SELF_AND_BEFORE     6
-#define SET_FN__DESCENDANTS_OPT_SELF_BEFORE_AFTER   7
-#define SET_FN__DESCENDANTS_OPT_LEAVES              8
+// #define SET_FN__DESCENDANTS_OPT_SELF                1
+// #define SET_FN__DESCENDANTS_OPT_AFTER               2
+// #define SET_FN__DESCENDANTS_OPT_BEFORE              3
+// #define SET_FN__DESCENDANTS_OPT_BEFORE_AND_AFTER    4
+// #define SET_FN__DESCENDANTS_OPT_SELF_AND_AFTER      5
+// #define SET_FN__DESCENDANTS_OPT_SELF_AND_BEFORE     6
+// #define SET_FN__DESCENDANTS_OPT_SELF_BEFORE_AFTER   7
+// #define SET_FN__DESCENDANTS_OPT_LEAVES              8
 
-typedef struct SetFn_Descendants
-{
-    MemberDef *mbr_def;
-    LevelRoleDef *lvr_def;
-    Expression *distance;
-    char flag;
-} SetFnDescendants;
+// typedef struct SetFn_Descendants
+// {
+//     MemberDef *mbr_def;
+//     LevelRoleDef *lvr_def;
+//     Expression *distance;
+//     char flag;
+// } SetFnDescendants;
 
-SetFnDescendants *SetFnDescendants_creat(MemberDef *, LevelRoleDef *, Expression *, char);
+// SetFnDescendants *SetFnDescendants_creat(MemberDef *, LevelRoleDef *, Expression *, char);
 
 typedef struct SetFn_Tail
 {

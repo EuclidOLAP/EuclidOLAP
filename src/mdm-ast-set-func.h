@@ -107,4 +107,28 @@ typedef struct
 // for ASTSetFunc_YTD
 void *interpret_ytd(void *md_ctx_, void *mrole_, void *ytd_, void *ctx_tuple_, void *cube_);
 
+
+typedef enum {
+    SELF,
+    AFTER,
+    BEFORE,
+    BEFORE_AND_AFTER,
+    SELF_AND_AFTER,
+    SELF_AND_BEFORE,
+    SELF_BEFORE_AFTER,
+    LEAVES
+} FnDescendantsOpt;
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mrole_def;
+    MDMEntityUniversalPath *lvrole_def;
+    Expression *disexp;
+    FnDescendantsOpt opt;
+} ASTSetFunc_Descendants;
+
+// for ASTSetFunc_Descendants
+void *interpret_descendants(void *md_ctx_, void *nil, void *desc_, void *ctx_tuple_, void *cube_);
+
 #endif

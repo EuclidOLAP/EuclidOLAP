@@ -1362,12 +1362,13 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 		// 	return als_get(set->tuples, 0);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnDescendants)
-		{
-			MddSet *set = SetFnDescendants_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
-			return als_get(set->tuples, 0);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnTail)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnDescendants)
+		// {
+		// 	MddSet *set = SetFnDescendants_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
+		// 	return als_get(set->tuples, 0);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnTail)
 		{
 			MddSet *set = SetFnTail_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
 			return als_get(set->tuples, 0);
@@ -1805,11 +1806,12 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 		// 	return SetFnYTD_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		// }
 		// else 
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnDescendants)
-		{
-			return SetFnDescendants_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnTail)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnDescendants)
+		// {
+		// 	return SetFnDescendants_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnTail)
 		{
 			return SetFnTail_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		}
@@ -2664,136 +2666,136 @@ void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *c
 // 	return result;
 // }
 
-MddSet *SetFnDescendants_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
-{
+// MddSet *SetFnDescendants_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
+// {
 
-	SetFnDescendants *desc = set_fn;
+// 	SetFnDescendants *desc = set_fn;
 
-	MddMemberRole *mr = ids_mbrsdef__build(md_ctx, desc->mbr_def, ctx_tuple, cube);
+// 	MddMemberRole *mr = ids_mbrsdef__build(md_ctx, desc->mbr_def, ctx_tuple, cube);
 
-	MddSet *result = mdd_set__create();
+// 	MddSet *result = mdd_set__create();
 
-	ArrayList *descendants = Member__descendants(mr->member);
+// 	ArrayList *descendants = Member__descendants(mr->member);
 
-	if (desc->lvr_def == NULL && desc->distance == NULL)
-	{
+// 	if (desc->lvr_def == NULL && desc->distance == NULL)
+// 	{
 
-		int i, sz = als_size(descendants);
-		for (i = 0; i < sz; i++)
-		{
-			MddTuple *tuple = mdd_tp__create();
-			mdd_tp__add_mbrole(tuple, mdd_mr__create(als_get(descendants, i), mr->dim_role));
-			mddset__add_tuple(result, tuple);
-		}
-		return result;
-	}
+// 		int i, sz = als_size(descendants);
+// 		for (i = 0; i < sz; i++)
+// 		{
+// 			MddTuple *tuple = mdd_tp__create();
+// 			mdd_tp__add_mbrole(tuple, mdd_mr__create(als_get(descendants, i), mr->dim_role));
+// 			mddset__add_tuple(result, tuple);
+// 		}
+// 		return result;
+// 	}
 
-	if (desc->lvr_def)
-	{
-		LevelRole *lr = LevelRoleDef_interpret(md_ctx, desc->lvr_def, ctx_tuple, cube);
+// 	if (desc->lvr_def)
+// 	{
+// 		LevelRole *lr = LevelRoleDef_interpret(md_ctx, desc->lvr_def, ctx_tuple, cube);
 
-		int i, sz = als_size(descendants);
-		for (i = 0; i < sz; i++)
-		{
-			Member *mbr = als_get(descendants, i);
-			switch (desc->flag)
-			{
-			case SET_FN__DESCENDANTS_OPT_SELF:
-				if (mbr->lv != lr->lv->level)
-					continue;
-				break;
-			case SET_FN__DESCENDANTS_OPT_AFTER:
-				if (mbr->lv <= lr->lv->level)
-					continue;
-				break;
-			case SET_FN__DESCENDANTS_OPT_BEFORE:
-				if (mbr->lv >= lr->lv->level)
-					continue;
-				break;
-			case SET_FN__DESCENDANTS_OPT_BEFORE_AND_AFTER:
-				if (mbr->lv == lr->lv->level)
-					continue;
-				break;
-			case SET_FN__DESCENDANTS_OPT_SELF_AND_AFTER:
-				if (mbr->lv < lr->lv->level)
-					continue;
-				break;
-			case SET_FN__DESCENDANTS_OPT_SELF_AND_BEFORE:
-				if (mbr->lv > lr->lv->level)
-					continue;
-				break;
-			case SET_FN__DESCENDANTS_OPT_SELF_BEFORE_AFTER:
-				// do nothing
-				break;
-			case SET_FN__DESCENDANTS_OPT_LEAVES:
-				if (mdd_mbr__is_leaf(mbr) == 0 || mbr->lv > lr->lv->level)
-					continue;
-				break;
-			default:
-				log_print("[ error ] program exit, cause by: worry value of set function Descendants option flag < %c >\n", desc->flag);
-				exit(1);
-			}
-			MddTuple *tuple = mdd_tp__create();
-			mdd_tp__add_mbrole(tuple, mdd_mr__create(mbr, mr->dim_role));
-			mddset__add_tuple(result, tuple);
-		}
-		return result;
-	}
+// 		int i, sz = als_size(descendants);
+// 		for (i = 0; i < sz; i++)
+// 		{
+// 			Member *mbr = als_get(descendants, i);
+// 			switch (desc->flag)
+// 			{
+// 			case SET_FN__DESCENDANTS_OPT_SELF:
+// 				if (mbr->lv != lr->lv->level)
+// 					continue;
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_AFTER:
+// 				if (mbr->lv <= lr->lv->level)
+// 					continue;
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_BEFORE:
+// 				if (mbr->lv >= lr->lv->level)
+// 					continue;
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_BEFORE_AND_AFTER:
+// 				if (mbr->lv == lr->lv->level)
+// 					continue;
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_SELF_AND_AFTER:
+// 				if (mbr->lv < lr->lv->level)
+// 					continue;
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_SELF_AND_BEFORE:
+// 				if (mbr->lv > lr->lv->level)
+// 					continue;
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_SELF_BEFORE_AFTER:
+// 				// do nothing
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_LEAVES:
+// 				if (mdd_mbr__is_leaf(mbr) == 0 || mbr->lv > lr->lv->level)
+// 					continue;
+// 				break;
+// 			default:
+// 				log_print("[ error ] program exit, cause by: worry value of set function Descendants option flag < %c >\n", desc->flag);
+// 				exit(1);
+// 			}
+// 			MddTuple *tuple = mdd_tp__create();
+// 			mdd_tp__add_mbrole(tuple, mdd_mr__create(mbr, mr->dim_role));
+// 			mddset__add_tuple(result, tuple);
+// 		}
+// 		return result;
+// 	}
 
-	if (desc->distance)
-	{
-		GridData data;
-		Expression_evaluate(md_ctx, desc->distance, cube, ctx_tuple, &data);
-		int stan_lv = mr->member->lv + data.val;
+// 	if (desc->distance)
+// 	{
+// 		GridData data;
+// 		Expression_evaluate(md_ctx, desc->distance, cube, ctx_tuple, &data);
+// 		int stan_lv = mr->member->lv + data.val;
 
-		int i, sz = als_size(descendants);
-		for (i = 0; i < sz; i++)
-		{
-			Member *mbr = als_get(descendants, i);
-			switch (desc->flag)
-			{
-			case SET_FN__DESCENDANTS_OPT_SELF:
-				if (mbr->lv != stan_lv)
-					continue;
-				break;
-			case SET_FN__DESCENDANTS_OPT_AFTER:
-				if (mbr->lv <= stan_lv)
-					continue;
-				break;
-			case SET_FN__DESCENDANTS_OPT_BEFORE:
-				if (mbr->lv >= stan_lv)
-					continue;
-				break;
-			case SET_FN__DESCENDANTS_OPT_BEFORE_AND_AFTER:
-				if (mbr->lv == stan_lv)
-					continue;
-				break;
-			case SET_FN__DESCENDANTS_OPT_SELF_AND_AFTER:
-				if (mbr->lv < stan_lv)
-					continue;
-				break;
-			case SET_FN__DESCENDANTS_OPT_SELF_AND_BEFORE:
-				if (mbr->lv > stan_lv)
-					continue;
-				break;
-			case SET_FN__DESCENDANTS_OPT_SELF_BEFORE_AFTER:
-				// do nothing
-				break;
-			case SET_FN__DESCENDANTS_OPT_LEAVES:
-				if (mdd_mbr__is_leaf(mbr) == 0 || mbr->lv > stan_lv)
-					continue;
-				break;
-			default:
-				log_print("[ error ] program exit, cause by: worry value of set function Descendants option flag < %c >\n", desc->flag);
-				exit(1);
-			}
-			MddTuple *tuple = mdd_tp__create();
-			mdd_tp__add_mbrole(tuple, mdd_mr__create(mbr, mr->dim_role));
-			mddset__add_tuple(result, tuple);
-		}
-		return result;
-	}
-}
+// 		int i, sz = als_size(descendants);
+// 		for (i = 0; i < sz; i++)
+// 		{
+// 			Member *mbr = als_get(descendants, i);
+// 			switch (desc->flag)
+// 			{
+// 			case SET_FN__DESCENDANTS_OPT_SELF:
+// 				if (mbr->lv != stan_lv)
+// 					continue;
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_AFTER:
+// 				if (mbr->lv <= stan_lv)
+// 					continue;
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_BEFORE:
+// 				if (mbr->lv >= stan_lv)
+// 					continue;
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_BEFORE_AND_AFTER:
+// 				if (mbr->lv == stan_lv)
+// 					continue;
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_SELF_AND_AFTER:
+// 				if (mbr->lv < stan_lv)
+// 					continue;
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_SELF_AND_BEFORE:
+// 				if (mbr->lv > stan_lv)
+// 					continue;
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_SELF_BEFORE_AFTER:
+// 				// do nothing
+// 				break;
+// 			case SET_FN__DESCENDANTS_OPT_LEAVES:
+// 				if (mdd_mbr__is_leaf(mbr) == 0 || mbr->lv > stan_lv)
+// 					continue;
+// 				break;
+// 			default:
+// 				log_print("[ error ] program exit, cause by: worry value of set function Descendants option flag < %c >\n", desc->flag);
+// 				exit(1);
+// 			}
+// 			MddTuple *tuple = mdd_tp__create();
+// 			mdd_tp__add_mbrole(tuple, mdd_mr__create(mbr, mr->dim_role));
+// 			mddset__add_tuple(result, tuple);
+// 		}
+// 		return result;
+// 	}
+// }
 
 MddSet *SetFnTail_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
 {
@@ -3773,8 +3775,8 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	// } else if (_type == OBJ_TYPE__SetFnYTD) {
 	// 	return SetFnYTD_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
-	} else if (_type == OBJ_TYPE__SetFnDescendants) {
-		return SetFnDescendants_evolving(md_ctx, seg_0, cube, ctx_tuple);
+	// } else if (_type == OBJ_TYPE__SetFnDescendants) {
+	// 	return SetFnDescendants_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
 	} else if (_type == OBJ_TYPE__SetFnTail) {
 		return SetFnTail_evolving(md_ctx, seg_0, cube, ctx_tuple);

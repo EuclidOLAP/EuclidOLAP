@@ -2,6 +2,7 @@
 
 #include "md-model.h"
 #include "mdd.h"
+#include "log.h"
 #include "mdm-ast-set-func.h"
 
 extern ArrayList *dims_pool;
@@ -444,4 +445,146 @@ void *interpret_ytd(void *md_ctx_, void *mrole_, void *ytd_, void *ctx_tuple_, v
 	}
 
 	return result;
+}
+
+// for ASTSetFunc_Descendants
+void *interpret_descendants(void *md_ctx_, void *nil, void *desc_, void *ctx_tuple_, void *cube_) {
+
+	ASTSetFunc_Descendants *descfn = desc_;
+
+	// MddMemberRole *mr = ids_mbrsdef__build(md_ctx, desc->mbr_def, ctx_tuple, cube);
+	MddMemberRole *mrole = up_evolving(md_ctx_, descfn->mrole_def, cube_, ctx_tuple_);
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
+        MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+        thrd_mam->exception_desc = "Function interpret_descendants throws an exception.";
+        longjmp(thrd_mam->excep_ctx_env, -1);
+	}
+
+	MddSet *result = mdd_set__create();
+
+	ArrayList *descendants = Member__descendants(mrole->member);
+
+	if (descfn->lvrole_def == NULL && descfn->disexp == NULL)
+	{
+
+		int i, sz = als_size(descendants);
+		for (i = 0; i < sz; i++)
+		{
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, mdd_mr__create(als_get(descendants, i), mrole->dim_role));
+			mddset__add_tuple(result, tuple);
+		}
+		return result;
+	}
+
+	if (descfn->lvrole_def)
+	{
+		LevelRole *lvrole = up_evolving(md_ctx_, descfn->lvrole_def, cube_, ctx_tuple_);
+		if (!lvrole || obj_type_of(lvrole) != OBJ_TYPE__LevelRole) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "Function interpret_descendants throws an exception.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+
+		int i, sz = als_size(descendants);
+		for (i = 0; i < sz; i++)
+		{
+			Member *mbr = als_get(descendants, i);
+			switch (descfn->opt)
+			{
+			case SELF:
+				if (mbr->lv != lvrole->lv->level)
+					continue;
+				break;
+			case AFTER:
+				if (mbr->lv <= lvrole->lv->level)
+					continue;
+				break;
+			case BEFORE:
+				if (mbr->lv >= lvrole->lv->level)
+					continue;
+				break;
+			case BEFORE_AND_AFTER:
+				if (mbr->lv == lvrole->lv->level)
+					continue;
+				break;
+			case SELF_AND_AFTER:
+				if (mbr->lv < lvrole->lv->level)
+					continue;
+				break;
+			case SELF_AND_BEFORE:
+				if (mbr->lv > lvrole->lv->level)
+					continue;
+				break;
+			case SELF_BEFORE_AFTER:
+				// do nothing
+				break;
+			case LEAVES:
+				if (mdd_mbr__is_leaf(mbr) == 0 || mbr->lv > lvrole->lv->level)
+					continue;
+				break;
+			default:
+				log_print("[ error ] program exit, cause by: worry value of set function Descendants option.\n");
+				exit(1);
+			}
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, mdd_mr__create(mbr, mrole->dim_role));
+			mddset__add_tuple(result, tuple);
+		}
+		return result;
+	}
+
+	if (descfn->disexp)
+	{
+		GridData data;
+		Expression_evaluate(md_ctx_, descfn->disexp, cube_, ctx_tuple_, &data);
+		int stan_lv = mrole->member->lv + data.val;
+
+		int i, sz = als_size(descendants);
+		for (i = 0; i < sz; i++)
+		{
+			Member *mbr = als_get(descendants, i);
+			switch (descfn->opt)
+			{
+			case SELF:
+				if (mbr->lv != stan_lv)
+					continue;
+				break;
+			case AFTER:
+				if (mbr->lv <= stan_lv)
+					continue;
+				break;
+			case BEFORE:
+				if (mbr->lv >= stan_lv)
+					continue;
+				break;
+			case BEFORE_AND_AFTER:
+				if (mbr->lv == stan_lv)
+					continue;
+				break;
+			case SELF_AND_AFTER:
+				if (mbr->lv < stan_lv)
+					continue;
+				break;
+			case SELF_AND_BEFORE:
+				if (mbr->lv > stan_lv)
+					continue;
+				break;
+			case SELF_BEFORE_AFTER:
+				// do nothing
+				break;
+			case LEAVES:
+				if (mdd_mbr__is_leaf(mbr) == 0 || mbr->lv > stan_lv)
+					continue;
+				break;
+			default:
+				log_print("[ error ] program exit, cause by: worry value of set function Descendants option.\n");
+				exit(1);
+			}
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, mdd_mr__create(mbr, mrole->dim_role));
+			mddset__add_tuple(result, tuple);
+		}
+		return result;
+	}
 }

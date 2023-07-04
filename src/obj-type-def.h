@@ -57,6 +57,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTSetFunc_TopCount     407
 #define OBJ_TYPE__ASTSetFunc_Except       408
 #define OBJ_TYPE__ASTSetFunc_YTD          409
+#define OBJ_TYPE__ASTSetFunc_Descendants          410
 #define OBJ_TYPE__AST_SET_FUNC_MAX        500
 
 
@@ -124,7 +125,7 @@ typedef short type_obj;
 #define OBJ_TYPE__SetFnBottomOrTopPercent 10060
 // #define OBJ_TYPE__SetFnChildren 10061
 // #define OBJ_TYPE__SetFnCrossJoin 10062
-#define OBJ_TYPE__SetFnDescendants 10063
+// #define OBJ_TYPE__SetFnDescendants 10063
 // #define OBJ_TYPE__SetFnExcept 10064
 // #define OBJ_TYPE__SetFnFilter 10065
 #define OBJ_TYPE__SetFnIntersect 10066

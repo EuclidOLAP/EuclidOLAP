@@ -460,6 +460,30 @@ where (Date.[ALL].[2021].Q4.M12);
 
 ---
 
+with 
+set SSSSSS 
+    as filter(descendants(Date.Calendar.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].[Cost]) > 1) 
+member [Measures].XXXXXX 
+    as ([Measures].[Cost]) - 20000 
+select 
+    topPercent(SSSSSS, 25, ([Measures].[Cost])) on 10, 
+    {([Measures].XXXXXX)} on 1 
+from [Airline A] ;
+
+---
+
+with 
+set SSSSSS 
+    as filter(descendants(Date.Calendar.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].[Revenue]) > 1) 
+member [Measures].XXXXXX 
+    as ([Measures].[Revenue]) - 20000 
+select 
+    topPercent(SSSSSS, 25, ([Measures].[Revenue])) on 10, 
+    {([Measures].XXXXXX)} on 1 
+from [Airline B] ;
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
