@@ -1023,29 +1023,27 @@ set_func_tail:
 	}
 ;
 
-// todo redo +suffix
 set_func_bottompercent:
 	BOTTOM_PERCENT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
-		Expression *exp;
-		stack_pop(&AST_STACK, (void **) &exp);
-		Expression *percentage;
-		stack_pop(&AST_STACK, (void **) &percentage);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		stack_push(&AST_STACK, SetFnBottomOrTopPercent_creat(SET_FN__BOTTOM_PERCENT, set, percentage, exp));
+		ASTSetFunc_BottomOrTopPercent *func = mam_alloc(sizeof(ASTSetFunc_BottomOrTopPercent), OBJ_TYPE__ASTSetFunc_BottomOrTopPercent, NULL, 0);
+		func->head.interpret = interpret_bottomortoppercent;
+		stack_pop(&AST_STACK, (void **)&(func->exp));
+		stack_pop(&AST_STACK, (void **)&(func->percentage));
+		stack_pop(&AST_STACK, (void **)&(func->set));
+		func->option = BOTTOM_PER;
+		stack_push(&AST_STACK, func);
 	}
 ;
 
-// todo redo +suffix
 set_func_toppercent:
 	TOP_PERCENT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
-		Expression *exp;
-		stack_pop(&AST_STACK, (void **) &exp);
-		Expression *percentage;
-		stack_pop(&AST_STACK, (void **) &percentage);
-		SetDef *set;
-		stack_pop(&AST_STACK, (void **) &set);
-		stack_push(&AST_STACK, SetFnBottomOrTopPercent_creat(SET_FN__TOP_PERCENT, set, percentage, exp));
+		ASTSetFunc_BottomOrTopPercent *func = mam_alloc(sizeof(ASTSetFunc_BottomOrTopPercent), OBJ_TYPE__ASTSetFunc_BottomOrTopPercent, NULL, 0);
+		func->head.interpret = interpret_bottomortoppercent;
+		stack_pop(&AST_STACK, (void **)&(func->exp));
+		stack_pop(&AST_STACK, (void **)&(func->percentage));
+		stack_pop(&AST_STACK, (void **)&(func->set));
+		func->option = TOP_PER;
+		stack_push(&AST_STACK, func);
 	}
 ;
 

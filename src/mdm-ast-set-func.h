@@ -143,4 +143,22 @@ typedef struct
 void *interpret_tail(void *md_ctx_, void *nil, void *tail_, void *ctx_tuple_, void *cube_);
 
 
+typedef enum
+{
+    BOTTOM_PER,
+    TOP_PER
+} FnBottomTopPercentOpt;
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *set;
+    Expression *percentage;
+    Expression *exp;
+    FnBottomTopPercentOpt option;
+} ASTSetFunc_BottomOrTopPercent;
+
+// for ASTSetFunc_BottomOrTopPercent
+void *interpret_bottomortoppercent(void *md_ctx_, void *nil, void *percent_, void *ctx_tuple_, void *cube_);
+
 #endif

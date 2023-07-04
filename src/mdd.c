@@ -1306,12 +1306,13 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 	}
 	else if (set_def->t_cons == SET_DEF__SET_FUNCTION)
 	{
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnBottomOrTopPercent)
-		{
-			MddSet *set = SetFnBottomOrTopPercent_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
-			return als_get(set->tuples, 0);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnUnion)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnBottomOrTopPercent)
+		// {
+		// 	MddSet *set = SetFnBottomOrTopPercent_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
+		// 	return als_get(set->tuples, 0);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnUnion)
 		{
 			MddSet *set = SetFnUnion_evolving(md_ctx, set_def->set_fn, cube, context_tuple);
 			return als_get(set->tuples, 0);
@@ -1695,11 +1696,12 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 	}
 	else if (set_def->t_cons == SET_DEF__SET_FUNCTION)
 	{
-		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnBottomOrTopPercent)
-		{
-			return SetFnBottomOrTopPercent_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
-		}
-		else if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnUnion)
+		// if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnBottomOrTopPercent)
+		// {
+		// 	return SetFnBottomOrTopPercent_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
+		// }
+		// else 
+		if (obj_type_of(set_def->set_fn) == OBJ_TYPE__SetFnUnion)
 		{
 			return SetFnUnion_evolving(md_ctx, set_def->set_fn, cube, ctx_tuple);
 		}
@@ -2174,74 +2176,74 @@ void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *c
 }
 
 
-MddSet *SetFnBottomOrTopPercent_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
-{
-	SetFnBottomOrTopPercent *per = set_fn;
-	MddSet *set = ids_setdef__build(md_ctx, per->set, ctx_tuple, cube);
-	GridData data;
-	Expression_evaluate(md_ctx, per->percentage, cube, ctx_tuple, &data);
-	double global = 0, percent = data.val / 100;
-	ArrayList *vals = als_new(128, "double", THREAD_MAM, NULL);
-	int i, j, sz = als_size(set->tuples);
-	for (i = 0; i < sz; i++)
-	{
-		Expression_evaluate(md_ctx, per->exp, cube, tuple__merge(ctx_tuple, als_get(set->tuples, i)), &data);
-		als_add(vals, *((void **)&data.val));
-		global += data.val;
-	}
+// MddSet *SetFnBottomOrTopPercent_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
+// {
+// 	SetFnBottomOrTopPercent *per = set_fn;
+// 	MddSet *set = ids_setdef__build(md_ctx, per->set, ctx_tuple, cube);
+// 	GridData data;
+// 	Expression_evaluate(md_ctx, per->percentage, cube, ctx_tuple, &data);
+// 	double global = 0, percent = data.val / 100;
+// 	ArrayList *vals = als_new(128, "double", THREAD_MAM, NULL);
+// 	int i, j, sz = als_size(set->tuples);
+// 	for (i = 0; i < sz; i++)
+// 	{
+// 		Expression_evaluate(md_ctx, per->exp, cube, tuple__merge(ctx_tuple, als_get(set->tuples, i)), &data);
+// 		als_add(vals, *((void **)&data.val));
+// 		global += data.val;
+// 	}
 
-	for (i = 1; i < sz; i++)
-	{
-		for (j = i; j > 0; j--)
-		{
-			void *va = als_get(vals, j - 1);
-			void *vb = als_get(vals, j);
+// 	for (i = 1; i < sz; i++)
+// 	{
+// 		for (j = i; j > 0; j--)
+// 		{
+// 			void *va = als_get(vals, j - 1);
+// 			void *vb = als_get(vals, j);
 
-			double val_a = *((double *)&va);
-			double val_b = *((double *)&vb);
+// 			double val_a = *((double *)&va);
+// 			double val_b = *((double *)&vb);
 
-			if (per->type == SET_FN__BOTTOM_PERCENT)
-			{
-				if (val_a <= val_b)
-					continue;
-			}
-			else
-			{ // per->type == SET_FN__TOP_PERCENT
-				if (val_a >= val_b)
-					continue;
-			}
-			ArrayList_set(vals, j - 1, vb);
-			ArrayList_set(vals, j, va);
-			MddTuple *tmp = als_get(set->tuples, j - 1);
-			ArrayList_set(set->tuples, j - 1, als_get(set->tuples, j));
-			ArrayList_set(set->tuples, j, tmp);
-		}
-	}
+// 			if (per->type == SET_FN__BOTTOM_PERCENT)
+// 			{
+// 				if (val_a <= val_b)
+// 					continue;
+// 			}
+// 			else
+// 			{ // per->type == SET_FN__TOP_PERCENT
+// 				if (val_a >= val_b)
+// 					continue;
+// 			}
+// 			ArrayList_set(vals, j - 1, vb);
+// 			ArrayList_set(vals, j, va);
+// 			MddTuple *tmp = als_get(set->tuples, j - 1);
+// 			ArrayList_set(set->tuples, j - 1, als_get(set->tuples, j));
+// 			ArrayList_set(set->tuples, j, tmp);
+// 		}
+// 	}
 
-	MddSet *result = mdd_set__create();
-	if (als_size(set->tuples) < 1)
-		return result;
+// 	MddSet *result = mdd_set__create();
+// 	if (als_size(set->tuples) < 1)
+// 		return result;
 
-	if (global <= 0)
-	{
-		mddset__add_tuple(result, als_get(set->tuples, 0));
-		return result;
-	}
+// 	if (global <= 0)
+// 	{
+// 		mddset__add_tuple(result, als_get(set->tuples, 0));
+// 		return result;
+// 	}
 
-	double part = 0;
-	for (i = 0; i < sz; i++)
-	{
-		mddset__add_tuple(result, als_get(set->tuples, i));
-		void *vi = als_get(vals, i);
-		part += *((double *)&vi);
-		if (part >= percent * global)
-		{ // part / global >= percent
-			return result;
-		}
-	}
+// 	double part = 0;
+// 	for (i = 0; i < sz; i++)
+// 	{
+// 		mddset__add_tuple(result, als_get(set->tuples, i));
+// 		void *vi = als_get(vals, i);
+// 		part += *((double *)&vi);
+// 		if (part >= percent * global)
+// 		{ // part / global >= percent
+// 			return result;
+// 		}
+// 	}
 
-	return result;
-}
+// 	return result;
+// }
 
 MddSet *SetFnUnion_evolving(MDContext *md_ctx, void *set_fn, Cube *cube, MddTuple *ctx_tuple)
 {
@@ -2992,8 +2994,8 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	if (_type == OBJ_TYPE__MemberDef) {
 		return ids_mbrsdef__build(md_ctx, (MemberDef *)seg_0, ctx_tuple, cube);
 		
-	} else if (_type == OBJ_TYPE__SetFnBottomOrTopPercent) {
-		return SetFnBottomOrTopPercent_evolving(md_ctx, seg_0, cube, ctx_tuple);
+	// } else if (_type == OBJ_TYPE__SetFnBottomOrTopPercent) {
+	// 	return SetFnBottomOrTopPercent_evolving(md_ctx, seg_0, cube, ctx_tuple);
 		
 	} else if (_type == OBJ_TYPE__SetFnUnion) {
 		return SetFnUnion_evolving(md_ctx, seg_0, cube, ctx_tuple);

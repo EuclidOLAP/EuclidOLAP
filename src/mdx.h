@@ -323,18 +323,18 @@ typedef struct Member_Role_Fn_Lag_
 ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index);
 
 
-#define SET_FN__BOTTOM_PERCENT  1
-#define SET_FN__TOP_PERCENT     2
+// #define SET_FN__BOTTOM_PERCENT  1
+// #define SET_FN__TOP_PERCENT     2
 
-typedef struct SetFn_Bottom_Or_Top_Percent
-{
-    SetDef *set;
-    Expression *percentage;
-    Expression *exp;
-    char type;
-} SetFnBottomOrTopPercent;
+// typedef struct SetFn_Bottom_Or_Top_Percent
+// {
+//     SetDef *set;
+//     Expression *percentage;
+//     Expression *exp;
+//     char type;
+// } SetFnBottomOrTopPercent;
 
-SetFnBottomOrTopPercent *SetFnBottomOrTopPercent_creat(char type, SetDef *set, Expression *percentage, Expression *exp);
+// SetFnBottomOrTopPercent *SetFnBottomOrTopPercent_creat(char type, SetDef *set, Expression *percentage, Expression *exp);
 
 #define SET_FN__UNION_ALL  1
 

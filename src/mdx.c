@@ -370,15 +370,15 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
     return mr_fn;
 }
 
-SetFnBottomOrTopPercent *SetFnBottomOrTopPercent_creat(char type, SetDef *set, Expression *percentage, Expression *exp)
-{
-    SetFnBottomOrTopPercent *percent = mam_alloc(sizeof(SetFnBottomOrTopPercent), OBJ_TYPE__SetFnBottomOrTopPercent, NULL, 0);
-    percent->type = type;
-    percent->set = set;
-    percent->percentage = percentage;
-    percent->exp = exp;
-    return percent;
-}
+// SetFnBottomOrTopPercent *SetFnBottomOrTopPercent_creat(char type, SetDef *set, Expression *percentage, Expression *exp)
+// {
+//     SetFnBottomOrTopPercent *percent = mam_alloc(sizeof(SetFnBottomOrTopPercent), OBJ_TYPE__SetFnBottomOrTopPercent, NULL, 0);
+//     percent->type = type;
+//     percent->set = set;
+//     percent->percentage = percentage;
+//     percent->exp = exp;
+//     return percent;
+// }
 
 SetFnUnion *SetFnUnion_creat(ArrayList *setDefs, char opt)
 {

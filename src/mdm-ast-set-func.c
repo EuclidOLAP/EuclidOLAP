@@ -615,3 +615,72 @@ void *interpret_tail(void *md_ctx_, void *nil, void *tail_, void *ctx_tuple_, vo
 	}
 	return result;
 }
+
+// for ASTSetFunc_BottomOrTopPercent
+void *interpret_bottomortoppercent(void *md_ctx_, void *nil, void *percent_, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_BottomOrTopPercent *per = percent_;
+	MddSet *set = ids_setdef__build(md_ctx_, per->set, ctx_tuple_, cube_);
+	GridData data;
+	Expression_evaluate(md_ctx_, per->percentage, cube_, ctx_tuple_, &data);
+	double global = 0, percent = data.val / 100;
+	ArrayList *vals = als_new(128, "double", THREAD_MAM, NULL);
+	int i, j, sz = als_size(set->tuples);
+	for (i = 0; i < sz; i++)
+	{
+		Expression_evaluate(md_ctx_, per->exp, cube_, tuple__merge(ctx_tuple_, als_get(set->tuples, i)), &data);
+		als_add(vals, *((void **)&data.val));
+		global += data.val;
+	}
+
+	for (i = 1; i < sz; i++)
+	{
+		for (j = i; j > 0; j--)
+		{
+			void *va = als_get(vals, j - 1);
+			void *vb = als_get(vals, j);
+
+			double val_a = *((double *)&va);
+			double val_b = *((double *)&vb);
+
+			if (per->option == BOTTOM_PER)
+			{
+				if (val_a <= val_b)
+					continue;
+			}
+			else
+			{ // per->option == TOP_PER
+				if (val_a >= val_b)
+					continue;
+			}
+			ArrayList_set(vals, j - 1, vb);
+			ArrayList_set(vals, j, va);
+			MddTuple *tmp = als_get(set->tuples, j - 1);
+			ArrayList_set(set->tuples, j - 1, als_get(set->tuples, j));
+			ArrayList_set(set->tuples, j, tmp);
+		}
+	}
+
+	MddSet *result = mdd_set__create();
+	if (als_size(set->tuples) < 1)
+		return result;
+
+	if (global <= 0)
+	{
+		mddset__add_tuple(result, als_get(set->tuples, 0));
+		return result;
+	}
+
+	double part = 0;
+	for (i = 0; i < sz; i++)
+	{
+		mddset__add_tuple(result, als_get(set->tuples, i));
+		void *vi = als_get(vals, i);
+		part += *((double *)&vi);
+		if (part >= percent * global)
+		{ // part / global >= percent
+			return result;
+		}
+	}
+
+	return result;
+}
