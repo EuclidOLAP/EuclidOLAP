@@ -289,11 +289,11 @@ typedef struct Member_Role_Fn_Opening_Period_
 ASTMemberFunc_OpeningPeriod *ASTMemberFunc_OpeningPeriod_creat(LevelRoleDef *lvr, MemberDef *mr);
 
 
-typedef struct Member_Role_Fn_FirstChild_
-{
-    MemberDef *mr_def;
-} ASTMemberFunc_FirstChild;
-ASTMemberFunc_FirstChild *ASTMemberFunc_FirstChild_creat(MemberDef *mr);
+// typedef struct Member_Role_Fn_FirstChild_
+// {
+//     MemberDef *mr_def;
+// } ASTMemberFunc_FirstChild;
+// ASTMemberFunc_FirstChild *ASTMemberFunc_FirstChild_creat(MemberDef *mr);
 
 typedef struct Member_Role_Fn_LastChild_
 {
@@ -360,10 +360,10 @@ ExpFnCoalesceEmpty *ExpFnCoalesceEmpty_creat(ArrayList *exp_ls);
 
 // } MemberRoleFuncPrevMember;
 
-typedef struct _member_role_func_firstchild_ {
-    char suf_flag;
+// typedef struct _member_role_func_firstchild_ {
+//     char suf_flag;
 
-} MemberRoleFuncFirstChild;
+// } MemberRoleFuncFirstChild;
 
 typedef struct _member_role_func_lastchild_ {
     char suf_flag;

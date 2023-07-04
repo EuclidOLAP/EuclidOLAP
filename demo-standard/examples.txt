@@ -616,6 +616,13 @@ where ( [Classes of Service].[Premium Business], [Aircraft Models].[Boeing].[Boe
 
 ---
 
+select 
+members([Measures]) on 1, 
+{ [Date].[ALL].[2020].FirstChild() } on 0 
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

@@ -1536,11 +1536,11 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 			member_role_ = ASTMemberFunc_OpeningPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
 		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_FirstChild)
-		{
-			member_role_ = ASTMemberFunc_FirstChild_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
-			return member_role_;
-		}
+		// else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_FirstChild)
+		// {
+		// 	member_role_ = ASTMemberFunc_FirstChild_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+		// 	return member_role_;
+		// }
 		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_LastChild)
 		{
 			member_role_ = ASTMemberFunc_LastChild_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
@@ -2505,18 +2505,18 @@ MddMemberRole *ASTMemberFunc_OpeningPeriod_evolving(MDContext *md_ctx, ASTMember
 }
 
 
-MddMemberRole *ASTMemberFunc_FirstChild_evolving(MDContext *md_ctx, ASTMemberFunc_FirstChild *mr_fn, MddTuple *context_tuple, Cube *cube) {
-	MddMemberRole *parent_mr = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
-	Member *member = NULL;
-	for (int i=0; i<als_size(member_pool); i++) {
-		Member *m = als_get(member_pool, i);
-		if (m->p_gid != parent_mr->member->gid)
-			continue;
-		if (member == NULL || m->gid < member->gid)
-			member = m;
-	}
-	return mdd_mr__create(member, parent_mr->dim_role);
-}
+// MddMemberRole *ASTMemberFunc_FirstChild_evolving(MDContext *md_ctx, ASTMemberFunc_FirstChild *mr_fn, MddTuple *context_tuple, Cube *cube) {
+// 	MddMemberRole *parent_mr = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
+// 	Member *member = NULL;
+// 	for (int i=0; i<als_size(member_pool); i++) {
+// 		Member *m = als_get(member_pool, i);
+// 		if (m->p_gid != parent_mr->member->gid)
+// 			continue;
+// 		if (member == NULL || m->gid < member->gid)
+// 			member = m;
+// 	}
+// 	return mdd_mr__create(member, parent_mr->dim_role);
+// }
 
 MddMemberRole *ASTMemberFunc_LastChild_evolving(MDContext *md_ctx, ASTMemberFunc_LastChild *mr_fn, MddTuple *context_tuple, Cube *cube) {
 	MddMemberRole *parent_mr = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);

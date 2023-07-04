@@ -1319,15 +1319,36 @@ member_func_prev_member:
 	}
 ;
 
+member_func_first_child:
+	FIRST_CHILD ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_FirstChild *func = mam_alloc(sizeof(ASTMemberFn_FirstChild), OBJ_TYPE__ASTMemberFn_FirstChild, NULL, 0);
+		func->head.interpret = interpret_firstchild;
+		stack_pop(&AST_STACK, (void **) &(func->mr_up));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	FIRST_CHILD ROUND_BRACKET_L ROUND_BRACKET_R {
+		ASTMemberFn_FirstChild *func = mam_alloc(sizeof(ASTMemberFn_FirstChild), OBJ_TYPE__ASTMemberFn_FirstChild, NULL, 0);
+		func->head.interpret = interpret_firstchild;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	FIRST_CHILD {
+		ASTMemberFn_FirstChild *func = mam_alloc(sizeof(ASTMemberFn_FirstChild), OBJ_TYPE__ASTMemberFn_FirstChild, NULL, 0);
+		func->head.interpret = interpret_firstchild;
+		stack_push(&AST_STACK, func);
+	}
+;
+
 member_function:
 	member_func_parent {}
   |
 	member_func_current_member {}
   |
 	member_func_prev_member {}
-  /*
-	member_func_first_child {}
   |
+	member_func_first_child {}
+  /*
 	member_func_last_child {}
   |
 	member_func_first_sibling {}
@@ -1351,15 +1372,8 @@ member_function:
 
 member_function_template:
 
-	FIRST_CHILD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		MemberDef *member_role_def;
-		stack_pop(&AST_STACK, (void **) &member_role_def);
-		ASTMemberFunc_FirstChild *mr_fn = ASTMemberFunc_FirstChild_creat(member_role_def);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = mr_fn;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | LAST_CHILD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
+	
+  LAST_CHILD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
 		ASTMemberFunc_LastChild *mr_fn = ASTMemberFunc_LastChild_creat(member_role_def);
@@ -1520,10 +1534,6 @@ member_role_fn_opening_period:
 ;
 
 member_function_template_suffix:
-	mrfn_FirstChild_suftpl {
-		// Don't do anything
-	}
-  |
 	mrfn_LastChild_suftpl {
 		// Don't do anything
 	}
@@ -1545,20 +1555,6 @@ member_function_template_suffix:
 	}
 ;
 
-
-mrfn_FirstChild_suftpl:
-	FIRST_CHILD {
-		MemberRoleFuncFirstChild *mr_func = mam_alloc(sizeof(MemberRoleFuncFirstChild), OBJ_TYPE__MemberRoleFuncFirstChild, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		stack_push(&AST_STACK, mr_func);
-	}
-  |
-	FIRST_CHILD ROUND_BRACKET_L ROUND_BRACKET_R {
-		MemberRoleFuncFirstChild *mr_func = mam_alloc(sizeof(MemberRoleFuncFirstChild), OBJ_TYPE__MemberRoleFuncFirstChild, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		stack_push(&AST_STACK, mr_func);
-	}
-;
 
 mrfn_LastChild_suftpl:
 	LAST_CHILD {

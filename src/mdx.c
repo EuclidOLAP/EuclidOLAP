@@ -337,11 +337,11 @@ ASTMemberFunc_OpeningPeriod *ASTMemberFunc_OpeningPeriod_creat(LevelRoleDef *lvr
 }
 
 
-ASTMemberFunc_FirstChild *ASTMemberFunc_FirstChild_creat(MemberDef *mr) {
-    ASTMemberFunc_FirstChild *mr_fn = mam_alloc(sizeof(ASTMemberFunc_FirstChild), OBJ_TYPE__ASTMemberFunc_FirstChild, NULL, 0);
-    mr_fn->mr_def = mr;
-    return mr_fn;
-}
+// ASTMemberFunc_FirstChild *ASTMemberFunc_FirstChild_creat(MemberDef *mr) {
+//     ASTMemberFunc_FirstChild *mr_fn = mam_alloc(sizeof(ASTMemberFunc_FirstChild), OBJ_TYPE__ASTMemberFunc_FirstChild, NULL, 0);
+//     mr_fn->mr_def = mr;
+//     return mr_fn;
+// }
 
 ASTMemberFunc_LastChild *ASTMemberFunc_LastChild_creat(MemberDef *mr) {
     ASTMemberFunc_LastChild *mr_fn = mam_alloc(sizeof(ASTMemberFunc_LastChild), OBJ_TYPE__ASTMemberFunc_LastChild, NULL, 0);
