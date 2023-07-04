@@ -187,11 +187,11 @@ void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *c
 MddTuple *tuple__merge(MddTuple *ctx_tuple, MddTuple *tuple_frag);
 
 
-MddMemberRole *ASTMemberFunc_Parent_evolving(MDContext *md_ctx, ASTMemberFunc_Parent *fn_parent, MddTuple *context_tuple, Cube *cube);
+// MddMemberRole *ASTMemberFunc_Parent_evolving(MDContext *md_ctx, ASTMemberFunc_Parent *fn_parent, MddTuple *context_tuple, Cube *cube);
 
-MddMemberRole *ASTMemberFunc_CurrentMember_evolving(MDContext *md_ctx, ASTMemberFunc_CurrentMember *cm, MddTuple *context_tuple, Cube *cube);
+// MddMemberRole *ASTMemberFunc_CurrentMember_evolving(MDContext *md_ctx, ASTMemberFunc_CurrentMember *cm, MddTuple *context_tuple, Cube *cube);
 
-MddMemberRole *ASTMemberFunc_PrevMember_evolving(MDContext *md_ctx, ASTMemberFunc_PrevMember *pm, MddTuple *context_tuple, Cube *cube);
+// MddMemberRole *ASTMemberFunc_PrevMember_evolving(MDContext *md_ctx, ASTMemberFunc_PrevMember *pm, MddTuple *context_tuple, Cube *cube);
 
 MddMemberRole *ASTMemberFunc_ParallelPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_ParallelPeriod *pp, MddTuple *context_tuple, Cube *cube);
 

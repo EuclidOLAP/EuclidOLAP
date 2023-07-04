@@ -1503,22 +1503,25 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 	}
 	else if (m_def->t_cons == MEMBER_DEF__MBR_FUNCTION)
 	{
-		if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_Parent)
-		{
-			member_role_ = ASTMemberFunc_Parent_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
-			return member_role_;
-		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_CurrentMember)
-		{
-			member_role_ = ASTMemberFunc_CurrentMember_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
-			return member_role_;
-		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_PrevMember)
-		{
-			member_role_ = ASTMemberFunc_PrevMember_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
-			return member_role_;
-		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_ParallelPeriod)
+		// if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_Parent)
+		// {
+		// 	member_role_ = ASTMemberFunc_Parent_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+		// 	return member_role_;
+		// }
+		// else 
+		// if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_CurrentMember)
+		// {
+		// 	member_role_ = ASTMemberFunc_CurrentMember_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+		// 	return member_role_;
+		// }
+		// else 
+		// if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_PrevMember)
+		// {
+		// 	member_role_ = ASTMemberFunc_PrevMember_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+		// 	return member_role_;
+		// }
+		// else 
+		if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_ParallelPeriod)
 		{
 			member_role_ = ASTMemberFunc_ParallelPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 			return member_role_;
@@ -2132,89 +2135,89 @@ void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *c
 }
 
 
-MddMemberRole *ASTMemberFunc_Parent_evolving(MDContext *md_ctx, ASTMemberFunc_Parent *fn_parent, MddTuple *context_tuple, Cube *cube)
-{
-	// when current member has no parent, return itself.
-	MddMemberRole *child_mr = ids_mbrsdef__build(md_ctx, fn_parent->ast_member, context_tuple, cube);
-	if (child_mr->member->p_gid)
-		return mdd_mr__create(find_member_by_gid(child_mr->member->p_gid), child_mr->dim_role);
-	else
-		return child_mr;
-}
+// MddMemberRole *ASTMemberFunc_Parent_evolving(MDContext *md_ctx, ASTMemberFunc_Parent *fn_parent, MddTuple *context_tuple, Cube *cube)
+// {
+// 	// when current member has no parent, return itself.
+// 	MddMemberRole *child_mr = ids_mbrsdef__build(md_ctx, fn_parent->ast_member, context_tuple, cube);
+// 	if (child_mr->member->p_gid)
+// 		return mdd_mr__create(find_member_by_gid(child_mr->member->p_gid), child_mr->dim_role);
+// 	else
+// 		return child_mr;
+// }
 
-MddMemberRole *ASTMemberFunc_CurrentMember_evolving(MDContext *md_ctx, ASTMemberFunc_CurrentMember *cm, MddTuple *context_tuple, Cube *cube)
-{
-	char *dimRole_name = cm->dr_def->name;
-	DimensionRole *dimRole = NULL; // NULL mean that current dimension role is measure
-	int i, drs_count, mrs_count;
-	if (strcmp("measure", dimRole_name) == 0)
-		goto point;
+// MddMemberRole *ASTMemberFunc_CurrentMember_evolving(MDContext *md_ctx, ASTMemberFunc_CurrentMember *cm, MddTuple *context_tuple, Cube *cube)
+// {
+// 	char *dimRole_name = cm->dr_def->name;
+// 	DimensionRole *dimRole = NULL; // NULL mean that current dimension role is measure
+// 	int i, drs_count, mrs_count;
+// 	if (strcmp("measure", dimRole_name) == 0)
+// 		goto point;
 
-	drs_count = als_size(cube->dim_role_ls);
-	for (i = 0; i < drs_count; i++)
-	{
-		dimRole = als_get(cube->dim_role_ls, i);
-		if (strcmp(dimRole_name, dimRole->name) == 0)
-			goto point;
-		dimRole = NULL;
-	}
+// 	drs_count = als_size(cube->dim_role_ls);
+// 	for (i = 0; i < drs_count; i++)
+// 	{
+// 		dimRole = als_get(cube->dim_role_ls, i);
+// 		if (strcmp(dimRole_name, dimRole->name) == 0)
+// 			goto point;
+// 		dimRole = NULL;
+// 	}
 
-	log_print("[ error ] - ASTMemberFunc_CurrentMember do not matching DimensionRole - < %s >\n", dimRole_name);
-	return NULL;
+// 	log_print("[ error ] - ASTMemberFunc_CurrentMember do not matching DimensionRole - < %s >\n", dimRole_name);
+// 	return NULL;
 
-point:
-	mrs_count = als_size(context_tuple->mr_ls);
-	for (i = 0; i < mrs_count; i++)
-	{
-		MddMemberRole *mbrRole = als_get(context_tuple->mr_ls, i);
-		if (dimRole == NULL && mbrRole->dim_role == NULL)
-			return mbrRole;
-		if (dimRole != NULL && mbrRole->dim_role != NULL && strcmp(dimRole->name, mbrRole->dim_role->name) == 0)
-			return mbrRole;
-	}
+// point:
+// 	mrs_count = als_size(context_tuple->mr_ls);
+// 	for (i = 0; i < mrs_count; i++)
+// 	{
+// 		MddMemberRole *mbrRole = als_get(context_tuple->mr_ls, i);
+// 		if (dimRole == NULL && mbrRole->dim_role == NULL)
+// 			return mbrRole;
+// 		if (dimRole != NULL && mbrRole->dim_role != NULL && strcmp(dimRole->name, mbrRole->dim_role->name) == 0)
+// 			return mbrRole;
+// 	}
 
-	log_print("[ error ] - ASTMemberFunc_CurrentMember do not matching DimensionRole - < %s >\n", dimRole_name);
-	return NULL;
-}
+// 	log_print("[ error ] - ASTMemberFunc_CurrentMember do not matching DimensionRole - < %s >\n", dimRole_name);
+// 	return NULL;
+// }
 
-MddMemberRole *ASTMemberFunc_PrevMember_evolving(MDContext *md_ctx, ASTMemberFunc_PrevMember *pm, MddTuple *context_tuple, Cube *cube)
-{
-	MddMemberRole *mr = ids_mbrsdef__build(md_ctx, pm->curr_mr, context_tuple, cube);
+// MddMemberRole *ASTMemberFunc_PrevMember_evolving(MDContext *md_ctx, ASTMemberFunc_PrevMember *pm, MddTuple *context_tuple, Cube *cube)
+// {
+// 	MddMemberRole *mr = ids_mbrsdef__build(md_ctx, pm->curr_mr, context_tuple, cube);
 
-	int i, len;
-	Member *prev = NULL;
+// 	int i, len;
+// 	Member *prev = NULL;
 
-	if (mr->dim_role == NULL)
-	{
-		// measure
-		len = als_size(cube->measure_mbrs);
-		if (len < 2)
-			return mr;
+// 	if (mr->dim_role == NULL)
+// 	{
+// 		// measure
+// 		len = als_size(cube->measure_mbrs);
+// 		if (len < 2)
+// 			return mr;
 
-		for (i = 0; i < len; i++)
-		{
-			Member *mea_m = als_get(cube->measure_mbrs, i);
-			if (mea_m->gid >= mr->member->gid)
-				continue;
-			if (prev == NULL || mea_m->gid > prev->gid)
-				prev = mea_m;
-		}
-		return prev ? mdd_mr__create(prev, mr->dim_role) : mr;
-	}
+// 		for (i = 0; i < len; i++)
+// 		{
+// 			Member *mea_m = als_get(cube->measure_mbrs, i);
+// 			if (mea_m->gid >= mr->member->gid)
+// 				continue;
+// 			if (prev == NULL || mea_m->gid > prev->gid)
+// 				prev = mea_m;
+// 		}
+// 		return prev ? mdd_mr__create(prev, mr->dim_role) : mr;
+// 	}
 
-	len = als_size(member_pool);
-	for (i = 0; i < len; i++)
-	{
-		Member *member = als_get(member_pool, i);
-		if ((member->dim_gid != mr->member->dim_gid) || (member->lv != mr->member->lv))
-			continue;
-		if (member->gid >= mr->member->gid)
-			continue;
-		if (prev == NULL || member->gid > prev->gid)
-			prev = member;
-	}
-	return prev ? mdd_mr__create(prev, mr->dim_role) : mr;
-}
+// 	len = als_size(member_pool);
+// 	for (i = 0; i < len; i++)
+// 	{
+// 		Member *member = als_get(member_pool, i);
+// 		if ((member->dim_gid != mr->member->dim_gid) || (member->lv != mr->member->lv))
+// 			continue;
+// 		if (member->gid >= mr->member->gid)
+// 			continue;
+// 		if (prev == NULL || member->gid > prev->gid)
+// 			prev = member;
+// 	}
+// 	return prev ? mdd_mr__create(prev, mr->dim_role) : mr;
+// }
 
 // TODO The function is too bloated and needs to be optimized.
 MddMemberRole *ASTMemberFunc_ParallelPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_ParallelPeriod *pp, MddTuple *context_tuple, Cube *cube)
@@ -2814,6 +2817,10 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	if (_type == OBJ_TYPE__MemberDef) {
 		return ids_mbrsdef__build(md_ctx, (MemberDef *)seg_0, ctx_tuple, cube);
 
+	}
+
+	if (is_type_astmemberfunc(_type)) {
+		return ((ASTFunctionCommonHead *)seg_0)->interpret(md_ctx, NULL, seg_0, ctx_tuple, cube);
 	}
 
 	if (is_type_ast_str_func(_type)) {

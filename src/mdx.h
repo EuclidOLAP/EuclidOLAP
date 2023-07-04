@@ -190,7 +190,7 @@ typedef struct formula_context
 FormulaContext *FormulaContext_creat();
 
 
-ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def);
+// ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def);
 
 typedef struct exp_fn_sum
 {
@@ -251,17 +251,17 @@ typedef struct Boolean_Expression_
 BooleanExpression *BooleanExpression_creat();
 void BooleanExpression_addTerm(BooleanExpression *, BooleanTerm *);
 
-typedef struct Member_Fn_Current_Member_
-{
-    DimRoleDef *dr_def;
-} ASTMemberFunc_CurrentMember;
-ASTMemberFunc_CurrentMember *ASTMemberFunc_CurrentMember_creat();
+// typedef struct Member_Fn_Current_Member_
+// {
+//     DimRoleDef *dr_def;
+// } ASTMemberFunc_CurrentMember;
+// ASTMemberFunc_CurrentMember *ASTMemberFunc_CurrentMember_creat();
 
-typedef struct Member_Fn_Prev_Member_
-{
-    MemberDef *curr_mr;
-} ASTMemberFunc_PrevMember;
-ASTMemberFunc_PrevMember *ASTMemberFunc_PrevMember_creat(MemberDef *);
+// typedef struct Member_Fn_Prev_Member_
+// {
+//     MemberDef *curr_mr;
+// } ASTMemberFunc_PrevMember;
+// ASTMemberFunc_PrevMember *ASTMemberFunc_PrevMember_creat(MemberDef *);
 
 
 typedef struct Member_Role_Fn_Parallel_Period_
@@ -350,15 +350,15 @@ ExpFnCoalesceEmpty *ExpFnCoalesceEmpty_creat(ArrayList *exp_ls);
 
 
 
-typedef struct _member_role_func_currentmember_ {
-    char suf_flag;
+// typedef struct _member_role_func_currentmember_ {
+//     char suf_flag;
 
-} MemberRoleFuncCurrentMember;
+// } MemberRoleFuncCurrentMember;
 
-typedef struct _member_role_func_prevmember_ {
-    char suf_flag;
+// typedef struct _member_role_func_prevmember_ {
+//     char suf_flag;
 
-} MemberRoleFuncPrevMember;
+// } MemberRoleFuncPrevMember;
 
 typedef struct _member_role_func_firstchild_ {
     char suf_flag;

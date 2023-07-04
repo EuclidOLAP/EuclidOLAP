@@ -202,12 +202,12 @@ MDContext *MDContext_creat()
     return mam_alloc(sizeof(MDContext), OBJ_TYPE__MDContext, NULL, 0);
 }
 
-ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def)
-{
-    ASTMemberFunc_Parent *fn = mam_alloc(sizeof(ASTMemberFunc_Parent), OBJ_TYPE__ASTMemberFunc_Parent, NULL, 0);
-    fn->ast_member = child_def;
-    return fn;
-}
+// ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def)
+// {
+//     ASTMemberFunc_Parent *fn = mam_alloc(sizeof(ASTMemberFunc_Parent), OBJ_TYPE__ASTMemberFunc_Parent, NULL, 0);
+//     fn->ast_member = child_def;
+//     return fn;
+// }
 
 ExpFnSum *ExpFnSum_creat(SetDef *_set, Expression *_exp)
 {
@@ -300,17 +300,17 @@ void BooleanExpression_addTerm(BooleanExpression *exp, BooleanTerm *term)
     als_add(exp->terms, term);
 }
 
-ASTMemberFunc_CurrentMember *ASTMemberFunc_CurrentMember_creat()
-{
-    return mam_alloc(sizeof(ASTMemberFunc_CurrentMember), OBJ_TYPE__ASTMemberFunc_CurrentMember, NULL, 0);
-}
+// ASTMemberFunc_CurrentMember *ASTMemberFunc_CurrentMember_creat()
+// {
+//     return mam_alloc(sizeof(ASTMemberFunc_CurrentMember), OBJ_TYPE__ASTMemberFunc_CurrentMember, NULL, 0);
+// }
 
-ASTMemberFunc_PrevMember *ASTMemberFunc_PrevMember_creat(MemberDef *m_def)
-{
-    ASTMemberFunc_PrevMember *fn = mam_alloc(sizeof(ASTMemberFunc_PrevMember), OBJ_TYPE__ASTMemberFunc_PrevMember, NULL, 0);
-    fn->curr_mr = m_def;
-    return fn;
-}
+// ASTMemberFunc_PrevMember *ASTMemberFunc_PrevMember_creat(MemberDef *m_def)
+// {
+//     ASTMemberFunc_PrevMember *fn = mam_alloc(sizeof(ASTMemberFunc_PrevMember), OBJ_TYPE__ASTMemberFunc_PrevMember, NULL, 0);
+//     fn->curr_mr = m_def;
+//     return fn;
+// }
 
 ASTMemberFunc_ParallelPeriod *ASTMemberFunc_ParallelPeriod_creat(LevelRoleDef *lvDef, Expression *idx, MemberDef *mDef)
 {
