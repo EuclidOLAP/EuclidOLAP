@@ -346,15 +346,15 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index);
 
 // SetFnUnion *SetFnUnion_creat(ArrayList *, char);
 
-#define SET_FN__INTERSECT_ALL  1
+// #define SET_FN__INTERSECT_ALL  1
 
-typedef struct SetFn_Intersect
-{
-    ArrayList *set_def_ls;
-    char option;
-} SetFnIntersect;
+// typedef struct SetFn_Intersect
+// {
+//     ArrayList *set_def_ls;
+//     char option;
+// } SetFnIntersect;
 
-SetFnIntersect *SetFnIntersect_creat(ArrayList *set_def_ls, char option);
+// SetFnIntersect *SetFnIntersect_creat(ArrayList *set_def_ls, char option);
 
 typedef struct ExpFn_Iif
 {

@@ -388,10 +388,10 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
 //     return union_;
 // }
 
-SetFnIntersect *SetFnIntersect_creat(ArrayList *set_def_ls, char option)
-{
-    SetFnIntersect *intersect = mam_alloc(sizeof(SetFnIntersect), OBJ_TYPE__SetFnIntersect, NULL, 0);
-    intersect->set_def_ls = set_def_ls;
-    intersect->option = option;
-    return intersect;
-}
+// SetFnIntersect *SetFnIntersect_creat(ArrayList *set_def_ls, char option)
+// {
+//     SetFnIntersect *intersect = mam_alloc(sizeof(SetFnIntersect), OBJ_TYPE__SetFnIntersect, NULL, 0);
+//     intersect->set_def_ls = set_def_ls;
+//     intersect->option = option;
+//     return intersect;
+// }

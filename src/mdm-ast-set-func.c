@@ -729,3 +729,25 @@ void *interpret_union(void *md_ctx_, void *nil, void *union_, void *ctx_tuple_, 
 	}
 	return result;
 }
+
+// for ASTSetFunc_Intersect
+void *interpret_intersect(void *md_ctx_, void *nil, void *intersect_, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_Intersect *inter = intersect_;
+	MddSet *set_0 = ids_setdef__build(md_ctx_, als_get(inter->set_def_ls, 0), ctx_tuple_, cube_);
+	if (als_size(inter->set_def_ls) < 2)
+		return set_0;
+	MddSet *set_1 = ids_setdef__build(md_ctx_, als_get(inter->set_def_ls, 1), ctx_tuple_, cube_);
+	MddSet *result = mdd_set__create();
+	int i, j, len_0 = als_size(set_0->tuples), len_1 = als_size(set_1->tuples);
+	for (i = 0; i < len_0; i++)
+	{
+		MddTuple *tuple = als_get(set_0->tuples, i);
+		for (j = 0; j < len_1; j++)
+		{
+			MddTuple *tp = als_get(set_1->tuples, j);
+			if (Tuple__cmp(tuple, tp) == 0)
+				mddset__add_tuple(result, tuple);
+		}
+	}
+	return result;
+}
