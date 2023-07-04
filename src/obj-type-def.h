@@ -60,6 +60,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTSetFunc_Descendants          410
 #define OBJ_TYPE__ASTSetFunc_Tail         411
 #define OBJ_TYPE__ASTSetFunc_BottomOrTopPercent         412
+#define OBJ_TYPE__ASTSetFunc_Union         413
 #define OBJ_TYPE__AST_SET_FUNC_MAX        500
 
 
@@ -126,7 +127,7 @@ typedef short type_obj;
 #define OBJ_TYPE__SetDef 10059
 // #define OBJ_TYPE__SetFnBottomOrTopPercent 10060
 #define OBJ_TYPE__SetFnIntersect 10066
-#define OBJ_TYPE__SetFnUnion 10072
+// #define OBJ_TYPE__SetFnUnion 10072
 #define OBJ_TYPE__SetFormula 10074
 #define OBJ_TYPE__SetFuncMembers 10076
 #define OBJ_TYPE__SockIntentThread 10077

@@ -161,4 +161,15 @@ typedef struct
 // for ASTSetFunc_BottomOrTopPercent
 void *interpret_bottomortoppercent(void *md_ctx_, void *nil, void *percent_, void *ctx_tuple_, void *cube_);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    ArrayList *set_def_ls;
+    char all_opt;
+} ASTSetFunc_Union;
+
+// for ASTSetFunc_Union
+void *interpret_union(void *md_ctx_, void *nil, void *union_, void *ctx_tuple_, void *cube_);
+
 #endif

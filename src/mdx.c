@@ -380,13 +380,13 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
 //     return percent;
 // }
 
-SetFnUnion *SetFnUnion_creat(ArrayList *setDefs, char opt)
-{
-    SetFnUnion *union_ = mam_alloc(sizeof(SetFnUnion), OBJ_TYPE__SetFnUnion, NULL, 0);
-    union_->set_def_ls = setDefs;
-    union_->option = opt;
-    return union_;
-}
+// SetFnUnion *SetFnUnion_creat(ArrayList *setDefs, char opt)
+// {
+//     SetFnUnion *union_ = mam_alloc(sizeof(SetFnUnion), OBJ_TYPE__SetFnUnion, NULL, 0);
+//     union_->set_def_ls = setDefs;
+//     union_->option = opt;
+//     return union_;
+// }
 
 SetFnIntersect *SetFnIntersect_creat(ArrayList *set_def_ls, char option)
 {

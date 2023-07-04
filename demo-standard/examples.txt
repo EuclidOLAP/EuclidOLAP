@@ -518,6 +518,13 @@ from [Airline A] ;
 
 ---
 
+select 
+  members([Measures]) on 0, 
+  intersect(members(Date.[Calendar]), UNION(children(Date.[ALL].[2021]), children(Date.[ALL].[2021].Q3))) on 1 
+from [Airline B] ;
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

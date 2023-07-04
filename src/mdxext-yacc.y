@@ -1047,17 +1047,19 @@ set_func_toppercent:
 	}
 ;
 
-// todo redo +suffix
 set_func_union:
 	UNION ROUND_BRACKET_L set_list ROUND_BRACKET_R {
-		ArrayList *set_def_ls;
-		stack_pop(&AST_STACK, (void **) &set_def_ls);
-		stack_push(&AST_STACK, SetFnUnion_creat(set_def_ls, 0));
+		ASTSetFunc_Union *func = mam_alloc(sizeof(ASTSetFunc_Union), OBJ_TYPE__ASTSetFunc_Union, NULL, 0);
+		func->head.interpret = interpret_union;
+		stack_pop(&AST_STACK, (void **)&(func->set_def_ls));
+		stack_push(&AST_STACK, func);
 	}
   | UNION ROUND_BRACKET_L set_list COMMA ALL ROUND_BRACKET_R {
-		ArrayList *set_def_ls;
-		stack_pop(&AST_STACK, (void **) &set_def_ls);
-		stack_push(&AST_STACK, SetFnUnion_creat(set_def_ls, SET_FN__UNION_ALL));
+		ASTSetFunc_Union *func = mam_alloc(sizeof(ASTSetFunc_Union), OBJ_TYPE__ASTSetFunc_Union, NULL, 0);
+		func->head.interpret = interpret_union;
+		stack_pop(&AST_STACK, (void **)&(func->set_def_ls));
+		func->all_opt = 1;
+		stack_push(&AST_STACK, func);
 	}
 ;
 

@@ -336,15 +336,15 @@ ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index);
 
 // SetFnBottomOrTopPercent *SetFnBottomOrTopPercent_creat(char type, SetDef *set, Expression *percentage, Expression *exp);
 
-#define SET_FN__UNION_ALL  1
+// #define SET_FN__UNION_ALL  1
 
-typedef struct SetFn_Union
-{
-    ArrayList *set_def_ls;
-    char option;
-} SetFnUnion;
+// typedef struct SetFn_Union
+// {
+//     ArrayList *set_def_ls;
+//     char option;
+// } SetFnUnion;
 
-SetFnUnion *SetFnUnion_creat(ArrayList *, char);
+// SetFnUnion *SetFnUnion_creat(ArrayList *, char);
 
 #define SET_FN__INTERSECT_ALL  1
 
