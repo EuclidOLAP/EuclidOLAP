@@ -234,3 +234,34 @@ void *interpret_lastchild(void *md_ctx, void *mrole, void *laschi, void *ctx_tup
 	}
 	return mdd_mr__create(member, mr->dim_role);
 }
+
+// for ASTMemberFn_FirstSibling
+void *interpret_firstsibling(void *md_ctx, void *mrole, void *firsib, void *ctx_tuple, void *cube) {
+    ASTMemberFn_LastChild *func = firsib;
+    MddMemberRole *mr = mrole;
+
+    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
+        if (!func->mr_up) {
+            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+            thrd_mam->exception_desc = "exception: function: interpret_firstsibling.";
+            longjmp(thrd_mam->excep_ctx_env, -1);
+        }
+
+        mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
+        if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole) {
+            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+            thrd_mam->exception_desc = "exception: function: interpret_firstsibling.";
+            longjmp(thrd_mam->excep_ctx_env, -1);
+        }
+    }
+
+	Member *member = NULL;
+	for (int i=0; i<als_size(member_pool); i++) {
+		Member *m = als_get(member_pool, i);
+		if (m->p_gid != mr->member->p_gid)
+			continue;
+		if (member == NULL || m->gid <= member->gid)
+			member = m;
+	}
+	return mdd_mr__create(member, mr->dim_role);
+}

@@ -1341,7 +1341,7 @@ member_func_first_child:
 ;
 
 member_func_last_child:
-	LAST_CHILD ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
+	LAST_CHILD ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
 		ASTMemberFn_LastChild *func = mam_alloc(sizeof(ASTMemberFn_LastChild), OBJ_TYPE__ASTMemberFn_LastChild, NULL, 0);
 		func->head.interpret = interpret_lastchild;
 		stack_pop(&AST_STACK, (void **) &(func->mr_up));
@@ -1361,6 +1361,27 @@ member_func_last_child:
 	}
 ;
 
+member_func_first_sibling:
+   FIRST_SIBLING ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_FirstSibling *func = mam_alloc(sizeof(ASTMemberFn_FirstSibling), OBJ_TYPE__ASTMemberFn_FirstSibling, NULL, 0);
+		func->head.interpret = interpret_firstsibling;
+		stack_pop(&AST_STACK, (void **) &(func->mr_up));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	FIRST_SIBLING ROUND_BRACKET_L ROUND_BRACKET_R {
+		ASTMemberFn_FirstSibling *func = mam_alloc(sizeof(ASTMemberFn_FirstSibling), OBJ_TYPE__ASTMemberFn_FirstSibling, NULL, 0);
+		func->head.interpret = interpret_firstsibling;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	FIRST_SIBLING {
+		ASTMemberFn_FirstSibling *func = mam_alloc(sizeof(ASTMemberFn_FirstSibling), OBJ_TYPE__ASTMemberFn_FirstSibling, NULL, 0);
+		func->head.interpret = interpret_firstsibling;
+		stack_push(&AST_STACK, func);
+	}
+;
+
 member_function:
 	member_func_parent {}
   |
@@ -1371,9 +1392,9 @@ member_function:
 	member_func_first_child {}
   |
 	member_func_last_child {}
-  /*
-	member_func_first_sibling {}
   |
+	member_func_first_sibling {}
+  /*
 	member_func_last_sibling {}
   |
 	member_func_lag {}
@@ -1395,16 +1416,8 @@ member_function_template:
 
 	
   
-   FIRST_SIBLING ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
-		/* FirstSibling */
-		MemberDef *member_role_def;
-		stack_pop(&AST_STACK, (void **) &member_role_def);
-		ASTMemberFunc_FirstSibling *mr_fn = ASTMemberFunc_FirstSibling_creat(member_role_def);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = mr_fn;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  | LAST_SIBLING ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
+
+  LAST_SIBLING ROUND_BRACKET_L member_statement ROUND_BRACKET_R {
 		/* LastSibling */
 		MemberDef *member_role_def;
 		stack_pop(&AST_STACK, (void **) &member_role_def);
@@ -1548,10 +1561,6 @@ member_role_fn_opening_period:
 ;
 
 member_function_template_suffix:
-	mrfn_FirstSibling_suftpl {
-		// Don't do anything
-	}
-  |
 	mrfn_LastSibling_suftpl {
 		// Don't do anything
 	}
@@ -1565,32 +1574,6 @@ member_function_template_suffix:
 	}
 ;
 
-mrfn_FirstSibling_suftpl:
-	FIRST_SIBLING {
-		MemberRoleFuncFirstSibling *mr_func = mam_alloc(sizeof(MemberRoleFuncFirstSibling), OBJ_TYPE__MemberRoleFuncFirstSibling, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		stack_push(&AST_STACK, mr_func);
-
-	}
-  |
-	FIRST_SIBLING ROUND_BRACKET_L ROUND_BRACKET_R {
-		MemberRoleFuncFirstSibling *mr_func = mam_alloc(sizeof(MemberRoleFuncFirstSibling), OBJ_TYPE__MemberRoleFuncFirstSibling, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		stack_push(&AST_STACK, mr_func);
-
-	}
-  |
-	FIRST_SIBLING ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
-		// mdm_entity_universal_path is expected to represent a hierarchy(hierarchy role)
-		MDMEntityUniversalPath *up = NULL;
-		stack_pop(&AST_STACK, (void **) &up);
-
-		MemberRoleFuncFirstSibling *mr_func = mam_alloc(sizeof(MemberRoleFuncFirstSibling), OBJ_TYPE__MemberRoleFuncFirstSibling, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		mr_func->hierarchy = up;
-		stack_push(&AST_STACK, mr_func);
-	}
-;
 
 mrfn_LastSibling_suftpl:
 	LAST_SIBLING {
