@@ -751,3 +751,47 @@ void *interpret_intersect(void *md_ctx_, void *nil, void *intersect_, void *ctx_
 	}
 	return result;
 }
+
+// for ASTSetFunc_Distinct
+void *interpret_distinct(void *md_ctx_, void *set_, void *dist_, void *ctx_tuple_, void *cube_) {
+
+	ASTSetFunc_Distinct *dist = dist_;
+	MddSet *set = set_;
+
+    if (!set || obj_type_of(set) != OBJ_TYPE__MddSet) {
+        if (!dist->setdef) {
+            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+            thrd_mam->exception_desc = "exception: function: interpret_distinct.";
+            longjmp(thrd_mam->excep_ctx_env, -1);
+        }
+
+        // set = up_evolving(md_ctx_, dist->setdef, cube_, ctx_tuple_);
+		set = ids_setdef__build(md_ctx_, dist->setdef, ctx_tuple_, cube_);
+        if (!set || obj_type_of(set) != OBJ_TYPE__MddSet) {
+            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+            thrd_mam->exception_desc = "exception: function: interpret_distinct.";
+            longjmp(thrd_mam->excep_ctx_env, -1);
+        }
+    }
+
+	unsigned int tsz = als_size(set->tuples);
+
+	ArrayList *distlist = als_new(64, "<MddTuple *>", THREAD_MAM, NULL);
+
+	for (int i=0; i<tsz ;i++) {
+		MddTuple *tp = als_get(set->tuples,i);
+		unsigned int dlsz = als_size(distlist);
+		for (int j=0; j<dlsz ;j++) {
+			MddTuple *targ = als_get(distlist, j);
+			if (Tuple__cmp(targ, tp) == 0)
+				goto bk;
+		}
+		als_add(distlist, tp);
+		bk:
+		i=i;
+	}
+
+	MddSet *dist_set = mdd_set__create();
+	dist_set->tuples = distlist;
+	return dist_set;
+}

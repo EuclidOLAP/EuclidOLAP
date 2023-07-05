@@ -686,7 +686,6 @@ void *interpret_nextmember(void *md_ctx, void *mrole_, void *nm, void *ctx_tuple
 	Cube *cube = cube_;
 	Member *meam = NULL;
 
-	// todo
 	if (mrole->dim_role->bin_attr & DR_MEASURE_MASK) {
 		// mrole is a measure member role
 

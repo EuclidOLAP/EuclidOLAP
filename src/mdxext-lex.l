@@ -201,6 +201,10 @@ NextMember {
 	return NEXT_MEMBER;
 }
 
+Distinct {
+	return DISTINCT;
+}
+
 lateralMembers {
 	return LATERAL_MEMBERS;
 }

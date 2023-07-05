@@ -136,7 +136,6 @@
 	BottomCount		(I) (M)
 	BottomSum		(I) (M)
 	CurrentOrdinal		(M)
-	Distinct		(I) (M) (O)
 	DrilldownLevel		(I) (M)
 	DrilldownLevelBottom		(I) (M)
 	DrillDownLevelTop		(I)
@@ -273,6 +272,7 @@
 	TopPercent		[E] [I] [M]
 	Union			[E] [I] [M] [O]
 	Ytd				[E] [I] [M]
+	Distinct		[E] [I] [M] [O]
 
 
 << String Functions >>

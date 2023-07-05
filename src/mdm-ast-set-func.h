@@ -183,4 +183,14 @@ typedef struct
 // for ASTSetFunc_Intersect
 void *interpret_intersect(void *md_ctx_, void *nil, void *intersect_, void *ctx_tuple_, void *cube_);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+} ASTSetFunc_Distinct;
+
+// for ASTSetFunc_Distinct
+void *interpret_distinct(void *md_ctx_, void *set, void *dist, void *ctx_tuple_, void *cube_);
+
 #endif
