@@ -56,7 +56,6 @@
 	Item (Member)		(M)
 	LinkMember		(M)
 	Members (String)		(M)
-	NextMember		(I) (M) (O)
 	Properties		(I)
 	StrToMbr		(O)
 	StrToMember		(M)
@@ -247,6 +246,7 @@
 	ParallelPeriod		[E] [I] [M] [O]
 	Parent				[E] [I] [M] [O]
 	PrevMember			[E] [I] [M] [O]
+	NextMember			[E] [I] [M] [O]
 
 
 << Numeric Functions >>
