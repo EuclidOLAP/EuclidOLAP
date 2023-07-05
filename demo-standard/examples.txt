@@ -651,6 +651,122 @@ from [Airline B];
 
 ---
 
+select 
+{ ( LastSibling([Date].[2020]) ) } on 0,
+{ ([Measures].Revenue), ([Measures].Cost) } on 100 
+from [Airline A];
+
+---
+
+select 
+//{ ( LastSibling([Date].[2020]) ) } on 0,
+[Date].[2020].LastSibling on 0,
+{ ([Measures].Revenue), ([Measures].Cost) } on 100 
+from [Airline A];
+
+---
+
+select 
+[Date].[2020].LastSibling() on 0,
+{ ([Measures].Revenue), ([Measures].Cost) } on 100 
+from [Airline B];
+
+---
+
+select
+{ 
+    [Classes of Service].[ALL].[Business Suite],
+    ( Lag ([Classes of Service].[ALL].[Business Suite], 0) )
+} on rows,
+{
+    [Aircraft Models].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Models].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Models].[ALL].Boeing.[Boeing 787]
+} on columns
+from [Airline A];
+
+---
+
+select
+{ 
+    [Classes of Service].[ALL].[Business Suite],
+    [Classes of Service].[ALL].[Business Suite].Lag ( 0)
+} on rows,
+{
+    [Aircraft Models].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Models].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Models].[ALL].Boeing.[Boeing 787]
+} on columns
+from [Airline A]
+
+---
+
+select
+{ 
+    [Classes of Service].[ALL].[Business Suite],
+    ( Lag ([Classes of Service].[ALL].[Business Suite], -110) ),
+    ( Lead([Classes of Service].[ALL].[Business Suite], - 110) )
+} on rows,
+{
+    [Aircraft Models].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Models].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Models].[ALL].Boeing.[Boeing 787]
+} on columns
+from [Airline B];
+
+---
+
+select
+{ 
+    [Classes of Service].[ALL].[Business Suite],
+    [Classes of Service].[ALL].[Business Suite].Lag ( -110),
+    ( [Classes of Service].[ALL].[Business Suite].Lead( - 110) )
+} on rows,
+{
+    [Aircraft Models].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Models].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Models].[ALL].Boeing.[Boeing 787]
+} on columns
+from [Airline B];
+
+---
+
+with 
+member [Measures].AAAaaa 
+  as ([Measures].[Revenue], parallelPeriod(Date.Calendar.Month, 0 - 3)) 
+member [Measures].SSS 
+  as ([Measures].[Cost], parallelPeriod(Date.Month, 0)) 
+member [Measures].DDD 
+  as ([Measures].[Cost], parallelPeriod(Date.Calendar.[Month], 0 - 5)) 
+select 
+  { (Date.[ALL].[2021].[Q3].M7) } on 0, 
+  {([Measures].AAAaaa),([Measures].SSS),([Measures].DDD)} on 1 
+from [Airline B] ;
+
+---
+
+select 
+{ (ClosingPeriod(
+    Date.Calendar.Quarter,
+    Date.[ALL].[2021]
+)) } on 10,
+{ ([Measures].[Revenue]) } on SECTIONS
+from [Airline B] ;
+
+---
+
+select 
+{ 
+    ([Starting Point].[North America], [Ending Point].[Europe], [Aircraft Models].[Airbus].[A320]), 
+    ([Ending Point].[Europe], [Classes of Service].[First Class Suite]) 
+} on 0, 
+{ 
+    (OpeningPeriod([Date].[Month])) 
+} on 2 
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

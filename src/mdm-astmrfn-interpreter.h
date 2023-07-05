@@ -66,4 +66,59 @@ typedef struct
 // for ASTMemberFn_FirstSibling
 void *interpret_firstsibling(void *md_ctx, void *mrole, void *firsib, void *ctx_tuple, void *cube);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mr_up;
+} ASTMemberFn_LastSibling;
+
+// for ASTMemberFn_LastSibling
+void *interpret_lastsibling(void *md_ctx, void *mrole, void *lassib, void *ctx_tuple, void *cube);
+
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mr_up;
+    long index;
+} ASTMemberFn_Lag;
+
+// for ASTMemberFn_Lag
+void *interpret_lag(void *md_ctx, void *mrole, void *lag, void *ctx_tuple, void *cube);
+
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *lvroleup;
+    Expression *index;
+    MDMEntityUniversalPath *mroleup;
+} ASTMemberFn_ParallelPeriod;
+
+// for ASTMemberFn_ParallelPeriod
+void *interpret_parallelperiod(void *md_ctx, void *nil, void *pp, void *ctx_tuple, void *cube);
+
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *lvroleup;
+    MDMEntityUniversalPath *mroleup;
+} ASTMemberFn_ClosingPeriod;
+
+// for ASTMemberFn_ClosingPeriod
+void *interpret_closingperiod(void *md_ctx, void *nil, void *cp, void *ctx_tuple, void *cube);
+
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *lvroleup;
+    MDMEntityUniversalPath *mroleup;
+} ASTMemberFn_OpeningPeriod;
+
+// for ASTMemberFn_OpeningPeriod
+void *interpret_openingperiod(void *md_ctx, void *nil, void *op, void *ctx_tuple, void *cube);
+
 #endif

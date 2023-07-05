@@ -312,29 +312,29 @@ void BooleanExpression_addTerm(BooleanExpression *exp, BooleanTerm *term)
 //     return fn;
 // }
 
-ASTMemberFunc_ParallelPeriod *ASTMemberFunc_ParallelPeriod_creat(LevelRoleDef *lvDef, Expression *idx, MemberDef *mDef)
-{
-    ASTMemberFunc_ParallelPeriod *pp = mam_alloc(sizeof(ASTMemberFunc_ParallelPeriod), OBJ_TYPE__ASTMemberFunc_ParallelPeriod, NULL, 0);
-    pp->lvr_def = lvDef;
-    pp->index = idx;
-    pp->mr_def = mDef;
-    return pp;
-}
+// ASTMemberFunc_ParallelPeriod *ASTMemberFunc_ParallelPeriod_creat(LevelRoleDef *lvDef, Expression *idx, MemberDef *mDef)
+// {
+//     ASTMemberFunc_ParallelPeriod *pp = mam_alloc(sizeof(ASTMemberFunc_ParallelPeriod), OBJ_TYPE__ASTMemberFunc_ParallelPeriod, NULL, 0);
+//     pp->lvr_def = lvDef;
+//     pp->index = idx;
+//     pp->mr_def = mDef;
+//     return pp;
+// }
 
 
-ASTMemberFunc_ClosingPeriod *ASTMemberFunc_ClosingPeriod_creat(LevelRoleDef *lvr, MemberDef *mr) {
-    ASTMemberFunc_ClosingPeriod *cp = mam_alloc(sizeof(ASTMemberFunc_ClosingPeriod), OBJ_TYPE__ASTMemberFunc_ClosingPeriod, NULL, 0);
-    cp->lvr_def = lvr;
-    cp->mr_def = mr;
-    return cp;
-}
+// ASTMemberFunc_ClosingPeriod *ASTMemberFunc_ClosingPeriod_creat(LevelRoleDef *lvr, MemberDef *mr) {
+//     ASTMemberFunc_ClosingPeriod *cp = mam_alloc(sizeof(ASTMemberFunc_ClosingPeriod), OBJ_TYPE__ASTMemberFunc_ClosingPeriod, NULL, 0);
+//     cp->lvr_def = lvr;
+//     cp->mr_def = mr;
+//     return cp;
+// }
 
-ASTMemberFunc_OpeningPeriod *ASTMemberFunc_OpeningPeriod_creat(LevelRoleDef *lvr, MemberDef *mr) {
-    ASTMemberFunc_OpeningPeriod *op = mam_alloc(sizeof(ASTMemberFunc_OpeningPeriod), OBJ_TYPE__ASTMemberFunc_OpeningPeriod, NULL, 0);
-    op->lvr_def = lvr;
-    op->mr_def = mr;
-    return op;
-}
+// ASTMemberFunc_OpeningPeriod *ASTMemberFunc_OpeningPeriod_creat(LevelRoleDef *lvr, MemberDef *mr) {
+//     ASTMemberFunc_OpeningPeriod *op = mam_alloc(sizeof(ASTMemberFunc_OpeningPeriod), OBJ_TYPE__ASTMemberFunc_OpeningPeriod, NULL, 0);
+//     op->lvr_def = lvr;
+//     op->mr_def = mr;
+//     return op;
+// }
 
 
 // ASTMemberFunc_FirstChild *ASTMemberFunc_FirstChild_creat(MemberDef *mr) {
@@ -356,16 +356,16 @@ ASTMemberFunc_OpeningPeriod *ASTMemberFunc_OpeningPeriod_creat(LevelRoleDef *lvr
 //     return mr_fn;
 // }
 
-ASTMemberFunc_LastSibling *ASTMemberFunc_LastSibling_creat(MemberDef *mr) {
-    ASTMemberFunc_LastSibling *mr_fn = mam_alloc(sizeof(ASTMemberFunc_LastSibling), OBJ_TYPE__ASTMemberFunc_LastSibling, NULL, 0);
-    mr_fn->mr_def = mr;
-    return mr_fn;
-}
+// ASTMemberFunc_LastSibling *ASTMemberFunc_LastSibling_creat(MemberDef *mr) {
+//     ASTMemberFunc_LastSibling *mr_fn = mam_alloc(sizeof(ASTMemberFunc_LastSibling), OBJ_TYPE__ASTMemberFunc_LastSibling, NULL, 0);
+//     mr_fn->mr_def = mr;
+//     return mr_fn;
+// }
 
 
-ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
-    ASTMemberFunc_Lag *mr_fn = mam_alloc(sizeof(ASTMemberFunc_Lag), OBJ_TYPE__ASTMemberFunc_Lag, NULL, 0);
-    mr_fn->mr_def = _mr_def;
-    mr_fn->index = _index;
-    return mr_fn;
-}
+// ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
+//     ASTMemberFunc_Lag *mr_fn = mam_alloc(sizeof(ASTMemberFunc_Lag), OBJ_TYPE__ASTMemberFunc_Lag, NULL, 0);
+//     mr_fn->mr_def = _mr_def;
+//     mr_fn->index = _index;
+//     return mr_fn;
+// }

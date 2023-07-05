@@ -1521,21 +1521,23 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 		// 	return member_role_;
 		// }
 		// else 
-		if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_ParallelPeriod)
-		{
-			member_role_ = ASTMemberFunc_ParallelPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
-			return member_role_;
-		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_ClosingPeriod)
-		{
-			member_role_ = ASTMemberFunc_ClosingPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
-			return member_role_;
-		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_OpeningPeriod)
-		{
-			member_role_ = ASTMemberFunc_OpeningPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
-			return member_role_;
-		}
+		// if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_ParallelPeriod)
+		// {
+		// 	member_role_ = ASTMemberFunc_ParallelPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+		// 	return member_role_;
+		// }
+		// else 
+		// if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_ClosingPeriod)
+		// {
+		// 	member_role_ = ASTMemberFunc_ClosingPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+		// 	return member_role_;
+		// }
+		// else 
+		// if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_OpeningPeriod)
+		// {
+		// 	member_role_ = ASTMemberFunc_OpeningPeriod_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+		// 	return member_role_;
+		// }
 		// else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_FirstChild)
 		// {
 		// 	member_role_ = ASTMemberFunc_FirstChild_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
@@ -1551,21 +1553,21 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 		// 	member_role_ = ASTMemberFunc_FirstSibling_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 		// 	return member_role_;
 		// }
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_LastSibling)
-		{
-			member_role_ = ASTMemberFunc_LastSibling_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
-			return member_role_;
-		}
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_Lag)
-		{
-			member_role_ = ASTMemberFunc_Lag_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
-			return member_role_;
-		}
-		else
-		{
+		// else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_LastSibling)
+		// {
+		// 	member_role_ = ASTMemberFunc_LastSibling_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+		// 	return member_role_;
+		// }
+		// else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_Lag)
+		// {
+		// 	member_role_ = ASTMemberFunc_Lag_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+		// 	return member_role_;
+		// }
+		// else
+		// {
 			log_print("[ error ] - ids_mbrsdef__build() obj_type_of(m_def->member_fn)\n");
 			exit(1);
-		}
+		// }
 	}
 	else
 	{
@@ -2220,289 +2222,289 @@ void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *c
 // }
 
 // TODO The function is too bloated and needs to be optimized.
-MddMemberRole *ASTMemberFunc_ParallelPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_ParallelPeriod *pp, MddTuple *context_tuple, Cube *cube)
-{
+// MddMemberRole *ASTMemberFunc_ParallelPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_ParallelPeriod *pp, MddTuple *context_tuple, Cube *cube)
+// {
 
-	// ParallelPeriod()
-	if (pp->lvr_def == NULL)
-	{
+// 	// ParallelPeriod()
+// 	if (pp->lvr_def == NULL)
+// 	{
 
-		ArrayList *roles_of_date_dims = Cube_find_date_dim_roles(cube);
-		if (als_size(roles_of_date_dims) != 1)
-			return NULL;
+// 		ArrayList *roles_of_date_dims = Cube_find_date_dim_roles(cube);
+// 		if (als_size(roles_of_date_dims) != 1)
+// 			return NULL;
 
-		DimensionRole *date_dim_role = als_get(roles_of_date_dims, 0);
-		MddMemberRole *date_mr = NULL;
+// 		DimensionRole *date_dim_role = als_get(roles_of_date_dims, 0);
+// 		MddMemberRole *date_mr = NULL;
 
-		int i, tp_len = als_size(context_tuple->mr_ls);
-		for (i = 0; i < tp_len; i++)
-		{
-			date_mr = als_get(context_tuple->mr_ls, i);
-			if (date_mr->dim_role != NULL && date_mr->dim_role->gid == date_dim_role->gid)
-				break;
-			date_mr = NULL;
-		}
+// 		int i, tp_len = als_size(context_tuple->mr_ls);
+// 		for (i = 0; i < tp_len; i++)
+// 		{
+// 			date_mr = als_get(context_tuple->mr_ls, i);
+// 			if (date_mr->dim_role != NULL && date_mr->dim_role->gid == date_dim_role->gid)
+// 				break;
+// 			date_mr = NULL;
+// 		}
 
-		if (date_mr->member_formula || (date_mr->member->p_gid == 0))
-			return NULL;
+// 		if (date_mr->member_formula || (date_mr->member->p_gid == 0))
+// 			return NULL;
 
-		Member *parent_mbr = find_member_by_gid(date_mr->member->p_gid);
-		Member *prev = Member_same_lv_m(parent_mbr, -1);
+// 		Member *parent_mbr = find_member_by_gid(date_mr->member->p_gid);
+// 		Member *prev = Member_same_lv_m(parent_mbr, -1);
 
-		if (prev == NULL)
-			return NULL;
+// 		if (prev == NULL)
+// 			return NULL;
 
-		int child_posi = Member_child_position(parent_mbr, date_mr->member);
-		Member *parallel_mbr = Member_get_posi_child(prev, child_posi);
+// 		int child_posi = Member_child_position(parent_mbr, date_mr->member);
+// 		Member *parallel_mbr = Member_get_posi_child(prev, child_posi);
 
-		if (parallel_mbr == NULL)
-			return NULL;
+// 		if (parallel_mbr == NULL)
+// 			return NULL;
 
-		return mdd_mr__create(parallel_mbr, date_dim_role);
-	}
+// 		return mdd_mr__create(parallel_mbr, date_dim_role);
+// 	}
 
-	// ParallelPeriod(<level expression>)
-	if (pp->index == NULL)
-	{
+// 	// ParallelPeriod(<level expression>)
+// 	if (pp->index == NULL)
+// 	{
 
-		LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, pp->lvr_def, context_tuple, cube);
+// 		LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, pp->lvr_def, context_tuple, cube);
 
-		MddMemberRole *mr = NULL;
+// 		MddMemberRole *mr = NULL;
 
-		int i, tp_len = als_size(context_tuple->mr_ls);
-		for (i = 0; i < tp_len; i++)
-		{
-			mr = als_get(context_tuple->mr_ls, i);
-			if (mr->dim_role && mr->dim_role->gid == lv_role->dim_role->gid)
-				break;
-			mr = NULL;
-		}
+// 		int i, tp_len = als_size(context_tuple->mr_ls);
+// 		for (i = 0; i < tp_len; i++)
+// 		{
+// 			mr = als_get(context_tuple->mr_ls, i);
+// 			if (mr->dim_role && mr->dim_role->gid == lv_role->dim_role->gid)
+// 				break;
+// 			mr = NULL;
+// 		}
 
-		if (mr->member->lv < lv_role->lv->level)
-			return NULL;
+// 		if (mr->member->lv < lv_role->lv->level)
+// 			return NULL;
 
-		if (mr->member->lv == lv_role->lv->level)
-		{
-			return mdd_mr__create(Member_same_lv_m(mr->member, -1), lv_role->dim_role);
-		}
+// 		if (mr->member->lv == lv_role->lv->level)
+// 		{
+// 			return mdd_mr__create(Member_same_lv_m(mr->member, -1), lv_role->dim_role);
+// 		}
 
-		Member *ancestor = Member_find_ancestor(mr->member, mr->member->lv - lv_role->lv->level);
+// 		Member *ancestor = Member_find_ancestor(mr->member, mr->member->lv - lv_role->lv->level);
 
-		ArrayList *desc_posi = Member_descendant_position(ancestor, mr->member);
+// 		ArrayList *desc_posi = Member_descendant_position(ancestor, mr->member);
 
-		Member *ancestor_prev = Member_same_lv_m(ancestor, -1);
+// 		Member *ancestor_prev = Member_same_lv_m(ancestor, -1);
 
-		return mdd_mr__create(Member_find_posi_descmbr(ancestor_prev, desc_posi), lv_role->dim_role);
-	}
+// 		return mdd_mr__create(Member_find_posi_descmbr(ancestor_prev, desc_posi), lv_role->dim_role);
+// 	}
 
-	// ParallelPeriod(<level expression>, offset)
-	if (pp->mr_def == NULL)
-	{
+// 	// ParallelPeriod(<level expression>, offset)
+// 	if (pp->mr_def == NULL)
+// 	{
 
-		LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, pp->lvr_def, context_tuple, cube);
+// 		LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, pp->lvr_def, context_tuple, cube);
 
-		MddMemberRole *mr = NULL;
+// 		MddMemberRole *mr = NULL;
 
-		int i, tp_len = als_size(context_tuple->mr_ls);
-		for (i = 0; i < tp_len; i++)
-		{
-			mr = als_get(context_tuple->mr_ls, i);
-			if (mr->dim_role && mr->dim_role->gid == lv_role->dim_role->gid)
-				break;
-			mr = NULL;
-		}
+// 		int i, tp_len = als_size(context_tuple->mr_ls);
+// 		for (i = 0; i < tp_len; i++)
+// 		{
+// 			mr = als_get(context_tuple->mr_ls, i);
+// 			if (mr->dim_role && mr->dim_role->gid == lv_role->dim_role->gid)
+// 				break;
+// 			mr = NULL;
+// 		}
 
-		if (mr->member->lv < lv_role->lv->level)
-			return NULL;
+// 		if (mr->member->lv < lv_role->lv->level)
+// 			return NULL;
 
-		GridData prev_offset;
-		Expression_evaluate(md_ctx, pp->index, cube, context_tuple, &prev_offset);
+// 		GridData prev_offset;
+// 		Expression_evaluate(md_ctx, pp->index, cube, context_tuple, &prev_offset);
 
-		int offset = prev_offset.val;
+// 		int offset = prev_offset.val;
 
-		if (mr->member->lv == lv_role->lv->level)
-		{
-			return mdd_mr__create(Member_same_lv_m(mr->member, 0 - offset), lv_role->dim_role);
-		}
+// 		if (mr->member->lv == lv_role->lv->level)
+// 		{
+// 			return mdd_mr__create(Member_same_lv_m(mr->member, 0 - offset), lv_role->dim_role);
+// 		}
 
-		unsigned int distance = mr->member->lv - lv_role->lv->level;
-		Member *ancestor = Member_find_ancestor(mr->member, distance);
+// 		unsigned int distance = mr->member->lv - lv_role->lv->level;
+// 		Member *ancestor = Member_find_ancestor(mr->member, distance);
 
-		ArrayList *desc_posi = Member_descendant_position(ancestor, mr->member);
+// 		ArrayList *desc_posi = Member_descendant_position(ancestor, mr->member);
 
-		Member *ancestor_prev = Member_same_lv_m(ancestor, 0 - offset);
+// 		Member *ancestor_prev = Member_same_lv_m(ancestor, 0 - offset);
 
-		return mdd_mr__create(Member_find_posi_descmbr(ancestor_prev, desc_posi), lv_role->dim_role);
-	}
+// 		return mdd_mr__create(Member_find_posi_descmbr(ancestor_prev, desc_posi), lv_role->dim_role);
+// 	}
 
-	// ParallelPeriod(<level expression>, offset, <member expression>)
+// 	// ParallelPeriod(<level expression>, offset, <member expression>)
 
-	LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, pp->lvr_def, context_tuple, cube);
+// 	LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, pp->lvr_def, context_tuple, cube);
 
-	MddMemberRole *mr = ids_mbrsdef__build(md_ctx, pp->mr_def, context_tuple, cube);
+// 	MddMemberRole *mr = ids_mbrsdef__build(md_ctx, pp->mr_def, context_tuple, cube);
 
-	if (mr->member->lv < lv_role->lv->level)
-		return NULL;
+// 	if (mr->member->lv < lv_role->lv->level)
+// 		return NULL;
 
-	GridData prev_offset;
-	Expression_evaluate(md_ctx, pp->index, cube, context_tuple, &prev_offset);
-	int offset = prev_offset.val;
+// 	GridData prev_offset;
+// 	Expression_evaluate(md_ctx, pp->index, cube, context_tuple, &prev_offset);
+// 	int offset = prev_offset.val;
 
-	if (mr->member->lv == lv_role->lv->level)
-	{
-		return mdd_mr__create(Member_same_lv_m(mr->member, 0 - offset), lv_role->dim_role);
-	}
+// 	if (mr->member->lv == lv_role->lv->level)
+// 	{
+// 		return mdd_mr__create(Member_same_lv_m(mr->member, 0 - offset), lv_role->dim_role);
+// 	}
 
-	unsigned int distance = mr->member->lv - lv_role->lv->level;
-	Member *ancestor = Member_find_ancestor(mr->member, distance);
+// 	unsigned int distance = mr->member->lv - lv_role->lv->level;
+// 	Member *ancestor = Member_find_ancestor(mr->member, distance);
 
-	ArrayList *desc_posi = Member_descendant_position(ancestor, mr->member);
+// 	ArrayList *desc_posi = Member_descendant_position(ancestor, mr->member);
 
-	Member *ancestor_prev = Member_same_lv_m(ancestor, 0 - offset);
+// 	Member *ancestor_prev = Member_same_lv_m(ancestor, 0 - offset);
 
-	return mdd_mr__create(Member_find_posi_descmbr(ancestor_prev, desc_posi), lv_role->dim_role);
-}
+// 	return mdd_mr__create(Member_find_posi_descmbr(ancestor_prev, desc_posi), lv_role->dim_role);
+// }
 
-MddMemberRole *ASTMemberFunc_ClosingPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_ClosingPeriod *cp, MddTuple *context_tuple, Cube *cube) {
-	if (cp->lvr_def == NULL && cp->mr_def == NULL) {
-		ArrayList *roles_of_date_dims = Cube_find_date_dim_roles(cube);
-		if (als_size(roles_of_date_dims) != 1)
-			return NULL;
+// MddMemberRole *ASTMemberFunc_ClosingPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_ClosingPeriod *cp, MddTuple *context_tuple, Cube *cube) {
+// 	if (cp->lvr_def == NULL && cp->mr_def == NULL) {
+// 		ArrayList *roles_of_date_dims = Cube_find_date_dim_roles(cube);
+// 		if (als_size(roles_of_date_dims) != 1)
+// 			return NULL;
 
-		DimensionRole *date_dim_role = als_get(roles_of_date_dims, 0);
-		Level *level = NULL;
-		Level *lv = NULL;
-		for (int i=0; i<als_size(levels_pool); i++) {
-			lv = als_get(levels_pool, i);
-			if (lv->dim_gid != date_dim_role->dim_gid || lv->level < 1)
-				continue;
+// 		DimensionRole *date_dim_role = als_get(roles_of_date_dims, 0);
+// 		Level *level = NULL;
+// 		Level *lv = NULL;
+// 		for (int i=0; i<als_size(levels_pool); i++) {
+// 			lv = als_get(levels_pool, i);
+// 			if (lv->dim_gid != date_dim_role->dim_gid || lv->level < 1)
+// 				continue;
 
-			if (level == NULL)
-				level = lv;
-			else if (lv->level < level->level)
-				level = lv;
-		}
+// 			if (level == NULL)
+// 				level = lv;
+// 			else if (lv->level < level->level)
+// 				level = lv;
+// 		}
 
-		Member *member = NULL;
-		for (int i=0; i<als_size(member_pool); i++) {
-			Member *m = als_get(member_pool, i);
+// 		Member *member = NULL;
+// 		for (int i=0; i<als_size(member_pool); i++) {
+// 			Member *m = als_get(member_pool, i);
 
-			if (m->dim_gid != level->dim_gid || m->lv != level->level)
-				continue;
+// 			if (m->dim_gid != level->dim_gid || m->lv != level->level)
+// 				continue;
 			
-			if (member == NULL)
-				member = m;
-			else if (m->gid > member->gid)
-				member = m;
-		}
+// 			if (member == NULL)
+// 				member = m;
+// 			else if (m->gid > member->gid)
+// 				member = m;
+// 		}
 
-		return mdd_mr__create(member, date_dim_role);
-	}
+// 		return mdd_mr__create(member, date_dim_role);
+// 	}
 
-	if (cp->lvr_def != NULL && cp->mr_def == NULL) {
-		LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, cp->lvr_def, context_tuple, cube);
-		Member *member = NULL;
-		for (int i=0; i<als_size(member_pool); i++) {
-			Member *m = als_get(member_pool, i);
-			if (m->dim_gid != lv_role->dim_role->dim_gid || m->lv != lv_role->lv->level)
-				continue;
+// 	if (cp->lvr_def != NULL && cp->mr_def == NULL) {
+// 		LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, cp->lvr_def, context_tuple, cube);
+// 		Member *member = NULL;
+// 		for (int i=0; i<als_size(member_pool); i++) {
+// 			Member *m = als_get(member_pool, i);
+// 			if (m->dim_gid != lv_role->dim_role->dim_gid || m->lv != lv_role->lv->level)
+// 				continue;
 			
-			if (member == NULL)
-				member = m;
-			else if (m->gid > member->gid)
-				member = m;
-		}
-		return mdd_mr__create(member, lv_role->dim_role);
-	}
+// 			if (member == NULL)
+// 				member = m;
+// 			else if (m->gid > member->gid)
+// 				member = m;
+// 		}
+// 		return mdd_mr__create(member, lv_role->dim_role);
+// 	}
 
-	if (cp->lvr_def != NULL && cp->mr_def != NULL) {
-		LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, cp->lvr_def, context_tuple, cube);
-		MddMemberRole *m_role = ids_mbrsdef__build(md_ctx, cp->mr_def, context_tuple, cube);
-		ArrayList *descendants = Member__descendants(m_role->member);
-		Member *member = NULL;
-		for (int i=0; i < als_size(descendants); i++) {
-			Member *m = als_get(descendants, i);
-			if (m->lv != lv_role->lv->level)
-				continue;
-			if (member == NULL || m->gid > member->gid)
-				member = m;
-		}
-		return mdd_mr__create(member, lv_role->dim_role);
-	}
+// 	if (cp->lvr_def != NULL && cp->mr_def != NULL) {
+// 		LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, cp->lvr_def, context_tuple, cube);
+// 		MddMemberRole *m_role = ids_mbrsdef__build(md_ctx, cp->mr_def, context_tuple, cube);
+// 		ArrayList *descendants = Member__descendants(m_role->member);
+// 		Member *member = NULL;
+// 		for (int i=0; i < als_size(descendants); i++) {
+// 			Member *m = als_get(descendants, i);
+// 			if (m->lv != lv_role->lv->level)
+// 				continue;
+// 			if (member == NULL || m->gid > member->gid)
+// 				member = m;
+// 		}
+// 		return mdd_mr__create(member, lv_role->dim_role);
+// 	}
 
-	log_print("[ error ] ASTMemberFunc_ClosingPeriod_evolving\n");
-	exit(EXIT_FAILURE);
-}
+// 	log_print("[ error ] ASTMemberFunc_ClosingPeriod_evolving\n");
+// 	exit(EXIT_FAILURE);
+// }
 
-MddMemberRole *ASTMemberFunc_OpeningPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_OpeningPeriod *op, MddTuple *context_tuple, Cube *cube) {
-	if (op->lvr_def == NULL && op->mr_def == NULL) {
-		ArrayList *roles_of_date_dims = Cube_find_date_dim_roles(cube);
-		if (als_size(roles_of_date_dims) != 1)
-			return NULL;
+// MddMemberRole *ASTMemberFunc_OpeningPeriod_evolving(MDContext *md_ctx, ASTMemberFunc_OpeningPeriod *op, MddTuple *context_tuple, Cube *cube) {
+// 	if (op->lvr_def == NULL && op->mr_def == NULL) {
+// 		ArrayList *roles_of_date_dims = Cube_find_date_dim_roles(cube);
+// 		if (als_size(roles_of_date_dims) != 1)
+// 			return NULL;
 
-		DimensionRole *date_dim_role = als_get(roles_of_date_dims, 0);
-		Level *level = NULL;
-		Level *lv = NULL;
-		for (int i=0; i<als_size(levels_pool); i++) {
-			lv = als_get(levels_pool, i);
-			if (lv->dim_gid != date_dim_role->dim_gid || lv->level < 1)
-				continue;
+// 		DimensionRole *date_dim_role = als_get(roles_of_date_dims, 0);
+// 		Level *level = NULL;
+// 		Level *lv = NULL;
+// 		for (int i=0; i<als_size(levels_pool); i++) {
+// 			lv = als_get(levels_pool, i);
+// 			if (lv->dim_gid != date_dim_role->dim_gid || lv->level < 1)
+// 				continue;
 
-			if (level == NULL)
-				level = lv;
-			else if (lv->level < level->level)
-				level = lv;
-		}
+// 			if (level == NULL)
+// 				level = lv;
+// 			else if (lv->level < level->level)
+// 				level = lv;
+// 		}
 
-		Member *member = NULL;
-		for (int i=0; i<als_size(member_pool); i++) {
-			Member *m = als_get(member_pool, i);
-			if (m->dim_gid != level->dim_gid || m->lv != level->level)
-				continue;
+// 		Member *member = NULL;
+// 		for (int i=0; i<als_size(member_pool); i++) {
+// 			Member *m = als_get(member_pool, i);
+// 			if (m->dim_gid != level->dim_gid || m->lv != level->level)
+// 				continue;
 			
-			if (member == NULL)
-				member = m;
-			else if (m->gid < member->gid)
-				member = m;
-		}
+// 			if (member == NULL)
+// 				member = m;
+// 			else if (m->gid < member->gid)
+// 				member = m;
+// 		}
 
-		return mdd_mr__create(member, date_dim_role);
-	}
+// 		return mdd_mr__create(member, date_dim_role);
+// 	}
 
-	if (op->lvr_def != NULL && op->mr_def == NULL) {
-		LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, op->lvr_def, context_tuple, cube);
-		Member *member = NULL;
-		for (int i=0; i<als_size(member_pool); i++) {
-			Member *m = als_get(member_pool, i);
-			if (m->dim_gid != lv_role->dim_role->dim_gid || m->lv != lv_role->lv->level)
-				continue;
+// 	if (op->lvr_def != NULL && op->mr_def == NULL) {
+// 		LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, op->lvr_def, context_tuple, cube);
+// 		Member *member = NULL;
+// 		for (int i=0; i<als_size(member_pool); i++) {
+// 			Member *m = als_get(member_pool, i);
+// 			if (m->dim_gid != lv_role->dim_role->dim_gid || m->lv != lv_role->lv->level)
+// 				continue;
 			
-			if (member == NULL)
-				member = m;
-			else if (m->gid < member->gid)
-				member = m;
-		}
-		return mdd_mr__create(member, lv_role->dim_role);
-	}
+// 			if (member == NULL)
+// 				member = m;
+// 			else if (m->gid < member->gid)
+// 				member = m;
+// 		}
+// 		return mdd_mr__create(member, lv_role->dim_role);
+// 	}
 
-	if (op->lvr_def != NULL && op->mr_def != NULL) {
-		LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, op->lvr_def, context_tuple, cube);
-		MddMemberRole *m_role = ids_mbrsdef__build(md_ctx, op->mr_def, context_tuple, cube);
-		ArrayList *descendants = Member__descendants(m_role->member);
-		Member *member = NULL;
-		for (int i=0; i < als_size(descendants); i++) {
-			Member *m = als_get(descendants, i);
-			if (m->lv != lv_role->lv->level)
-				continue;
-			if (member == NULL || m->gid < member->gid)
-				member = m;
-		}
-		return mdd_mr__create(member, lv_role->dim_role);
-	}
+// 	if (op->lvr_def != NULL && op->mr_def != NULL) {
+// 		LevelRole *lv_role = LevelRoleDef_interpret(md_ctx, op->lvr_def, context_tuple, cube);
+// 		MddMemberRole *m_role = ids_mbrsdef__build(md_ctx, op->mr_def, context_tuple, cube);
+// 		ArrayList *descendants = Member__descendants(m_role->member);
+// 		Member *member = NULL;
+// 		for (int i=0; i < als_size(descendants); i++) {
+// 			Member *m = als_get(descendants, i);
+// 			if (m->lv != lv_role->lv->level)
+// 				continue;
+// 			if (member == NULL || m->gid < member->gid)
+// 				member = m;
+// 		}
+// 		return mdd_mr__create(member, lv_role->dim_role);
+// 	}
 
-	log_print("[ error ] ASTMemberFunc_OpeningPeriod_evolving\n");
-	exit(EXIT_FAILURE);
-}
+// 	log_print("[ error ] ASTMemberFunc_OpeningPeriod_evolving\n");
+// 	exit(EXIT_FAILURE);
+// }
 
 
 // MddMemberRole *ASTMemberFunc_FirstChild_evolving(MDContext *md_ctx, ASTMemberFunc_FirstChild *mr_fn, MddTuple *context_tuple, Cube *cube) {
@@ -2547,62 +2549,58 @@ MddMemberRole *ASTMemberFunc_OpeningPeriod_evolving(MDContext *md_ctx, ASTMember
 // 	return mdd_mr__create(member, member_role->dim_role);
 // }
 
-MddMemberRole *ASTMemberFunc_LastSibling_evolving(MDContext *md_ctx, ASTMemberFunc_LastSibling *mr_fn, MddTuple *context_tuple, Cube *cube) {
-	MddMemberRole *member_role = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
-	// if (member_role->member->p_gid == 0)
-	// 	return member_role;
-	Member *member = NULL;
-	for (int i=0; i<als_size(member_pool); i++) {
-		Member *m = als_get(member_pool, i);
-		if (m->p_gid != member_role->member->p_gid)
-			continue;
-		if (member == NULL || m->gid >= member->gid)
-			member = m;
-	}
-	return mdd_mr__create(member, member_role->dim_role);
-}
+// MddMemberRole *ASTMemberFunc_LastSibling_evolving(MDContext *md_ctx, ASTMemberFunc_LastSibling *mr_fn, MddTuple *context_tuple, Cube *cube) {
+// 	MddMemberRole *member_role = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
+// 	// if (member_role->member->p_gid == 0)
+// 	// 	return member_role;
+// 	Member *member = NULL;
+// 	for (int i=0; i<als_size(member_pool); i++) {
+// 		Member *m = als_get(member_pool, i);
+// 		if (m->p_gid != member_role->member->p_gid)
+// 			continue;
+// 		if (member == NULL || m->gid >= member->gid)
+// 			member = m;
+// 	}
+// 	return mdd_mr__create(member, member_role->dim_role);
+// }
 
 
-int __mr_fn_lag_cmp__(void *obj, void *other) {
-	Member *mobj = (Member *)obj;
-	Member *moth = (Member *)other;
-	return moth->gid < mobj->gid ? -1 : (moth->gid > mobj->gid ? 1 : 0);
-}
 
-MddMemberRole *ASTMemberFunc_Lag_evolving(MDContext *md_ctx, ASTMemberFunc_Lag *mr_fn, MddTuple *context_tuple, Cube *cube) {
-	MddMemberRole *member_role = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
-	if (mr_fn->index == 0)
-		return member_role;
 
-	ArrayList *list = als_new(64, "Member *", THREAD_MAM, NULL);
+// MddMemberRole *ASTMemberFunc_Lag_evolving(MDContext *md_ctx, ASTMemberFunc_Lag *mr_fn, MddTuple *context_tuple, Cube *cube) {
+// 	MddMemberRole *member_role = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
+// 	if (mr_fn->index == 0)
+// 		return member_role;
 
-	for (int i=0; i<als_size(member_pool); i++) {
-		Member *m = als_get(member_pool, i);
-		if (m->p_gid == member_role->member->p_gid)
-			als_add(list, m);
-	}
+// 	ArrayList *list = als_new(64, "Member *", THREAD_MAM, NULL);
 
-	ArrayList_sort(list, __mr_fn_lag_cmp__);
+// 	for (int i=0; i<als_size(member_pool); i++) {
+// 		Member *m = als_get(member_pool, i);
+// 		if (m->p_gid == member_role->member->p_gid)
+// 			als_add(list, m);
+// 	}
 
-	int m_idx = 0;
-	for (int i=0; i<als_size(list); i++) {
-		Member *m = als_get(list, i);
-		if (m->gid == member_role->member->gid) {
-			m_idx = i;
-			break;
-		}
-	}
+// 	ArrayList_sort(list, __mr_fn_lag_cmp__);
 
-	m_idx -= mr_fn->index;
+// 	int m_idx = 0;
+// 	for (int i=0; i<als_size(list); i++) {
+// 		Member *m = als_get(list, i);
+// 		if (m->gid == member_role->member->gid) {
+// 			m_idx = i;
+// 			break;
+// 		}
+// 	}
 
-	if (m_idx < 0) {
-		m_idx = 0;
-	} else if (m_idx >= als_size(list)) {
-		m_idx = als_size(list) - 1;
-	}
+// 	m_idx -= mr_fn->index;
 
-	return mdd_mr__create(als_get(list, m_idx), member_role->dim_role);
-}
+// 	if (m_idx < 0) {
+// 		m_idx = 0;
+// 	} else if (m_idx >= als_size(list)) {
+// 		m_idx = als_size(list) - 1;
+// 	}
+
+// 	return mdd_mr__create(als_get(list, m_idx), member_role->dim_role);
+// }
 
 
 MultiDimResult *MultiDimResult_creat()
@@ -2853,6 +2851,13 @@ static void *_up_interpret_segment_hr
 				return mdd_mr__create(mbr, hr->dim_role);
 		}
 
+		for (int i = 0; i < als_size(levels_pool); i++) {
+			Level *lv = als_get(levels_pool, i);
+			if (lv->hierarchy_gid == hr->hierarchy->gid && !strcmp(lv->name, seg->info.seg_str)) {
+				return LevelRole_creat(lv, hr->dim_role);
+			}
+		}
+
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 		thrd_mam->exception_desc = "<exception code 3789>";
 		longjmp(thrd_mam->excep_ctx_env, -1);
@@ -3098,7 +3103,12 @@ static void *_up_interpret_segment_dr(MDContext *md_ctx, DimensionRole *dr, MdmE
 				return mdd_mr__create(m, dr);
 		}
 
-		// TODO LevelRole
+		// LevelRole
+		for (int i=0; i<als_size(levels_pool); i++) {
+			Level *lv = als_get(levels_pool, i);
+			if (lv->hierarchy_gid == dim->def_hierarchy_gid && !strcmp(lv->name, seg->info.seg_str))
+				return LevelRole_creat(lv, dr);
+		}
 
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 		thrd_mam->exception_desc = "exception: // TODO _up_interpret_segment_dr :: MDX could not be resolved.";
