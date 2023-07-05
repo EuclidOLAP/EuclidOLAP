@@ -68,6 +68,15 @@ Member *find_member_lv0(Dimension *dimension, Hierarchy *hierarchy, char *mbr_na
 
 Member *find_member_child(Member *parent_mbr, char *child_name);
 
+/*
+ * Compares the position of two members.
+ *
+ * @return -1 - oth is in front of the mem.
+ *          0
+ *          1 - oth is behind mem.
+ */
+int compare_member_position(Member *mem, Member *oth);
+
 void Cube_print(Cube *);
 
 ArrayList *Cube_find_date_dim_roles(Cube *);

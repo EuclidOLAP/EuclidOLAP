@@ -85,6 +85,7 @@ Stack AST_STACK = { 0 };
 %token LAST_SIBLING		/* LastSibling */
 %token LAG				/* Lag */
 %token LEAD				/* Lead */
+%token NEXT_MEMBER		/* NextMember */
 
 /* Numeric Functions key words */
 %token SUM				/* sum */
@@ -1519,6 +1520,27 @@ member_func_opening_period:
 	}
 ;
 
+member_func_next_member:
+	NEXT_MEMBER ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_NextMember *func = mam_alloc(sizeof(ASTMemberFn_NextMember), OBJ_TYPE__ASTMemberFn_NextMember, NULL, 0);
+		func->head.interpret = interpret_nextmember;
+		stack_pop(&AST_STACK, (void **) &(func->mroleup));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	NEXT_MEMBER ROUND_BRACKET_L ROUND_BRACKET_R {
+		ASTMemberFn_NextMember *func = mam_alloc(sizeof(ASTMemberFn_NextMember), OBJ_TYPE__ASTMemberFn_NextMember, NULL, 0);
+		func->head.interpret = interpret_nextmember;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	NEXT_MEMBER {
+		ASTMemberFn_NextMember *func = mam_alloc(sizeof(ASTMemberFn_NextMember), OBJ_TYPE__ASTMemberFn_NextMember, NULL, 0);
+		func->head.interpret = interpret_nextmember;
+		stack_push(&AST_STACK, func);
+	}
+;
+
 member_function:
 	member_func_parent {}
   |
@@ -1543,6 +1565,8 @@ member_function:
 	member_func_closing_period {}
   |
 	member_func_opening_period {}
+  |
+	member_func_next_member {}
 ;
 
 insert_cube_measures:
