@@ -17,17 +17,6 @@ typedef short type_obj;
 // The range reserved for the member functions of the AST is 1 ~ 200.
 #define OBJ_TYPE__ASTMEMBERFUNC__MIN 1
 
-// #define OBJ_TYPE__ASTMemberFunc_ClosingPeriod 1
-// #define OBJ_TYPE__ASTMemberFunc_CurrentMember 2
-// #define OBJ_TYPE__ASTMemberFunc_FirstChild 3
-// #define OBJ_TYPE__ASTMemberFunc_FirstSibling 4
-// #define OBJ_TYPE__ASTMemberFunc_Lag 5
-// #define OBJ_TYPE__ASTMemberFunc_LastChild 6
-// #define OBJ_TYPE__ASTMemberFunc_LastSibling 7
-// #define OBJ_TYPE__ASTMemberFunc_OpeningPeriod 8
-// #define OBJ_TYPE__ASTMemberFunc_ParallelPeriod 9
-// #define OBJ_TYPE__ASTMemberFunc_Parent 10
-// #define OBJ_TYPE__ASTMemberFunc_PrevMember 11
 #define OBJ_TYPE__ASTMemberFn_Parent 12
 #define OBJ_TYPE__ASTMemberFn_CurrentMember 13
 #define OBJ_TYPE__ASTMemberFn_PrevMember 14
@@ -120,15 +109,6 @@ typedef short type_obj;
 #define OBJ_TYPE__Member 10040
 #define OBJ_TYPE__MemberDef 10041
 #define OBJ_TYPE__MemberFormula 10042
-// #define OBJ_TYPE__MemberRoleFuncCurrentMember 10043
-// #define OBJ_TYPE__MemberRoleFuncFirstChild 10044
-// #define OBJ_TYPE__MemberRoleFuncFirstSibling 10045
-// #define OBJ_TYPE__MemberRoleFuncLag 10046
-// #define OBJ_TYPE__MemberRoleFuncLastChild 10047
-// #define OBJ_TYPE__MemberRoleFuncLastSibling 10048
-// #define OBJ_TYPE__MemberRoleFuncLead 10049
-#define OBJ_TYPE__MemberRoleFuncParent 10050
-// #define OBJ_TYPE__MemberRoleFuncPrevMember 10051
 #define OBJ_TYPE__MembersDef 10052
 #define OBJ_TYPE__MultiDimResult 10053
 #define OBJ_TYPE__RBNode 10054
@@ -137,11 +117,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ScaleOffsetRange 10057
 #define OBJ_TYPE__SelectDef 10058
 #define OBJ_TYPE__SetDef 10059
-// #define OBJ_TYPE__SetFnBottomOrTopPercent 10060
-// #define OBJ_TYPE__SetFnIntersect 10066
-// #define OBJ_TYPE__SetFnUnion 10072
 #define OBJ_TYPE__SetFormula 10074
-#define OBJ_TYPE__SetFuncMembers 10076
 #define OBJ_TYPE__SockIntentThread 10077
 #define OBJ_TYPE__StrArr 10078
 #define OBJ_TYPE__STRING 10079
