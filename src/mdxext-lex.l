@@ -197,6 +197,10 @@ Lead {
 	return LEAD;
 }
 
+NextMember {
+	return NEXT_MEMBER;
+}
+
 lateralMembers {
 	return LATERAL_MEMBERS;
 }

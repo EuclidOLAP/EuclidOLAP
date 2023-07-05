@@ -767,6 +767,36 @@ from [Airline B];
 
 ---
 
+select
+{
+  [Measures].Revenue,
+  [Measures].Revenue.NextMember,
+  [Measures].Cost
+} on columns,
+{
+    Date.[2021].Q4.NextMember(),
+    Date.[2022].Q1
+} on rows
+from [Airline A];
+
+---
+
+select
+{
+  [Measures].Revenue,
+  [Measures].Revenue.NextMember,
+  [Measures].Cost
+} on columns,
+{
+    Date.[2021].Q4.NextMember(),
+    Date.[2022].Q1,
+    Date.Calendar.[all],
+    nextmember(Date.Calendar.rOOt)
+} on rows
+from [Airline A];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

@@ -2999,3 +2999,24 @@ Member *hi_get_root_mbr(Hierarchy *hier) {
 	log_print("[ error ] - in fn:hi_get_root_mbr The hierarchy does not have a corresponding root member.\n");
 	exit(EXIT_FAILURE);
 }
+
+/*
+ * Compares the position of two members.
+ *
+ * @return -1 - oth is in front of the mem.
+ *          0
+ *          1 - oth is behind mem.
+ */
+int compare_member_position(Member *mem, Member *oth) {
+
+	if (mem->hierarchy_gid != oth->hierarchy_gid)
+		return oth->hierarchy_gid - mem->hierarchy_gid;
+
+	int slv = mem->lv < oth->lv ? mem->lv : oth->lv;
+	for (int i=0;i<slv;i++) {
+		if (mem->abs_path[i] != oth->abs_path[i])
+			return oth->abs_path[i] - mem->abs_path[i];
+	}
+
+	return oth->lv > mem->lv ? 1 : (oth->lv < mem->lv ? -1 : 0);
+}

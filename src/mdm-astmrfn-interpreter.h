@@ -118,4 +118,14 @@ typedef struct
 // for ASTMemberFn_OpeningPeriod
 void *interpret_openingperiod(void *md_ctx, void *nil, void *op, void *ctx_tuple, void *cube);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mroleup;
+} ASTMemberFn_NextMember;
+
+// for ASTMemberFn_NextMember
+void *interpret_nextmember(void *md_ctx, void *mrole, void *nm, void *ctx_tuple, void *cube);
+
 #endif

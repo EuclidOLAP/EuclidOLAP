@@ -661,3 +661,57 @@ void *interpret_openingperiod(void *md_ctx, void *nil, void *op, void *ctx_tuple
 	log_print("[ error ] interpret_openingperiod\n");
 	exit(EXIT_FAILURE);
 }
+
+// for ASTMemberFn_NextMember
+void *interpret_nextmember(void *md_ctx, void *mrole_, void *nm, void *ctx_tuple, void *cube_) {
+
+    ASTMemberFn_NextMember *nexmem = nm;
+    MddMemberRole *mrole = mrole_;
+
+    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
+        if (!nexmem->mroleup) {
+            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+            thrd_mam->exception_desc = "exception: function: interpret_nextmember.";
+            longjmp(thrd_mam->excep_ctx_env, -1);
+        }
+
+        mrole = up_evolving(md_ctx, nexmem->mroleup, cube_, ctx_tuple);
+        if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
+            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+            thrd_mam->exception_desc = "exception: function: interpret_nextmember.";
+            longjmp(thrd_mam->excep_ctx_env, -1);
+        }
+    }
+
+	Cube *cube = cube_;
+	Member *meam = NULL;
+
+	// todo
+	if (mrole->dim_role->bin_attr & DR_MEASURE_MASK) {
+		// mrole is a measure member role
+
+		for (int i=0; i<als_size( cube->measure_mbrs ); i++) {
+			Member *m = als_get( cube->measure_mbrs, i );
+			if (m->gid <= mrole->member->gid)
+				continue;
+			if (meam == NULL || m->gid < meam->gid)
+				meam = m;
+		}
+	} else {
+		// mrole is a non measure member role
+
+		unsigned int mpsz = als_size(member_pool);
+		for (unsigned int i=0; i<mpsz ;i++) {
+			Member *m = als_get( member_pool, i );
+			if (m->lv != mrole->member->lv)
+				continue;
+			
+			if (compare_member_position(mrole->member, m) < 1)
+				continue;
+
+			if (meam == NULL || compare_member_position(meam, m) < 0)
+				meam = m;
+		}
+	}
+	return meam ? mdd_mr__create(meam, mrole->dim_role) : mrole;
+}

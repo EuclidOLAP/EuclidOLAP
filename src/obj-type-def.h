@@ -28,6 +28,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTMemberFn_ParallelPeriod 20
 #define OBJ_TYPE__ASTMemberFn_ClosingPeriod 21
 #define OBJ_TYPE__ASTMemberFn_OpeningPeriod 22
+#define OBJ_TYPE__ASTMemberFn_NextMember 23
 
 #define OBJ_TYPE__ASTMEMBERFUNC__MAX 200
 
