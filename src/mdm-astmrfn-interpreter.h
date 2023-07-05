@@ -76,4 +76,15 @@ typedef struct
 // for ASTMemberFn_LastSibling
 void *interpret_lastsibling(void *md_ctx, void *mrole, void *lassib, void *ctx_tuple, void *cube);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mr_up;
+    long index;
+} ASTMemberFn_Lag;
+
+// for ASTMemberFn_Lag
+void *interpret_lag(void *md_ctx, void *mrole, void *lag, void *ctx_tuple, void *cube);
+
 #endif

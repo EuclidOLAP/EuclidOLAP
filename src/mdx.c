@@ -363,9 +363,9 @@ ASTMemberFunc_OpeningPeriod *ASTMemberFunc_OpeningPeriod_creat(LevelRoleDef *lvr
 // }
 
 
-ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
-    ASTMemberFunc_Lag *mr_fn = mam_alloc(sizeof(ASTMemberFunc_Lag), OBJ_TYPE__ASTMemberFunc_Lag, NULL, 0);
-    mr_fn->mr_def = _mr_def;
-    mr_fn->index = _index;
-    return mr_fn;
-}
+// ASTMemberFunc_Lag *ASTMemberFunc_Lag_creat(MemberDef *_mr_def, long _index) {
+//     ASTMemberFunc_Lag *mr_fn = mam_alloc(sizeof(ASTMemberFunc_Lag), OBJ_TYPE__ASTMemberFunc_Lag, NULL, 0);
+//     mr_fn->mr_def = _mr_def;
+//     mr_fn->index = _index;
+//     return mr_fn;
+// }

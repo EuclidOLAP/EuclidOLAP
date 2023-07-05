@@ -1556,11 +1556,11 @@ MddMemberRole *ids_mbrsdef__build(MDContext *md_ctx, MemberDef *m_def, MddTuple 
 		// 	member_role_ = ASTMemberFunc_LastSibling_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
 		// 	return member_role_;
 		// }
-		else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_Lag)
-		{
-			member_role_ = ASTMemberFunc_Lag_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
-			return member_role_;
-		}
+		// else if (obj_type_of(m_def->member_fn) == OBJ_TYPE__ASTMemberFunc_Lag)
+		// {
+		// 	member_role_ = ASTMemberFunc_Lag_evolving(md_ctx, m_def->member_fn, context_tuple, cube);
+		// 	return member_role_;
+		// }
 		else
 		{
 			log_print("[ error ] - ids_mbrsdef__build() obj_type_of(m_def->member_fn)\n");
@@ -2563,46 +2563,42 @@ MddMemberRole *ASTMemberFunc_OpeningPeriod_evolving(MDContext *md_ctx, ASTMember
 // }
 
 
-int __mr_fn_lag_cmp__(void *obj, void *other) {
-	Member *mobj = (Member *)obj;
-	Member *moth = (Member *)other;
-	return moth->gid < mobj->gid ? -1 : (moth->gid > mobj->gid ? 1 : 0);
-}
 
-MddMemberRole *ASTMemberFunc_Lag_evolving(MDContext *md_ctx, ASTMemberFunc_Lag *mr_fn, MddTuple *context_tuple, Cube *cube) {
-	MddMemberRole *member_role = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
-	if (mr_fn->index == 0)
-		return member_role;
 
-	ArrayList *list = als_new(64, "Member *", THREAD_MAM, NULL);
+// MddMemberRole *ASTMemberFunc_Lag_evolving(MDContext *md_ctx, ASTMemberFunc_Lag *mr_fn, MddTuple *context_tuple, Cube *cube) {
+// 	MddMemberRole *member_role = ids_mbrsdef__build(md_ctx, mr_fn->mr_def, context_tuple, cube);
+// 	if (mr_fn->index == 0)
+// 		return member_role;
 
-	for (int i=0; i<als_size(member_pool); i++) {
-		Member *m = als_get(member_pool, i);
-		if (m->p_gid == member_role->member->p_gid)
-			als_add(list, m);
-	}
+// 	ArrayList *list = als_new(64, "Member *", THREAD_MAM, NULL);
 
-	ArrayList_sort(list, __mr_fn_lag_cmp__);
+// 	for (int i=0; i<als_size(member_pool); i++) {
+// 		Member *m = als_get(member_pool, i);
+// 		if (m->p_gid == member_role->member->p_gid)
+// 			als_add(list, m);
+// 	}
 
-	int m_idx = 0;
-	for (int i=0; i<als_size(list); i++) {
-		Member *m = als_get(list, i);
-		if (m->gid == member_role->member->gid) {
-			m_idx = i;
-			break;
-		}
-	}
+// 	ArrayList_sort(list, __mr_fn_lag_cmp__);
 
-	m_idx -= mr_fn->index;
+// 	int m_idx = 0;
+// 	for (int i=0; i<als_size(list); i++) {
+// 		Member *m = als_get(list, i);
+// 		if (m->gid == member_role->member->gid) {
+// 			m_idx = i;
+// 			break;
+// 		}
+// 	}
 
-	if (m_idx < 0) {
-		m_idx = 0;
-	} else if (m_idx >= als_size(list)) {
-		m_idx = als_size(list) - 1;
-	}
+// 	m_idx -= mr_fn->index;
 
-	return mdd_mr__create(als_get(list, m_idx), member_role->dim_role);
-}
+// 	if (m_idx < 0) {
+// 		m_idx = 0;
+// 	} else if (m_idx >= als_size(list)) {
+// 		m_idx = als_size(list) - 1;
+// 	}
+
+// 	return mdd_mr__create(als_get(list, m_idx), member_role->dim_role);
+// }
 
 
 MultiDimResult *MultiDimResult_creat()
