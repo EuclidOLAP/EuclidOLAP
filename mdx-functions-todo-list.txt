@@ -56,7 +56,6 @@
 	Item (Member)		(M)
 	LinkMember		(M)
 	Members (String)		(M)
-	NextMember		(I) (M) (O)
 	Properties		(I)
 	StrToMbr		(O)
 	StrToMember		(M)
@@ -137,7 +136,6 @@
 	BottomCount		(I) (M)
 	BottomSum		(I) (M)
 	CurrentOrdinal		(M)
-	Distinct		(I) (M) (O)
 	DrilldownLevel		(I) (M)
 	DrilldownLevelBottom		(I) (M)
 	DrillDownLevelTop		(I)
@@ -247,6 +245,7 @@
 	ParallelPeriod		[E] [I] [M] [O]
 	Parent				[E] [I] [M] [O]
 	PrevMember			[E] [I] [M] [O]
+	NextMember			[E] [I] [M] [O]
 
 
 << Numeric Functions >>
@@ -273,6 +272,7 @@
 	TopPercent		[E] [I] [M]
 	Union			[E] [I] [M] [O]
 	Ytd				[E] [I] [M]
+	Distinct		[E] [I] [M] [O]
 
 
 << String Functions >>

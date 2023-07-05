@@ -71,6 +71,7 @@ Stack AST_STACK = { 0 };
 %token TOP_PERCENT
 %token UNION
 %token INTERSECT
+%token DISTINCT			/* Distinct */
 
 /* member functions key words */
 %token PARENT			/* parent */
@@ -725,6 +726,29 @@ set_function:
 	set_func_union {}
   |
 	set_func_intersect {}
+  |
+	set_func_distinct {}
+;
+
+set_func_distinct:
+	DISTINCT ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		ASTSetFunc_Distinct *func = mam_alloc(sizeof(ASTSetFunc_Distinct), OBJ_TYPE__ASTSetFunc_Distinct, NULL, 0);
+		func->head.interpret = interpret_distinct;
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	DISTINCT ROUND_BRACKET_L ROUND_BRACKET_R {
+		ASTSetFunc_Distinct *func = mam_alloc(sizeof(ASTSetFunc_Distinct), OBJ_TYPE__ASTSetFunc_Distinct, NULL, 0);
+		func->head.interpret = interpret_distinct;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	DISTINCT {
+		ASTSetFunc_Distinct *func = mam_alloc(sizeof(ASTSetFunc_Distinct), OBJ_TYPE__ASTSetFunc_Distinct, NULL, 0);
+		func->head.interpret = interpret_distinct;
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 set_func_children:
