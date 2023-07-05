@@ -745,6 +745,16 @@ from [Airline B] ;
 
 ---
 
+select 
+{ (ClosingPeriod(
+    Date.Calendar.Quarter,
+    Date.[ALL].[2021]
+)) } on 10,
+{ ([Measures].[Revenue]) } on SECTIONS
+from [Airline B] ;
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

@@ -273,12 +273,12 @@ void BooleanExpression_addTerm(BooleanExpression *, BooleanTerm *);
 // ASTMemberFunc_ParallelPeriod *ASTMemberFunc_ParallelPeriod_creat(LevelRoleDef *, Expression *, MemberDef *);
 
 
-typedef struct Member_Role_Fn_Closing_Period_
-{
-    LevelRoleDef *lvr_def;
-    MemberDef *mr_def;
-} ASTMemberFunc_ClosingPeriod;
-ASTMemberFunc_ClosingPeriod *ASTMemberFunc_ClosingPeriod_creat(LevelRoleDef *lvr, MemberDef *mr);
+// typedef struct Member_Role_Fn_Closing_Period_
+// {
+//     LevelRoleDef *lvr_def;
+//     MemberDef *mr_def;
+// } ASTMemberFunc_ClosingPeriod;
+// ASTMemberFunc_ClosingPeriod *ASTMemberFunc_ClosingPeriod_creat(LevelRoleDef *lvr, MemberDef *mr);
 
 
 typedef struct Member_Role_Fn_Opening_Period_

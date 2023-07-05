@@ -99,4 +99,15 @@ typedef struct
 // for ASTMemberFn_ParallelPeriod
 void *interpret_parallelperiod(void *md_ctx, void *nil, void *pp, void *ctx_tuple, void *cube);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *lvroleup;
+    MDMEntityUniversalPath *mroleup;
+} ASTMemberFn_ClosingPeriod;
+
+// for ASTMemberFn_ClosingPeriod
+void *interpret_closingperiod(void *md_ctx, void *nil, void *cp, void *ctx_tuple, void *cube);
+
 #endif

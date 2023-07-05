@@ -17,7 +17,7 @@ typedef short type_obj;
 // The range reserved for the member functions of the AST is 1 ~ 200.
 #define OBJ_TYPE__ASTMEMBERFUNC__MIN 1
 
-#define OBJ_TYPE__ASTMemberFunc_ClosingPeriod 1
+// #define OBJ_TYPE__ASTMemberFunc_ClosingPeriod 1
 // #define OBJ_TYPE__ASTMemberFunc_CurrentMember 2
 // #define OBJ_TYPE__ASTMemberFunc_FirstChild 3
 // #define OBJ_TYPE__ASTMemberFunc_FirstSibling 4
@@ -37,6 +37,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTMemberFn_LastSibling 18
 #define OBJ_TYPE__ASTMemberFn_Lag 19
 #define OBJ_TYPE__ASTMemberFn_ParallelPeriod 20
+#define OBJ_TYPE__ASTMemberFn_ClosingPeriod 21
 
 #define OBJ_TYPE__ASTMEMBERFUNC__MAX 200
 
