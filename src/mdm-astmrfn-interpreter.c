@@ -611,3 +611,95 @@ void *interpret_closingperiod(void *md_ctx, void *nil, void *cp, void *ctx_tuple
 	log_print("[ error ] interpret_closingperiod\n");
 	exit(EXIT_FAILURE);
 }
+
+// for ASTMemberFn_OpeningPeriod
+void *interpret_openingperiod(void *md_ctx, void *nil, void *op, void *ctx_tuple, void *cube) {
+
+	ASTMemberFn_OpeningPeriod *opeper = op;
+
+	if (opeper->lvroleup == NULL && opeper->mroleup == NULL) {
+		ArrayList *roles_of_date_dims = Cube_find_date_dim_roles(cube);
+		if (als_size(roles_of_date_dims) != 1)
+			return NULL;
+
+		DimensionRole *date_dim_role = als_get(roles_of_date_dims, 0);
+		Level *level = NULL;
+		Level *lv = NULL;
+		for (int i=0; i<als_size(levels_pool); i++) {
+			lv = als_get(levels_pool, i);
+			if (lv->dim_gid != date_dim_role->dim_gid || lv->level < 1)
+				continue;
+
+			if (level == NULL)
+				level = lv;
+			else if (lv->level < level->level)
+				level = lv;
+		}
+
+		Member *member = NULL;
+		for (int i=0; i<als_size(member_pool); i++) {
+			Member *m = als_get(member_pool, i);
+			if (m->dim_gid != level->dim_gid || m->lv != level->level)
+				continue;
+			
+			if (member == NULL)
+				member = m;
+			else if (m->gid < member->gid)
+				member = m;
+		}
+
+		return mdd_mr__create(member, date_dim_role);
+	}
+
+	if (opeper->lvroleup != NULL && opeper->mroleup == NULL) {
+		LevelRole *lv_role = up_evolving(md_ctx, opeper->lvroleup, cube, ctx_tuple);
+		if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_openingperiod.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+
+		Member *member = NULL;
+		for (int i=0; i<als_size(member_pool); i++) {
+			Member *m = als_get(member_pool, i);
+			if (m->dim_gid != lv_role->dim_role->dim_gid || m->lv != lv_role->lv->level)
+				continue;
+			
+			if (member == NULL)
+				member = m;
+			else if (m->gid < member->gid)
+				member = m;
+		}
+		return mdd_mr__create(member, lv_role->dim_role);
+	}
+
+	if (opeper->lvroleup != NULL && opeper->mroleup != NULL) {
+		LevelRole *lv_role = up_evolving(md_ctx, opeper->lvroleup, cube, ctx_tuple);
+		if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_openingperiod.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+
+		MddMemberRole *m_role = up_evolving(md_ctx, opeper->mroleup, cube, ctx_tuple);
+		if (!m_role || obj_type_of(m_role) != OBJ_TYPE__MddMemberRole) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_openingperiod.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+
+		ArrayList *descendants = Member__descendants(m_role->member);
+		Member *member = NULL;
+		for (int i=0; i < als_size(descendants); i++) {
+			Member *m = als_get(descendants, i);
+			if (m->lv != lv_role->lv->level)
+				continue;
+			if (member == NULL || m->gid < member->gid)
+				member = m;
+		}
+		return mdd_mr__create(member, lv_role->dim_role);
+	}
+
+	log_print("[ error ] interpret_openingperiod\n");
+	exit(EXIT_FAILURE);
+}

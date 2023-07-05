@@ -329,12 +329,12 @@ void BooleanExpression_addTerm(BooleanExpression *exp, BooleanTerm *term)
 //     return cp;
 // }
 
-ASTMemberFunc_OpeningPeriod *ASTMemberFunc_OpeningPeriod_creat(LevelRoleDef *lvr, MemberDef *mr) {
-    ASTMemberFunc_OpeningPeriod *op = mam_alloc(sizeof(ASTMemberFunc_OpeningPeriod), OBJ_TYPE__ASTMemberFunc_OpeningPeriod, NULL, 0);
-    op->lvr_def = lvr;
-    op->mr_def = mr;
-    return op;
-}
+// ASTMemberFunc_OpeningPeriod *ASTMemberFunc_OpeningPeriod_creat(LevelRoleDef *lvr, MemberDef *mr) {
+//     ASTMemberFunc_OpeningPeriod *op = mam_alloc(sizeof(ASTMemberFunc_OpeningPeriod), OBJ_TYPE__ASTMemberFunc_OpeningPeriod, NULL, 0);
+//     op->lvr_def = lvr;
+//     op->mr_def = mr;
+//     return op;
+// }
 
 
 // ASTMemberFunc_FirstChild *ASTMemberFunc_FirstChild_creat(MemberDef *mr) {

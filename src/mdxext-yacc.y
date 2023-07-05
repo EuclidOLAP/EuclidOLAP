@@ -1500,6 +1500,29 @@ member_func_closing_period:
 	}
 ;
 
+member_func_opening_period:
+	OPENING_PERIOD ROUND_BRACKET_L ROUND_BRACKET_R {
+		ASTMemberFn_OpeningPeriod *func = mam_alloc(sizeof(ASTMemberFn_OpeningPeriod), OBJ_TYPE__ASTMemberFn_OpeningPeriod, NULL, 0);
+		func->head.interpret = interpret_openingperiod;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	OPENING_PERIOD ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_OpeningPeriod *func = mam_alloc(sizeof(ASTMemberFn_OpeningPeriod), OBJ_TYPE__ASTMemberFn_OpeningPeriod, NULL, 0);
+		func->head.interpret = interpret_openingperiod;
+		stack_pop(&AST_STACK, (void **) &(func->lvroleup));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	OPENING_PERIOD ROUND_BRACKET_L mdm_entity_universal_path COMMA mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_OpeningPeriod *func = mam_alloc(sizeof(ASTMemberFn_OpeningPeriod), OBJ_TYPE__ASTMemberFn_OpeningPeriod, NULL, 0);
+		func->head.interpret = interpret_openingperiod;
+		stack_pop(&AST_STACK, (void **) &(func->mroleup));
+		stack_pop(&AST_STACK, (void **) &(func->lvroleup));
+		stack_push(&AST_STACK, func);
+	}
+;
+
 member_function:
 	member_func_parent {}
   |
@@ -1522,48 +1545,8 @@ member_function:
 	member_func_parallel_period {}
   |
 	member_func_closing_period {}
-  /*
-	member_func_opening_period {} */
-;
-
-// ----------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------
-
-member_function_template:
-	member_role_fn_opening_period {
-		ASTMemberFunc_OpeningPeriod *opening_period;
-		stack_pop(&AST_STACK, (void **) &opening_period);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = opening_period;
-		stack_push(&AST_STACK, mbr_def);
-	}
-;
-
-
-member_role_fn_opening_period:
-	OPENING_PERIOD ROUND_BRACKET_L ROUND_BRACKET_R {
-		ASTMemberFunc_OpeningPeriod *mr_fn = ASTMemberFunc_OpeningPeriod_creat(NULL, NULL);
-		stack_push(&AST_STACK, mr_fn);
-	}
   |
-	OPENING_PERIOD ROUND_BRACKET_L level_role_statement ROUND_BRACKET_R {
-		LevelRoleDef *lvr_def;
-		stack_pop(&AST_STACK, (void **) &lvr_def);
-		ASTMemberFunc_OpeningPeriod *mr_fn = ASTMemberFunc_OpeningPeriod_creat(lvr_def, NULL);
-		stack_push(&AST_STACK, mr_fn);
-
-	}
-  |
-	OPENING_PERIOD ROUND_BRACKET_L level_role_statement COMMA member_statement ROUND_BRACKET_R {
-		MemberDef *mbr_def;
-		stack_pop(&AST_STACK, (void **) &mbr_def);
-		LevelRoleDef *lvr_def;
-		stack_pop(&AST_STACK, (void **) &lvr_def);
-		ASTMemberFunc_OpeningPeriod *mr_fn = ASTMemberFunc_OpeningPeriod_creat(lvr_def, mbr_def);
-		stack_push(&AST_STACK, mr_fn);
-		
-	}
+	member_func_opening_period {}
 ;
 
 // ????????????????????????????????????????????????????????????????????????????????????????????????????

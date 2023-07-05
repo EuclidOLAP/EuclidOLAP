@@ -755,6 +755,18 @@ from [Airline B] ;
 
 ---
 
+select 
+{ 
+    ([Starting Point].[North America], [Ending Point].[Europe], [Aircraft Models].[Airbus].[A320]), 
+    ([Ending Point].[Europe], [Classes of Service].[First Class Suite]) 
+} on 0, 
+{ 
+    (OpeningPeriod([Date].[Month])) 
+} on 2 
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

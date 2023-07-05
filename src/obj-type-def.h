@@ -24,7 +24,7 @@ typedef short type_obj;
 // #define OBJ_TYPE__ASTMemberFunc_Lag 5
 // #define OBJ_TYPE__ASTMemberFunc_LastChild 6
 // #define OBJ_TYPE__ASTMemberFunc_LastSibling 7
-#define OBJ_TYPE__ASTMemberFunc_OpeningPeriod 8
+// #define OBJ_TYPE__ASTMemberFunc_OpeningPeriod 8
 // #define OBJ_TYPE__ASTMemberFunc_ParallelPeriod 9
 // #define OBJ_TYPE__ASTMemberFunc_Parent 10
 // #define OBJ_TYPE__ASTMemberFunc_PrevMember 11
@@ -38,6 +38,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTMemberFn_Lag 19
 #define OBJ_TYPE__ASTMemberFn_ParallelPeriod 20
 #define OBJ_TYPE__ASTMemberFn_ClosingPeriod 21
+#define OBJ_TYPE__ASTMemberFn_OpeningPeriod 22
 
 #define OBJ_TYPE__ASTMEMBERFUNC__MAX 200
 
