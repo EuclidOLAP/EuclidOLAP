@@ -1424,6 +1424,27 @@ member_func_lag:
 	}
 ;
 
+member_func_lead:
+	LEAD ROUND_BRACKET_L mdm_entity_universal_path COMMA decimal_value ROUND_BRACKET_R {
+		ASTMemberFn_Lag *func = mam_alloc(sizeof(ASTMemberFn_Lag), OBJ_TYPE__ASTMemberFn_Lag, NULL, 0);
+		func->head.interpret = interpret_lag;
+		void *ptol = NULL;
+		stack_pop(&AST_STACK, (void **) &ptol);
+		func->index = 0L - (long)ptol;
+		stack_pop(&AST_STACK, (void **) &(func->mr_up));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	LEAD ROUND_BRACKET_L decimal_value ROUND_BRACKET_R {
+		ASTMemberFn_Lag *func = mam_alloc(sizeof(ASTMemberFn_Lag), OBJ_TYPE__ASTMemberFn_Lag, NULL, 0);
+		func->head.interpret = interpret_lag;
+		void *ptol = NULL;
+		stack_pop(&AST_STACK, (void **) &ptol);
+		func->index = 0L - (long)ptol;
+		stack_push(&AST_STACK, func);
+	}
+;
+
 member_function:
 	member_func_parent {}
   |
@@ -1440,9 +1461,9 @@ member_function:
 	member_func_last_sibling {}
   |
 	member_func_lag {}
-  /*
-	member_func_lead {}
   |
+	member_func_lead {}
+  /*
 	member_func_parallel_period {}
   |
 	member_func_closing_period {}
@@ -1456,18 +1477,7 @@ member_function:
 
 member_function_template:
   
-  LEAD ROUND_BRACKET_L member_statement COMMA decimal_value ROUND_BRACKET_R {
-		void *ptol = NULL;
-		stack_pop(&AST_STACK, (void **) &ptol);
-		long index = (long) ptol;
-		MemberDef *member_role_def;
-		stack_pop(&AST_STACK, (void **) &member_role_def);
-		ASTMemberFunc_Lag *mr_fn = ASTMemberFunc_Lag_creat(member_role_def, 0 - index);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = mr_fn;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  |
+  
 	member_role_fn_parallel_period {
 		ASTMemberFunc_ParallelPeriod *pp;
 		stack_pop(&AST_STACK, (void **) &pp);
@@ -1576,24 +1586,6 @@ member_role_fn_opening_period:
 		ASTMemberFunc_OpeningPeriod *mr_fn = ASTMemberFunc_OpeningPeriod_creat(lvr_def, mbr_def);
 		stack_push(&AST_STACK, mr_fn);
 		
-	}
-;
-
-member_function_template_suffix:
-	mrfn_Lead_suftpl {
-		// Don't do anything
-	}
-;
-
-mrfn_Lead_suftpl:
-	LEAD ROUND_BRACKET_L decimal_value ROUND_BRACKET_R {
-		void *__vp__ = NULL;
-		stack_pop(&AST_STACK, (void **) &__vp__);
-
-		MemberRoleFuncLead *mr_func = mam_alloc(sizeof(MemberRoleFuncLead), OBJ_TYPE__MemberRoleFuncLead, NULL, 0);
-		mr_func->suf_flag = MDX_FN_SUFFIX_TRUE;
-		mr_func->index = (long) __vp__;
-		stack_push(&AST_STACK, mr_func);
 	}
 ;
 

@@ -388,11 +388,11 @@ ExpFnCoalesceEmpty *ExpFnCoalesceEmpty_creat(ArrayList *exp_ls);
 
 // } MemberRoleFuncLag;
 
-typedef struct _member_role_func_lead_ {
-    char suf_flag;
-    long index;
+// typedef struct _member_role_func_lead_ {
+//     char suf_flag;
+//     long index;
 
-} MemberRoleFuncLead;
+// } MemberRoleFuncLead;
 
 
 /*************************************************************************************

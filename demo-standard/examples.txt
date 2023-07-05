@@ -701,6 +701,36 @@ from [Airline A]
 
 ---
 
+select
+{ 
+    [Classes of Service].[ALL].[Business Suite],
+    ( Lag ([Classes of Service].[ALL].[Business Suite], -110) ),
+    ( Lead([Classes of Service].[ALL].[Business Suite], - 110) )
+} on rows,
+{
+    [Aircraft Models].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Models].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Models].[ALL].Boeing.[Boeing 787]
+} on columns
+from [Airline B];
+
+---
+
+select
+{ 
+    [Classes of Service].[ALL].[Business Suite],
+    [Classes of Service].[ALL].[Business Suite].Lag ( -110),
+    ( [Classes of Service].[ALL].[Business Suite].Lead( - 110) )
+} on rows,
+{
+    [Aircraft Models].[ALL].Boeing.[Boeing 747], 
+    [Aircraft Models].[ALL].Boeing.[Boeing 777], 
+    [Aircraft Models].[ALL].Boeing.[Boeing 787]
+} on columns
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

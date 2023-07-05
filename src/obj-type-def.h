@@ -123,7 +123,7 @@ typedef short type_obj;
 // #define OBJ_TYPE__MemberRoleFuncLag 10046
 // #define OBJ_TYPE__MemberRoleFuncLastChild 10047
 // #define OBJ_TYPE__MemberRoleFuncLastSibling 10048
-#define OBJ_TYPE__MemberRoleFuncLead 10049
+// #define OBJ_TYPE__MemberRoleFuncLead 10049
 #define OBJ_TYPE__MemberRoleFuncParent 10050
 // #define OBJ_TYPE__MemberRoleFuncPrevMember 10051
 #define OBJ_TYPE__MembersDef 10052
