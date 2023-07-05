@@ -87,4 +87,16 @@ typedef struct
 // for ASTMemberFn_Lag
 void *interpret_lag(void *md_ctx, void *mrole, void *lag, void *ctx_tuple, void *cube);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *lvroleup;
+    Expression *index;
+    MDMEntityUniversalPath *mroleup;
+} ASTMemberFn_ParallelPeriod;
+
+// for ASTMemberFn_ParallelPeriod
+void *interpret_parallelperiod(void *md_ctx, void *nil, void *pp, void *ctx_tuple, void *cube);
+
 #endif

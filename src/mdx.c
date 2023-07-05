@@ -312,14 +312,14 @@ void BooleanExpression_addTerm(BooleanExpression *exp, BooleanTerm *term)
 //     return fn;
 // }
 
-ASTMemberFunc_ParallelPeriod *ASTMemberFunc_ParallelPeriod_creat(LevelRoleDef *lvDef, Expression *idx, MemberDef *mDef)
-{
-    ASTMemberFunc_ParallelPeriod *pp = mam_alloc(sizeof(ASTMemberFunc_ParallelPeriod), OBJ_TYPE__ASTMemberFunc_ParallelPeriod, NULL, 0);
-    pp->lvr_def = lvDef;
-    pp->index = idx;
-    pp->mr_def = mDef;
-    return pp;
-}
+// ASTMemberFunc_ParallelPeriod *ASTMemberFunc_ParallelPeriod_creat(LevelRoleDef *lvDef, Expression *idx, MemberDef *mDef)
+// {
+//     ASTMemberFunc_ParallelPeriod *pp = mam_alloc(sizeof(ASTMemberFunc_ParallelPeriod), OBJ_TYPE__ASTMemberFunc_ParallelPeriod, NULL, 0);
+//     pp->lvr_def = lvDef;
+//     pp->index = idx;
+//     pp->mr_def = mDef;
+//     return pp;
+// }
 
 
 ASTMemberFunc_ClosingPeriod *ASTMemberFunc_ClosingPeriod_creat(LevelRoleDef *lvr, MemberDef *mr) {

@@ -264,13 +264,13 @@ void BooleanExpression_addTerm(BooleanExpression *, BooleanTerm *);
 // ASTMemberFunc_PrevMember *ASTMemberFunc_PrevMember_creat(MemberDef *);
 
 
-typedef struct Member_Role_Fn_Parallel_Period_
-{
-    LevelRoleDef *lvr_def;
-    Expression *index;
-    MemberDef *mr_def;
-} ASTMemberFunc_ParallelPeriod;
-ASTMemberFunc_ParallelPeriod *ASTMemberFunc_ParallelPeriod_creat(LevelRoleDef *, Expression *, MemberDef *);
+// typedef struct Member_Role_Fn_Parallel_Period_
+// {
+//     LevelRoleDef *lvr_def;
+//     Expression *index;
+//     MemberDef *mr_def;
+// } ASTMemberFunc_ParallelPeriod;
+// ASTMemberFunc_ParallelPeriod *ASTMemberFunc_ParallelPeriod_creat(LevelRoleDef *, Expression *, MemberDef *);
 
 
 typedef struct Member_Role_Fn_Closing_Period_

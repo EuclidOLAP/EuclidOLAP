@@ -1445,6 +1445,38 @@ member_func_lead:
 	}
 ;
 
+member_func_parallel_period:
+	PARALLEL_PERIOD ROUND_BRACKET_L ROUND_BRACKET_R {
+		ASTMemberFn_ParallelPeriod *func = mam_alloc(sizeof(ASTMemberFn_ParallelPeriod), OBJ_TYPE__ASTMemberFn_ParallelPeriod, NULL, 0);
+		func->head.interpret = interpret_parallelperiod;
+		stack_push(&AST_STACK, func);
+	}
+  | 
+	PARALLEL_PERIOD ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_ParallelPeriod *func = mam_alloc(sizeof(ASTMemberFn_ParallelPeriod), OBJ_TYPE__ASTMemberFn_ParallelPeriod, NULL, 0);
+		func->head.interpret = interpret_parallelperiod;
+		stack_pop(&AST_STACK, (void **) &(func->mroleup));
+		stack_push(&AST_STACK, func);
+	}
+  | 
+	PARALLEL_PERIOD ROUND_BRACKET_L mdm_entity_universal_path COMMA expression ROUND_BRACKET_R {
+		ASTMemberFn_ParallelPeriod *func = mam_alloc(sizeof(ASTMemberFn_ParallelPeriod), OBJ_TYPE__ASTMemberFn_ParallelPeriod, NULL, 0);
+		func->head.interpret = interpret_parallelperiod;
+		stack_pop(&AST_STACK, (void **) &(func->mroleup));
+		stack_pop(&AST_STACK, (void **) &(func->index));
+		stack_push(&AST_STACK, func);
+	}
+  | 
+	PARALLEL_PERIOD ROUND_BRACKET_L mdm_entity_universal_path COMMA expression COMMA mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_ParallelPeriod *func = mam_alloc(sizeof(ASTMemberFn_ParallelPeriod), OBJ_TYPE__ASTMemberFn_ParallelPeriod, NULL, 0);
+		func->head.interpret = interpret_parallelperiod;
+		stack_pop(&AST_STACK, (void **) &(func->mroleup));
+		stack_pop(&AST_STACK, (void **) &(func->index));
+		stack_pop(&AST_STACK, (void **) &(func->lvroleup));
+		stack_push(&AST_STACK, func);
+	}
+;
+
 member_function:
 	member_func_parent {}
   |
@@ -1463,9 +1495,9 @@ member_function:
 	member_func_lag {}
   |
 	member_func_lead {}
-  /*
-	member_func_parallel_period {}
   |
+	member_func_parallel_period {}
+  /*
 	member_func_closing_period {}
   |
 	member_func_opening_period {} */
@@ -1476,16 +1508,6 @@ member_function:
 // ----------------------------------------------------------------------------------------------------
 
 member_function_template:
-  
-  
-	member_role_fn_parallel_period {
-		ASTMemberFunc_ParallelPeriod *pp;
-		stack_pop(&AST_STACK, (void **) &pp);
-		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
-		mbr_def->member_fn = pp;
-		stack_push(&AST_STACK, mbr_def);
-	}
-  |
 	member_role_fn_closing_period {
 		ASTMemberFunc_ClosingPeriod *closing_period;
 		stack_pop(&AST_STACK, (void **) &closing_period);
@@ -1500,42 +1522,6 @@ member_function_template:
 		MemberDef *mbr_def = MemberDef_creat(MEMBER_DEF__MBR_FUNCTION);
 		mbr_def->member_fn = opening_period;
 		stack_push(&AST_STACK, mbr_def);
-	}
-;
-
-
-
-member_role_fn_parallel_period:
-	PARALLEL_PERIOD ROUND_BRACKET_L ROUND_BRACKET_R {
-		ASTMemberFunc_ParallelPeriod *pp = ASTMemberFunc_ParallelPeriod_creat(NULL, NULL, NULL);
-		stack_push(&AST_STACK, pp);
-	}
-  | 
-	PARALLEL_PERIOD ROUND_BRACKET_L level_role_statement ROUND_BRACKET_R {
-		LevelRoleDef *lvr_def;
-		stack_pop(&AST_STACK, (void **) &lvr_def);
-		ASTMemberFunc_ParallelPeriod *pp = ASTMemberFunc_ParallelPeriod_creat(lvr_def, NULL, NULL);
-		stack_push(&AST_STACK, pp);
-	}
-  | 
-	PARALLEL_PERIOD ROUND_BRACKET_L level_role_statement COMMA expression ROUND_BRACKET_R {
-		Expression *exp;
-		stack_pop(&AST_STACK, (void **) &exp);
-		LevelRoleDef *lvr_def;
-		stack_pop(&AST_STACK, (void **) &lvr_def);
-		ASTMemberFunc_ParallelPeriod *pp = ASTMemberFunc_ParallelPeriod_creat(lvr_def, exp, NULL);
-		stack_push(&AST_STACK, pp);
-	}
-  | 
-	PARALLEL_PERIOD ROUND_BRACKET_L level_role_statement COMMA expression COMMA member_statement ROUND_BRACKET_R {
-		MemberDef *mbr_def;
-		stack_pop(&AST_STACK, (void **) &mbr_def);
-		Expression *exp;
-		stack_pop(&AST_STACK, (void **) &exp);
-		LevelRoleDef *lvr_def;
-		stack_pop(&AST_STACK, (void **) &lvr_def);
-		ASTMemberFunc_ParallelPeriod *pp = ASTMemberFunc_ParallelPeriod_creat(lvr_def, exp, mbr_def);
-		stack_push(&AST_STACK, pp);
 	}
 ;
 

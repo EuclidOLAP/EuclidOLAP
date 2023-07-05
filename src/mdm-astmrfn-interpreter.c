@@ -356,3 +356,165 @@ void *interpret_lag(void *md_ctx, void *mrole, void *lag, void *ctx_tuple, void 
 
 	return mdd_mr__create(als_get(list, m_idx), mr->dim_role);
 }
+
+// for ASTMemberFn_ParallelPeriod
+void *interpret_parallelperiod(void *md_ctx, void *nil, void *pp, void *ctx_tuple, void *cube) {
+
+    ASTMemberFn_ParallelPeriod *paper = pp;
+    MddTuple *context_tuple = ctx_tuple;
+
+	// ParallelPeriod()
+	if (paper->lvroleup == NULL)
+	{
+		ArrayList *roles_of_date_dims = Cube_find_date_dim_roles(cube);
+		if (als_size(roles_of_date_dims) != 1)
+			return NULL;
+
+		DimensionRole *date_dim_role = als_get(roles_of_date_dims, 0);
+		MddMemberRole *date_mr = NULL;
+
+		int i, tp_len = als_size(context_tuple->mr_ls);
+		for (i = 0; i < tp_len; i++)
+		{
+			date_mr = als_get(context_tuple->mr_ls, i);
+			if (date_mr->dim_role != NULL && date_mr->dim_role->gid == date_dim_role->gid)
+				break;
+			date_mr = NULL;
+		}
+
+		if (date_mr->member_formula || (date_mr->member->p_gid == 0))
+			return NULL;
+
+		Member *parent_mbr = find_member_by_gid(date_mr->member->p_gid);
+		Member *prev = Member_same_lv_m(parent_mbr, -1);
+
+		if (prev == NULL)
+			return NULL;
+
+		int child_posi = Member_child_position(parent_mbr, date_mr->member);
+		Member *parallel_mbr = Member_get_posi_child(prev, child_posi);
+
+		if (parallel_mbr == NULL)
+			return NULL;
+
+		return mdd_mr__create(parallel_mbr, date_dim_role);
+	}
+
+	// ParallelPeriod(<level expression>)
+	if (paper->index == NULL)
+	{
+		LevelRole *lv_role = up_evolving(md_ctx, paper->lvroleup, cube, context_tuple);
+        if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole) {
+            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+            thrd_mam->exception_desc = "exception: function: interpret_parallelperiod.";
+            longjmp(thrd_mam->excep_ctx_env, -1);
+        }
+
+		MddMemberRole *mr = NULL;
+
+		int i, tp_len = als_size(context_tuple->mr_ls);
+		for (i = 0; i < tp_len; i++)
+		{
+			mr = als_get(context_tuple->mr_ls, i);
+			if (mr->dim_role && mr->dim_role->gid == lv_role->dim_role->gid)
+				break;
+			mr = NULL;
+		}
+
+		if (mr->member->lv < lv_role->lv->level)
+			return NULL;
+
+		if (mr->member->lv == lv_role->lv->level)
+		{
+			return mdd_mr__create(Member_same_lv_m(mr->member, -1), lv_role->dim_role);
+		}
+
+		Member *ancestor = Member_find_ancestor(mr->member, mr->member->lv - lv_role->lv->level);
+
+		ArrayList *desc_posi = Member_descendant_position(ancestor, mr->member);
+
+		Member *ancestor_prev = Member_same_lv_m(ancestor, -1);
+
+		return mdd_mr__create(Member_find_posi_descmbr(ancestor_prev, desc_posi), lv_role->dim_role);
+	}
+
+	// ParallelPeriod(<level expression>, offset)
+	if (paper->mroleup == NULL)
+	{
+		LevelRole *lv_role = up_evolving(md_ctx, paper->lvroleup, cube, context_tuple);
+        if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole) {
+            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+            thrd_mam->exception_desc = "exception: function: interpret_parallelperiod.";
+            longjmp(thrd_mam->excep_ctx_env, -1);
+        }
+
+		MddMemberRole *mr = NULL;
+
+		int i, tp_len = als_size(context_tuple->mr_ls);
+		for (i = 0; i < tp_len; i++)
+		{
+			mr = als_get(context_tuple->mr_ls, i);
+			if (mr->dim_role && mr->dim_role->gid == lv_role->dim_role->gid)
+				break;
+			mr = NULL;
+		}
+
+		if (mr->member->lv < lv_role->lv->level)
+			return NULL;
+
+		GridData prev_offset;
+		Expression_evaluate(md_ctx, paper->index, cube, context_tuple, &prev_offset);
+
+		int offset = prev_offset.val;
+
+		if (mr->member->lv == lv_role->lv->level)
+		{
+			return mdd_mr__create(Member_same_lv_m(mr->member, 0 - offset), lv_role->dim_role);
+		}
+
+		unsigned int distance = mr->member->lv - lv_role->lv->level;
+		Member *ancestor = Member_find_ancestor(mr->member, distance);
+
+		ArrayList *desc_posi = Member_descendant_position(ancestor, mr->member);
+
+		Member *ancestor_prev = Member_same_lv_m(ancestor, 0 - offset);
+
+		return mdd_mr__create(Member_find_posi_descmbr(ancestor_prev, desc_posi), lv_role->dim_role);
+	}
+
+	// ParallelPeriod(<level expression>, offset, <member expression>)
+    LevelRole *lv_role = up_evolving(md_ctx, paper->lvroleup, cube, context_tuple);
+    if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole) {
+        MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+        thrd_mam->exception_desc = "exception: function: interpret_parallelperiod.";
+        longjmp(thrd_mam->excep_ctx_env, -1);
+    }
+
+	MddMemberRole *mr = up_evolving(md_ctx, paper->mroleup, cube, context_tuple);
+    if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole) {
+        MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+        thrd_mam->exception_desc = "exception: function: interpret_parallelperiod.";
+        longjmp(thrd_mam->excep_ctx_env, -1);
+    }
+
+	if (mr->member->lv < lv_role->lv->level)
+		return NULL;
+
+	GridData prev_offset;
+	Expression_evaluate(md_ctx, paper->index, cube, context_tuple, &prev_offset);
+	int offset = prev_offset.val;
+
+	if (mr->member->lv == lv_role->lv->level)
+	{
+		return mdd_mr__create(Member_same_lv_m(mr->member, 0 - offset), lv_role->dim_role);
+	}
+
+	unsigned int distance = mr->member->lv - lv_role->lv->level;
+	Member *ancestor = Member_find_ancestor(mr->member, distance);
+
+	ArrayList *desc_posi = Member_descendant_position(ancestor, mr->member);
+
+	Member *ancestor_prev = Member_same_lv_m(ancestor, 0 - offset);
+
+	return mdd_mr__create(Member_find_posi_descmbr(ancestor_prev, desc_posi), lv_role->dim_role);
+}
