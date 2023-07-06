@@ -1,0 +1,18 @@
+#ifndef MDM_AST_NUM_FUNC__H
+#define MDM_AST_NUM_FUNC__H 1
+
+#include "mdx-ast-struct.h"
+#include "mdx.h"
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef;
+    char include_empty;
+} ASTNumFunc_Avg;
+
+// for ASTNumFunc_Avg
+void *interpret_avg(void *md_ctx_, void *nil, void *avg_, void *ctx_tuple_, void *cube_);
+
+#endif

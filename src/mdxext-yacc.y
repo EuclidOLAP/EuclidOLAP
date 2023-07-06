@@ -9,6 +9,7 @@
 #include "mdm-astlogifn-interpreter.h"
 #include "mdm-ast-str-fn.h"
 #include "mdm-ast-set-func.h"
+#include "mdm-ast-num-func.h"
 
 int yyerror(const char *);
 
@@ -96,6 +97,7 @@ Stack AST_STACK = { 0 };
 %token LOOK_UP_CUBE 	/* lookUpCube */
 %token IIF				/* iif */
 %token COALESCE_EMPTY	/* coalesceEmpty */
+%token AVG				/* Avg */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -519,6 +521,35 @@ expression_function:
 	}
   | exp_fn__coalesce_empty {
 		// do nothing
+	}
+  |
+	exp_fn__avg {}
+;
+
+exp_fn__avg:
+	AVG ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		ASTNumFunc_Avg *func = mam_alloc(sizeof(ASTNumFunc_Avg), OBJ_TYPE__ASTNumFunc_Avg, NULL, 0);
+		func->head.interpret = interpret_avg;
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	AVG ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Avg *func = mam_alloc(sizeof(ASTNumFunc_Avg), OBJ_TYPE__ASTNumFunc_Avg, NULL, 0);
+		func->head.interpret = interpret_avg;
+		stack_pop(&AST_STACK, (void **) &(func->expdef));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	AVG ROUND_BRACKET_L set_statement COMMA expression COMMA INCLUDEEMPTY ROUND_BRACKET_R {
+		// IncludeEmpty
+		ASTNumFunc_Avg *func = mam_alloc(sizeof(ASTNumFunc_Avg), OBJ_TYPE__ASTNumFunc_Avg, NULL, 0);
+		func->head.interpret = interpret_avg;
+		stack_pop(&AST_STACK, (void **) &(func->expdef));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		func->include_empty = 1;
+		stack_push(&AST_STACK, func);
 	}
 ;
 

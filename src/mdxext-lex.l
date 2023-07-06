@@ -125,6 +125,10 @@ sum {
 	return SUM;
 }
 
+Avg {
+	return AVG;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }

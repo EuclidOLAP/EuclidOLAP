@@ -12,6 +12,7 @@ typedef short type_obj;
 #define is_type_astlogicalfunc(obj_type) (obj_type >= OBJ_TYPE__ASTLOGICALFUNC__MIN && obj_type <= OBJ_TYPE__ASTLOGICALFUNC__MAX)
 #define is_type_ast_str_func(obj_type) (obj_type >= OBJ_TYPE__AST_STR_FUNC__MIN && obj_type <= OBJ_TYPE__AST_STR_FUNC__MAX)
 #define is_type_ast_set_func(obj_type) (obj_type >= OBJ_TYPE__AST_SET_FUNC_MIN && obj_type <= OBJ_TYPE__AST_SET_FUNC_MAX)
+#define is_type_ast_num_func(obj_type) (obj_type >= OBJ_TYPE__ASTNUMFUNC_MIN && obj_type <= OBJ_TYPE__ASTNUMFUNC_MAX)
 
 
 // The range reserved for the member functions of the AST is 1 ~ 200.
@@ -65,6 +66,12 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTSetFunc_Intersect         414
 #define OBJ_TYPE__ASTSetFunc_Distinct         415
 #define OBJ_TYPE__AST_SET_FUNC_MAX        500
+
+
+// The range reserved for the Numeric functions of the AST is 501 ~ 600.
+#define OBJ_TYPE__ASTNUMFUNC_MIN        501
+#define OBJ_TYPE__ASTNumFunc_Avg        501
+#define OBJ_TYPE__ASTNUMFUNC_MAX        600
 
 
 #define OBJ_TYPE__RAW_BYTES 10001

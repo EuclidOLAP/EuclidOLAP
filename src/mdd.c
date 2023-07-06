@@ -1968,9 +1968,14 @@ void Factory_evaluate(MDContext *md_ctx, Factory *fac, Cube *cube, MddTuple *ctx
 			ExpFnCoalesceEmpty_evolving(md_ctx, fac->exp, cube, ctx_tuple, grid_data);
 			return;
 		}
+		else if (is_type_ast_num_func(obj_type_of(fac->exp))) {
+			GridData *cell = ((ASTFunctionCommonHead *)fac->exp)->interpret(md_ctx, NULL, fac->exp, ctx_tuple, cube);
+			memcpy(grid_data, cell, sizeof(GridData));
+			return;
+		}
 		else
 		{
-			log_print("[ error ] - Factory_evaluate() - Unknown expression function type.\n");
+			log_print("[ Exit(1) ] - Factory_evaluate() - Unknown expression function type.\n");
 			exit(1);
 		}
 	} else if (fac->t_cons == FACTORY_DEF__STR_LITERAL) {

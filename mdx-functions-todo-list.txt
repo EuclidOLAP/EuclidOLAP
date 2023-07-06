@@ -66,7 +66,6 @@
 << Numeric Functions >>
 	Abs		(I) (O)
 	Aggregate		(I) (M) (O)
-	Avg		(I) (M) (O)
 	CalculationCurrentPass		(M)
 	CalculationPassValue		(M)
 	Case		(O)
@@ -254,6 +253,7 @@
 	IIf					[E] [M] [O]
 	LookupCube			[E] [M]
 	Sum					[E] [I] [M] [O]
+	Avg					[E] [I] [M] [O]
 
 
 << Set Functions >>
