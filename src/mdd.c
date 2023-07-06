@@ -1943,17 +1943,19 @@ void Factory_evaluate(MDContext *md_ctx, Factory *fac, Cube *cube, MddTuple *ctx
 	}
 	else if (fac->t_cons == FACTORY_DEF__EXP_FN)
 	{
-		if (obj_type_of(fac->exp) == OBJ_TYPE__ExpFnSum)
-		{
-			ExpFnSum_evolving(md_ctx, fac->exp, cube, ctx_tuple, grid_data);
-			return;
-		}
-		else if (obj_type_of(fac->exp) == OBJ_TYPE__ExpFnCount)
-		{
-			ExpFnCount_evolving(md_ctx, fac->exp, cube, ctx_tuple, grid_data);
-			return;
-		}
-		else if (obj_type_of(fac->exp) == OBJ_TYPE__ExpFnLookUpCube)
+		// if (obj_type_of(fac->exp) == OBJ_TYPE__ExpFnSum)
+		// {
+		// 	ExpFnSum_evolving(md_ctx, fac->exp, cube, ctx_tuple, grid_data);
+		// 	return;
+		// }
+		// else 
+		// if (obj_type_of(fac->exp) == OBJ_TYPE__ExpFnCount)
+		// {
+		// 	ExpFnCount_evolving(md_ctx, fac->exp, cube, ctx_tuple, grid_data);
+		// 	return;
+		// }
+		// else 
+		if (obj_type_of(fac->exp) == OBJ_TYPE__ExpFnLookUpCube)
 		{
 			ExpFnLookUpCube_evolving(md_ctx, fac->exp, cube, ctx_tuple, grid_data);
 			return;
@@ -2104,70 +2106,6 @@ Cube *Tuple_ctx_cube(MddTuple *tuple)
 			return find_cube_by_gid(mr_0->dim_role->cube_gid);
 	}
 	return NULL;
-}
-
-void ExpFnSum_evolving(MDContext *md_ctx, ExpFnSum *sum, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data)
-{
-	grid_data->null_flag = 1;
-	grid_data->val = 0;
-
-	MddSet *set = ids_setdef__build(md_ctx, sum->set_def, ctx_tuple, cube);
-	int i, sz = als_size(set->tuples);
-	for (i = 0; i < sz; i++)
-	{
-		MddTuple *tuple = als_get(set->tuples, i);
-		tuple = tuple__merge(ctx_tuple, tuple);
-		GridData tmp;
-		if (sum->exp)
-			Expression_evaluate(md_ctx, sum->exp, cube, tuple, &tmp);
-		else
-			do_calculate_measure_value(md_ctx, cube, tuple, &tmp);
-
-		if (tmp.null_flag == 0)
-		{
-			grid_data->val += tmp.val;
-			grid_data->null_flag = 0;
-		}
-		else
-		{
-			grid_data->null_flag = 1;
-			return;
-		}
-	}
-}
-
-void ExpFnCount_evolving(MDContext *md_ctx, ExpFnCount *count, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data)
-{
-
-	grid_data->null_flag = 0;
-	grid_data->val = 0;
-
-	MddSet *set = ids_setdef__build(md_ctx, count->set_def, ctx_tuple, cube);
-
-	int i, tuples_size = als_size(set->tuples);
-
-	if (count->include_empty)
-	{
-		grid_data->val = tuples_size;
-		return;
-	}
-
-	MddTuple **tuples_matrix_h = mam_alloc(sizeof(MddTuple *) * tuples_size, OBJ_TYPE__RAW_BYTES, NULL, 0);
-
-	for (i = 0; i < tuples_size; i++)
-	{
-		tuples_matrix_h[i] = tuple__merge(ctx_tuple, (MddTuple *)(als_get(set->tuples, i)));
-	}
-
-	// char *null_flags;
-	ArrayList *grids = vce_vactors_values(md_ctx, tuples_matrix_h, tuples_size);
-
-	for (i = 0; i < tuples_size; i++)
-	{
-		GridData *gd = als_get(grids, i);
-		if (gd->null_flag == 0)
-			grid_data->val += 1;
-	}
 }
 
 void ExpFnLookUpCube_evolving(MDContext *md_ctx, ExpFnLookUpCube *luc, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data)

@@ -863,6 +863,45 @@ from [Airline B] ;
 
 ---
 
+with 
+member [Measures].EEEEEE
+  as Date.currentMember.name
+member [Measures].QQQQQQ
+  as Aggregate(Date.members, [Measures].EEEEEE, DistinctCount)
+select 
+  [Measures].EEEEEE on 1,
+  Date.members on 10 
+from [Airline B] 
+where ([Ending Point].[South America]);
+
+---
+
+with 
+member [Measures].EEEEEE
+  as Date.currentMember.name
+member [Measures].QQQQQQ
+  as Aggregate(Date.members, [Measures].EEEEEE, DistinctCount)
+select 
+  [Measures].QQQQQQ on 1,
+  [Ending Point].[South America] on 10 
+from [Airline B] 
+where ([Ending Point].[South America]);
+
+---
+
+with 
+member [Measures].EEEEEE
+  as Date.currentMember.name
+member [Measures].QQQQQQ
+  as Aggregate(Date.[2022].children, [Measures].EEEEEE, DistinctCount)
+select 
+  [Measures].QQQQQQ on 1,
+  [Ending Point].[South America] on 10 
+from [Airline B] 
+where ([Ending Point].[South America]);
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

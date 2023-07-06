@@ -189,26 +189,6 @@ typedef struct formula_context
 } FormulaContext;
 FormulaContext *FormulaContext_creat();
 
-
-// ASTMemberFunc_Parent *ASTMemberFunc_Parent_creat(MemberDef *child_def);
-
-typedef struct exp_fn_sum
-{
-    SetDef *set_def;
-    Expression *exp;
-} ExpFnSum;
-ExpFnSum *ExpFnSum_creat(SetDef *, Expression *);
-
-typedef struct Exp_Fn_Count
-{
-    char include_empty; // 0 - EXCLUDEEMPTY, 1(def) - INCLUDEEMPTY
-    SetDef *set_def;
-} ExpFnCount;
-ExpFnCount *ExpFnCount_creat();
-void ExpFnCount_set_setDef(ExpFnCount *, SetDef *);
-void ExpFnCount_excludeEmpty(ExpFnCount *);
-
-
 typedef struct ExpFn_LookUpCube
 {
     char *cube_name;

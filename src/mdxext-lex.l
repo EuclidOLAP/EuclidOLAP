@@ -137,6 +137,10 @@ MIN {
 	return MIN;
 }
 
+Aggregate {
+	return AGGREGATE;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }

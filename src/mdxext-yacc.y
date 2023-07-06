@@ -100,6 +100,7 @@ Stack AST_STACK = { 0 };
 %token AVG				/* Avg */
 %token MAX				/* Max */
 %token MIN				/* Min */
+%token AGGREGATE		/* Aggregate */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -530,6 +531,90 @@ expression_function:
 	exp_fn__max {}
   |
 	exp_fn__min {}
+  |
+	exp_fn__aggregate {}
+;
+
+exp_fn__aggregate:
+	AGGREGATE ROUND_BRACKET_L set_statement COMMA expression COMMA VAR {
+		ASTNumFunc_Aggregate *func = mam_alloc(sizeof(ASTNumFunc_Aggregate), OBJ_TYPE__ASTNumFunc_Aggregate, NULL, 0);
+		func->head.interpret = interpret_aggregate;
+
+		if (!strcasecmp(yytext, "DEFAULT")) {
+			func->opt = FAO_DEFAULT;
+		} else if (!strcasecmp(yytext, "SUM")) {
+			func->opt = FAO_SUM;
+		} else if (!strcasecmp(yytext, "COUNT")) {
+			func->opt = FAO_COUNT;
+		} else if (!strcasecmp(yytext, "MAX")) {
+			func->opt = FAO_MAX;
+		} else if (!strcasecmp(yytext, "MIN")) {
+			func->opt = FAO_MIN;
+		} else if (!strcasecmp(yytext, "DistinctCount")) {
+			func->opt = FAO_DISTINCT_COUNT;
+		}
+
+		stack_pop(&AST_STACK, (void **) &(func->expdef));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	} ROUND_BRACKET_R
+  |
+	AGGREGATE ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Aggregate *func = mam_alloc(sizeof(ASTNumFunc_Aggregate), OBJ_TYPE__ASTNumFunc_Aggregate, NULL, 0);
+		func->head.interpret = interpret_aggregate;
+		func->opt = FAO_SUM;
+		stack_pop(&AST_STACK, (void **) &(func->expdef));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	AGGREGATE ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		ASTNumFunc_Aggregate *func = mam_alloc(sizeof(ASTNumFunc_Aggregate), OBJ_TYPE__ASTNumFunc_Aggregate, NULL, 0);
+		func->head.interpret = interpret_aggregate;
+		func->opt = FAO_SUM;
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+;
+
+exp_fn_sum:
+	SUM ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		ASTNumFunc_Sum *func = mam_alloc(sizeof(ASTNumFunc_Sum), OBJ_TYPE__ASTNumFunc_Sum, NULL, 0);
+		func->head.interpret = interpret_sum;
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  | SUM ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Sum *func = mam_alloc(sizeof(ASTNumFunc_Sum), OBJ_TYPE__ASTNumFunc_Sum, NULL, 0);
+		func->head.interpret = interpret_sum;
+		stack_pop(&AST_STACK, (void **) &(func->expdef));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+;
+
+exp_fn_count:
+	COUNT ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		ASTNumFunc_Count *func = mam_alloc(sizeof(ASTNumFunc_Count), OBJ_TYPE__ASTNumFunc_Count, NULL, 0);
+		func->head.interpret = interpret_count;
+		func->include_empty = 0;
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  | COUNT ROUND_BRACKET_L set_statement COMMA EXCLUDEEMPTY ROUND_BRACKET_R {
+		ASTNumFunc_Count *func = mam_alloc(sizeof(ASTNumFunc_Count), OBJ_TYPE__ASTNumFunc_Count, NULL, 0);
+		func->head.interpret = interpret_count;
+		func->include_empty = 0;
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  | COUNT ROUND_BRACKET_L set_statement COMMA INCLUDEEMPTY ROUND_BRACKET_R {
+		ASTNumFunc_Count *func = mam_alloc(sizeof(ASTNumFunc_Count), OBJ_TYPE__ASTNumFunc_Count, NULL, 0);
+		func->head.interpret = interpret_count;
+		func->include_empty = 1;
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__max:
@@ -645,44 +730,6 @@ exp_fn__look_up_cube:
 	}
 ;
 
-exp_fn_count:
-	COUNT ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
-		SetDef *set_def = NULL;
-		stack_pop(&AST_STACK, (void **) &set_def);
-		ExpFnCount *count = ExpFnCount_creat();
-		ExpFnCount_set_setDef(count, set_def);
-		stack_push(&AST_STACK, count);
-	}
-  | COUNT ROUND_BRACKET_L set_statement COMMA EXCLUDEEMPTY ROUND_BRACKET_R {
-		SetDef *set_def = NULL;
-		stack_pop(&AST_STACK, (void **) &set_def);
-		ExpFnCount *count = ExpFnCount_creat();
-		ExpFnCount_set_setDef(count, set_def);
-		ExpFnCount_excludeEmpty(count);
-		stack_push(&AST_STACK, count);
-	}
-  | COUNT ROUND_BRACKET_L set_statement COMMA INCLUDEEMPTY ROUND_BRACKET_R {
-		SetDef *set_def = NULL;
-		stack_pop(&AST_STACK, (void **) &set_def);
-		ExpFnCount *count = ExpFnCount_creat();
-		ExpFnCount_set_setDef(count, set_def);
-		stack_push(&AST_STACK, count);
-	}
-;
-
-exp_fn_sum:
-	SUM ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
-		ExpFnSum *sum = ExpFnSum_creat(NULL, NULL);
-		stack_pop(&AST_STACK, (void **) &(sum->set_def));
-		stack_push(&AST_STACK, sum);
-	}
-  | SUM ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
-		ExpFnSum *sum = ExpFnSum_creat(NULL, NULL);
-		stack_pop(&AST_STACK, (void **) &(sum->exp));
-		stack_pop(&AST_STACK, (void **) &(sum->set_def));
-		stack_push(&AST_STACK, sum);
-	}
-;
 
 cube__statement:
 	var_or_block {
