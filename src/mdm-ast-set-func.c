@@ -19,133 +19,146 @@ extern ArrayList *levels_pool;
 void *interpret_children(void *md_ctx_, void *mrole_, void *ast_children_, void *ctx_tuple_, void *cube_)
 {
 
-    ASTSetFunc_Children *children = ast_children_;
+	ASTSetFunc_Children *children = ast_children_;
 
-    MddMemberRole *mrole = mrole_;
-    if (!mrole)
-    {
-        if (!children->mrole_sep)
-        {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: A member must be specified when the Children function is called.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
-        mrole = up_evolving(md_ctx_, children->mrole_sep, cube_, ctx_tuple_);
-    }
+	MddMemberRole *mrole = mrole_;
+	if (!mrole)
+	{
+		if (!children->mrole_sep)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: A member must be specified when the Children function is called.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+		mrole = up_evolving(md_ctx_, children->mrole_sep, cube_, ctx_tuple_);
+	}
 
-    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole)
-    {
-        MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-        thrd_mam->exception_desc = "exception: A member must be specified when the Children function is called.";
-        longjmp(thrd_mam->excep_ctx_env, -1);
-    }
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole)
+	{
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: A member must be specified when the Children function is called.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
 
-    MddSet *set = mdd_set__create();
-    int i, sz = als_size(member_pool);
-    for (i = 0; i < sz; i++)
-    {
-        Member *m = als_get(member_pool, i);
-        if (m->p_gid == mrole->member->gid)
-        {
-            MddTuple *tuple = mdd_tp__create();
-            mdd_tp__add_mbrole(tuple, mdd_mr__create(m, mrole->dim_role));
-            mddset__add_tuple(set, tuple);
-        }
-    }
+	MddSet *set = mdd_set__create();
+	int i, sz = als_size(member_pool);
+	for (i = 0; i < sz; i++)
+	{
+		Member *m = als_get(member_pool, i);
+		if (m->p_gid == mrole->member->gid)
+		{
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, mdd_mr__create(m, mrole->dim_role));
+			mddset__add_tuple(set, tuple);
+		}
+	}
 
-    return set;
+	return set;
 }
 
 // for ASTSetFunc_Members
-void *interpret_members(void *md_ctx_, void *entity_, void *ast_members_, void *ctx_tuple_, void *cube_) {
+void *interpret_members(void *md_ctx_, void *entity_, void *ast_members_, void *ctx_tuple_, void *cube_)
+{
 
-    ASTSetFunc_Members *members = ast_members_;
+	ASTSetFunc_Members *members = ast_members_;
 
 	Cube *cube = cube_;
 
-    if (!entity_)
-    {
-        if (!members->eup)
-        {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "Function interpret_members throws an exception.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
-        entity_ = up_evolving(md_ctx_, members->eup, cube_, ctx_tuple_);
-    }
+	if (!entity_)
+	{
+		if (!members->eup)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "Function interpret_members throws an exception.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+		entity_ = up_evolving(md_ctx_, members->eup, cube_, ctx_tuple_);
+	}
 
-    if (!entity_)
-    {
-        MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-        thrd_mam->exception_desc = "Function interpret_members throws an exception.";
-        longjmp(thrd_mam->excep_ctx_env, -1);
-    }
+	if (!entity_)
+	{
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "Function interpret_members throws an exception.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
 
-    int msz = als_size(member_pool);
-    MddSet *set = mdd_set__create();
+	int msz = als_size(member_pool);
+	MddSet *set = mdd_set__create();
 
-    if (obj_type_of(entity_) == OBJ_TYPE__DimensionRole) {
-        DimensionRole *dimrole = entity_;
+	if (obj_type_of(entity_) == OBJ_TYPE__DimensionRole)
+	{
+		DimensionRole *dimrole = entity_;
 
 		ArrayList *targetls = NULL;
 
-		if (dimrole->bin_attr & DR_MEASURE_MASK) {
+		if (dimrole->bin_attr & DR_MEASURE_MASK)
+		{
 			// dimrole is a measure dimension role
 			msz = als_size(cube->measure_mbrs);
 			targetls = cube->measure_mbrs;
-		} else {
+		}
+		else
+		{
 			// dimrole is not a measure dimension role
 			targetls = member_pool;
 		}
 
-		for (int i=0; i<msz; i++) {
+		for (int i = 0; i < msz; i++)
+		{
 			Member *member = als_get(targetls, i);
-			if ((dimrole->bin_attr & DR_MEASURE_MASK) || member->dim_gid == dimrole->dim_gid) {
+			if ((dimrole->bin_attr & DR_MEASURE_MASK) || member->dim_gid == dimrole->dim_gid)
+			{
 				MddTuple *tuple = mdd_tp__create();
 				mdd_tp__add_mbrole(tuple, mdd_mr__create(member, dimrole));
 				mddset__add_tuple(set, tuple);
 			}
 		}
+	}
+	else if (obj_type_of(entity_) == OBJ_TYPE__HierarchyRole)
+	{
+		HierarchyRole *hierole = entity_;
+		for (int i = 0; i < msz; i++)
+		{
+			Member *member = als_get(member_pool, i);
 
-    } else if (obj_type_of(entity_) == OBJ_TYPE__HierarchyRole) {
-        HierarchyRole *hierole = entity_;
-        for (int i=0; i<msz; i++) {
-            Member *member = als_get(member_pool, i);
+			if (member->hierarchy_gid != hierole->hierarchy->gid)
+				continue;
 
-            if (member->hierarchy_gid != hierole->hierarchy->gid)
-                continue;
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, mdd_mr__create(member, hierole->dim_role));
+			mddset__add_tuple(set, tuple);
+		}
+	}
+	else if (obj_type_of(entity_) == OBJ_TYPE__LevelRole)
+	{
+		LevelRole *lvrole = entity_;
+		for (int i = 0; i < msz; i++)
+		{
+			Member *member = als_get(member_pool, i);
 
-            MddTuple *tuple = mdd_tp__create();
-            mdd_tp__add_mbrole(tuple, mdd_mr__create(member, hierole->dim_role));
-            mddset__add_tuple(set, tuple);
-        }
+			if (!(member->hierarchy_gid == lvrole->lv->hierarchy_gid && member->lv == lvrole->lv->level))
+				continue;
 
-    } else if (obj_type_of(entity_) == OBJ_TYPE__LevelRole) {
-        LevelRole *lvrole = entity_;
-        for (int i=0; i<msz; i++) {
-            Member *member = als_get(member_pool, i);
-
-            if (!(member->hierarchy_gid == lvrole->lv->hierarchy_gid && member->lv == lvrole->lv->level))
-                continue;
-
-            MddTuple *tuple = mdd_tp__create();
-            mdd_tp__add_mbrole(tuple, mdd_mr__create(member, lvrole->dim_role));
-            mddset__add_tuple(set, tuple);
-        }
-
-    } else {
-        MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-        thrd_mam->exception_desc = "Function interpret_members throws an exception.";
-        longjmp(thrd_mam->excep_ctx_env, -1);
-    }
+			MddTuple *tuple = mdd_tp__create();
+			mdd_tp__add_mbrole(tuple, mdd_mr__create(member, lvrole->dim_role));
+			mddset__add_tuple(set, tuple);
+		}
+	}
+	else
+	{
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "Function interpret_members throws an exception.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
 
 	return set;
 }
 
 // for ASTSetFunc_CrossJoin
-void *interpret_crossjoin(void *md_ctx_, void *nil, void *crossjoin_, void *ctx_tuple_, void *cube_) {
+void *interpret_crossjoin(void *md_ctx_, void *nil, void *crossjoin_, void *ctx_tuple_, void *cube_)
+{
 
-    ArrayList *setdefs = ((ASTSetFunc_CrossJoin *)crossjoin_)->setdefs;
+	ArrayList *setdefs = ((ASTSetFunc_CrossJoin *)crossjoin_)->setdefs;
 
 	MddSet *set_ctx = ids_setdef__build(md_ctx_, als_get(setdefs, 0), ctx_tuple_, cube_);
 	ArrayList *ctx_tuple_ls = set_ctx->tuples;
@@ -171,15 +184,16 @@ void *interpret_crossjoin(void *md_ctx_, void *nil, void *crossjoin_, void *ctx_
 	}
 
 	MddSet *join_set = mdd_set__create();
-    join_set->tuples = ctx_tuple_ls;
+	join_set->tuples = ctx_tuple_ls;
 
 	return join_set;
 }
 
 // for ASTSetFunc_Filter
-void *interpret_filter(void *md_ctx_, void *nil, void *filter_, void *ctx_tuple_, void *cube_) {
+void *interpret_filter(void *md_ctx_, void *nil, void *filter_, void *ctx_tuple_, void *cube_)
+{
 
-    ASTSetFunc_Filter *filter = filter_;
+	ASTSetFunc_Filter *filter = filter_;
 	MddSet *result = mdd_set__create();
 
 	MddSet *set = ids_setdef__build(md_ctx_, filter->set_def, ctx_tuple_, cube_);
@@ -196,16 +210,18 @@ void *interpret_filter(void *md_ctx_, void *nil, void *filter_, void *ctx_tuple_
 }
 
 // for ASTSetFunc_LateralMembers
-void *interpret_lateralmembers(void *md_ctx_, void *nil, void *lateral_, void *ctx_tuple_, void *cube_) {
+void *interpret_lateralmembers(void *md_ctx_, void *nil, void *lateral_, void *ctx_tuple_, void *cube_)
+{
 
-    MddMemberRole *mr = up_evolving(md_ctx_, ((ASTSetFunc_LateralMembers *)lateral_)->mrole_up, cube_, ctx_tuple_);
-    if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole) {
-        MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-        thrd_mam->exception_desc = "Function interpret_lateralmembers throws an exception.";
-        longjmp(thrd_mam->excep_ctx_env, -1);
-    }
+	MddMemberRole *mr = up_evolving(md_ctx_, ((ASTSetFunc_LateralMembers *)lateral_)->mrole_up, cube_, ctx_tuple_);
+	if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole)
+	{
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "Function interpret_lateralmembers throws an exception.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
 
-    Cube *cube = cube_;
+	Cube *cube = cube_;
 
 	MddSet *set = mdd_set__create();
 	int i, sz;
@@ -237,7 +253,8 @@ void *interpret_lateralmembers(void *md_ctx_, void *nil, void *lateral_, void *c
 }
 
 // for ASTSetFunc_Order
-void *interpret_order(void *md_ctx_, void *nil, void *order_, void *ctx_tuple_, void *cube_) {
+void *interpret_order(void *md_ctx_, void *nil, void *order_, void *ctx_tuple_, void *cube_)
+{
 
 	ASTSetFunc_Order *order = order_;
 
@@ -293,13 +310,17 @@ void *interpret_order(void *md_ctx_, void *nil, void *order_, void *ctx_tuple_, 
 }
 
 // for ASTSetFunc_TopCount
-void *interpret_topcount(void *md_ctx_, void *setdef_, void *topcount_, void *ctx_tuple_, void *cube_) {
+void *interpret_topcount(void *md_ctx_, void *setdef_, void *topcount_, void *ctx_tuple_, void *cube_)
+{
 
 	ASTSetFunc_TopCount *topcount = topcount_;
 	MddSet *set = NULL;
-	if (setdef_ && obj_type_of(setdef_) == OBJ_TYPE__MddSet) {
+	if (setdef_ && obj_type_of(setdef_) == OBJ_TYPE__MddSet)
+	{
 		set = setdef_;
-	} else {
+	}
+	else
+	{
 		set = ids_setdef__build(md_ctx_, topcount->set_def, ctx_tuple_, cube_);
 	}
 
@@ -359,7 +380,8 @@ void *interpret_topcount(void *md_ctx_, void *setdef_, void *topcount_, void *ct
 }
 
 // for ASTSetFunc_Except
-void *interpret_except(void *md_ctx_, void *nil, void *except_, void *ctx_tuple_, void *cube_) {
+void *interpret_except(void *md_ctx_, void *nil, void *except_, void *ctx_tuple_, void *cube_)
+{
 
 	ASTSetFunc_Except *except = except_;
 
@@ -386,7 +408,8 @@ void *interpret_except(void *md_ctx_, void *nil, void *except_, void *ctx_tuple_
 }
 
 // for ASTSetFunc_YTD
-void *interpret_ytd(void *md_ctx_, void *mrole_, void *ytd_, void *ctx_tuple_, void *cube_) {
+void *interpret_ytd(void *md_ctx_, void *mrole_, void *ytd_, void *ctx_tuple_, void *cube_)
+{
 
 	ASTSetFunc_YTD *ytd = ytd_;
 	MddMemberRole *date_mr;
@@ -448,16 +471,18 @@ void *interpret_ytd(void *md_ctx_, void *mrole_, void *ytd_, void *ctx_tuple_, v
 }
 
 // for ASTSetFunc_Descendants
-void *interpret_descendants(void *md_ctx_, void *nil, void *desc_, void *ctx_tuple_, void *cube_) {
+void *interpret_descendants(void *md_ctx_, void *nil, void *desc_, void *ctx_tuple_, void *cube_)
+{
 
 	ASTSetFunc_Descendants *descfn = desc_;
 
 	// MddMemberRole *mr = ids_mbrsdef__build(md_ctx, desc->mbr_def, ctx_tuple, cube);
 	MddMemberRole *mrole = up_evolving(md_ctx_, descfn->mrole_def, cube_, ctx_tuple_);
-	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
-        MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-        thrd_mam->exception_desc = "Function interpret_descendants throws an exception.";
-        longjmp(thrd_mam->excep_ctx_env, -1);
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole)
+	{
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "Function interpret_descendants throws an exception.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
 	}
 
 	MddSet *result = mdd_set__create();
@@ -480,7 +505,8 @@ void *interpret_descendants(void *md_ctx_, void *nil, void *desc_, void *ctx_tup
 	if (descfn->lvrole_def)
 	{
 		LevelRole *lvrole = up_evolving(md_ctx_, descfn->lvrole_def, cube_, ctx_tuple_);
-		if (!lvrole || obj_type_of(lvrole) != OBJ_TYPE__LevelRole) {
+		if (!lvrole || obj_type_of(lvrole) != OBJ_TYPE__LevelRole)
+		{
 			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 			thrd_mam->exception_desc = "Function interpret_descendants throws an exception.";
 			longjmp(thrd_mam->excep_ctx_env, -1);
@@ -590,7 +616,8 @@ void *interpret_descendants(void *md_ctx_, void *nil, void *desc_, void *ctx_tup
 }
 
 // for ASTSetFunc_Tail
-void *interpret_tail(void *md_ctx_, void *nil, void *tail_, void *ctx_tuple_, void *cube_) {
+void *interpret_tail(void *md_ctx_, void *nil, void *tail_, void *ctx_tuple_, void *cube_)
+{
 
 	// SetFnTail *tail = set_fn;
 	ASTSetFunc_Tail *tail = tail_;
@@ -617,7 +644,8 @@ void *interpret_tail(void *md_ctx_, void *nil, void *tail_, void *ctx_tuple_, vo
 }
 
 // for ASTSetFunc_BottomOrTopPercent
-void *interpret_bottomortoppercent(void *md_ctx_, void *nil, void *percent_, void *ctx_tuple_, void *cube_) {
+void *interpret_bottomortoppercent(void *md_ctx_, void *nil, void *percent_, void *ctx_tuple_, void *cube_)
+{
 	ASTSetFunc_BottomOrTopPercent *per = percent_;
 	MddSet *set = ids_setdef__build(md_ctx_, per->set, ctx_tuple_, cube_);
 	GridData data;
@@ -686,7 +714,8 @@ void *interpret_bottomortoppercent(void *md_ctx_, void *nil, void *percent_, voi
 }
 
 // for ASTSetFunc_Union
-void *interpret_union(void *md_ctx_, void *nil, void *union_, void *ctx_tuple_, void *cube_) {
+void *interpret_union(void *md_ctx_, void *nil, void *union_, void *ctx_tuple_, void *cube_)
+{
 	ASTSetFunc_Union *uni = union_;
 	ArrayList *tuples = als_new(64, "MddTuple *", THREAD_MAM, NULL);
 	int i, j, len = als_size(uni->set_def_ls);
@@ -731,7 +760,8 @@ void *interpret_union(void *md_ctx_, void *nil, void *union_, void *ctx_tuple_, 
 }
 
 // for ASTSetFunc_Intersect
-void *interpret_intersect(void *md_ctx_, void *nil, void *intersect_, void *ctx_tuple_, void *cube_) {
+void *interpret_intersect(void *md_ctx_, void *nil, void *intersect_, void *ctx_tuple_, void *cube_)
+{
 	ASTSetFunc_Intersect *inter = intersect_;
 	MddSet *set_0 = ids_setdef__build(md_ctx_, als_get(inter->set_def_ls, 0), ctx_tuple_, cube_);
 	if (als_size(inter->set_def_ls) < 2)
@@ -753,42 +783,48 @@ void *interpret_intersect(void *md_ctx_, void *nil, void *intersect_, void *ctx_
 }
 
 // for ASTSetFunc_Distinct
-void *interpret_distinct(void *md_ctx_, void *set_, void *dist_, void *ctx_tuple_, void *cube_) {
+void *interpret_distinct(void *md_ctx_, void *set_, void *dist_, void *ctx_tuple_, void *cube_)
+{
 
 	ASTSetFunc_Distinct *dist = dist_;
 	MddSet *set = set_;
 
-    if (!set || obj_type_of(set) != OBJ_TYPE__MddSet) {
-        if (!dist->setdef) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_distinct.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
+	if (!set || obj_type_of(set) != OBJ_TYPE__MddSet)
+	{
+		if (!dist->setdef)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_distinct.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
 
-        // set = up_evolving(md_ctx_, dist->setdef, cube_, ctx_tuple_);
+		// set = up_evolving(md_ctx_, dist->setdef, cube_, ctx_tuple_);
 		set = ids_setdef__build(md_ctx_, dist->setdef, ctx_tuple_, cube_);
-        if (!set || obj_type_of(set) != OBJ_TYPE__MddSet) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_distinct.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
-    }
+		if (!set || obj_type_of(set) != OBJ_TYPE__MddSet)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_distinct.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+	}
 
 	unsigned int tsz = als_size(set->tuples);
 
 	ArrayList *distlist = als_new(64, "<MddTuple *>", THREAD_MAM, NULL);
 
-	for (int i=0; i<tsz ;i++) {
-		MddTuple *tp = als_get(set->tuples,i);
+	for (int i = 0; i < tsz; i++)
+	{
+		MddTuple *tp = als_get(set->tuples, i);
 		unsigned int dlsz = als_size(distlist);
-		for (int j=0; j<dlsz ;j++) {
+		for (int j = 0; j < dlsz; j++)
+		{
 			MddTuple *targ = als_get(distlist, j);
 			if (Tuple__cmp(targ, tp) == 0)
 				goto bk;
 		}
 		als_add(distlist, tp);
-		bk:
-		i=i;
+	bk:
+		i = i;
 	}
 
 	MddSet *dist_set = mdd_set__create();

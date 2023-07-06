@@ -13,63 +13,70 @@ extern ArrayList *member_pool;
 extern ArrayList *cubes_pool;
 extern ArrayList *levels_pool;
 
-
 // for ASTMemberFn_Parent
-void *interpret_parent(void *md_ctx, void *mrole, void *parent, void *ctx_tuple, void *cube) {
-    ASTMemberFn_Parent *func = parent;
-    MddMemberRole *mr = mrole;
+void *interpret_parent(void *md_ctx, void *mrole, void *parent, void *ctx_tuple, void *cube)
+{
+	ASTMemberFn_Parent *func = parent;
+	MddMemberRole *mr = mrole;
 
-    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
-        if (!func->mr_up) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_parent.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole)
+	{
+		if (!func->mr_up)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_parent.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
 
-        mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
-        if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_parent.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
-    }
+		mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
+		if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_parent.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+	}
 
-    // when current member has no parent, return itself.
-    if (mr->member->p_gid)
-        return mdd_mr__create(find_member_by_gid(mr->member->p_gid), mr->dim_role);
-    else
-        return mr;
+	// when current member has no parent, return itself.
+	if (mr->member->p_gid)
+		return mdd_mr__create(find_member_by_gid(mr->member->p_gid), mr->dim_role);
+	else
+		return mr;
 }
 
 // for ASTMemberFn_CurrentMember
-void *interpret_currentmember(void *md_ctx, void *drole, void *curmbr, void *ctx_tuple, void *cube) {
+void *interpret_currentmember(void *md_ctx, void *drole, void *curmbr, void *ctx_tuple, void *cube)
+{
 
-    ASTMemberFn_CurrentMember *func = curmbr;
-    DimensionRole *dimrole = drole;
+	ASTMemberFn_CurrentMember *func = curmbr;
+	DimensionRole *dimrole = drole;
 
-    if (!dimrole || obj_type_of(dimrole) != OBJ_TYPE__DimensionRole) {
-        if (!func->dr_up) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_currentmember.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
+	if (!dimrole || obj_type_of(dimrole) != OBJ_TYPE__DimensionRole)
+	{
+		if (!func->dr_up)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_currentmember.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
 
-        dimrole = up_evolving(md_ctx, func->dr_up, cube, ctx_tuple);
-        if (!dimrole || obj_type_of(dimrole) != OBJ_TYPE__DimensionRole) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_currentmember.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
-    }
+		dimrole = up_evolving(md_ctx, func->dr_up, cube, ctx_tuple);
+		if (!dimrole || obj_type_of(dimrole) != OBJ_TYPE__DimensionRole)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_currentmember.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+	}
 
-    MddTuple *context_tuple = ctx_tuple;
+	MddTuple *context_tuple = ctx_tuple;
 	int mrs_count = als_size(context_tuple->mr_ls);
 
 	for (int i = 0; i < mrs_count; i++)
 	{
 		MddMemberRole *mbrRole = als_get(context_tuple->mr_ls, i);
-        if (dimrole->gid == mbrRole->dim_role->gid)
-            return mbrRole;
+		if (dimrole->gid == mbrRole->dim_role->gid)
+			return mbrRole;
 	}
 
 	log_print("[ error ] - ASTMemberFn_CurrentMember do not matching DimensionRole - < %s >\n", dimrole->name);
@@ -77,24 +84,28 @@ void *interpret_currentmember(void *md_ctx, void *drole, void *curmbr, void *ctx
 }
 
 // for ASTMemberFn_PrevMember
-void *interpret_prevmember(void *md_ctx, void *mrole, void *prembr, void *ctx_tuple, void *cube) {
-    ASTMemberFn_PrevMember *func = prembr;
-    MddMemberRole *mr = mrole;
+void *interpret_prevmember(void *md_ctx, void *mrole, void *prembr, void *ctx_tuple, void *cube)
+{
+	ASTMemberFn_PrevMember *func = prembr;
+	MddMemberRole *mr = mrole;
 
-    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
-        if (!func->mr_up) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_prevmember.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole)
+	{
+		if (!func->mr_up)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_prevmember.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
 
-        mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
-        if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_prevmember.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
-    }
+		mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
+		if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_prevmember.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+	}
 
 	int i, len;
 	Member *prev = NULL;
@@ -132,27 +143,32 @@ void *interpret_prevmember(void *md_ctx, void *mrole, void *prembr, void *ctx_tu
 }
 
 // for ASTMemberFn_FirstChild
-void *interpret_firstchild(void *md_ctx, void *mrole, void *firchi, void *ctx_tuple, void *cube) {
-    ASTMemberFn_FirstChild *func = firchi;
-    MddMemberRole *mr = mrole;
+void *interpret_firstchild(void *md_ctx, void *mrole, void *firchi, void *ctx_tuple, void *cube)
+{
+	ASTMemberFn_FirstChild *func = firchi;
+	MddMemberRole *mr = mrole;
 
-    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
-        if (!func->mr_up) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_firstchild.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole)
+	{
+		if (!func->mr_up)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_firstchild.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
 
-        mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
-        if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_firstchild.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
-    }
+		mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
+		if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_firstchild.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+	}
 
 	Member *member = NULL;
-	for (int i=0; i<als_size(member_pool); i++) {
+	for (int i = 0; i < als_size(member_pool); i++)
+	{
 		Member *m = als_get(member_pool, i);
 		if (m->p_gid != mr->member->gid)
 			continue;
@@ -163,27 +179,32 @@ void *interpret_firstchild(void *md_ctx, void *mrole, void *firchi, void *ctx_tu
 }
 
 // for ASTMemberFn_LastChild
-void *interpret_lastchild(void *md_ctx, void *mrole, void *laschi, void *ctx_tuple, void *cube) {
-    ASTMemberFn_LastChild *func = laschi;
-    MddMemberRole *mr = mrole;
+void *interpret_lastchild(void *md_ctx, void *mrole, void *laschi, void *ctx_tuple, void *cube)
+{
+	ASTMemberFn_LastChild *func = laschi;
+	MddMemberRole *mr = mrole;
 
-    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
-        if (!func->mr_up) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_lastchild.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole)
+	{
+		if (!func->mr_up)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_lastchild.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
 
-        mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
-        if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_lastchild.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
-    }
+		mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
+		if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_lastchild.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+	}
 
 	Member *member = NULL;
-	for (int i=0; i<als_size(member_pool); i++) {
+	for (int i = 0; i < als_size(member_pool); i++)
+	{
 		Member *m = als_get(member_pool, i);
 		if (m->p_gid != mr->member->gid)
 			continue;
@@ -194,27 +215,32 @@ void *interpret_lastchild(void *md_ctx, void *mrole, void *laschi, void *ctx_tup
 }
 
 // for ASTMemberFn_FirstSibling
-void *interpret_firstsibling(void *md_ctx, void *mrole, void *firsib, void *ctx_tuple, void *cube) {
-    ASTMemberFn_FirstSibling *func = firsib;
-    MddMemberRole *mr = mrole;
+void *interpret_firstsibling(void *md_ctx, void *mrole, void *firsib, void *ctx_tuple, void *cube)
+{
+	ASTMemberFn_FirstSibling *func = firsib;
+	MddMemberRole *mr = mrole;
 
-    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
-        if (!func->mr_up) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_firstsibling.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole)
+	{
+		if (!func->mr_up)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_firstsibling.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
 
-        mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
-        if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_firstsibling.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
-    }
+		mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
+		if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_firstsibling.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+	}
 
 	Member *member = NULL;
-	for (int i=0; i<als_size(member_pool); i++) {
+	for (int i = 0; i < als_size(member_pool); i++)
+	{
 		Member *m = als_get(member_pool, i);
 		if (m->p_gid != mr->member->p_gid)
 			continue;
@@ -225,27 +251,32 @@ void *interpret_firstsibling(void *md_ctx, void *mrole, void *firsib, void *ctx_
 }
 
 // for ASTMemberFn_LastSibling
-void *interpret_lastsibling(void *md_ctx, void *mrole, void *lassib, void *ctx_tuple, void *cube) {
-    ASTMemberFn_LastSibling *func = lassib;
-    MddMemberRole *mr = mrole;
+void *interpret_lastsibling(void *md_ctx, void *mrole, void *lassib, void *ctx_tuple, void *cube)
+{
+	ASTMemberFn_LastSibling *func = lassib;
+	MddMemberRole *mr = mrole;
 
-    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
-        if (!func->mr_up) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_lastsibling.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole)
+	{
+		if (!func->mr_up)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_lastsibling.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
 
-        mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
-        if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_lastsibling.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
-    }
+		mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
+		if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_lastsibling.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+	}
 
 	Member *member = NULL;
-	for (int i=0; i<als_size(member_pool); i++) {
+	for (int i = 0; i < als_size(member_pool); i++)
+	{
 		Member *m = als_get(member_pool, i);
 		if (m->p_gid != mr->member->p_gid)
 			continue;
@@ -255,39 +286,44 @@ void *interpret_lastsibling(void *md_ctx, void *mrole, void *lassib, void *ctx_t
 	return mdd_mr__create(member, mr->dim_role);
 }
 
-
-int __mr_fn_lag_cmp__(void *obj, void *other) {
+int __mr_fn_lag_cmp__(void *obj, void *other)
+{
 	Member *mobj = (Member *)obj;
 	Member *moth = (Member *)other;
 	return moth->gid < mobj->gid ? -1 : (moth->gid > mobj->gid ? 1 : 0);
 }
 
 // for ASTMemberFn_Lag
-void *interpret_lag(void *md_ctx, void *mrole, void *lag, void *ctx_tuple, void *cube) {
-    ASTMemberFn_Lag *func = lag;
-    MddMemberRole *mr = mrole;
+void *interpret_lag(void *md_ctx, void *mrole, void *lag, void *ctx_tuple, void *cube)
+{
+	ASTMemberFn_Lag *func = lag;
+	MddMemberRole *mr = mrole;
 
-    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
-        if (!func->mr_up) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_lag.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole)
+	{
+		if (!func->mr_up)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_lag.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
 
-        mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
-        if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_lag.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
-    }
+		mr = up_evolving(md_ctx, func->mr_up, cube, ctx_tuple);
+		if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_lag.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+	}
 
 	if (func->index == 0)
 		return mr;
 
 	ArrayList *list = als_new(64, "Member *", THREAD_MAM, NULL);
 
-	for (int i=0; i<als_size(member_pool); i++) {
+	for (int i = 0; i < als_size(member_pool); i++)
+	{
 		Member *m = als_get(member_pool, i);
 		if (m->p_gid == mr->member->p_gid)
 			als_add(list, m);
@@ -296,9 +332,11 @@ void *interpret_lag(void *md_ctx, void *mrole, void *lag, void *ctx_tuple, void 
 	ArrayList_sort(list, __mr_fn_lag_cmp__);
 
 	int m_idx = 0;
-	for (int i=0; i<als_size(list); i++) {
+	for (int i = 0; i < als_size(list); i++)
+	{
 		Member *m = als_get(list, i);
-		if (m->gid == mr->member->gid) {
+		if (m->gid == mr->member->gid)
+		{
 			m_idx = i;
 			break;
 		}
@@ -306,9 +344,12 @@ void *interpret_lag(void *md_ctx, void *mrole, void *lag, void *ctx_tuple, void 
 
 	m_idx -= func->index;
 
-	if (m_idx < 0) {
+	if (m_idx < 0)
+	{
 		m_idx = 0;
-	} else if (m_idx >= als_size(list)) {
+	}
+	else if (m_idx >= als_size(list))
+	{
 		m_idx = als_size(list) - 1;
 	}
 
@@ -316,10 +357,11 @@ void *interpret_lag(void *md_ctx, void *mrole, void *lag, void *ctx_tuple, void 
 }
 
 // for ASTMemberFn_ParallelPeriod
-void *interpret_parallelperiod(void *md_ctx, void *nil, void *pp, void *ctx_tuple, void *cube) {
+void *interpret_parallelperiod(void *md_ctx, void *nil, void *pp, void *ctx_tuple, void *cube)
+{
 
-    ASTMemberFn_ParallelPeriod *paper = pp;
-    MddTuple *context_tuple = ctx_tuple;
+	ASTMemberFn_ParallelPeriod *paper = pp;
+	MddTuple *context_tuple = ctx_tuple;
 
 	// ParallelPeriod()
 	if (paper->lvroleup == NULL)
@@ -362,11 +404,12 @@ void *interpret_parallelperiod(void *md_ctx, void *nil, void *pp, void *ctx_tupl
 	if (paper->index == NULL)
 	{
 		LevelRole *lv_role = up_evolving(md_ctx, paper->lvroleup, cube, context_tuple);
-        if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_parallelperiod.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
+		if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_parallelperiod.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
 
 		MddMemberRole *mr = NULL;
 
@@ -400,11 +443,12 @@ void *interpret_parallelperiod(void *md_ctx, void *nil, void *pp, void *ctx_tupl
 	if (paper->mroleup == NULL)
 	{
 		LevelRole *lv_role = up_evolving(md_ctx, paper->lvroleup, cube, context_tuple);
-        if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_parallelperiod.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
+		if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_parallelperiod.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
 
 		MddMemberRole *mr = NULL;
 
@@ -441,19 +485,21 @@ void *interpret_parallelperiod(void *md_ctx, void *nil, void *pp, void *ctx_tupl
 	}
 
 	// ParallelPeriod(<level expression>, offset, <member expression>)
-    LevelRole *lv_role = up_evolving(md_ctx, paper->lvroleup, cube, context_tuple);
-    if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole) {
-        MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-        thrd_mam->exception_desc = "exception: function: interpret_parallelperiod.";
-        longjmp(thrd_mam->excep_ctx_env, -1);
-    }
+	LevelRole *lv_role = up_evolving(md_ctx, paper->lvroleup, cube, context_tuple);
+	if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole)
+	{
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: function: interpret_parallelperiod.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
 
 	MddMemberRole *mr = up_evolving(md_ctx, paper->mroleup, cube, context_tuple);
-    if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole) {
-        MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-        thrd_mam->exception_desc = "exception: function: interpret_parallelperiod.";
-        longjmp(thrd_mam->excep_ctx_env, -1);
-    }
+	if (!mr || obj_type_of(mr) != OBJ_TYPE__MddMemberRole)
+	{
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: function: interpret_parallelperiod.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
 
 	if (mr->member->lv < lv_role->lv->level)
 		return NULL;
@@ -478,11 +524,13 @@ void *interpret_parallelperiod(void *md_ctx, void *nil, void *pp, void *ctx_tupl
 }
 
 // for ASTMemberFn_ClosingPeriod
-void *interpret_closingperiod(void *md_ctx, void *nil, void *cp, void *ctx_tuple, void *cube) {
+void *interpret_closingperiod(void *md_ctx, void *nil, void *cp, void *ctx_tuple, void *cube)
+{
 
 	ASTMemberFn_ClosingPeriod *cloper = cp;
 
-	if (cloper->lvroleup == NULL && cloper->mroleup == NULL) {
+	if (cloper->lvroleup == NULL && cloper->mroleup == NULL)
+	{
 		ArrayList *roles_of_date_dims = Cube_find_date_dim_roles(cube);
 		if (als_size(roles_of_date_dims) != 1)
 			return NULL;
@@ -490,7 +538,8 @@ void *interpret_closingperiod(void *md_ctx, void *nil, void *cp, void *ctx_tuple
 		DimensionRole *date_dim_role = als_get(roles_of_date_dims, 0);
 		Level *level = NULL;
 		Level *lv = NULL;
-		for (int i=0; i<als_size(levels_pool); i++) {
+		for (int i = 0; i < als_size(levels_pool); i++)
+		{
 			lv = als_get(levels_pool, i);
 			if (lv->dim_gid != date_dim_role->dim_gid || lv->level < 1)
 				continue;
@@ -502,12 +551,13 @@ void *interpret_closingperiod(void *md_ctx, void *nil, void *cp, void *ctx_tuple
 		}
 
 		Member *member = NULL;
-		for (int i=0; i<als_size(member_pool); i++) {
+		for (int i = 0; i < als_size(member_pool); i++)
+		{
 			Member *m = als_get(member_pool, i);
 
 			if (m->dim_gid != level->dim_gid || m->lv != level->level)
 				continue;
-			
+
 			if (member == NULL)
 				member = m;
 			else if (m->gid > member->gid)
@@ -517,20 +567,23 @@ void *interpret_closingperiod(void *md_ctx, void *nil, void *cp, void *ctx_tuple
 		return mdd_mr__create(member, date_dim_role);
 	}
 
-	if (cloper->lvroleup != NULL && cloper->mroleup == NULL) {
+	if (cloper->lvroleup != NULL && cloper->mroleup == NULL)
+	{
 		LevelRole *lv_role = up_evolving(md_ctx, cloper->lvroleup, cube, ctx_tuple);
-		if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole) {
+		if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole)
+		{
 			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 			thrd_mam->exception_desc = "exception: function: interpret_closingperiod.";
 			longjmp(thrd_mam->excep_ctx_env, -1);
 		}
 
 		Member *member = NULL;
-		for (int i=0; i<als_size(member_pool); i++) {
+		for (int i = 0; i < als_size(member_pool); i++)
+		{
 			Member *m = als_get(member_pool, i);
 			if (m->dim_gid != lv_role->dim_role->dim_gid || m->lv != lv_role->lv->level)
 				continue;
-			
+
 			if (member == NULL)
 				member = m;
 			else if (m->gid > member->gid)
@@ -539,16 +592,19 @@ void *interpret_closingperiod(void *md_ctx, void *nil, void *cp, void *ctx_tuple
 		return mdd_mr__create(member, lv_role->dim_role);
 	}
 
-	if (cloper->lvroleup != NULL && cloper->mroleup != NULL) {
+	if (cloper->lvroleup != NULL && cloper->mroleup != NULL)
+	{
 		LevelRole *lv_role = up_evolving(md_ctx, cloper->lvroleup, cube, ctx_tuple);
-		if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole) {
+		if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole)
+		{
 			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 			thrd_mam->exception_desc = "exception: function: interpret_closingperiod.";
 			longjmp(thrd_mam->excep_ctx_env, -1);
 		}
 
 		MddMemberRole *m_role = up_evolving(md_ctx, cloper->mroleup, cube, ctx_tuple);
-		if (!m_role || obj_type_of(m_role) != OBJ_TYPE__MddMemberRole) {
+		if (!m_role || obj_type_of(m_role) != OBJ_TYPE__MddMemberRole)
+		{
 			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 			thrd_mam->exception_desc = "exception: function: interpret_closingperiod.";
 			longjmp(thrd_mam->excep_ctx_env, -1);
@@ -556,7 +612,8 @@ void *interpret_closingperiod(void *md_ctx, void *nil, void *cp, void *ctx_tuple
 
 		ArrayList *descendants = Member__descendants(m_role->member);
 		Member *member = NULL;
-		for (int i=0; i < als_size(descendants); i++) {
+		for (int i = 0; i < als_size(descendants); i++)
+		{
 			Member *m = als_get(descendants, i);
 			if (m->lv != lv_role->lv->level)
 				continue;
@@ -571,11 +628,13 @@ void *interpret_closingperiod(void *md_ctx, void *nil, void *cp, void *ctx_tuple
 }
 
 // for ASTMemberFn_OpeningPeriod
-void *interpret_openingperiod(void *md_ctx, void *nil, void *op, void *ctx_tuple, void *cube) {
+void *interpret_openingperiod(void *md_ctx, void *nil, void *op, void *ctx_tuple, void *cube)
+{
 
 	ASTMemberFn_OpeningPeriod *opeper = op;
 
-	if (opeper->lvroleup == NULL && opeper->mroleup == NULL) {
+	if (opeper->lvroleup == NULL && opeper->mroleup == NULL)
+	{
 		ArrayList *roles_of_date_dims = Cube_find_date_dim_roles(cube);
 		if (als_size(roles_of_date_dims) != 1)
 			return NULL;
@@ -583,7 +642,8 @@ void *interpret_openingperiod(void *md_ctx, void *nil, void *op, void *ctx_tuple
 		DimensionRole *date_dim_role = als_get(roles_of_date_dims, 0);
 		Level *level = NULL;
 		Level *lv = NULL;
-		for (int i=0; i<als_size(levels_pool); i++) {
+		for (int i = 0; i < als_size(levels_pool); i++)
+		{
 			lv = als_get(levels_pool, i);
 			if (lv->dim_gid != date_dim_role->dim_gid || lv->level < 1)
 				continue;
@@ -595,11 +655,12 @@ void *interpret_openingperiod(void *md_ctx, void *nil, void *op, void *ctx_tuple
 		}
 
 		Member *member = NULL;
-		for (int i=0; i<als_size(member_pool); i++) {
+		for (int i = 0; i < als_size(member_pool); i++)
+		{
 			Member *m = als_get(member_pool, i);
 			if (m->dim_gid != level->dim_gid || m->lv != level->level)
 				continue;
-			
+
 			if (member == NULL)
 				member = m;
 			else if (m->gid < member->gid)
@@ -609,20 +670,23 @@ void *interpret_openingperiod(void *md_ctx, void *nil, void *op, void *ctx_tuple
 		return mdd_mr__create(member, date_dim_role);
 	}
 
-	if (opeper->lvroleup != NULL && opeper->mroleup == NULL) {
+	if (opeper->lvroleup != NULL && opeper->mroleup == NULL)
+	{
 		LevelRole *lv_role = up_evolving(md_ctx, opeper->lvroleup, cube, ctx_tuple);
-		if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole) {
+		if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole)
+		{
 			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 			thrd_mam->exception_desc = "exception: function: interpret_openingperiod.";
 			longjmp(thrd_mam->excep_ctx_env, -1);
 		}
 
 		Member *member = NULL;
-		for (int i=0; i<als_size(member_pool); i++) {
+		for (int i = 0; i < als_size(member_pool); i++)
+		{
 			Member *m = als_get(member_pool, i);
 			if (m->dim_gid != lv_role->dim_role->dim_gid || m->lv != lv_role->lv->level)
 				continue;
-			
+
 			if (member == NULL)
 				member = m;
 			else if (m->gid < member->gid)
@@ -631,16 +695,19 @@ void *interpret_openingperiod(void *md_ctx, void *nil, void *op, void *ctx_tuple
 		return mdd_mr__create(member, lv_role->dim_role);
 	}
 
-	if (opeper->lvroleup != NULL && opeper->mroleup != NULL) {
+	if (opeper->lvroleup != NULL && opeper->mroleup != NULL)
+	{
 		LevelRole *lv_role = up_evolving(md_ctx, opeper->lvroleup, cube, ctx_tuple);
-		if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole) {
+		if (!lv_role || obj_type_of(lv_role) != OBJ_TYPE__LevelRole)
+		{
 			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 			thrd_mam->exception_desc = "exception: function: interpret_openingperiod.";
 			longjmp(thrd_mam->excep_ctx_env, -1);
 		}
 
 		MddMemberRole *m_role = up_evolving(md_ctx, opeper->mroleup, cube, ctx_tuple);
-		if (!m_role || obj_type_of(m_role) != OBJ_TYPE__MddMemberRole) {
+		if (!m_role || obj_type_of(m_role) != OBJ_TYPE__MddMemberRole)
+		{
 			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 			thrd_mam->exception_desc = "exception: function: interpret_openingperiod.";
 			longjmp(thrd_mam->excep_ctx_env, -1);
@@ -648,7 +715,8 @@ void *interpret_openingperiod(void *md_ctx, void *nil, void *op, void *ctx_tuple
 
 		ArrayList *descendants = Member__descendants(m_role->member);
 		Member *member = NULL;
-		for (int i=0; i < als_size(descendants); i++) {
+		for (int i = 0; i < als_size(descendants); i++)
+		{
 			Member *m = als_get(descendants, i);
 			if (m->lv != lv_role->lv->level)
 				continue;
@@ -663,48 +731,57 @@ void *interpret_openingperiod(void *md_ctx, void *nil, void *op, void *ctx_tuple
 }
 
 // for ASTMemberFn_NextMember
-void *interpret_nextmember(void *md_ctx, void *mrole_, void *nm, void *ctx_tuple, void *cube_) {
+void *interpret_nextmember(void *md_ctx, void *mrole_, void *nm, void *ctx_tuple, void *cube_)
+{
 
-    ASTMemberFn_NextMember *nexmem = nm;
-    MddMemberRole *mrole = mrole_;
+	ASTMemberFn_NextMember *nexmem = nm;
+	MddMemberRole *mrole = mrole_;
 
-    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
-        if (!nexmem->mroleup) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_nextmember.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole)
+	{
+		if (!nexmem->mroleup)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_nextmember.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
 
-        mrole = up_evolving(md_ctx, nexmem->mroleup, cube_, ctx_tuple);
-        if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
-            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
-            thrd_mam->exception_desc = "exception: function: interpret_nextmember.";
-            longjmp(thrd_mam->excep_ctx_env, -1);
-        }
-    }
+		mrole = up_evolving(md_ctx, nexmem->mroleup, cube_, ctx_tuple);
+		if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole)
+		{
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: function: interpret_nextmember.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+	}
 
 	Cube *cube = cube_;
 	Member *meam = NULL;
 
-	if (mrole->dim_role->bin_attr & DR_MEASURE_MASK) {
+	if (mrole->dim_role->bin_attr & DR_MEASURE_MASK)
+	{
 		// mrole is a measure member role
 
-		for (int i=0; i<als_size( cube->measure_mbrs ); i++) {
-			Member *m = als_get( cube->measure_mbrs, i );
+		for (int i = 0; i < als_size(cube->measure_mbrs); i++)
+		{
+			Member *m = als_get(cube->measure_mbrs, i);
 			if (m->gid <= mrole->member->gid)
 				continue;
 			if (meam == NULL || m->gid < meam->gid)
 				meam = m;
 		}
-	} else {
+	}
+	else
+	{
 		// mrole is a non measure member role
 
 		unsigned int mpsz = als_size(member_pool);
-		for (unsigned int i=0; i<mpsz ;i++) {
-			Member *m = als_get( member_pool, i );
+		for (unsigned int i = 0; i < mpsz; i++)
+		{
+			Member *m = als_get(member_pool, i);
 			if (m->lv != mrole->member->lv)
 				continue;
-			
+
 			if (compare_member_position(mrole->member, m) < 1)
 				continue;
 

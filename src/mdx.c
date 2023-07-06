@@ -20,20 +20,22 @@ extern void do_parse_mdx(char *mdx);
 // for synchronize the function parse_mdx
 static pthread_mutex_t sync_parse_mtx;
 
-void mdx_init() {
+void mdx_init()
+{
     pthread_mutex_init(&sync_parse_mtx, NULL);
 }
 
-void parse_mdx(char *mdx, Stack *stk) {
+void parse_mdx(char *mdx, Stack *stk)
+{
 
     pthread_mutex_lock(&sync_parse_mtx);
 
     do_parse_mdx(mdx);
 
-	memcpy(stk, &AST_STACK, sizeof(Stack));
-	stack_reset(&AST_STACK);
+    memcpy(stk, &AST_STACK, sizeof(Stack));
+    stack_reset(&AST_STACK);
 
-	pthread_mutex_unlock(&sync_parse_mtx);
+    pthread_mutex_unlock(&sync_parse_mtx);
 }
 
 MemberDef *MemberDef_creat(ids_ct t_cons)

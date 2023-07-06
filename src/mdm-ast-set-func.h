@@ -13,7 +13,6 @@ typedef struct
 // for ASTSetFunc_Children
 void *interpret_children(void *md_ctx_, void *mrole_, void *ast_children_, void *ctx_tuple_, void *cube_);
 
-
 typedef struct
 {
     ASTFunctionCommonHead head;
@@ -23,7 +22,6 @@ typedef struct
 // for ASTSetFunc_Members
 void *interpret_members(void *md_ctx_, void *entity_, void *ast_members_, void *ctx_tuple_, void *cube_);
 
-
 typedef struct
 {
     ASTFunctionCommonHead head;
@@ -32,7 +30,6 @@ typedef struct
 
 // for ASTSetFunc_CrossJoin
 void *interpret_crossjoin(void *md_ctx_, void *nil, void *crossjoin_, void *ctx_tuple_, void *cube_);
-
 
 typedef struct
 {
@@ -44,7 +41,6 @@ typedef struct
 // for ASTSetFunc_Filter
 void *interpret_filter(void *md_ctx_, void *nil, void *filter_, void *ctx_tuple_, void *cube_);
 
-
 typedef struct
 {
     ASTFunctionCommonHead head;
@@ -54,8 +50,8 @@ typedef struct
 // for ASTSetFunc_LateralMembers
 void *interpret_lateralmembers(void *md_ctx_, void *nil, void *lateral_, void *ctx_tuple_, void *cube_);
 
-
-typedef enum fn_order_opt {
+typedef enum fn_order_opt
+{
     ASC,
     DESC,
     BASC,
@@ -73,7 +69,6 @@ typedef struct
 // for ASTSetFunc_Order
 void *interpret_order(void *md_ctx_, void *nil, void *order_, void *ctx_tuple_, void *cube_);
 
-
 typedef struct
 {
     ASTFunctionCommonHead head;
@@ -84,7 +79,6 @@ typedef struct
 
 // for ASTSetFunc_TopCount
 void *interpret_topcount(void *md_ctx_, void *setdef_, void *topcount_, void *ctx_tuple_, void *cube_);
-
 
 typedef struct
 {
@@ -97,7 +91,6 @@ typedef struct
 // for ASTSetFunc_Except
 void *interpret_except(void *md_ctx_, void *nil, void *except_, void *ctx_tuple_, void *cube_);
 
-
 typedef struct
 {
     ASTFunctionCommonHead head;
@@ -107,8 +100,8 @@ typedef struct
 // for ASTSetFunc_YTD
 void *interpret_ytd(void *md_ctx_, void *mrole_, void *ytd_, void *ctx_tuple_, void *cube_);
 
-
-typedef enum {
+typedef enum
+{
     SELF,
     AFTER,
     BEFORE,
@@ -131,7 +124,6 @@ typedef struct
 // for ASTSetFunc_Descendants
 void *interpret_descendants(void *md_ctx_, void *nil, void *desc_, void *ctx_tuple_, void *cube_);
 
-
 typedef struct
 {
     ASTFunctionCommonHead head;
@@ -141,7 +133,6 @@ typedef struct
 
 // for ASTSetFunc_Tail
 void *interpret_tail(void *md_ctx_, void *nil, void *tail_, void *ctx_tuple_, void *cube_);
-
 
 typedef enum
 {
@@ -161,7 +152,6 @@ typedef struct
 // for ASTSetFunc_BottomOrTopPercent
 void *interpret_bottomortoppercent(void *md_ctx_, void *nil, void *percent_, void *ctx_tuple_, void *cube_);
 
-
 typedef struct
 {
     ASTFunctionCommonHead head;
@@ -172,7 +162,6 @@ typedef struct
 // for ASTSetFunc_Union
 void *interpret_union(void *md_ctx_, void *nil, void *union_, void *ctx_tuple_, void *cube_);
 
-
 typedef struct
 {
     ASTFunctionCommonHead head;
@@ -182,7 +171,6 @@ typedef struct
 
 // for ASTSetFunc_Intersect
 void *interpret_intersect(void *md_ctx_, void *nil, void *intersect_, void *ctx_tuple_, void *cube_);
-
 
 typedef struct
 {

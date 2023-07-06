@@ -15,7 +15,6 @@ typedef struct
 // for ASTNumFunc_Avg
 void *interpret_avg(void *md_ctx_, void *nil, void *avg_, void *ctx_tuple_, void *cube_);
 
-
 typedef struct
 {
     ASTFunctionCommonHead head;
@@ -27,8 +26,8 @@ typedef struct
 // for ASTNumFunc_MaxMin
 void *interpret_maxmin(void *md_ctx_, void *nil, void *mm, void *ctx_tuple_, void *cube_);
 
-
-typedef enum {
+typedef enum
+{
     FAO_DEFAULT,
     FAO_SUM,
     FAO_COUNT,
@@ -48,7 +47,6 @@ typedef struct
 // for ASTNumFunc_Aggregate
 void *interpret_aggregate(void *md_ctx_, void *nil, void *agg, void *ctx_tuple_, void *cube_);
 
-
 typedef struct
 {
     ASTFunctionCommonHead head;
@@ -58,7 +56,6 @@ typedef struct
 
 // for ASTNumFunc_Sum
 void *interpret_sum(void *md_ctx_, void *nil, void *sum_, void *ctx_tuple_, void *cube_);
-
 
 typedef struct
 {
@@ -70,7 +67,6 @@ typedef struct
 // for ASTNumFunc_Count
 void *interpret_count(void *md_ctx_, void *nil, void *count_, void *ctx_tuple_, void *cube_);
 
-
 typedef struct
 {
     ASTFunctionCommonHead head;
@@ -80,7 +76,6 @@ typedef struct
 
 // for ASTNumFunc_Median
 void *interpret_median(void *md_ctx_, void *nil, void *median_, void *ctx_tuple_, void *cube_);
-
 
 typedef struct
 {
