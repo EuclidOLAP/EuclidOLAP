@@ -101,7 +101,6 @@
 	Percentile		(O)
 	Power		(O)
 	Predict		(M)
-	Rank		(I) (M) (O)
 	RealValue		(O)
 	Remainder		(O)
 	RollupChildren		(M)
@@ -254,6 +253,7 @@
 	Min					[E] [I] [M] [O]
 	Aggregate			[E] [I] [M] [O]
 	Median				[E] [I] [M] [O]
+	Rank				[E] [I] [M] [O]
 
 
 << Set Functions >>

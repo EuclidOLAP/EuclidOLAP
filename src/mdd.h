@@ -171,6 +171,8 @@ MddTuple *mdd_ax__get_tuple(MddAxis *, int);
 
 MddTuple *_MddTuple__mergeTuples(MddTuple **tps, int count);
 
+MddTuple *ids_tupledef__build(MDContext *md_ctx, TupleDef *t_def, MddTuple *context_tuple, Cube *cube);
+
 void mdd__gen_mbr_abs_path(Member *);
 
 Member *find_member_by_gid(md_gid);

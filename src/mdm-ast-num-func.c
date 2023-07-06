@@ -262,3 +262,56 @@ void *interpret_median(void *md_ctx_, void *nil, void *median_, void *ctx_tuple_
 
     return cells + (sz / 2);
 }
+
+// for ASTNumFunc_Rank
+void *interpret_rank(void *md_ctx_, void *nil, void *rank_, void *ctx_tuple_, void *cube_) {
+    ASTNumFunc_Rank *rank = rank_;
+    MddTuple *tuple = NULL;
+    if (obj_type_of(rank->param1) == OBJ_TYPE__TupleDef) {
+        tuple = ids_tupledef__build(md_ctx_, rank->param1, ctx_tuple_, cube_);
+    } else {
+        MddMemberRole *mr = ids_mbrsdef__build(md_ctx_, rank->param1, ctx_tuple_, cube_);
+        tuple = mdd_tp__create();
+        mdd_tp__add_mbrole(tuple, mr);
+    }
+
+    MddSet *set = ids_setdef__build(md_ctx_, rank->setdef, ctx_tuple_, cube_);
+    unsigned sz = als_size(set->tuples);
+
+    if (rank->expdef) {
+        GridData *cells = mam_alloc(sizeof(GridData) * sz, OBJ_TYPE__GridData, NULL, 0);
+        for (int i = 0; i < sz; i++)
+        {
+            MddTuple *tup = tuple__merge(ctx_tuple_, als_get(set->tuples, i));
+            Expression_evaluate(md_ctx_, rank->expdef, cube_, tup, cells + i);
+        }
+
+        double cval;
+        MddTuple *ctup = NULL;
+
+        for (int i=0;i<sz-1;i++) {
+            for (int j=i+1;j<sz;j++) {
+                if (cells[j].val < cells[i].val) {
+                    cval = cells[j].val;
+                    cells[j].val = cells[i].val;
+                    cells[i].val = cval;
+
+                    ctup = als_get(set->tuples, i);
+                    ArrayList_set(set->tuples, i, als_get(set->tuples, j));
+                    ArrayList_set(set->tuples, j, ctup);
+                }
+            }
+        }
+    }
+
+    GridData *res = mam_alloc(sizeof(GridData), OBJ_TYPE__GridData, NULL, 0);
+    res->type = GRIDDATA_TYPE_NUM;
+    for (int i=0;i<sz;i++) {
+        if (Tuple__cmp( tuple, als_get(set->tuples, i) ) == 0) {
+            res->val = i + 1;
+            return res;
+        }
+    }
+    res->val = 0;
+    return res;
+}

@@ -987,6 +987,82 @@ from [Airline A]
 
 ---
 
+select
+[Measures].Revenue on 0,
+crossjoin(Date.[all].children(), children([Aircraft Models].[Airbus])) on 1
+from [Airline B]
+where ([Classes of Service].[Economy Plus]);
+
+---
+
+with
+member [Measures].aaasss as
+    rank(
+        (Date.root.[2021], [Aircraft Models].[Airbus].[A340]),
+        crossjoin(Date.[all].children(), children([Aircraft Models].[Airbus]))
+    )
+select
+[Measures].aaasss on 0,
+[Classes of Service].[Economy Plus] on 1
+from [Airline B];
+
+---
+
+with
+member [Measures].aaasss as
+    rank(
+        (Date.root.[2021], [Aircraft Models].[Airbus].[A340]),
+        {
+            (Date.root.[2021], [Aircraft Models].[Airbus].[A380]),
+            (Date.root.[2021], [Aircraft Models].[Airbus].[A340])
+        }
+    )
+select
+[Measures].aaasss on 0,
+[Classes of Service].[Economy Plus] on 1
+from [Airline B];
+
+---
+
+select
+[Measures].Revenue on 0,
+order(
+    crossjoin(Date.[all].children(), children([Aircraft Models].[Airbus])),
+    [Measures].Revenue
+) on 1
+from [Airline B]
+where ([Classes of Service].[Economy Plus]);
+
+---
+
+with
+member [Measures].aaasss as
+    rank(
+        (Date.root.[2021], [Aircraft Models].[Airbus].[A340]),
+        crossjoin(Date.[all].children(), children([Aircraft Models].[Airbus])),
+        [Measures].Revenue
+    )
+select
+[Measures].aaasss on 0,
+[Classes of Service].[Economy Plus] on 1
+from [Airline B];
+
+---
+
+with
+member [Measures].aaasss as
+    rank(
+        (Date.root.[2020], [Aircraft Models].[Airbus].[A320]),
+        crossjoin(Date.[all].children(), children([Aircraft Models].[Airbus])),
+        [Measures].Revenue
+    )
+select
+[Measures].aaasss on 0,
+[Classes of Service].[Economy Plus] on 1
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
