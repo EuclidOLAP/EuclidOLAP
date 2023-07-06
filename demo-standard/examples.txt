@@ -843,6 +843,26 @@ from [Airline B] ;
 
 ---
 
+select 
+    members([Measures]) on 0, 
+    intersect(members(Date), UNION(children(Date.Calendar.[ALL].[2021]), children(Date.[ALL].[2021].Q1)), ALL) on 1 
+from [Airline B] ;
+
+---
+
+with
+
+member [Measures].MMax as 
+    max(intersect(members(Date), UNION(children(Date.Calendar.[ALL].[2021]), children(Date.[ALL].[2021].Q1)), ALL), [Measures].Revenue)
+member [Measures].MMin as 
+    min(intersect(members(Date), UNION(children(Date.Calendar.[ALL].[2021]), children(Date.[ALL].[2021].Q1)), ALL), [Measures].Revenue)
+select 
+    { [Measures].MMax, [Measures].MMin } on 0, 
+    [Aircraft Models].Root on 1 
+from [Airline B] ;
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

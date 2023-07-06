@@ -95,9 +95,7 @@
 	Ln		(O)
 	Log		(O)
 	Log10		(O)
-	Max		(I) (M) (O)
 	Median		(I) (M) (O)
-	Min		(I) (M) (O)
 	Mod		(O)
 	NonEmptyCount		(O)
 	NTile		(O)
@@ -254,6 +252,8 @@
 	LookupCube			[E] [M]
 	Sum					[E] [I] [M] [O]
 	Avg					[E] [I] [M] [O]
+	Max					[E] [I] [M] [O]
+	Min					[E] [I] [M] [O]
 
 
 << Set Functions >>

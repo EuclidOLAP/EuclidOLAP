@@ -15,4 +15,16 @@ typedef struct
 // for ASTNumFunc_Avg
 void *interpret_avg(void *md_ctx_, void *nil, void *avg_, void *ctx_tuple_, void *cube_);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef;
+    char opt; // 'x' - max; 'i' - min
+} ASTNumFunc_MaxMin;
+
+// for ASTNumFunc_MaxMin
+void *interpret_maxmin(void *md_ctx_, void *nil, void *mm, void *ctx_tuple_, void *cube_);
+
 #endif

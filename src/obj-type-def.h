@@ -71,6 +71,7 @@ typedef short type_obj;
 // The range reserved for the Numeric functions of the AST is 501 ~ 600.
 #define OBJ_TYPE__ASTNUMFUNC_MIN        501
 #define OBJ_TYPE__ASTNumFunc_Avg        501
+#define OBJ_TYPE__ASTNumFunc_MaxMin        502
 #define OBJ_TYPE__ASTNUMFUNC_MAX        600
 
 

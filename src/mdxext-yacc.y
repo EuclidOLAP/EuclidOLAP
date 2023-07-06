@@ -98,6 +98,8 @@ Stack AST_STACK = { 0 };
 %token IIF				/* iif */
 %token COALESCE_EMPTY	/* coalesceEmpty */
 %token AVG				/* Avg */
+%token MAX				/* Max */
+%token MIN				/* Min */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -524,6 +526,48 @@ expression_function:
 	}
   |
 	exp_fn__avg {}
+  |
+	exp_fn__max {}
+  |
+	exp_fn__min {}
+;
+
+exp_fn__max:
+	MAX ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_MaxMin *func = mam_alloc(sizeof(ASTNumFunc_MaxMin), OBJ_TYPE__ASTNumFunc_MaxMin, NULL, 0);
+		func->head.interpret = interpret_maxmin;
+		stack_pop(&AST_STACK, (void **) &(func->expdef));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		func->opt = 'x';
+		stack_push(&AST_STACK, func);
+	}
+  |
+	MAX ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		ASTNumFunc_MaxMin *func = mam_alloc(sizeof(ASTNumFunc_MaxMin), OBJ_TYPE__ASTNumFunc_MaxMin, NULL, 0);
+		func->head.interpret = interpret_maxmin;
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		func->opt = 'x';
+		stack_push(&AST_STACK, func);
+	}
+;
+
+exp_fn__min:
+	MIN ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_MaxMin *func = mam_alloc(sizeof(ASTNumFunc_MaxMin), OBJ_TYPE__ASTNumFunc_MaxMin, NULL, 0);
+		func->head.interpret = interpret_maxmin;
+		stack_pop(&AST_STACK, (void **) &(func->expdef));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		func->opt = 'i';
+		stack_push(&AST_STACK, func);
+	}
+  |
+	MIN ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		ASTNumFunc_MaxMin *func = mam_alloc(sizeof(ASTNumFunc_MaxMin), OBJ_TYPE__ASTNumFunc_MaxMin, NULL, 0);
+		func->head.interpret = interpret_maxmin;
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		func->opt = 'i';
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__avg:

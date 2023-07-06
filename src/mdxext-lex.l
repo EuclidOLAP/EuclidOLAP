@@ -129,6 +129,14 @@ Avg {
 	return AVG;
 }
 
+MAX {
+	return MAX;
+}
+
+MIN {
+	return MIN;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }
