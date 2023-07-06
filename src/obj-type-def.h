@@ -75,6 +75,8 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTNumFunc_Sum        503
 #define OBJ_TYPE__ASTNumFunc_Count        504
 #define OBJ_TYPE__ASTNumFunc_Aggregate        505
+#define OBJ_TYPE__ASTNumFunc_Median        506
+#define OBJ_TYPE__ASTNumFunc_Rank        507
 #define OBJ_TYPE__ASTNUMFUNC_MAX        600
 
 

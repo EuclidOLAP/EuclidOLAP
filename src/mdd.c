@@ -55,8 +55,6 @@ static unsigned int mdd_ax__len(MddAxis *);
 
 static unsigned int mdd_set__len(MddSet *);
 
-static MddTuple *ids_tupledef__build(MDContext *md_ctx, TupleDef *t_def, MddTuple *context_tuple, Cube *cube);
-
 int mdd_init()
 {
 	meta_mam = MemAllocMng_new();
@@ -1360,7 +1358,7 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 	}
 }
 
-static MddTuple *ids_tupledef__build(MDContext *md_ctx, TupleDef *t_def, MddTuple *context_tuple, Cube *cube)
+MddTuple *ids_tupledef__build(MDContext *md_ctx, TupleDef *t_def, MddTuple *context_tuple, Cube *cube)
 {
 
 	MddTuple *tuple = mdd_tp__create();

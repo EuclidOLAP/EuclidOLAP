@@ -94,7 +94,6 @@
 	Ln		(O)
 	Log		(O)
 	Log10		(O)
-	Median		(I) (M) (O)
 	Mod		(O)
 	NonEmptyCount		(O)
 	NTile		(O)
@@ -102,7 +101,6 @@
 	Percentile		(O)
 	Power		(O)
 	Predict		(M)
-	Rank		(I) (M) (O)
 	RealValue		(O)
 	Remainder		(O)
 	RollupChildren		(M)
@@ -254,6 +252,8 @@
 	Max					[E] [I] [M] [O]
 	Min					[E] [I] [M] [O]
 	Aggregate			[E] [I] [M] [O]
+	Median				[E] [I] [M] [O]
+	Rank				[E] [I] [M] [O]
 
 
 << Set Functions >>
