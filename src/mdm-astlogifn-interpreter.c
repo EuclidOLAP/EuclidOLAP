@@ -8,7 +8,8 @@
 #include "mdm-astlogifn-interpreter.h"
 
 // for ASTLogicalFunc_IsEmpty
-void *interpret_ast_is_empty(void *md_context, void *grid_data, void *_is_empty, void *context_tuple, void *_cube) {
+void *interpret_ast_is_empty(void *md_context, void *grid_data, void *_is_empty, void *context_tuple, void *_cube)
+{
 
     MDContext *md_ctx = md_context;
     GridData *grid = grid_data;
@@ -23,10 +24,12 @@ void *interpret_ast_is_empty(void *md_context, void *grid_data, void *_is_empty,
 
     grid->type = GRIDDATA_TYPE_BOOL;
 
-    if ((exp_result.type == GRIDDATA_TYPE_NUM && exp_result.null_flag != 1)
-        || (exp_result.type == GRIDDATA_TYPE_BOOL && exp_result.boolean)) {
+    if ((exp_result.type == GRIDDATA_TYPE_NUM && exp_result.null_flag != 1) || (exp_result.type == GRIDDATA_TYPE_BOOL && exp_result.boolean))
+    {
         grid->boolean = 0;
-    } else {
+    }
+    else
+    {
         grid->boolean = 1;
     }
 

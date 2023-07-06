@@ -18,7 +18,8 @@ void parse_mdx(char *mdx, Stack *stk);
 #define IDS_CREATE_HIERARCHY ((void *)0x07)
 #define IDS_MAKE_EQUIVALENT ((void *)0x08)
 
-typedef struct general_chain_expression {
+typedef struct general_chain_expression
+{
     ArrayList *chain;
     type_obj final_form;
 } GeneralChainExpression;
@@ -29,17 +30,11 @@ typedef struct __vector_measures__
     ArrayList *ls_mears_vals;
 } IDSVectorMears;
 
-
-
-
 typedef struct Level_Role_Def_
 {
     ArrayList *lr_path;
 } LevelRoleDef;
 LevelRoleDef *LevelRoleDef_creat(ArrayList *lr_path);
-
-
-
 
 // MemberDef *ids_mbrdef_new__mbr_abs_path(ArrayList *);
 MemberDef *MemberDef_creat(ids_ct t_cons);
@@ -162,7 +157,6 @@ Term *Term_creat();
 void Term_mul_factory(Term *t, Factory *f);
 void Term_div_factory(Term *t, Factory *f);
 
-
 Expression *Expression_creat();
 void Expression_plus_term(Expression *e, Term *t);
 void Expression_minus_term(Expression *e, Term *t);
@@ -197,7 +191,6 @@ typedef struct ExpFn_LookUpCube
 } ExpFnLookUpCube;
 
 ExpFnLookUpCube *ExpFnLookUpCube_creat(char *cube_name, char *exp_str, Expression *exp);
-
 
 #define BOOL_FAC_OPS__LESS 1
 #define BOOL_FAC_OPS__LESS_EQ 2
