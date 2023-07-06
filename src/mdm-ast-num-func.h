@@ -70,4 +70,15 @@ typedef struct
 // for ASTNumFunc_Count
 void *interpret_count(void *md_ctx_, void *nil, void *count_, void *ctx_tuple_, void *cube_);
 
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef;
+} ASTNumFunc_Median;
+
+// for ASTNumFunc_Median
+void *interpret_median(void *md_ctx_, void *nil, void *median_, void *ctx_tuple_, void *cube_);
+
 #endif

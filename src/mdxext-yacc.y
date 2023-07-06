@@ -101,6 +101,7 @@ Stack AST_STACK = { 0 };
 %token MAX				/* Max */
 %token MIN				/* Min */
 %token AGGREGATE		/* Aggregate */
+%token MEDIAN			/* Median */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -533,6 +534,25 @@ expression_function:
 	exp_fn__min {}
   |
 	exp_fn__aggregate {}
+  |
+	exp_fn__median {}
+;
+
+exp_fn__median:
+	MEDIAN ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Median *func = mam_alloc(sizeof(ASTNumFunc_Median), OBJ_TYPE__ASTNumFunc_Median, NULL, 0);
+		func->head.interpret = interpret_median;
+		stack_pop(&AST_STACK, (void **) &(func->expdef));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	MEDIAN ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		ASTNumFunc_Median *func = mam_alloc(sizeof(ASTNumFunc_Median), OBJ_TYPE__ASTNumFunc_Median, NULL, 0);
+		func->head.interpret = interpret_median;
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__aggregate:

@@ -224,3 +224,41 @@ void *interpret_count(void *md_ctx_, void *nil, void *count_, void *ctx_tuple_, 
 
     return grid_data;
 }
+
+// for ASTNumFunc_Median
+void *interpret_median(void *md_ctx_, void *nil, void *median_, void *ctx_tuple_, void *cube_) {
+
+    ASTNumFunc_Median *median = median_;
+
+    MddSet *set = ids_setdef__build(md_ctx_, median->setdef, ctx_tuple_, cube_);
+    int i, sz = als_size(set->tuples);
+
+    GridData *cells = mam_alloc(sizeof(GridData) * sz, OBJ_TYPE__GridData, NULL, 0);
+	
+	for (i = 0; i < sz; i++)
+	{
+		MddTuple *tuple = tuple__merge(ctx_tuple_, als_get(set->tuples, i));
+
+		if (median->expdef)
+			Expression_evaluate(md_ctx_, median->expdef, cube_, tuple, cells + i);
+		else
+			do_calculate_measure_value(md_ctx_, cube_, tuple, cells + i);
+	}
+
+    double tmpv;
+    for (i=0;i<sz-1;i++) {
+        for (int j=i+1;j<sz;j++) {
+            if (cells[j].val < cells[i].val) {
+               tmpv = cells[j].val;
+               cells[j].val = cells[i].val;
+               cells[i].val = tmpv;
+            }
+        }
+    }
+
+    if (sz % 2 == 0) {
+        cells[sz / 2].val = (cells[sz / 2 - 1].val + cells[sz / 2].val) / 2;
+    }
+
+    return cells + (sz / 2);
+}

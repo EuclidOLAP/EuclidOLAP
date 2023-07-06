@@ -141,6 +141,10 @@ Aggregate {
 	return AGGREGATE;
 }
 
+Median {
+	return MEDIAN;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }
