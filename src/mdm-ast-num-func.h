@@ -27,4 +27,47 @@ typedef struct
 // for ASTNumFunc_MaxMin
 void *interpret_maxmin(void *md_ctx_, void *nil, void *mm, void *ctx_tuple_, void *cube_);
 
+
+typedef enum {
+    FAO_DEFAULT,
+    FAO_SUM,
+    FAO_COUNT,
+    FAO_MAX,
+    FAO_MIN,
+    FAO_DISTINCT_COUNT
+} FnAggregateOpt;
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef;
+    FnAggregateOpt opt;
+} ASTNumFunc_Aggregate;
+
+// for ASTNumFunc_Aggregate
+void *interpret_aggregate(void *md_ctx_, void *nil, void *agg, void *ctx_tuple_, void *cube_);
+
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef;
+} ASTNumFunc_Sum;
+
+// for ASTNumFunc_Sum
+void *interpret_sum(void *md_ctx_, void *nil, void *sum_, void *ctx_tuple_, void *cube_);
+
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    char include_empty; // 0(def) - EXCLUDEEMPTY, 1 - INCLUDEEMPTY
+} ASTNumFunc_Count;
+
+// for ASTNumFunc_Count
+void *interpret_count(void *md_ctx_, void *nil, void *count_, void *ctx_tuple_, void *cube_);
+
 #endif

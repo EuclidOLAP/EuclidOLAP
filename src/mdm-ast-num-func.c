@@ -1,6 +1,9 @@
+#include <string.h>
+
 #include "mdm-ast-num-func.h"
 #include "md-model.h"
 #include "mdd.h"
+#include "math.h"
 #include "vce.h"
 
 // for ASTNumFunc_Avg
@@ -88,4 +91,136 @@ void *interpret_maxmin(void *md_ctx_, void *nil, void *mm, void *ctx_tuple_, voi
     }
     result->type = GRIDDATA_TYPE_NUM;
     return result;
+}
+
+// for ASTNumFunc_Aggregate
+void *interpret_aggregate(void *md_ctx_, void *nil, void *agg, void *ctx_tuple_, void *cube_) {
+
+    ASTNumFunc_Aggregate *aggregate = agg;
+	MddSet *set = ids_setdef__build(md_ctx_, aggregate->setdef, ctx_tuple_, cube_);
+    int i, sz = als_size(set->tuples);
+    GridData *cells = mam_alloc(sizeof(GridData) * sz, OBJ_TYPE__RAW_BYTES, NULL, 0);
+	
+	for (i = 0; i < sz; i++)
+	{
+		MddTuple *tuple = tuple__merge(ctx_tuple_, als_get(set->tuples, i));
+		if (aggregate->expdef)
+			Expression_evaluate(md_ctx_, aggregate->expdef, cube_, tuple, cells + i);
+		else
+			do_calculate_measure_value(md_ctx_, cube_, tuple, cells + i);
+	}
+
+    GridData *result = mam_alloc(sizeof(GridData), OBJ_TYPE__RAW_BYTES, NULL, 0);
+
+    switch (aggregate->opt)
+    {
+    case FAO_COUNT:
+        result->type = GRIDDATA_TYPE_NUM;
+        result->val = sz;
+        break;
+    case FAO_MAX:
+        cells_max(cells, sz, &result);
+        result->type = GRIDDATA_TYPE_NUM;
+        break;
+    case FAO_MIN:
+        cells_min(cells, sz, &result);
+        result->type = GRIDDATA_TYPE_NUM;
+        break;
+    case FAO_DISTINCT_COUNT:
+        result->type = GRIDDATA_TYPE_NUM;
+        result->val = 1;
+        for (int i=1;i<sz;i++) {
+            for (int j=0;j<i;j++) {
+                if (cells[i].type == GRIDDATA_TYPE_STR && cells[j].type == GRIDDATA_TYPE_STR && !strcmp(cells[i].str, cells[j].str))
+                    goto bk_a;
+            }
+            result->val += 1;
+            bk_a:
+        }
+        break;
+    case FAO_DEFAULT:
+    case FAO_SUM:
+    default:
+        cells_sum(cells, sz, &result);
+        result->type = GRIDDATA_TYPE_NUM;
+        break;
+    }
+
+    return result;
+}
+
+// for ASTNumFunc_Sum
+void *interpret_sum(void *md_ctx_, void *nil, void *sum_, void *ctx_tuple_, void *cube_) {
+
+    ASTNumFunc_Sum *sum = sum_;
+
+    GridData *grid_data = mam_alloc(sizeof(GridData), OBJ_TYPE__GridData, NULL, 0);
+	grid_data->null_flag = 1;
+	grid_data->val = 0;
+	grid_data->type = GRIDDATA_TYPE_NUM;
+
+	MddSet *set = ids_setdef__build(md_ctx_, sum->setdef, ctx_tuple_, cube_);
+	int i, sz = als_size(set->tuples);
+	for (i = 0; i < sz; i++)
+	{
+		MddTuple *tuple = als_get(set->tuples, i);
+		tuple = tuple__merge(ctx_tuple_, tuple);
+		GridData tmp;
+		if (sum->expdef)
+			Expression_evaluate(md_ctx_, sum->expdef, cube_, tuple, &tmp);
+		else
+			do_calculate_measure_value(md_ctx_, cube_, tuple, &tmp);
+
+		if (tmp.null_flag == 0)
+		{
+			grid_data->val += tmp.val;
+			grid_data->null_flag = 0;
+		}
+		// else
+		// {
+		// 	grid_data->null_flag = 1;
+		// 	return;
+		// }
+	}
+
+    return grid_data;
+}
+
+// for ASTNumFunc_Count
+void *interpret_count(void *md_ctx_, void *nil, void *count_, void *ctx_tuple_, void *cube_) {
+
+    ASTNumFunc_Count *count = count_;
+
+    GridData *grid_data = mam_alloc(sizeof(GridData), OBJ_TYPE__GridData, NULL, 0);
+	grid_data->null_flag = 0;
+	grid_data->val = 0;
+
+	MddSet *set = ids_setdef__build(md_ctx_, count->setdef, ctx_tuple_, cube_);
+
+	int i, tuples_size = als_size(set->tuples);
+
+	if (count->include_empty)
+	{
+		grid_data->val = tuples_size;
+		return grid_data;
+	}
+
+	MddTuple **tuples_matrix_h = mam_alloc(sizeof(MddTuple *) * tuples_size, OBJ_TYPE__RAW_BYTES, NULL, 0);
+
+	for (i = 0; i < tuples_size; i++)
+	{
+		tuples_matrix_h[i] = tuple__merge(ctx_tuple_, (MddTuple *)(als_get(set->tuples, i)));
+	}
+
+	// char *null_flags;
+	ArrayList *grids = vce_vactors_values(md_ctx_, tuples_matrix_h, tuples_size);
+
+	for (i = 0; i < tuples_size; i++)
+	{
+		GridData *gd = als_get(grids, i);
+		if (gd->null_flag == 0)
+			grid_data->val += 1;
+	}
+
+    return grid_data;
 }

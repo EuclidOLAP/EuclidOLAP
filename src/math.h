@@ -18,6 +18,12 @@ typedef struct _grid_data_
     char *str;
 } GridData;
 
+void cells_sum(GridData *celarr, int len, GridData **pp);
+
+void cells_max(GridData *celarr, int len, GridData **pp);
+
+void cells_min(GridData *celarr, int len, GridData **pp);
+
 // typedef enum _cell_type_
 // {
 //     NIL, // nil is null

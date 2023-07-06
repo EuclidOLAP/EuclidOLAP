@@ -72,6 +72,9 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTNUMFUNC_MIN        501
 #define OBJ_TYPE__ASTNumFunc_Avg        501
 #define OBJ_TYPE__ASTNumFunc_MaxMin        502
+#define OBJ_TYPE__ASTNumFunc_Sum        503
+#define OBJ_TYPE__ASTNumFunc_Count        504
+#define OBJ_TYPE__ASTNumFunc_Aggregate        505
 #define OBJ_TYPE__ASTNUMFUNC_MAX        600
 
 
@@ -93,10 +96,10 @@ typedef short type_obj;
 #define OBJ_TYPE__DimRoleDef 10014
 #define OBJ_TYPE__EuclidCommand 10015
 #define OBJ_TYPE__ExpFnCoalesceEmpty 10016
-#define OBJ_TYPE__ExpFnCount 10017
+// #define OBJ_TYPE__ExpFnCount 10017
 #define OBJ_TYPE__ExpFnIif 10018
 #define OBJ_TYPE__ExpFnLookUpCube 10019
-#define OBJ_TYPE__ExpFnSum 10020
+// #define OBJ_TYPE__ExpFnSum 10020
 #define OBJ_TYPE__Expression 10021
 #define OBJ_TYPE__Factory 10022
 #define OBJ_TYPE__FormulaContext 10023

@@ -202,28 +202,28 @@ MDContext *MDContext_creat()
     return mam_alloc(sizeof(MDContext), OBJ_TYPE__MDContext, NULL, 0);
 }
 
-ExpFnSum *ExpFnSum_creat(SetDef *_set, Expression *_exp)
-{
-    ExpFnSum *sum = mam_alloc(sizeof(ExpFnSum), OBJ_TYPE__ExpFnSum, NULL, 0);
-    sum->set_def = _set;
-    sum->exp = _exp;
-    return sum;
-}
-void ExpFnCount_set_setDef(ExpFnCount *count, SetDef *set_def)
-{
-    count->set_def = set_def;
-}
-void ExpFnCount_excludeEmpty(ExpFnCount *count)
-{
-    count->include_empty = 0;
-}
+// ExpFnSum *ExpFnSum_creat(SetDef *_set, Expression *_exp)
+// {
+//     ExpFnSum *sum = mam_alloc(sizeof(ExpFnSum), OBJ_TYPE__ExpFnSum, NULL, 0);
+//     sum->set_def = _set;
+//     sum->exp = _exp;
+//     return sum;
+// }
+// void ExpFnCount_set_setDef(ExpFnCount *count, SetDef *set_def)
+// {
+//     count->set_def = set_def;
+// }
+// void ExpFnCount_excludeEmpty(ExpFnCount *count)
+// {
+//     count->include_empty = 0;
+// }
 
-ExpFnCount *ExpFnCount_creat()
-{
-    ExpFnCount *count = mam_alloc(sizeof(ExpFnCount), OBJ_TYPE__ExpFnCount, NULL, 0);
-    count->include_empty = 1; // default value - include empty
-    return count;
-}
+// ExpFnCount *ExpFnCount_creat()
+// {
+//     ExpFnCount *count = mam_alloc(sizeof(ExpFnCount), OBJ_TYPE__ExpFnCount, NULL, 0);
+//     count->include_empty = 1; // default value - include empty
+//     return count;
+// }
 
 ExpFnLookUpCube *ExpFnLookUpCube_creat(char *cube_name, char *exp_str, Expression *exp)
 {

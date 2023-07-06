@@ -65,7 +65,6 @@
 
 << Numeric Functions >>
 	Abs		(I) (O)
-	Aggregate		(I) (M) (O)
 	CalculationCurrentPass		(M)
 	CalculationPassValue		(M)
 	Case		(O)
@@ -254,6 +253,7 @@
 	Avg					[E] [I] [M] [O]
 	Max					[E] [I] [M] [O]
 	Min					[E] [I] [M] [O]
+	Aggregate			[E] [I] [M] [O]
 
 
 << Set Functions >>
