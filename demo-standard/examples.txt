@@ -814,6 +814,55 @@ from [Airline A];
 
 ---
 
+select 
+except(members(Date), children(Date.[Root])) on 1, 
+except(members( [Measures] ), {([Measures].Revenue)}) on 0 
+from [Airline B] 
+where ( [Aircraft Models].[Bombardier] );
+
+---
+
+with
+member [Measures].[AAaaAA] as // 123
+    avg(except(members(Date), children(Date.[Root])), [Measures].Cost)
+    // avg(except(members(Date), children(Date.[Root])))
+select
+[Measures].[AAaaAA] on 0,
+[Aircraft Models].[Bombardier] on 1
+from [Airline B] ;
+
+---
+
+with
+member [Measures].[AAaaAA] as
+    avg(except(members(Date), children(Date.[Root])), [Measures].Cost, INCLUDEEMPTY)
+select
+[Measures].[AAaaAA] on 0,
+[Aircraft Models].[Bombardier] on 1
+from [Airline B] ;
+
+---
+
+select 
+    members([Measures]) on 0, 
+    intersect(members(Date), UNION(children(Date.Calendar.[ALL].[2021]), children(Date.[ALL].[2021].Q1)), ALL) on 1 
+from [Airline B] ;
+
+---
+
+with
+
+member [Measures].MMax as 
+    max(intersect(members(Date), UNION(children(Date.Calendar.[ALL].[2021]), children(Date.[ALL].[2021].Q1)), ALL), [Measures].Revenue)
+member [Measures].MMin as 
+    min(intersect(members(Date), UNION(children(Date.Calendar.[ALL].[2021]), children(Date.[ALL].[2021].Q1)), ALL), [Measures].Revenue)
+select 
+    { [Measures].MMax, [Measures].MMin } on 0, 
+    [Aircraft Models].Root on 1 
+from [Airline B] ;
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
