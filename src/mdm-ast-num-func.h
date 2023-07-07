@@ -88,4 +88,13 @@ typedef struct
 // for ASTNumFunc_Rank
 void *interpret_rank(void *md_ctx_, void *nil, void *rank_, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    Expression *expdef;
+} ASTNumFunc_Abs;
+
+// for ASTNumFunc_Abs
+void *interpret_abs(void *md_ctx_, void *nil, void *abs_, void *ctx_tuple_, void *cube_);
+
 #endif

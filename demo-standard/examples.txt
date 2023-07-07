@@ -1063,6 +1063,19 @@ from [Airline B];
 
 ---
 
+with 
+member [Measures].PPPPPP 
+  as abs([Measures].MMMMMM) // ([Date].[2021].Q1.M2) + ([Date].[2021].Q1.M3) 
+member [Measures].MMMMMM as [Measures].Cost - 750000
+//  (prevMember(currentMember([Date])), [Measures].Cost) 
+select 
+  { ([Measures].Cost), ([Measures].MMMMMM), [Measures].PPPPPP  } on 1, 
+  filter(members([Date]), ([Measures].Cost) > 600000) on 200 
+from [Airline A] 
+where ( [Classes of Service].[Premium Business], [Aircraft Models].[Boeing].[Boeing 737] );
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

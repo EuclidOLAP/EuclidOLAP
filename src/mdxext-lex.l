@@ -149,6 +149,10 @@ Rank {
 	return RANK;
 }
 
+Abs {
+	return ABS;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }

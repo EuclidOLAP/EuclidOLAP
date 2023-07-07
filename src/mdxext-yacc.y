@@ -103,6 +103,7 @@ Stack AST_STACK = { 0 };
 %token AGGREGATE		/* Aggregate */
 %token MEDIAN			/* Median */
 %token RANK				/* Rank */
+%token ABS				/* abs */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -539,6 +540,17 @@ expression_function:
 	exp_fn__median {}
   |
 	exp_fn__rank {}
+  |
+	exp_fn__abs {}
+;
+
+exp_fn__abs:
+	ABS ROUND_BRACKET_L expression ROUND_BRACKET_R {
+		ASTNumFunc_Abs *func = mam_alloc(sizeof(ASTNumFunc_Abs), OBJ_TYPE__ASTNumFunc_Abs, NULL, 0);
+		func->head.interpret = interpret_abs;
+		stack_pop(&AST_STACK, (void **) &(func->expdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__rank:
