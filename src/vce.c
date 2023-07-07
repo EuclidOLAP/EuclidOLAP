@@ -1033,7 +1033,7 @@ void dispatchAggregateMeasure(/*MDContext *md_context,*/ Cube *cube, ArrayList *
             MddMemberRole *mr = als_get(tuple->mr_ls, j);
             DimensionRole *dr = mr->dim_role;
 
-            if (dr == NULL)
+            if (dr->bin_attr & DR_MEASURE_MASK)
             {
                 measure_mr = mr;
                 continue;

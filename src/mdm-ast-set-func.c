@@ -418,7 +418,6 @@ void *interpret_ytd(void *md_ctx_, void *mrole_, void *ytd_, void *ctx_tuple_, v
 
 	if (ytd->mrole_def)
 	{
-		// mr = ids_mbrsdef__build(md_ctx, ytd->mbr_def, ctx_tuple, cube);
 		date_mr = up_evolving(md_ctx_, ytd->mrole_def, cube_, ctx_tuple_);
 		// dim = find_dim_by_gid(mr->dim_role->dim_gid);
 		date_dim = find_dim_by_gid(date_mr->dim_role->dim_gid);
@@ -476,7 +475,6 @@ void *interpret_descendants(void *md_ctx_, void *nil, void *desc_, void *ctx_tup
 
 	ASTSetFunc_Descendants *descfn = desc_;
 
-	// MddMemberRole *mr = ids_mbrsdef__build(md_ctx, desc->mbr_def, ctx_tuple, cube);
 	MddMemberRole *mrole = up_evolving(md_ctx_, descfn->mrole_def, cube_, ctx_tuple_);
 	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole)
 	{

@@ -305,7 +305,7 @@ void *interpret_rank(void *md_ctx_, void *nil, void *rank_, void *ctx_tuple_, vo
     }
     else
     {
-        MddMemberRole *mr = ids_mbrsdef__build(md_ctx_, rank->param1, ctx_tuple_, cube_);
+        MddMemberRole *mr = up_evolving(md_ctx_, rank->param1, cube_, ctx_tuple_);
         tuple = mdd_tp__create();
         mdd_tp__add_mbrole(tuple, mr);
     }
