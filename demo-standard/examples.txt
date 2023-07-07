@@ -1076,6 +1076,57 @@ where ( [Classes of Service].[Premium Business], [Aircraft Models].[Boeing].[Boe
 
 ---
 
+select 
+children([Date].[2022]) on rows, 
+{ [Measures].Cost } on columns 
+from [Airline A]
+
+---
+
+select 
+DrilldownLevel(
+	{
+		[Date].[2022].[Q1],
+		[Date].[2022]
+	},
+	[Date].[Year]
+	) on rows, 
+{ [Measures].Cost } on columns 
+from [Airline A]
+
+---
+
+select 
+[Date].[2022].[Q1].Children() on rows, 
+{ [Measures].Cost } on columns 
+from [Airline B]
+
+---
+
+select 
+DrilldownLevel(
+    crossjoin(
+        [Aircraft Models].root,
+        { [Date].[2022].[Q1], [Date].[2022] }
+    ), 1
+) on rows, 
+{ [Measures].Cost } on columns 
+from [Airline B]
+
+---
+
+select 
+DrilldownLevel(
+    crossjoin(
+        [Aircraft Models].root,
+        { [Date].[2022].[Q1], [Date].[2022] }
+    )
+) on rows, 
+{ [Measures].Cost } on columns 
+from [Airline B]
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

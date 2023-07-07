@@ -613,6 +613,18 @@ Member *find_member_child(Member *parent_mbr, char *child_name)
 	return NULL;
 }
 
+ArrayList *find_member_children(Member *member) {
+	int i, sz = als_size(member_pool);
+	ArrayList *children_ls = als_new(128, "<Member *>", THREAD_MAM, NULL);
+	for (i = 0; i < sz; i++)
+	{
+		Member *chi = als_get(member_pool, i);
+		if (chi->p_gid == member->gid)
+			als_add(children_ls, chi);
+	}
+	return children_ls;
+}
+
 static Member *_create_member_lv1(Dimension *dim, Hierarchy *hierarchy, char *mbr_name)
 {
 	return _new_member(mbr_name, dim->gid, hierarchy, 0, 1);
@@ -1189,6 +1201,19 @@ MddTuple *tuple__merge(MddTuple *ctx_tuple, MddTuple *tuple_frag)
 	}
 
 	return tp;
+}
+
+MddTuple *tuple_inset_mr(MddTuple *tuple, MddMemberRole *mrole) {
+	unsigned int sz = als_size(tuple->mr_ls);
+	MddTuple *tup = mdd_tp__create();
+	for (int i=0;i<sz;i++) {
+		MddMemberRole *mr = als_get(tuple->mr_ls, i);
+		if (mr->dim_role->gid == mrole->dim_role->gid)
+			mdd_tp__add_mbrole(tup, mrole);
+		else
+			mdd_tp__add_mbrole(tup, mr);
+	}
+	return tup;
 }
 
 static MddAxis *ax_def__build(MDContext *md_ctx, AxisDef *ax_def, MddTuple *ctx_tuple, Cube *cube)

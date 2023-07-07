@@ -157,6 +157,14 @@ crossjoin {
 	return CROSS_JOIN;
 }
 
+DrilldownLevel {
+	return DRILL_DOWN_LEVEL;
+}
+
+Include_Calc_Members {
+	return INCLUDE_CALC_MEMBERS;
+}
+
 count {
 	return COUNT;
 }

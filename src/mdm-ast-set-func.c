@@ -829,3 +829,77 @@ void *interpret_distinct(void *md_ctx_, void *set_, void *dist_, void *ctx_tuple
 	dist_set->tuples = distlist;
 	return dist_set;
 }
+
+// for ASTSetFunc_DrilldownLevel
+void *interpret_drilldownlevel(void *md_ctx_, void *nil, void *ddl, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_DrilldownLevel *drilldl = ddl;
+
+	MddSet *set = ids_setdef__build(md_ctx_, drilldl->setdef, ctx_tuple_, cube_);
+	LevelRole *lrole = NULL;
+	if (drilldl->lvrole_up) {
+		lrole = up_evolving(md_ctx_, drilldl->lvrole_up, cube_, ctx_tuple_);
+		if (!lrole || obj_type_of(lrole) != OBJ_TYPE__LevelRole) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "Function interpret_drilldownlevel throws an exception.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+	}
+
+	int setsz = als_size(set->tuples);
+
+	MddSet *resset = mdd_set__create();
+
+	if (lrole) {
+		for (int i=0;i<setsz;i++) {
+			MddTuple *tup = als_get(set->tuples, i);
+			mddset__add_tuple(resset, tup);
+			int tpmrsz = als_size(tup->mr_ls);
+			for (int j=0;j<tpmrsz;j++) {
+				MddMemberRole *mrole = als_get(tup->mr_ls, j);
+				if (mrole->dim_role->gid == lrole->dim_role->gid && mrole->member->lv == lrole->lv->level) {
+					ArrayList *children = find_member_children(mrole->member);
+					int chi_sz = als_size(children);
+					for (int k=0;k<chi_sz;k++) {
+						Member *child = als_get(children, k);
+						MddMemberRole *_mr_ = mdd_mr__create(child, lrole->dim_role);
+						MddTuple *chi_tup = tuple_inset_mr(tup, _mr_);
+						mddset__add_tuple(resset, chi_tup);
+					}
+					break;
+				}
+			}
+		}
+	} else {
+		int bottom_lval = 0;
+		for (int i=0;i<setsz;i++) {
+			MddTuple *tup = als_get(set->tuples, i);
+			if (drilldl->index < als_size(tup->mr_ls)) {
+				MddMemberRole *mr = als_get(tup->mr_ls, drilldl->index);
+				if (mr->member->lv > bottom_lval)
+					bottom_lval = mr->member->lv;
+			}
+		}
+		
+		for (int i=0;i<setsz;i++) {
+			MddTuple *tup = als_get(set->tuples, i);
+			mddset__add_tuple(resset, tup);
+
+			if (drilldl->index >= als_size(tup->mr_ls))
+				continue;
+
+			MddMemberRole *mrole = als_get(tup->mr_ls, drilldl->index);
+			if (mrole->member->lv == bottom_lval) {
+				ArrayList *children = find_member_children(mrole->member);
+				int chi_sz = als_size(children);
+				for (int k=0;k<chi_sz;k++) {
+					Member *child = als_get(children, k);
+					MddMemberRole *_mr_ = mdd_mr__create(child, mrole->dim_role);
+					MddTuple *chi_tup = tuple_inset_mr(tup, _mr_);
+					mddset__add_tuple(resset, chi_tup);
+				}
+			}
+		}
+	}
+
+	return resset;
+}

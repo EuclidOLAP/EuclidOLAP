@@ -68,6 +68,8 @@ Member *find_member_lv0(Dimension *dimension, Hierarchy *hierarchy, char *mbr_na
 
 Member *find_member_child(Member *parent_mbr, char *child_name);
 
+ArrayList *find_member_children(Member *member);
+
 /*
  * Compares the position of two members.
  *
@@ -196,6 +198,8 @@ void BooleanTerm_evaluate(MDContext *md_ctx, BooleanTerm *boolTerm, Cube *cube, 
 void BooleanFactory_evaluate(MDContext *md_ctx, BooleanFactory *boolFac, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data);
 
 MddTuple *tuple__merge(MddTuple *ctx_tuple, MddTuple *tuple_frag);
+
+MddTuple *tuple_inset_mr(MddTuple *tuple, MddMemberRole *mrole);
 
 void ExpFnLookUpCube_evolving(MDContext *md_ctx, ExpFnLookUpCube *luc, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data);
 

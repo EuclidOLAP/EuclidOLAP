@@ -65,6 +65,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTSetFunc_Union         413
 #define OBJ_TYPE__ASTSetFunc_Intersect         414
 #define OBJ_TYPE__ASTSetFunc_Distinct         415
+#define OBJ_TYPE__ASTSetFunc_DrilldownLevel         416
 #define OBJ_TYPE__AST_SET_FUNC_MAX        500
 
 
