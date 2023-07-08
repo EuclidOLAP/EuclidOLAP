@@ -149,8 +149,28 @@ Rank {
 	return RANK;
 }
 
+Abs {
+	return ABS;
+}
+
 crossjoin {
 	return CROSS_JOIN;
+}
+
+DrilldownLevel {
+	return DRILL_DOWN_LEVEL;
+}
+
+Include_Calc_Members {
+	return INCLUDE_CALC_MEMBERS;
+}
+
+DrilldownLevelBottom {
+	return DRILL_DOWN_LEVEL_BOTTOM;
+}
+
+DrilldownLevelTop {
+	return DRILL_DOWN_LEVEL_TOP;
 }
 
 count {

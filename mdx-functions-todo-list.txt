@@ -64,16 +64,11 @@
 
 
 << Numeric Functions >>
-	Abs		(I) (O)
 	CalculationCurrentPass		(M)
 	CalculationPassValue		(M)
 	Case		(O)
 	CellValue		(O)
 	Correlation		(I) (M)
-	Count		(I) (O)
-	Count (Dimension)		(M)
-	Count (Hierarchy Levels)		(M)
-	Count (Tuple)		(M)
 	Covariance		(I) (M)
 	CovarianceN		(M)
 	DateDiff		(O)
@@ -130,16 +125,9 @@
 	BottomCount		(I) (M)
 	BottomSum		(I) (M)
 	CurrentOrdinal		(M)
-	DrilldownLevel		(I) (M)
-	DrilldownLevelBottom		(I) (M)
-	DrillDownLevelTop		(I)
-	DrilldownLevelTop		(M)
-	DrillDownMember		(I)
-	DrilldownMember		(M)
-	DrillDownMemberBottom		(I)
-	DrilldownMemberBottom		(M)
-	DrillDownMemberTop		(I)
-	DrilldownMemberTop		(M)
+	DrillDownMember		(I) (M)
+	DrillDownMemberBottom		(I) (M)
+	DrillDownMemberTop		(I) (M)
 	DrillupLevel		(I) (M)
 	DrillupMember		(I) (M)
 	Exists		(M)
@@ -254,6 +242,7 @@
 	Aggregate			[E] [I] [M] [O]
 	Median				[E] [I] [M] [O]
 	Rank				[E] [I] [M] [O]
+	Abs					[E] [I] [O]
 
 
 << Set Functions >>
@@ -273,7 +262,9 @@
 	Union			[E] [I] [M] [O]
 	Ytd				[E] [I] [M]
 	Distinct		[E] [I] [M] [O]
-
+	DrilldownLevel	[E] [I] [M]
+	DrilldownLevelBottom		[E] [I] [M]
+	DrillDownLevelTop			[E] [I] [M]
 
 << String Functions >>
 	Name			[E] [I] [M]

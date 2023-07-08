@@ -356,3 +356,18 @@ void *interpret_rank(void *md_ctx_, void *nil, void *rank_, void *ctx_tuple_, vo
     res->val = 0;
     return res;
 }
+
+// for ASTNumFunc_Abs
+void *interpret_abs(void *md_ctx_, void *nil, void *abs_, void *ctx_tuple_, void *cube_) {
+
+    ASTNumFunc_Abs *abs = abs_;
+
+    GridData *cell = mam_alloc(sizeof(GridData), OBJ_TYPE__GridData, NULL, 0);
+
+    Expression_evaluate(md_ctx_, abs->expdef, cube_, ctx_tuple_, cell);
+
+    if (cell->val < 0)
+        cell->val = 0 - cell->val;
+
+    return cell;
+}

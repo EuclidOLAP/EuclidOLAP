@@ -73,6 +73,10 @@ Stack AST_STACK = { 0 };
 %token UNION
 %token INTERSECT
 %token DISTINCT			/* Distinct */
+%token DRILL_DOWN_LEVEL	/* DrilldownLevel */
+%token INCLUDE_CALC_MEMBERS	/* param: Include_Calc_Members */
+%token DRILL_DOWN_LEVEL_BOTTOM	/* DrilldownLevelBottom */
+%token DRILL_DOWN_LEVEL_TOP	/* DrilldownLevelTop */
 
 /* member functions key words */
 %token PARENT			/* parent */
@@ -103,6 +107,7 @@ Stack AST_STACK = { 0 };
 %token AGGREGATE		/* Aggregate */
 %token MEDIAN			/* Median */
 %token RANK				/* Rank */
+%token ABS				/* abs */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -539,6 +544,17 @@ expression_function:
 	exp_fn__median {}
   |
 	exp_fn__rank {}
+  |
+	exp_fn__abs {}
+;
+
+exp_fn__abs:
+	ABS ROUND_BRACKET_L expression ROUND_BRACKET_R {
+		ASTNumFunc_Abs *func = mam_alloc(sizeof(ASTNumFunc_Abs), OBJ_TYPE__ASTNumFunc_Abs, NULL, 0);
+		func->head.interpret = interpret_abs;
+		stack_pop(&AST_STACK, (void **) &(func->expdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__rank:
@@ -909,7 +925,170 @@ set_function:
 	set_func_intersect {}
   |
 	set_func_distinct {}
+  |
+	set_func_drilldownlevel {}
+  |
+	set_func_DrilldownLevelBottom {}
+  |
+	set_func_DrilldownLevelTop {}
 ;
+
+// DrilldownLevelBottom(Set_def, Count [, Level_def] [, Expression] [, INCLUDE_CALC_MEMBERS])
+set_func_DrilldownLevelBottom:
+	DRILL_DOWN_LEVEL_BOTTOM ROUND_BRACKET_L DrilldownLevel_BottomAndTop_params ROUND_BRACKET_R {
+		ASTSetFunc_DrilldownLevelBottomTop *func = NULL;
+		stack_pop(&AST_STACK, (void **)&func);
+		func->type = 'b';
+		stack_push(&AST_STACK, func);
+	}
+;
+
+// DrilldownLevelTop(Set_def, Count [, Level_def] [, Expression] [, INCLUDE_CALC_MEMBERS])
+set_func_DrilldownLevelTop:
+	DRILL_DOWN_LEVEL_TOP ROUND_BRACKET_L DrilldownLevel_BottomAndTop_params ROUND_BRACKET_R {
+		ASTSetFunc_DrilldownLevelBottomTop *func = NULL;
+		stack_pop(&AST_STACK, (void **)&func);
+		func->type = 't';
+		stack_push(&AST_STACK, func);
+	}
+;
+
+DrilldownLevel_BottomAndTop_params:
+	set_statement COMMA expression {
+		ASTSetFunc_DrilldownLevelBottomTop *func = mam_alloc(sizeof(ASTSetFunc_DrilldownLevelBottomTop), OBJ_TYPE__ASTSetFunc_DrilldownLevelBottomTop, NULL, 0);
+		func->head.interpret = interpret_drilldownlevelbottomtop;
+
+		stack_pop(&AST_STACK, (void **)&(func->countexp));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	set_statement COMMA expression COMMA expression COMMA expression {
+		ASTSetFunc_DrilldownLevelBottomTop *func = mam_alloc(sizeof(ASTSetFunc_DrilldownLevelBottomTop), OBJ_TYPE__ASTSetFunc_DrilldownLevelBottomTop, NULL, 0);
+		func->head.interpret = interpret_drilldownlevelbottomtop;
+
+		stack_pop(&AST_STACK, (void **)&(func->sortexp));
+		stack_pop(&AST_STACK, (void **)&(func->uncertainexp));
+		stack_pop(&AST_STACK, (void **)&(func->countexp));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	set_statement COMMA expression COMMA expression {
+		ASTSetFunc_DrilldownLevelBottomTop *func = mam_alloc(sizeof(ASTSetFunc_DrilldownLevelBottomTop), OBJ_TYPE__ASTSetFunc_DrilldownLevelBottomTop, NULL, 0);
+		func->head.interpret = interpret_drilldownlevelbottomtop;
+
+		stack_pop(&AST_STACK, (void **)&(func->uncertainexp));
+		stack_pop(&AST_STACK, (void **)&(func->countexp));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+
+	}
+  |
+	set_statement COMMA expression COMMA INCLUDE_CALC_MEMBERS {
+		ASTSetFunc_DrilldownLevelBottomTop *func = mam_alloc(sizeof(ASTSetFunc_DrilldownLevelBottomTop), OBJ_TYPE__ASTSetFunc_DrilldownLevelBottomTop, NULL, 0);
+		func->head.interpret = interpret_drilldownlevelbottomtop;
+		func->include_calc_members = 1;
+
+		stack_pop(&AST_STACK, (void **)&(func->countexp));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+
+	}
+  |
+	set_statement COMMA expression COMMA expression COMMA expression COMMA INCLUDE_CALC_MEMBERS {
+		ASTSetFunc_DrilldownLevelBottomTop *func = mam_alloc(sizeof(ASTSetFunc_DrilldownLevelBottomTop), OBJ_TYPE__ASTSetFunc_DrilldownLevelBottomTop, NULL, 0);
+		func->head.interpret = interpret_drilldownlevelbottomtop;
+		func->include_calc_members = 1;
+
+		stack_pop(&AST_STACK, (void **)&(func->sortexp));
+		stack_pop(&AST_STACK, (void **)&(func->uncertainexp));
+		stack_pop(&AST_STACK, (void **)&(func->countexp));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	set_statement COMMA expression COMMA expression COMMA INCLUDE_CALC_MEMBERS {
+		ASTSetFunc_DrilldownLevelBottomTop *func = mam_alloc(sizeof(ASTSetFunc_DrilldownLevelBottomTop), OBJ_TYPE__ASTSetFunc_DrilldownLevelBottomTop, NULL, 0);
+		func->head.interpret = interpret_drilldownlevelbottomtop;
+		func->include_calc_members = 1;
+
+		stack_pop(&AST_STACK, (void **)&(func->uncertainexp));
+		stack_pop(&AST_STACK, (void **)&(func->countexp));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+;
+
+set_func_drilldownlevel:
+	DRILL_DOWN_LEVEL ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		// DrilldownLevel(Set_Expression)
+		ASTSetFunc_DrilldownLevel *func = mam_alloc(sizeof(ASTSetFunc_DrilldownLevel), OBJ_TYPE__ASTSetFunc_DrilldownLevel, NULL, 0);
+		func->head.interpret = interpret_drilldownlevel;
+
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	DRILL_DOWN_LEVEL ROUND_BRACKET_L set_statement COMMA mdm_entity_universal_path ROUND_BRACKET_R {
+		// DrilldownLevel(Set_Expression, Level_Expression)
+		ASTSetFunc_DrilldownLevel *func = mam_alloc(sizeof(ASTSetFunc_DrilldownLevel), OBJ_TYPE__ASTSetFunc_DrilldownLevel, NULL, 0);
+		func->head.interpret = interpret_drilldownlevel;
+
+		stack_pop(&AST_STACK, (void **)&(func->lvrole_up));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	DRILL_DOWN_LEVEL ROUND_BRACKET_L set_statement COMMA decimal_value ROUND_BRACKET_R {
+		// DrilldownLevel(Set_Expression, Index)
+		ASTSetFunc_DrilldownLevel *func = mam_alloc(sizeof(ASTSetFunc_DrilldownLevel), OBJ_TYPE__ASTSetFunc_DrilldownLevel, NULL, 0);
+		func->head.interpret = interpret_drilldownlevel;
+
+		long lidx;
+		stack_pop(&AST_STACK, (void **)&lidx);
+		func->index = (int)lidx;
+
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	DRILL_DOWN_LEVEL ROUND_BRACKET_L set_statement COMMA INCLUDE_CALC_MEMBERS ROUND_BRACKET_R {
+		// DrilldownLevel(Set_Expression, INCLUDE_CALC_MEMBERS)
+		ASTSetFunc_DrilldownLevel *func = mam_alloc(sizeof(ASTSetFunc_DrilldownLevel), OBJ_TYPE__ASTSetFunc_DrilldownLevel, NULL, 0);
+		func->head.interpret = interpret_drilldownlevel;
+		func->include_calc_members = 1;
+
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	DRILL_DOWN_LEVEL ROUND_BRACKET_L set_statement COMMA mdm_entity_universal_path COMMA INCLUDE_CALC_MEMBERS ROUND_BRACKET_R {
+		// DrilldownLevel(Set_Expression, Level_Expression, INCLUDE_CALC_MEMBERS)
+		ASTSetFunc_DrilldownLevel *func = mam_alloc(sizeof(ASTSetFunc_DrilldownLevel), OBJ_TYPE__ASTSetFunc_DrilldownLevel, NULL, 0);
+		func->head.interpret = interpret_drilldownlevel;
+		func->include_calc_members = 1;
+
+		stack_pop(&AST_STACK, (void **)&(func->lvrole_up));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	DRILL_DOWN_LEVEL ROUND_BRACKET_L set_statement COMMA decimal_value COMMA INCLUDE_CALC_MEMBERS ROUND_BRACKET_R {
+		// DrilldownLevel(Set_Expression, Index, INCLUDE_CALC_MEMBERS)
+		ASTSetFunc_DrilldownLevel *func = mam_alloc(sizeof(ASTSetFunc_DrilldownLevel), OBJ_TYPE__ASTSetFunc_DrilldownLevel, NULL, 0);
+		func->head.interpret = interpret_drilldownlevel;
+		func->include_calc_members = 1;
+
+		long lidx;
+		stack_pop(&AST_STACK, (void **)&lidx);
+		func->index = (int)lidx;
+
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+;
+
 
 set_func_distinct:
 	DISTINCT ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
