@@ -165,6 +165,14 @@ Include_Calc_Members {
 	return INCLUDE_CALC_MEMBERS;
 }
 
+DrilldownLevelBottom {
+	return DRILL_DOWN_LEVEL_BOTTOM;
+}
+
+DrilldownLevelTop {
+	return DRILL_DOWN_LEVEL_TOP;
+}
+
 count {
 	return COUNT;
 }

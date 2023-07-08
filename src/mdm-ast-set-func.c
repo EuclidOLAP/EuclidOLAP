@@ -2,6 +2,7 @@
 
 #include "md-model.h"
 #include "mdd.h"
+#include "vce.h"
 #include "log.h"
 #include "mdm-ast-set-func.h"
 
@@ -896,6 +897,207 @@ void *interpret_drilldownlevel(void *md_ctx_, void *nil, void *ddl, void *ctx_tu
 					MddMemberRole *_mr_ = mdd_mr__create(child, mrole->dim_role);
 					MddTuple *chi_tup = tuple_inset_mr(tup, _mr_);
 					mddset__add_tuple(resset, chi_tup);
+				}
+			}
+		}
+	}
+
+	return resset;
+}
+
+void _bottop_sort_(ASTSetFunc_DrilldownLevelBottomTop *bottop, GridData *cellarr, ArrayList *memberls) {
+	unsigned int sz = als_size(memberls);
+	for (int i=0;i<sz-1;i++) {
+		for (int j=i+1;j<sz;j++) {
+			if ((bottop->type == 'b' && cellarr[i].val > cellarr[j].val) || (bottop->type == 't' && cellarr[i].val < cellarr[j].val)) {
+				double var = cellarr[i].val;
+				cellarr[i].val = cellarr[j].val;
+				cellarr[j].val = var;
+
+				void *addr = als_get(memberls, i);
+				ArrayList_set(memberls, i, als_get(memberls, j));
+				ArrayList_set(memberls, j, addr);
+			}
+		}
+	}
+}
+
+// for ASTSetFunc_DrilldownLevelBottomTop
+void *interpret_drilldownlevelbottomtop(void *md_ctx_, void *nil, void *bottop_, void *ctx_tuple_, void *cube_) {
+
+	ASTSetFunc_DrilldownLevelBottomTop *bottop = bottop_;
+
+	MddSet *set = ids_setdef__build(md_ctx_, bottop->setdef, ctx_tuple_, cube_);
+	GridData cell;
+	Expression_evaluate(md_ctx_, bottop->countexp, cube_, ctx_tuple_, &cell);
+	int count = (int)cell.val;
+
+	int setsz = als_size(set->tuples);
+
+	MddSet *resset = mdd_set__create();
+
+	if (!bottop->uncertainexp && !bottop->sortexp) {
+		int bottom_lval = 0;
+		for (int i=0;i<setsz;i++) {
+			MddTuple *tup = als_get(set->tuples, i);
+			MddMemberRole *mr = als_get(tup->mr_ls, 0);
+			if (mr->member->lv > bottom_lval)
+				bottom_lval = mr->member->lv;
+		}
+		
+		for (int i=0;i<setsz;i++) {
+			MddTuple *tup = als_get(set->tuples, i);
+			mddset__add_tuple(resset, tup);
+
+			MddMemberRole *mrole = als_get(tup->mr_ls, 0);
+			if (mrole->member->lv == bottom_lval) {
+				ArrayList *children = find_member_children(mrole->member);
+				int chi_sz = als_size(children);
+				GridData *cellarr = mam_alloc(sizeof(GridData) * chi_sz, OBJ_TYPE__RAW_BYTES, NULL, 0);
+				for (int k=0;k<chi_sz;k++) {
+					Member *child = als_get(children, k);
+					MddMemberRole *_mr_ = mdd_mr__create(child, mrole->dim_role);
+					MddTuple *chi_tup = tuple_inset_mr(tup, _mr_);
+					do_calculate_measure_value(md_ctx_, cube_, tuple__merge(ctx_tuple_, chi_tup), cellarr + k);
+				}
+				_bottop_sort_(bottop, cellarr, children);
+				for (int k=0;k<chi_sz && k<count;k++) {
+					MddTuple *chi_tup = tuple_inset_mr(tup, mdd_mr__create(als_get(children, k), mrole->dim_role));
+					mddset__add_tuple(resset, chi_tup);
+				}
+			}
+		}
+	} else if (bottop->uncertainexp && bottop->sortexp) {
+		Term *term = als_get(bottop->uncertainexp->plus_terms, 0);
+		Factory *fac = als_get(term->mul_factories, 0);
+		MDMEntityUniversalPath *lv_up = fac->up;
+
+		LevelRole *lvrole = up_evolving(md_ctx_, lv_up, cube_, ctx_tuple_);
+		if (!lvrole || obj_type_of(lvrole) != OBJ_TYPE__LevelRole) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "Function interpret_drilldownlevelbottomtop throws an exception.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+
+		for (int i=0;i<setsz;i++) {
+			MddTuple *tup = als_get(set->tuples, i);
+			mddset__add_tuple(resset, tup);
+			MddMemberRole *mrole = NULL;
+			for (int j=0;j<als_size(tup->mr_ls);j++) {
+				mrole = als_get(tup->mr_ls, j);
+				if (mrole->dim_role->gid == lvrole->dim_role->gid && mrole->member->lv == lvrole->lv->level) {
+					break;
+				} else {
+					mrole = NULL;
+				}
+			}
+
+			if (!mrole)
+				continue;
+
+			// if (mrole->dim_role->gid == lvrole->dim_role->gid && mrole->member->lv == lvrole->lv->level) {
+			ArrayList *children = find_member_children(mrole->member);
+			int chi_sz = als_size(children);
+			GridData *cellarr = mam_alloc(sizeof(GridData) * chi_sz, OBJ_TYPE__RAW_BYTES, NULL, 0);
+			for (int k=0;k<chi_sz;k++) {
+				Member *child = als_get(children, k);
+				MddMemberRole *_mr_ = mdd_mr__create(child, mrole->dim_role);
+				MddTuple *chi_tup = tuple_inset_mr(tup, _mr_);
+				do_calculate_measure_value(md_ctx_, cube_, tuple__merge(ctx_tuple_, chi_tup), cellarr + k);
+			}
+
+			_bottop_sort_(bottop, cellarr, children);
+
+			for (int k=0;k<chi_sz && k<count;k++) {
+				MddTuple *chi_tup = tuple_inset_mr(tup, mdd_mr__create(als_get(children, k), mrole->dim_role));
+				mddset__add_tuple(resset, chi_tup);
+			}
+			// }
+		}
+	} else if (bottop->uncertainexp && !bottop->sortexp) {
+		LevelRole *lvrole = NULL;
+		if (als_size(bottop->uncertainexp->plus_terms) == 1) {
+			Term *term = als_get(bottop->uncertainexp->plus_terms, 0);
+			if (als_size(term->mul_factories) == 1) {
+				Factory *fac = als_get(term->mul_factories, 0);
+				if (fac->t_cons == FACTORY_DEF__EU_PATH) {
+					lvrole = up_evolving(md_ctx_, fac->up, cube_, ctx_tuple_);
+					if (!lvrole || obj_type_of(lvrole) != OBJ_TYPE__LevelRole) {
+						lvrole = NULL;
+					}
+				}
+			}
+		}
+
+		if (lvrole) {
+			
+			for (int i=0;i<setsz;i++) {
+				MddTuple *tup = als_get(set->tuples, i);
+				mddset__add_tuple(resset, tup);
+
+				MddMemberRole *mrole = NULL;
+				for (int j=0;j<als_size(tup->mr_ls);j++) {
+					mrole = als_get(tup->mr_ls, j);
+					if (mrole->dim_role->gid == lvrole->dim_role->gid && mrole->member->lv == lvrole->lv->level) {
+						break;
+					} else {
+						mrole = NULL;
+					}
+				}
+
+				if (!mrole)
+					continue;
+
+				// if (mrole->dim_role->gid == lvrole->dim_role->gid && mrole->member->lv == lvrole->lv->level) {
+				ArrayList *children = find_member_children(mrole->member);
+				int chi_sz = als_size(children);
+				GridData *cellarr = mam_alloc(sizeof(GridData) * chi_sz, OBJ_TYPE__RAW_BYTES, NULL, 0);
+				for (int k=0;k<chi_sz;k++) {
+					Member *child = als_get(children, k);
+					MddMemberRole *_mr_ = mdd_mr__create(child, mrole->dim_role);
+					MddTuple *chi_tup = tuple_inset_mr(tup, _mr_);
+					do_calculate_measure_value(md_ctx_, cube_, tuple__merge(ctx_tuple_, chi_tup), cellarr + k);
+				}
+
+				_bottop_sort_(bottop, cellarr, children);
+
+				for (int k=0;k<chi_sz && k<count;k++) {
+					MddTuple *chi_tup = tuple_inset_mr(tup, mdd_mr__create(als_get(children, k), mrole->dim_role));
+					mddset__add_tuple(resset, chi_tup);
+				}
+				// }
+			}
+	
+		} else {
+			int bottom_lval = 0;
+			for (int i=0;i<setsz;i++) {
+				MddTuple *tup = als_get(set->tuples, i);
+				MddMemberRole *mr = als_get(tup->mr_ls, 0);
+				if (mr->member->lv > bottom_lval)
+					bottom_lval = mr->member->lv;
+			}
+			
+			for (int i=0;i<setsz;i++) {
+				MddTuple *tup = als_get(set->tuples, i);
+				mddset__add_tuple(resset, tup);
+				MddMemberRole *mrole = als_get(tup->mr_ls, 0);
+				if (mrole->member->lv == bottom_lval) {
+					ArrayList *children = find_member_children(mrole->member);
+					int chi_sz = als_size(children);
+					GridData *cellarr = mam_alloc(sizeof(GridData) * chi_sz, OBJ_TYPE__RAW_BYTES, NULL, 0);
+					for (int k=0;k<chi_sz;k++) {
+						Member *child = als_get(children, k);
+						MddMemberRole *_mr_ = mdd_mr__create(child, mrole->dim_role);
+						MddTuple *chi_tup = tuple_inset_mr(tup, _mr_);
+						Expression_evaluate(md_ctx_, bottop->uncertainexp, cube_, tuple__merge(ctx_tuple_, chi_tup), cellarr + k);
+					}
+
+					_bottop_sort_(bottop, cellarr, children);
+
+					for (int k=0;k<chi_sz && k<count;k++) {
+						MddTuple *chi_tup = tuple_inset_mr(tup, mdd_mr__create(als_get(children, k), mrole->dim_role));
+						mddset__add_tuple(resset, chi_tup);
+					}
 				}
 			}
 		}

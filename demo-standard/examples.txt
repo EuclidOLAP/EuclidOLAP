@@ -1127,6 +1127,140 @@ from [Airline B]
 
 ---
 
+select 
+DrilldownLevelBottom(
+   crossjoin( { [Date].[2022].Q1, [Date].[2022] } , { [Starting Point].[Asia] } ), 2
+) on rows, 
+{ [Ending Point].[Asia] } on columns 
+from [Airline B]
+where ([Classes of Service].[Business Suite], [Aircraft Models].[Boeing].[Boeing 787])
+
+---
+
+select 
+DrilldownLevelBottom(
+   crossjoin( { [Date].[2022].Q4, [Date].[2022] } , { [Starting Point].[Asia] } ), 2, [Measures].Cost
+) on rows, 
+{ [Ending Point].[Asia] } on columns 
+from [Airline B]
+where ([Classes of Service].[Business Suite], [Aircraft Models].[Boeing].[Boeing 787])
+
+---
+
+select 
+DrilldownLevelBottom(
+   crossjoin( { [Date].[2022].Q1, [Date].[2022] } , { [Starting Point].[Asia] } ), 2
+) on rows, 
+{ [Ending Point].[Asia] } on columns 
+from [Airline B]
+where ([Classes of Service].[Business Suite], [Aircraft Models].[Boeing].[Boeing 787])
+
+---
+
+select
+Date.[2022].children on 1,
+[Measures].members on 0
+from [Airline B]
+where ([Classes of Service].[Business Suite], [Aircraft Models].[Boeing].[Boeing 787], [Starting Point].[Asia]);
+
+---
+
+select
+DrilldownLevelBottom(
+    crossjoin({ Date.[2022].Q1, Date.[2022] }, [Starting Point].[Asia] )
+    , 2
+) on rows, 
+[Measures].members on 0
+from [Airline B]
+where ([Classes of Service].[Business Suite], [Aircraft Models].[Boeing].[Boeing 787]);
+
+---
+
+select
+DrilldownLevelBottom(
+    crossjoin( { [Aircraft Models].[Boeing], [Aircraft Models].[Airbus] }, [Starting Point].[Asia] )
+    , 3
+    , [Measures].Cost
+) on rows, 
+[Classes of Service].[Business Suite] on 0
+from [Airline B]
+where ( [Measures].Cost, [Aircraft Models].[Boeing].[Boeing 787], [Ending Point].[Asia]);
+
+---
+
+select
+DrilldownLevelBottom(
+    crossjoin( [Starting Point].[Asia], { [Aircraft Models].[Boeing], [Aircraft Models].[Airbus] } )
+    , 3
+    , [Aircraft Models].[Aircraft Models].Manufacturer
+    , [Measures].Revenue
+) on rows, 
+[Classes of Service].[Business Suite] on 0
+from [Airline B]
+where ( [Measures].Revenue, [Aircraft Models].[Boeing].[Boeing 787], [Ending Point].[Asia]);
+
+---
+
+select
+DrilldownLevelBottom(
+    crossjoin( [Starting Point].[Asia], { [Aircraft Models].[Boeing], [Aircraft Models].[Airbus] } )
+    , 3
+    , [Aircraft Models].[Aircraft Models].Manufacturer
+) on rows, 
+[Classes of Service].[Business Suite] on 0
+from [Airline B]
+where ( [Measures].Revenue, [Aircraft Models].[Boeing].[Boeing 787], [Ending Point].[Asia]);
+
+---
+
+select
+DrilldownLevelTop(
+    crossjoin({ Date.[2022].Q1, Date.[2022] }, [Starting Point].[Asia] )
+    , 2
+) on rows, 
+[Measures].members on 0
+from [Airline B]
+where ([Classes of Service].[Business Suite], [Aircraft Models].[Boeing].[Boeing 787]);
+
+---
+
+select
+DrilldownLevelTop(
+    crossjoin( { [Aircraft Models].[Boeing], [Aircraft Models].[Airbus] }, [Starting Point].[Asia] )
+    , 3
+    , [Measures].Cost
+) on rows, 
+[Classes of Service].[Business Suite] on 0
+from [Airline B]
+where ( [Measures].Cost, [Aircraft Models].[Boeing].[Boeing 787], [Ending Point].[Asia]);
+
+---
+
+select
+DrilldownLevelTop(
+    crossjoin( [Starting Point].[Asia], { [Aircraft Models].[Boeing], [Aircraft Models].[Airbus] } )
+    , 3
+    , [Aircraft Models].[Aircraft Models].Manufacturer
+    , [Measures].Revenue
+) on rows, 
+[Classes of Service].[Business Suite] on 0
+from [Airline B]
+where ( [Measures].Revenue, [Aircraft Models].[Boeing].[Boeing 787], [Ending Point].[Asia]);
+
+---
+
+select
+DrilldownLevelTop(
+    crossjoin( [Starting Point].[Asia], { [Aircraft Models].[Boeing], [Aircraft Models].[Airbus] } )
+    , 3
+    , [Aircraft Models].[Aircraft Models].Manufacturer
+) on rows, 
+[Classes of Service].[Business Suite] on 0
+from [Airline B]
+where ( [Measures].Revenue, [Aircraft Models].[Boeing].[Boeing 787], [Ending Point].[Asia]);
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
