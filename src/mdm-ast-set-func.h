@@ -208,4 +208,49 @@ typedef struct
 // for ASTSetFunc_DrilldownLevelBottomTop
 void *interpret_drilldownlevelbottomtop(void *md_ctx_, void *nil, void *bottop_, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef1;
+    SetDef *setdef2;
+    char recursive; // 0 f, 1 t
+} ASTSetFunc_DrilldownMember;
+
+// for ASTSetFunc_DrilldownMember
+void *interpret_drilldownmember(void *md_ctx_, void *nil, void *ddm_, void *ctx_tuple_, void *cube_);
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef1;
+    SetDef *setdef2;
+    Expression *count_exp;
+    Expression *num_exp;
+    char recursive; // 0 - false, 1 - true
+    char type; // 'b' - Bottom, 't' - Top
+} ASTSetFunc_DrilldownMemberBottomTop;
+
+// for ASTSetFunc_DrilldownMemberBottomTop
+void *interpret_drilldownmemberbottomtop(void *md_ctx_, void *nil, void *ddmpt, void *ctx_tuple_, void *cube_);
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    MDMEntityUniversalPath *lrdef;
+} ASTSetFunc_DrillupLevel;
+
+// for ASTSetFunc_DrillupLevel
+void *interpret_drilluplevel(void *md_ctx_, void *nil, void *dul_, void *ctx_tuple_, void *cube_);
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef1;
+    SetDef *setdef2;
+} ASTSetFunc_DrillupMember;
+
+// for ASTSetFunc_DrillupMember
+void *interpret_drillupmember(void *md_ctx_, void *nil, void *dum_, void *ctx_tuple_, void *cube_);
+
 #endif

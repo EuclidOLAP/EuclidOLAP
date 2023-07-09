@@ -1261,6 +1261,96 @@ where ( [Measures].Revenue, [Aircraft Models].[Boeing].[Boeing 787], [Ending Poi
 
 ---
 
+select 
+DrilldownMember(
+    Date.root.children,
+    { [Date].[2021] }
+) on rows, { [Aircraft Models].Boeing } on columns
+ from [Airline A];
+
+---
+
+select 
+DrilldownMember(
+    Date.root.children,
+    { [Date].[2021], [Date].[2021].Q3, [Date].[2021].Q1, [Date].[2022].Q1 },
+    recursive
+) on rows, { [Aircraft Models].Boeing } on columns
+ from [Airline B];
+
+---
+
+select 
+DrilldownMemberBottom(
+    [Date].[2022],
+    [Date].[2022],
+    2
+) on rows, { [Aircraft Models].Boeing } on columns
+ from [Airline B];
+
+---
+
+select 
+DrilldownMemberBottom(
+    [Date].[2022],
+    [Date].[2022],
+    2,
+    [Measures].Cost
+) on rows, { [Aircraft Models].Boeing } on columns
+ from [Airline B];
+
+---
+
+select 
+DrilldownMemberBottom(
+    [Date].[2022],
+    { [Date].[2022], [Date].[2022].Q3 },
+    2,
+    recursive
+) on rows, { [Aircraft Models].Boeing } on columns
+from [Airline B];
+
+---
+
+select 
+DrillupLevel(
+    union([Date].root.children, LateralMembers(Date.[2021].Q1.M1))
+) on rows, { [Aircraft Models].Boeing } on columns
+from [Airline B];
+
+---
+
+select 
+DrillupLevel(
+    union([Date].root.children, LateralMembers(Date.[2021].Q1), LateralMembers(Date.[2021].Q1.M1)),
+    Date.[Quarter]
+) on rows, { [Aircraft Models].Boeing } on columns
+from [Airline B];
+
+---
+
+select 
+DrillupLevel(
+    union([Date].root.children, LateralMembers(Date.[2021].Q1), LateralMembers(Date.[2021].Q1.M1)),
+    Date.[Month]
+) on rows, { [Aircraft Models].Boeing } on columns
+from [Airline B];
+
+---
+
+select 
+DrillupMember(
+    {
+        [Date].[2022],
+        [Date].[2022].Q1,
+        [Date].[2022].Q1.M1
+    },
+    [Date].[2022].Q1
+) on rows, { [Aircraft Models].Boeing } on columns
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

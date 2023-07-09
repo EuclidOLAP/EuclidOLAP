@@ -173,6 +173,30 @@ DrilldownLevelTop {
 	return DRILL_DOWN_LEVEL_TOP;
 }
 
+DrillDownMember {
+	return DRILL_DOWN_MEMBER;
+}
+
+DrillDownMemberBottom {
+	return DRILL_DOWN_MEMBER_BOTTOM;
+}
+
+DrillDownMemberTop {
+	return DRILL_DOWN_MEMBER_TOP;
+}
+
+RECURSIVE {
+	return RECURSIVE;
+}
+
+DrillupLevel {
+	return DRILLUP_LEVEL;
+}
+
+DrillupMember {
+	return DRILLUP_MEMBER;
+}
+
 count {
 	return COUNT;
 }
