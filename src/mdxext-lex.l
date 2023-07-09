@@ -173,6 +173,10 @@ DrilldownLevelTop {
 	return DRILL_DOWN_LEVEL_TOP;
 }
 
+DrillDownMember {
+	return DRILL_DOWN_MEMBER;
+}
+
 count {
 	return COUNT;
 }

@@ -208,4 +208,15 @@ typedef struct
 // for ASTSetFunc_DrilldownLevelBottomTop
 void *interpret_drilldownlevelbottomtop(void *md_ctx_, void *nil, void *bottop_, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef1;
+    SetDef *setdef2;
+    char recursive; // 0 f, 1 t
+} ASTSetFunc_DrilldownMember;
+
+// for ASTSetFunc_DrilldownMember
+void *interpret_drilldownmember(void *md_ctx_, void *nil, void *ddm_, void *ctx_tuple_, void *cube_);
+
 #endif

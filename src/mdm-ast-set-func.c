@@ -1105,3 +1105,89 @@ void *interpret_drilldownlevelbottomtop(void *md_ctx_, void *nil, void *bottop_,
 
 	return resset;
 }
+
+// for ASTSetFunc_DrilldownMember
+void *interpret_drilldownmember(void *md_ctx_, void *nil, void *ddm_, void *ctx_tuple_, void *cube_) {
+
+	ASTSetFunc_DrilldownMember *drill = ddm_;
+
+	MddSet *set1 = ids_setdef__build(md_ctx_, drill->setdef1, ctx_tuple_, cube_);
+	MddSet *set2 = ids_setdef__build(md_ctx_, drill->setdef2, ctx_tuple_, cube_);
+
+	ArrayList *mls = als_new(8, "<MddMemberRole *>", THREAD_MAM, NULL);
+	for (int i=0;i<als_size(set2->tuples);i++) {
+		MddTuple *tup = als_get(set2->tuples, i);
+		MddMemberRole *mr = als_get(tup->mr_ls, 0);
+		if (mr->dim_role->bin_attr & DR_MEASURE_MASK)
+			continue;
+		als_add(mls, mr);
+	}
+
+	int msz = als_size(mls);
+	for (int i=0;i<msz-1;i++) {
+		for (int j=i+1;j<msz;j++) {
+			Member *mi = ((MddMemberRole *)als_get(mls, i))->member;
+			Member *mj = ((MddMemberRole *)als_get(mls, j))->member;
+			if (mj->lv < mi->lv) {
+				void *vp = als_get(mls, i);
+				ArrayList_set(mls, i, als_get(mls, j));
+				ArrayList_set(mls, j, vp);
+			}
+		}
+	}
+
+	MddSet *resset = NULL;
+
+	if (drill->recursive) {
+		for (int i=0;i<als_size(mls);i++) {
+			resset = mdd_set__create();
+			MddMemberRole *mrole = als_get(mls, i);
+			for (int j=0;j<als_size(set1->tuples);j++) {
+				MddTuple *tuple = als_get(set1->tuples, j);
+				mddset__add_tuple(resset, tuple);
+				for (int k=0;k<als_size(tuple->mr_ls);k++) {
+					MddMemberRole *mr = als_get(tuple->mr_ls, k);
+					if (mr->dim_role->bin_attr & DR_MEASURE_MASK)
+						continue;
+					if (mr->dim_role->gid != mrole->dim_role->gid || mr->member->gid != mrole->member->gid)
+						continue;
+
+					ArrayList *children = find_member_children(mr->member);
+					int chi_sz = als_size(children);
+					for (int x=0;x<chi_sz;x++) {
+						MddTuple *chi_tup = tuple_inset_mr(tuple, mdd_mr__create(als_get(children, x), mr->dim_role));
+						mddset__add_tuple(resset, chi_tup);
+					}
+				}
+			}
+			// als_rm_index(mls, i--);
+			set1 = resset;
+		}
+		return resset;
+	}
+
+	resset = mdd_set__create();
+	for (int i=0;i<als_size(set1->tuples);i++) {
+		MddTuple *tuple = als_get(set1->tuples, i);
+		mddset__add_tuple(resset, tuple);
+		for (int j=0;j<als_size(tuple->mr_ls);j++) {
+			MddMemberRole *mr = als_get(tuple->mr_ls, j);
+			if (mr->dim_role->bin_attr & DR_MEASURE_MASK)
+				continue;
+			for (int k=0;k<msz;k++) {
+				MddMemberRole *mrole = als_get(mls, k);
+				if (mr->dim_role->gid != mrole->dim_role->gid || mr->member->gid != mrole->member->gid)
+					continue;
+
+				ArrayList *children = find_member_children(mr->member);
+				int chi_sz = als_size(children);
+				for (int x=0;x<chi_sz;x++) {
+					MddTuple *chi_tup = tuple_inset_mr(tuple, mdd_mr__create(als_get(children, x), mr->dim_role));
+					mddset__add_tuple(resset, chi_tup);
+				}
+			}
+		}
+	}
+
+	return resset;
+}

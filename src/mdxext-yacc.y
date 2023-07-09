@@ -77,6 +77,7 @@ Stack AST_STACK = { 0 };
 %token INCLUDE_CALC_MEMBERS	/* param: Include_Calc_Members */
 %token DRILL_DOWN_LEVEL_BOTTOM	/* DrilldownLevelBottom */
 %token DRILL_DOWN_LEVEL_TOP	/* DrilldownLevelTop */
+%token DRILL_DOWN_MEMBER	/* DrillDownMember */
 
 /* member functions key words */
 %token PARENT			/* parent */
@@ -931,6 +932,28 @@ set_function:
 	set_func_DrilldownLevelBottom {}
   |
 	set_func_DrilldownLevelTop {}
+  |
+	set_func_DrilldownMember {}
+;
+
+set_func_DrilldownMember:
+	DRILL_DOWN_MEMBER ROUND_BRACKET_L set_statement COMMA set_statement ROUND_BRACKET_R {
+		ASTSetFunc_DrilldownMember *func = mam_alloc(sizeof(ASTSetFunc_DrilldownMember), OBJ_TYPE__ASTSetFunc_DrilldownMember, NULL, 0);
+		func->head.interpret = interpret_drilldownmember;
+		stack_pop(&AST_STACK, (void **)&(func->setdef2));
+		stack_pop(&AST_STACK, (void **)&(func->setdef1));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	DRILL_DOWN_MEMBER ROUND_BRACKET_L set_statement COMMA set_statement COMMA VAR ROUND_BRACKET_R {
+		// VAR is the RECURSIVE option.
+		ASTSetFunc_DrilldownMember *func = mam_alloc(sizeof(ASTSetFunc_DrilldownMember), OBJ_TYPE__ASTSetFunc_DrilldownMember, NULL, 0);
+		func->head.interpret = interpret_drilldownmember;
+		func->recursive = 1;
+		stack_pop(&AST_STACK, (void **)&(func->setdef2));
+		stack_pop(&AST_STACK, (void **)&(func->setdef1));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 // DrilldownLevelBottom(Set_def, Count [, Level_def] [, Expression] [, INCLUDE_CALC_MEMBERS])

@@ -1261,6 +1261,25 @@ where ( [Measures].Revenue, [Aircraft Models].[Boeing].[Boeing 787], [Ending Poi
 
 ---
 
+select 
+DrilldownMember(
+    Date.root.children,
+    { [Date].[2021] }
+) on rows, { [Aircraft Models].Boeing } on columns
+ from [Airline A];
+
+---
+
+select 
+DrilldownMember(
+    Date.root.children,
+    { [Date].[2021], [Date].[2021].Q3, [Date].[2021].Q1, [Date].[2022].Q1 },
+    recursive
+) on rows, { [Aircraft Models].Boeing } on columns
+ from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
