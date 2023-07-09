@@ -243,4 +243,14 @@ typedef struct
 // for ASTSetFunc_DrillupLevel
 void *interpret_drilluplevel(void *md_ctx_, void *nil, void *dul_, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef1;
+    SetDef *setdef2;
+} ASTSetFunc_DrillupMember;
+
+// for ASTSetFunc_DrillupMember
+void *interpret_drillupmember(void *md_ctx_, void *nil, void *dum_, void *ctx_tuple_, void *cube_);
+
 #endif

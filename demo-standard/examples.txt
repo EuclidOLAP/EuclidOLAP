@@ -1338,6 +1338,19 @@ from [Airline B];
 
 ---
 
+select 
+DrillupMember(
+    {
+        [Date].[2022],
+        [Date].[2022].Q1,
+        [Date].[2022].Q1.M1
+    },
+    [Date].[2022].Q1
+) on rows, { [Aircraft Models].Boeing } on columns
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

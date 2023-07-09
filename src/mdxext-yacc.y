@@ -82,6 +82,7 @@ Stack AST_STACK = { 0 };
 %token DRILL_DOWN_MEMBER_TOP	/* DrillDownMemberTop */
 %token RECURSIVE		/* param: Recursive */
 %token DRILLUP_LEVEL		/* DrillupLevel */
+%token DRILLUP_MEMBER		/* DrillupMember */
 
 /* member functions key words */
 %token PARENT			/* parent */
@@ -944,6 +945,18 @@ set_function:
 	set_func_DrilldownMemberTop {}
   |
 	set_func_DrillupLevel {}
+  |
+	set_func_DrillupMember {}
+;
+
+set_func_DrillupMember:
+	DRILLUP_MEMBER ROUND_BRACKET_L set_statement COMMA set_statement ROUND_BRACKET_R {
+		ASTSetFunc_DrillupMember *func = mam_alloc(sizeof(ASTSetFunc_DrillupMember), OBJ_TYPE__ASTSetFunc_DrillupMember, NULL, 0);
+		func->head.interpret = interpret_drillupmember;
+		stack_pop(&AST_STACK, (void **)&(func->setdef2));
+		stack_pop(&AST_STACK, (void **)&(func->setdef1));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 set_func_DrillupLevel:

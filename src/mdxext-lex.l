@@ -193,6 +193,10 @@ DrillupLevel {
 	return DRILLUP_LEVEL;
 }
 
+DrillupMember {
+	return DRILLUP_MEMBER;
+}
+
 count {
 	return COUNT;
 }

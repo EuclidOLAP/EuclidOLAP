@@ -1324,3 +1324,26 @@ void *interpret_drilluplevel(void *md_ctx_, void *nil, void *dul_, void *ctx_tup
 	return set;
 
 }
+
+// for ASTSetFunc_DrillupMember
+void *interpret_drillupmember(void *md_ctx_, void *nil, void *dum_, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_DrillupMember *drillupm = dum_;
+	MddSet *set1 = ids_setdef__build(md_ctx_, drillupm->setdef1, ctx_tuple_, cube_);
+	MddSet *set2 = ids_setdef__build(md_ctx_, drillupm->setdef2, ctx_tuple_, cube_);
+
+	int s1_sz = als_size(set1->tuples);
+	for (int i=als_size(set1->tuples)-1;i>=0;i--) {
+		MddTuple *s1tup = als_get(set1->tuples, i);
+		MddMemberRole *s1t_mr = als_get(s1tup->mr_ls, 0);
+		for (int j=0;j<als_size(set2->tuples);j++) {
+			MddTuple *s2tup = als_get(set2->tuples, j);
+			MddMemberRole *s2t_mr = als_get(s2tup->mr_ls, 0);
+			if (s1t_mr->member->p_gid == s2t_mr->member->gid) {
+				als_rm_index(set1->tuples, i);
+				break;
+			}
+		}		
+	}
+
+	return set1;
+}
