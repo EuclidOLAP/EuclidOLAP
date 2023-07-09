@@ -1290,3 +1290,37 @@ void *interpret_drilldownmemberbottomtop(void *md_ctx_, void *nil, void *ddmpt, 
 
 	return resset;
 }
+
+// for ASTSetFunc_DrillupLevel
+void *interpret_drilluplevel(void *md_ctx_, void *nil, void *dul_, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_DrillupLevel *drillup = dul_;
+	MddSet *set = ids_setdef__build(md_ctx_, drillup->setdef, ctx_tuple_, cube_);
+
+	LevelRole *lvrole = NULL;
+	if (drillup->lrdef) {
+		lvrole = up_evolving(md_ctx_, drillup->lrdef, cube_, ctx_tuple_);
+		if (!lvrole || obj_type_of(lvrole) != OBJ_TYPE__LevelRole)
+			lvrole = NULL;
+	}
+
+	int botlval = 0;
+	if (!lvrole) {
+		for (int i=0; i < als_size(set->tuples); i++) {
+			MddTuple *tuple = als_get(set->tuples, i);
+			MddMemberRole *mr = als_get(tuple->mr_ls, 0);
+			if (i == 0 || (int)mr->member->lv > botlval)
+				botlval = (int)mr->member->lv;
+		}
+	}
+
+	for (int i = als_size(set->tuples) - 1; i >= 0; i--) {
+		MddTuple *tuple = als_get(set->tuples, i);
+		MddMemberRole *mr = als_get(tuple->mr_ls, 0);
+		if (mr->member->lv >= (lvrole ? lvrole->lv->level : botlval)) {
+			als_rm_index(set->tuples, i);
+		}
+	}
+
+	return set;
+
+}

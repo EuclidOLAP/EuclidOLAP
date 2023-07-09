@@ -233,4 +233,14 @@ typedef struct
 // for ASTSetFunc_DrilldownMemberBottomTop
 void *interpret_drilldownmemberbottomtop(void *md_ctx_, void *nil, void *ddmpt, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    MDMEntityUniversalPath *lrdef;
+} ASTSetFunc_DrillupLevel;
+
+// for ASTSetFunc_DrillupLevel
+void *interpret_drilluplevel(void *md_ctx_, void *nil, void *dul_, void *ctx_tuple_, void *cube_);
+
 #endif

@@ -1312,6 +1312,32 @@ from [Airline B];
 
 ---
 
+select 
+DrillupLevel(
+    union([Date].root.children, LateralMembers(Date.[2021].Q1.M1))
+) on rows, { [Aircraft Models].Boeing } on columns
+from [Airline B];
+
+---
+
+select 
+DrillupLevel(
+    union([Date].root.children, LateralMembers(Date.[2021].Q1), LateralMembers(Date.[2021].Q1.M1)),
+    Date.[Quarter]
+) on rows, { [Aircraft Models].Boeing } on columns
+from [Airline B];
+
+---
+
+select 
+DrillupLevel(
+    union([Date].root.children, LateralMembers(Date.[2021].Q1), LateralMembers(Date.[2021].Q1.M1)),
+    Date.[Month]
+) on rows, { [Aircraft Models].Boeing } on columns
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

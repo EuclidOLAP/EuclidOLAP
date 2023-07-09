@@ -125,7 +125,6 @@
 	BottomCount		(I) (M)
 	BottomSum		(I) (M)
 	CurrentOrdinal		(M)
-	DrillupLevel		(I) (M)
 	DrillupMember		(I) (M)
 	Exists		(M)
 	Extract		(I) (M)
@@ -265,6 +264,7 @@
 	DrillDownMember				[E] [I] [M]
 	DrillDownMemberBottom		[E] [I] [M]
 	DrillDownMemberTop			[E] [I] [M]
+	DrillupLevel				[E] [I] [M]
 
 << String Functions >>
 	Name			[E] [I] [M]

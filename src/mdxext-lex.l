@@ -189,6 +189,10 @@ RECURSIVE {
 	return RECURSIVE;
 }
 
+DrillupLevel {
+	return DRILLUP_LEVEL;
+}
+
 count {
 	return COUNT;
 }
