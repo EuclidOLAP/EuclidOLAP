@@ -68,6 +68,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTSetFunc_DrilldownLevel         416
 #define OBJ_TYPE__ASTSetFunc_DrilldownLevelBottomTop         417
 #define OBJ_TYPE__ASTSetFunc_DrilldownMember         418
+#define OBJ_TYPE__ASTSetFunc_DrilldownMemberBottomTop         419
 #define OBJ_TYPE__AST_SET_FUNC_MAX        500
 
 

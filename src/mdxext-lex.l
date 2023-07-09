@@ -177,6 +177,18 @@ DrillDownMember {
 	return DRILL_DOWN_MEMBER;
 }
 
+DrillDownMemberBottom {
+	return DRILL_DOWN_MEMBER_BOTTOM;
+}
+
+DrillDownMemberTop {
+	return DRILL_DOWN_MEMBER_TOP;
+}
+
+RECURSIVE {
+	return RECURSIVE;
+}
+
 count {
 	return COUNT;
 }
