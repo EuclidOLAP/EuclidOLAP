@@ -29,7 +29,6 @@
 
 
 << Logical Functions >>
-	And		(I)
 	Case		(I)
 	Contains		(O)
 	Is		(O)
@@ -43,7 +42,6 @@
 	IsUda		(O)
 	IsValid		(O)
 	Not		(I)
-	Or		(I)
 
 
 << Member Functions >>
