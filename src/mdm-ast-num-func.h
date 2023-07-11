@@ -108,4 +108,58 @@ typedef struct
 // for ASTNumFunc_Correlation
 void *interpret_correlation(void *md_ctx_, void *nil, void *cor, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef_y;
+    Expression *expdef_x;
+} ASTNumFunc_Covariance;
+
+// for ASTNumFunc_Covariance
+void *interpret_covariance(void *md_ctx_, void *nil, void *cov, void *ctx_tuple_, void *cube_);
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef_y;
+    Expression *expdef_x;
+} ASTNumFunc_LinRegIntercept;
+
+// for ASTNumFunc_LinRegIntercept
+void *interpret_LinRegIntercept(void *md_ctx_, void *nil, void *numfunc, void *ctx_tuple_, void *cube_);
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef_y;
+    Expression *expdef_x;
+} ASTNumFunc_LinRegSlope;
+
+// for ASTNumFunc_LinRegSlope
+void *interpret_LinRegSlope(void *md_ctx_, void *nil, void *numfunc, void *ctx_tuple_, void *cube_);
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef_y;
+    Expression *expdef_x;
+} ASTNumFunc_LinRegVariance;
+
+// for ASTNumFunc_LinRegVariance
+void *interpret_LinRegVariance(void *md_ctx_, void *nil, void *numfunc, void *ctx_tuple_, void *cube_);
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef;
+} ASTNumFunc_Stdev;
+
+// for ASTNumFunc_Stdev
+void *interpret_Stdev(void *md_ctx_, void *nil, void *numfunc, void *ctx_tuple_, void *cube_);
+
 #endif

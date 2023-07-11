@@ -1369,6 +1369,85 @@ from [Airline B];
 ---
 
 with
+member [Measures].XXXXXX
+    as Covariance(
+        children([Ending Point].root),
+        [Measures].Revenue,
+        // [Measures].Revenue
+        [Measures].Cost
+    )
+Select
+[Measures].XXXXXX on 1,
+[Starting Point].[ALL] on 0
+from [Airline B];
+
+---
+
+with member [Measures].[xxxxxx] as 
+LinRegIntercept(
+    [Aircraft Models].root.children,
+    [Measures].Cost,
+    [Measures].Revenue
+)
+select 
+children([Aircraft Models].root) on rows, 
+[Measures].[xxxxxx] on columns 
+from [Airline A]
+
+---
+
+with 
+member [Measures].[XXXXXX] as 
+    LinRegR2(
+        Date.[2022].children,
+        [Measures].Revenue,
+        [Measures].Cost)
+select 
+[Measures].[XXXXXX] on rows, 
+[Aircraft Models].Root on columns 
+from [Airline B];
+
+---
+
+with 
+member [Measures].[XXXXXX] as 
+    LinRegSlope(
+        Date.[2022].children,
+        [Measures].Revenue,
+        [Measures].Cost)
+select 
+[Measures].[XXXXXX] on rows, 
+[Aircraft Models].Root on columns 
+from [Airline B];
+
+---
+
+with member [Measures].[xxxxxx] as 
+LinRegVariance(
+    [Aircraft Models].root.children,
+    [Measures].Cost,
+    [Measures].Revenue
+)
+select 
+children([Aircraft Models].root) on rows, 
+[Measures].[xxxxxx] on columns 
+from [Airline A]
+
+---
+
+with member [Measures].[xxxxxx] as 
+STDEV(
+    [Aircraft Models].root.children
+    ,[Measures].Revenue
+    )
+select 
+children([Aircraft Models].root) on rows, 
+[Measures].[xxxxxx] on columns 
+from [Airline A]
+
+---
+
+with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
 select

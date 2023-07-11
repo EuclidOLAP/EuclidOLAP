@@ -66,7 +66,6 @@
 	CalculationPassValue		(M)
 	Case		(O)
 	CellValue		(O)
-	Covariance		(I) (M)
 	CovarianceN		(M)
 	DateDiff		(O)
 	DatePart		(O)
@@ -78,11 +77,7 @@
 	InStr		(O)
 	Int		(O)
 	Len		(O)
-	LinRegIntercept		(I) (M)
 	LinRegPoint		(M)
-	LinRegR2		(I) (M)
-	LinRegSlope		(I) (M)
-	LinRegVariance		(I) (M)
 	Ln		(O)
 	Log		(O)
 	Log10		(O)
@@ -100,7 +95,6 @@
 	Stddev		(M) (O)
 	StddevP		(M)
 	Stddevp		(O)
-	Stdev		(I) (M)
 	StdevP		(M)
 	StrToNum		(O)
 	StrToValue		(M)
@@ -236,6 +230,12 @@
 	Rank				[E] [I] [M] [O]
 	Abs					[E] [I] [O]
 	Correlation			[E] [I] [M]
+	Covariance			[E] [I] [M]
+	LinRegIntercept		[E] [I] [M]
+	LinRegR2			[E] [I] [M]
+	LinRegSlope			[E] [I] [M]
+	LinRegVariance		[E] [I] [M]
+	Stdev				[E] [I] [M]
 
 
 << Set Functions >>

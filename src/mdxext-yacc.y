@@ -115,6 +115,12 @@ Stack AST_STACK = { 0 };
 %token RANK				/* Rank */
 %token ABS				/* abs */
 %token CORRELATION		/* Correlation */
+%token COVARIANCE		/* Covariance */
+%token LINREGINTERCEPT		/* LinRegIntercept */
+%token LINREGR2		/* LinRegR2 */
+%token LIN_REG_SLOPE		/* LinRegSlope */
+%token LIN_REG_VARIANCE		/* LinRegVariance */
+%token STDEV				/* Stdev */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -555,6 +561,131 @@ expression_function:
 	exp_fn__abs {}
   |
 	exp_fn__correlation {}
+  |
+	exp_fn__covariance {}
+  |
+	exp_fn__LinRegIntercept {}
+  |
+	exp_fn__LinRegR2 {}
+  |
+	exp_fn__LinRegSlope {}
+  |
+	exp_fn__LinRegVariance {}
+  |
+	exp_fn__Stdev {}
+;
+
+exp_fn__Stdev:
+	STDEV ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Stdev *func = mam_alloc(sizeof(ASTNumFunc_Stdev), OBJ_TYPE__ASTNumFunc_Stdev, NULL, 0);
+		func->head.interpret = interpret_Stdev;
+		stack_pop(&AST_STACK, (void **) &(func->expdef));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	STDEV ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		ASTNumFunc_Stdev *func = mam_alloc(sizeof(ASTNumFunc_Stdev), OBJ_TYPE__ASTNumFunc_Stdev, NULL, 0);
+		func->head.interpret = interpret_Stdev;
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+;
+
+exp_fn__LinRegVariance:
+	LIN_REG_VARIANCE ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_LinRegVariance *func = mam_alloc(sizeof(ASTNumFunc_LinRegVariance), OBJ_TYPE__ASTNumFunc_LinRegVariance, NULL, 0);
+		func->head.interpret = interpret_LinRegVariance;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_x));
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	LIN_REG_VARIANCE ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_LinRegVariance *func = mam_alloc(sizeof(ASTNumFunc_LinRegVariance), OBJ_TYPE__ASTNumFunc_LinRegVariance, NULL, 0);
+		func->head.interpret = interpret_LinRegVariance;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+;
+
+exp_fn__LinRegSlope:
+	LIN_REG_SLOPE ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_LinRegSlope *func = mam_alloc(sizeof(ASTNumFunc_LinRegSlope), OBJ_TYPE__ASTNumFunc_LinRegSlope, NULL, 0);
+		func->head.interpret = interpret_LinRegSlope;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_x));
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	LIN_REG_SLOPE ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_LinRegSlope *func = mam_alloc(sizeof(ASTNumFunc_LinRegSlope), OBJ_TYPE__ASTNumFunc_LinRegSlope, NULL, 0);
+		func->head.interpret = interpret_LinRegSlope;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+;
+
+// The function 'LINREGR2' has the same logic as the function 'Correlation'.
+exp_fn__LinRegR2:
+	LINREGR2 ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Correlation *func = mam_alloc(sizeof(ASTNumFunc_Correlation), OBJ_TYPE__ASTNumFunc_Correlation, NULL, 0);
+		func->head.interpret = interpret_correlation;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_x));
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	LINREGR2 ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Correlation *func = mam_alloc(sizeof(ASTNumFunc_Correlation), OBJ_TYPE__ASTNumFunc_Correlation, NULL, 0);
+		func->head.interpret = interpret_correlation;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+;
+
+exp_fn__LinRegIntercept:
+	LINREGINTERCEPT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_LinRegIntercept *func = mam_alloc(sizeof(ASTNumFunc_LinRegIntercept), OBJ_TYPE__ASTNumFunc_LinRegIntercept, NULL, 0);
+		func->head.interpret = interpret_LinRegIntercept;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_x));
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	LINREGINTERCEPT ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_LinRegIntercept *func = mam_alloc(sizeof(ASTNumFunc_LinRegIntercept), OBJ_TYPE__ASTNumFunc_LinRegIntercept, NULL, 0);
+		func->head.interpret = interpret_LinRegIntercept;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+;
+
+exp_fn__covariance:
+	COVARIANCE ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Covariance *func = mam_alloc(sizeof(ASTNumFunc_Covariance), OBJ_TYPE__ASTNumFunc_Covariance, NULL, 0);
+		func->head.interpret = interpret_covariance;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_x));
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	COVARIANCE ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Covariance *func = mam_alloc(sizeof(ASTNumFunc_Covariance), OBJ_TYPE__ASTNumFunc_Covariance, NULL, 0);
+		func->head.interpret = interpret_covariance;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__correlation:

@@ -157,6 +157,30 @@ Correlation {
 	return CORRELATION;
 }
 
+Covariance {
+	return COVARIANCE;
+}
+
+LinRegIntercept {
+	return LINREGINTERCEPT;
+}
+
+LinRegR2 {
+	return LINREGR2;
+}
+
+LinRegVariance {
+	return LIN_REG_VARIANCE;
+}
+
+Stdev {
+	return STDEV;
+}
+
+LinRegSlope {
+	return LIN_REG_SLOPE;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }
