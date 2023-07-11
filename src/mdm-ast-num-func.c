@@ -608,3 +608,43 @@ void *interpret_LinRegVariance(void *md_ctx_, void *nil, void *numfunc, void *ct
 
     return result;
 }
+
+// for ASTNumFunc_Stdev
+void *interpret_Stdev(void *md_ctx_, void *nil, void *numfunc, void *ctx_tuple_, void *cube_) {
+
+    ASTNumFunc_Stdev *stdev = numfunc;
+    MddSet *set = ids_setdef__build(md_ctx_, stdev->setdef, ctx_tuple_, cube_);
+
+    GridData *result = mam_alloc(sizeof(GridData), OBJ_TYPE__RAW_BYTES, NULL, 0);
+    result->type = GRIDDATA_TYPE_NUM;
+
+    unsigned int setlen = als_size(set->tuples);
+    if (setlen < 2)
+        return result;
+
+    GridData *cells = mam_alloc(sizeof(GridData) * setlen, OBJ_TYPE__RAW_BYTES, NULL, 0);
+
+    for (int i=0;i<setlen;i++) {
+        MddTuple *tup = tuple__merge(ctx_tuple_, als_get(set->tuples, i));
+        if (stdev->expdef) {
+            Expression_evaluate(md_ctx_, stdev->expdef, cube_, tup, cells + i);
+        } else {
+            do_calculate_measure_value(md_ctx_, cube_, tup, cells + i);
+        }
+    }
+
+    GridData cell_avg;
+
+    cells_avg(cells, setlen, &cell_avg);
+
+    result->val = 0;
+
+    for (int i=0;i<setlen;i++) {
+        double _tmp_ = cells[i].val - cell_avg.val;
+        result->val += _tmp_ * _tmp_;
+    }
+
+    result->val = sqrt(result->val / (setlen - 1));
+
+    return result;
+}

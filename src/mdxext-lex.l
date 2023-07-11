@@ -173,6 +173,10 @@ LinRegVariance {
 	return LIN_REG_VARIANCE;
 }
 
+Stdev {
+	return STDEV;
+}
+
 LinRegSlope {
 	return LIN_REG_SLOPE;
 }

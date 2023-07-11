@@ -152,4 +152,14 @@ typedef struct
 // for ASTNumFunc_LinRegVariance
 void *interpret_LinRegVariance(void *md_ctx_, void *nil, void *numfunc, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef;
+} ASTNumFunc_Stdev;
+
+// for ASTNumFunc_Stdev
+void *interpret_Stdev(void *md_ctx_, void *nil, void *numfunc, void *ctx_tuple_, void *cube_);
+
 #endif

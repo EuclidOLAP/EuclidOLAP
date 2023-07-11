@@ -95,7 +95,6 @@
 	Stddev		(M) (O)
 	StddevP		(M)
 	Stddevp		(O)
-	Stdev		(I) (M)
 	StdevP		(M)
 	StrToNum		(O)
 	StrToValue		(M)
@@ -236,6 +235,7 @@
 	LinRegR2			[E] [I] [M]
 	LinRegSlope			[E] [I] [M]
 	LinRegVariance		[E] [I] [M]
+	Stdev				[E] [I] [M]
 
 
 << Set Functions >>
