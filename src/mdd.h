@@ -4,7 +4,7 @@
 #include "utils.h"
 #include "command.h"
 #include "md-model.h"
-#include "math.h"
+#include "mathematics.h"
 #include "mdx.h"
 #include "tools/elastic-byte-buffer.h"
 

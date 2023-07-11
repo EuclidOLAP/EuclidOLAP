@@ -84,6 +84,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTNumFunc_Median        506
 #define OBJ_TYPE__ASTNumFunc_Rank        507
 #define OBJ_TYPE__ASTNumFunc_Abs        508
+#define OBJ_TYPE__ASTNumFunc_Correlation        509
 #define OBJ_TYPE__ASTNUMFUNC_MAX        600
 
 

@@ -8,7 +8,7 @@
 
 #include "log.h"
 #include "mdd.h"
-#include "math.h"
+#include "mathematics.h"
 #include "mdx.h"
 #include "command.h"
 #include "cfg.h"

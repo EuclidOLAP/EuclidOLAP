@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "math.h"
+#include "mathematics.h"
 #include "utils.h"
 
 void cells_sum(GridData *celarr, int len, GridData **pp) {
@@ -33,4 +33,13 @@ void cells_min(GridData *celarr, int len, GridData **pp) {
             (*pp)->val = celarr[i].val;
     }
 
+}
+
+void cells_avg(GridData *celarr, unsigned int len, GridData *gdp) {
+    gdp->type = GRIDDATA_TYPE_NUM;
+    gdp->val = celarr[0].val;
+    for (int i=1;i<len;i++) {
+        gdp->val += celarr[i].val;
+    }
+    gdp->val = gdp->val / len;
 }

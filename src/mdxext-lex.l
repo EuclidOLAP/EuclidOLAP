@@ -153,6 +153,10 @@ Abs {
 	return ABS;
 }
 
+Correlation {
+	return CORRELATION;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }
