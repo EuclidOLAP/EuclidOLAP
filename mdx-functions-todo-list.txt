@@ -66,7 +66,6 @@
 	CalculationPassValue		(M)
 	Case		(O)
 	CellValue		(O)
-	Covariance		(I) (M)
 	CovarianceN		(M)
 	DateDiff		(O)
 	DatePart		(O)
@@ -236,6 +235,7 @@
 	Rank				[E] [I] [M] [O]
 	Abs					[E] [I] [O]
 	Correlation			[E] [I] [M]
+	Covariance			[E] [I] [M]
 
 
 << Set Functions >>

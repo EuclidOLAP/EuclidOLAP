@@ -115,6 +115,7 @@ Stack AST_STACK = { 0 };
 %token RANK				/* Rank */
 %token ABS				/* abs */
 %token CORRELATION		/* Correlation */
+%token COVARIANCE		/* Covariance */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -555,6 +556,27 @@ expression_function:
 	exp_fn__abs {}
   |
 	exp_fn__correlation {}
+  |
+	exp_fn__covariance {}
+;
+
+exp_fn__covariance:
+	COVARIANCE ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Covariance *func = mam_alloc(sizeof(ASTNumFunc_Covariance), OBJ_TYPE__ASTNumFunc_Covariance, NULL, 0);
+		func->head.interpret = interpret_covariance;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_x));
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	COVARIANCE ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Covariance *func = mam_alloc(sizeof(ASTNumFunc_Covariance), OBJ_TYPE__ASTNumFunc_Covariance, NULL, 0);
+		func->head.interpret = interpret_covariance;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__correlation:

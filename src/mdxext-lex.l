@@ -157,6 +157,10 @@ Correlation {
 	return CORRELATION;
 }
 
+Covariance {
+	return COVARIANCE;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }

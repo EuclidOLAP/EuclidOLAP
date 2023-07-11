@@ -1369,6 +1369,21 @@ from [Airline B];
 ---
 
 with
+member [Measures].XXXXXX
+    as Covariance(
+        children([Ending Point].root),
+        [Measures].Revenue,
+        // [Measures].Revenue
+        [Measures].Cost
+    )
+Select
+[Measures].XXXXXX on 1,
+[Starting Point].[ALL] on 0
+from [Airline B];
+
+---
+
+with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
 select
