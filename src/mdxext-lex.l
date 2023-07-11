@@ -169,6 +169,10 @@ LinRegR2 {
 	return LINREGR2;
 }
 
+LinRegSlope {
+	return LIN_REG_SLOPE;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }

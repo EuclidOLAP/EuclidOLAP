@@ -1409,6 +1409,19 @@ from [Airline B];
 
 ---
 
+with 
+member [Measures].[XXXXXX] as 
+    LinRegSlope(
+        Date.[2022].children,
+        [Measures].Revenue,
+        [Measures].Cost)
+select 
+[Measures].[XXXXXX] on rows, 
+[Aircraft Models].Root on columns 
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

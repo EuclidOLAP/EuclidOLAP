@@ -78,7 +78,6 @@
 	Int		(O)
 	Len		(O)
 	LinRegPoint		(M)
-	LinRegSlope		(I) (M)
 	LinRegVariance		(I) (M)
 	Ln		(O)
 	Log		(O)
@@ -236,6 +235,7 @@
 	Covariance			[E] [I] [M]
 	LinRegIntercept		[E] [I] [M]
 	LinRegR2			[E] [I] [M]
+	LinRegSlope			[E] [I] [M]
 
 
 << Set Functions >>
