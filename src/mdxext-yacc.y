@@ -121,6 +121,7 @@ Stack AST_STACK = { 0 };
 %token LIN_REG_SLOPE		/* LinRegSlope */
 %token LIN_REG_VARIANCE		/* LinRegVariance */
 %token STDEV				/* Stdev */
+%token FN_VAR				/* Var */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -573,6 +574,25 @@ expression_function:
 	exp_fn__LinRegVariance {}
   |
 	exp_fn__Stdev {}
+  |
+	exp_fn__Var {}
+;
+
+exp_fn__Var:
+	FN_VAR ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Var *func = mam_alloc(sizeof(ASTNumFunc_Var), OBJ_TYPE__ASTNumFunc_Var, NULL, 0);
+		func->head.interpret = interpret_Var;
+		stack_pop(&AST_STACK, (void **) &(func->expdef));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	FN_VAR ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		ASTNumFunc_Var *func = mam_alloc(sizeof(ASTNumFunc_Var), OBJ_TYPE__ASTNumFunc_Var, NULL, 0);
+		func->head.interpret = interpret_Var;
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__Stdev:

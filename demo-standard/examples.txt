@@ -1447,6 +1447,21 @@ from [Airline A]
 
 ---
 
+with member [Measures].m111 as 0 - 10000
+member [Measures].m222 as 4200
+member [Measures].m333 as 6800
+member [Ending Point].KKKKKK
+as
+var(
+    { [Measures].m111, [Measures].m222, [Measures].m333 }
+    )
+select 
+children([Aircraft Models].root) on rows, 
+[Ending Point].KKKKKK on columns 
+from [Airline B]
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

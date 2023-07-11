@@ -181,6 +181,10 @@ LinRegSlope {
 	return LIN_REG_SLOPE;
 }
 
+Var {
+	return FN_VAR;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }

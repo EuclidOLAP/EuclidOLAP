@@ -162,4 +162,14 @@ typedef struct
 // for ASTNumFunc_Stdev
 void *interpret_Stdev(void *md_ctx_, void *nil, void *numfunc, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef;
+} ASTNumFunc_Var;
+
+// for ASTNumFunc_Var
+void *interpret_Var(void *md_ctx_, void *nil, void *numfunc, void *ctx_tuple_, void *cube_);
+
 #endif
