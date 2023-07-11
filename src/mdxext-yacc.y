@@ -114,6 +114,7 @@ Stack AST_STACK = { 0 };
 %token MEDIAN			/* Median */
 %token RANK				/* Rank */
 %token ABS				/* abs */
+%token CORRELATION		/* Correlation */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -552,6 +553,27 @@ expression_function:
 	exp_fn__rank {}
   |
 	exp_fn__abs {}
+  |
+	exp_fn__correlation {}
+;
+
+exp_fn__correlation:
+	CORRELATION ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Correlation *func = mam_alloc(sizeof(ASTNumFunc_Correlation), OBJ_TYPE__ASTNumFunc_Correlation, NULL, 0);
+		func->head.interpret = interpret_correlation;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_x));
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	CORRELATION ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Correlation *func = mam_alloc(sizeof(ASTNumFunc_Correlation), OBJ_TYPE__ASTNumFunc_Correlation, NULL, 0);
+		func->head.interpret = interpret_correlation;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__abs:

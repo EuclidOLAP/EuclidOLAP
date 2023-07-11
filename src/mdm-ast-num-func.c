@@ -1,9 +1,10 @@
 #include <string.h>
+#include <math.h>
 
 #include "mdm-ast-num-func.h"
 #include "md-model.h"
 #include "mdd.h"
-#include "math.h"
+#include "mathematics.h"
 #include "vce.h"
 
 // for ASTNumFunc_Avg
@@ -370,4 +371,51 @@ void *interpret_abs(void *md_ctx_, void *nil, void *abs_, void *ctx_tuple_, void
         cell->val = 0 - cell->val;
 
     return cell;
+}
+
+// for ASTNumFunc_Correlation
+void *interpret_correlation(void *md_ctx_, void *nil, void *cor, void *ctx_tuple_, void *cube_) {
+    ASTNumFunc_Correlation *corre = cor;
+    MddSet *set = ids_setdef__build(md_ctx_, corre->setdef, ctx_tuple_, cube_);
+
+    unsigned int setlen = als_size(set->tuples);
+
+    GridData *cellsY = mam_alloc(sizeof(GridData) * setlen, OBJ_TYPE__RAW_BYTES, NULL, 0);
+    GridData *cellsX = mam_alloc(sizeof(GridData) * setlen, OBJ_TYPE__RAW_BYTES, NULL, 0);
+
+    for (int i=0;i<setlen;i++) {
+        MddTuple *tup = tuple__merge(ctx_tuple_, als_get(set->tuples, i));
+        Expression_evaluate(md_ctx_, corre->expdef_y, cube_, tup, cellsY + i);
+        if (corre->expdef_x) {
+            Expression_evaluate(md_ctx_, corre->expdef_x, cube_, tup, cellsX + i);
+        } else {
+            do_calculate_measure_value(md_ctx_, cube_, tup, cellsX + i);
+        }
+    }
+
+    GridData avgY;
+    GridData avgX;
+
+    cells_avg(cellsY, setlen, &avgY);
+    cells_avg(cellsX, setlen, &avgX);
+
+    double dividend = 0;
+    double divisor_h1 = 0;
+    double divisor_h2 = 0;
+
+    for (int i=0;i<setlen;i++) {
+        double x__ = cellsX[i].val - avgX.val;
+        double y__ = cellsY[i].val - avgY.val;
+
+        dividend += x__ * y__;
+        divisor_h1 += x__ * x__;
+        divisor_h2 += y__ * y__;
+    }
+
+    GridData *result = mam_alloc(sizeof(GridData), OBJ_TYPE__RAW_BYTES, NULL, 0);
+    result->type = GRIDDATA_TYPE_NUM;
+
+    result->val = dividend / sqrt(divisor_h1 * divisor_h2);
+
+    return result;
 }

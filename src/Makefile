@@ -1,15 +1,15 @@
 SRC_FILES = cfg.c net.c utils.c command.c mdxext-lex.yy.c mdxext-yacc.tab.c mdx.c mdd.c vce.c rb-tree.c log.c \
 tools/elastic-byte-buffer.c locks/global-locks.c mdm-astmrfn-interpreter.c \
-mdm-astlogifn-interpreter.c printer.c mdm-ast-str-fn.c math.c env.c mdm-ast-set-func.c mdm-ast-num-func.c
+mdm-astlogifn-interpreter.c printer.c mdm-ast-str-fn.c mathematics.c env.c mdm-ast-set-func.c mdm-ast-num-func.c
 OBJ_FILES = cfg.o net.o utils.o command.o mdxext-lex.yy.o mdxext-yacc.tab.o mdx.o mdd.o vce.o rb-tree.o log.o \
 tools/elastic-byte-buffer.o locks/global-locks.o mdm-astmrfn-interpreter.o \
-mdm-astlogifn-interpreter.o printer.o mdm-ast-str-fn.o math.o env.o mdm-ast-set-func.o mdm-ast-num-func.o
+mdm-astlogifn-interpreter.o printer.o mdm-ast-str-fn.o mathematics.o env.o mdm-ast-set-func.o mdm-ast-num-func.o
 
 euclid : euclid-svr.c euclid-cli.c $(SRC_FILES) euclid-svr.o euclid-cli.o $(OBJ_FILES)
-	cc      $(OBJ_FILES)  euclid-svr.o  -o euclid-svr      -lpthread
-	cc  -g  $(SRC_FILES)  euclid-svr.c  -o euclid-svr.out  -lpthread
-	cc      $(OBJ_FILES)  euclid-cli.o  -o euclid-cli      -lpthread
-	cc  -g  $(SRC_FILES)  euclid-cli.c  -o euclid-cli.out  -lpthread
+	cc      $(OBJ_FILES)  euclid-svr.o  -o euclid-svr      -lpthread -lm
+	cc  -g  $(SRC_FILES)  euclid-svr.c  -o euclid-svr.out  -lpthread -lm
+	cc      $(OBJ_FILES)  euclid-cli.o  -o euclid-cli      -lpthread -lm
+	cc  -g  $(SRC_FILES)  euclid-cli.c  -o euclid-cli.out  -lpthread -lm
 
 mdxext-lex.yy.c: mdxext-lex.l
 	flex -i -o mdxext-lex.yy.c mdxext-lex.l

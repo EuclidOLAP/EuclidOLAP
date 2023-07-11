@@ -15,7 +15,7 @@ SRC_FILES = src/cfg.c \
 	src/mdm-astlogifn-interpreter.c \
 	src/printer.c \
 	src/mdm-ast-str-fn.c \
-	src/math.c \
+	src/mathematics.c \
 	src/env.c \
 	src/mdm-ast-set-func.c \
 	src/mdm-ast-num-func.c
@@ -36,16 +36,16 @@ OBJ_FILES = src/cfg.o \
 	src/mdm-astlogifn-interpreter.o \
 	src/printer.o \
 	src/mdm-ast-str-fn.o \
-	src/math.o \
+	src/mathematics.o \
 	src/env.o \
 	src/mdm-ast-set-func.o \
 	src/mdm-ast-num-func.o
 
 euclid: src/euclid-svr.c src/euclid-cli.c $(SRC_FILES) src/euclid-svr.o src/euclid-cli.o $(OBJ_FILES)
-	cc      $(OBJ_FILES)  src/euclid-svr.o  -o src/euclid-svr      -lpthread
-	cc  -g  $(SRC_FILES)  src/euclid-svr.c  -o src/euclid-svr.out  -lpthread
-	cc      $(OBJ_FILES)  src/euclid-cli.o  -o src/euclid-cli      -lpthread
-	cc  -g  $(SRC_FILES)  src/euclid-cli.c  -o src/euclid-cli.out  -lpthread
+	cc      $(OBJ_FILES)  src/euclid-svr.o  -o src/euclid-svr      -lpthread -lm
+	cc  -g  $(SRC_FILES)  src/euclid-svr.c  -o src/euclid-svr.out  -lpthread -lm
+	cc      $(OBJ_FILES)  src/euclid-cli.o  -o src/euclid-cli      -lpthread -lm
+	cc  -g  $(SRC_FILES)  src/euclid-cli.c  -o src/euclid-cli.out  -lpthread -lm
 
 src/mdxext-lex.yy.c: src/mdxext-lex.l src/mdxext-yacc.tab.h
 	flex -i -o src/mdxext-lex.yy.c src/mdxext-lex.l

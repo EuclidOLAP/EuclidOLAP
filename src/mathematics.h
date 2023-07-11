@@ -1,5 +1,5 @@
-#ifndef EUCLID__MATH__H
-#define EUCLID__MATH__H 1
+#ifndef EUCLID__MATHEMATICS__H
+#define EUCLID__MATHEMATICS__H 1
 
 
 #define GRIDDATA_TYPE_NUM 0
@@ -23,6 +23,8 @@ void cells_sum(GridData *celarr, int len, GridData **pp);
 void cells_max(GridData *celarr, int len, GridData **pp);
 
 void cells_min(GridData *celarr, int len, GridData **pp);
+
+void cells_avg(GridData *celarr, unsigned int len, GridData *gdp);
 
 // typedef enum _cell_type_
 // {
