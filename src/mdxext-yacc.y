@@ -119,6 +119,7 @@ Stack AST_STACK = { 0 };
 %token LINREGINTERCEPT		/* LinRegIntercept */
 %token LINREGR2		/* LinRegR2 */
 %token LIN_REG_SLOPE		/* LinRegSlope */
+%token LIN_REG_VARIANCE		/* LinRegVariance */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -567,6 +568,27 @@ expression_function:
 	exp_fn__LinRegR2 {}
   |
 	exp_fn__LinRegSlope {}
+  |
+	exp_fn__LinRegVariance {}
+;
+
+exp_fn__LinRegVariance:
+	LIN_REG_VARIANCE ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_LinRegVariance *func = mam_alloc(sizeof(ASTNumFunc_LinRegVariance), OBJ_TYPE__ASTNumFunc_LinRegVariance, NULL, 0);
+		func->head.interpret = interpret_LinRegVariance;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_x));
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	LIN_REG_VARIANCE ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_LinRegVariance *func = mam_alloc(sizeof(ASTNumFunc_LinRegVariance), OBJ_TYPE__ASTNumFunc_LinRegVariance, NULL, 0);
+		func->head.interpret = interpret_LinRegVariance;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__LinRegSlope:

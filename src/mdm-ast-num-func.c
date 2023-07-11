@@ -556,3 +556,55 @@ void *interpret_LinRegSlope(void *md_ctx_, void *nil, void *numfunc, void *ctx_t
     return result;
 
 }
+
+// for ASTNumFunc_LinRegVariance
+void *interpret_LinRegVariance(void *md_ctx_, void *nil, void *numfunc, void *ctx_tuple_, void *cube_) {
+    
+    ASTNumFunc_LinRegVariance *linrv = numfunc;
+    MddSet *set = ids_setdef__build(md_ctx_, linrv->setdef, ctx_tuple_, cube_);
+
+    unsigned int setlen = als_size(set->tuples);
+
+    GridData *cellsY = mam_alloc(sizeof(GridData) * setlen, OBJ_TYPE__RAW_BYTES, NULL, 0);
+    GridData *cellsX = mam_alloc(sizeof(GridData) * setlen, OBJ_TYPE__RAW_BYTES, NULL, 0);
+
+    for (int i=0;i<setlen;i++) {
+        MddTuple *tup = tuple__merge(ctx_tuple_, als_get(set->tuples, i));
+        Expression_evaluate(md_ctx_, linrv->expdef_y, cube_, tup, cellsY + i);
+        if (linrv->expdef_x) {
+            Expression_evaluate(md_ctx_, linrv->expdef_x, cube_, tup, cellsX + i);
+        } else {
+            do_calculate_measure_value(md_ctx_, cube_, tup, cellsX + i);
+        }
+    }
+
+    GridData avgY;
+    GridData avgX;
+
+    cells_avg(cellsY, setlen, &avgY);
+    cells_avg(cellsX, setlen, &avgX);
+
+    double dividend = 0;
+    double divisor = 0;
+
+    for (int i=0;i<setlen;i++) {
+        double x__ = cellsX[i].val - avgX.val;
+        double y__ = cellsY[i].val - avgY.val;
+
+        dividend += x__ * y__;
+        divisor += x__ * x__;
+    }
+
+    GridData *result = mam_alloc(sizeof(GridData), OBJ_TYPE__RAW_BYTES, NULL, 0);
+    result->type = GRIDDATA_TYPE_NUM;
+    result->val = 0;
+
+    double slope = dividend / divisor; // b
+    double intercept = avgY.val - slope * avgX.val; // a
+    for (int i=0;i<setlen;i++) {
+        double tmp = intercept + slope * cellsX[i].val - avgY.val;
+        result->val += tmp * tmp;
+    }
+
+    return result;
+}

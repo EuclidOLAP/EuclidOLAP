@@ -169,6 +169,10 @@ LinRegR2 {
 	return LINREGR2;
 }
 
+LinRegVariance {
+	return LIN_REG_VARIANCE;
+}
+
 LinRegSlope {
 	return LIN_REG_SLOPE;
 }
