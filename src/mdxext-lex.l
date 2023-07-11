@@ -165,6 +165,10 @@ LinRegIntercept {
 	return LINREGINTERCEPT;
 }
 
+LinRegR2 {
+	return LINREGR2;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }

@@ -117,6 +117,7 @@ Stack AST_STACK = { 0 };
 %token CORRELATION		/* Correlation */
 %token COVARIANCE		/* Covariance */
 %token LINREGINTERCEPT		/* LinRegIntercept */
+%token LINREGR2		/* LinRegR2 */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -561,6 +562,28 @@ expression_function:
 	exp_fn__covariance {}
   |
 	exp_fn__LinRegIntercept {}
+  |
+	exp_fn__LinRegR2 {}
+;
+
+// The function 'LINREGR2' has the same logic as the function 'Correlation'.
+exp_fn__LinRegR2:
+	LINREGR2 ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Correlation *func = mam_alloc(sizeof(ASTNumFunc_Correlation), OBJ_TYPE__ASTNumFunc_Correlation, NULL, 0);
+		func->head.interpret = interpret_correlation;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_x));
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	LINREGR2 ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Correlation *func = mam_alloc(sizeof(ASTNumFunc_Correlation), OBJ_TYPE__ASTNumFunc_Correlation, NULL, 0);
+		func->head.interpret = interpret_correlation;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__LinRegIntercept:
