@@ -1383,6 +1383,19 @@ from [Airline B];
 
 ---
 
+with member [Measures].[xxxxxx] as 
+LinRegIntercept(
+    [Aircraft Models].root.children,
+    [Measures].Cost,
+    [Measures].Revenue
+)
+select 
+children([Aircraft Models].root) on rows, 
+[Measures].[xxxxxx] on columns 
+from [Airline A]
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

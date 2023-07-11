@@ -116,6 +116,7 @@ Stack AST_STACK = { 0 };
 %token ABS				/* abs */
 %token CORRELATION		/* Correlation */
 %token COVARIANCE		/* Covariance */
+%token LINREGINTERCEPT		/* LinRegIntercept */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -558,6 +559,27 @@ expression_function:
 	exp_fn__correlation {}
   |
 	exp_fn__covariance {}
+  |
+	exp_fn__LinRegIntercept {}
+;
+
+exp_fn__LinRegIntercept:
+	LINREGINTERCEPT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_LinRegIntercept *func = mam_alloc(sizeof(ASTNumFunc_LinRegIntercept), OBJ_TYPE__ASTNumFunc_LinRegIntercept, NULL, 0);
+		func->head.interpret = interpret_LinRegIntercept;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_x));
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	LINREGINTERCEPT ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_LinRegIntercept *func = mam_alloc(sizeof(ASTNumFunc_LinRegIntercept), OBJ_TYPE__ASTNumFunc_LinRegIntercept, NULL, 0);
+		func->head.interpret = interpret_LinRegIntercept;
+		stack_pop(&AST_STACK, (void **) &(func->expdef_y));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__covariance:

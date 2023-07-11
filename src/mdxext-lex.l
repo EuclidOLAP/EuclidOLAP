@@ -161,6 +161,10 @@ Covariance {
 	return COVARIANCE;
 }
 
+LinRegIntercept {
+	return LINREGINTERCEPT;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }

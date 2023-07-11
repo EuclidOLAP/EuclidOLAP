@@ -119,4 +119,15 @@ typedef struct
 // for ASTNumFunc_Covariance
 void *interpret_covariance(void *md_ctx_, void *nil, void *cov, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef_y;
+    Expression *expdef_x;
+} ASTNumFunc_LinRegIntercept;
+
+// for ASTNumFunc_LinRegIntercept
+void *interpret_LinRegIntercept(void *md_ctx_, void *nil, void *numfunc, void *ctx_tuple_, void *cube_);
+
 #endif
