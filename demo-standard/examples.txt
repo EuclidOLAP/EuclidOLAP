@@ -1462,6 +1462,18 @@ from [Airline B]
 
 ---
 
+with member [Measures].[xxxxxx] as 
+STDEV(
+    [Aircraft Models].root.children
+    ,[Measures].Revenue
+    )
+select 
+ANCESTORS([Aircraft Models].Root.FirstChild.FirstChild, 1) on rows, 
+[Measures].[xxxxxx] on columns 
+from [Airline A]
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

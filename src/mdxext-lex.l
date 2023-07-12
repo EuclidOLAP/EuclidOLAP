@@ -185,6 +185,10 @@ Var {
 	return FN_VAR;
 }
 
+Ancestors {
+	return ANCESTORS;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }

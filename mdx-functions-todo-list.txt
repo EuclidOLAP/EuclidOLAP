@@ -109,7 +109,6 @@
 << Set Functions >>
 	AddCalculatedMembers		(M)
 	AllMembers		(M)
-	Ancestors		(I) (M)
 	Ascendants		(M)
 	Axis		(M)
 	BottomCount		(I) (M)
@@ -263,6 +262,7 @@
 	DrillDownMemberTop			[E] [I] [M]
 	DrillupLevel				[E] [I] [M]
 	DrillupMember				[E] [I] [M]
+	Ancestors					[E] [I] [M]
 
 << String Functions >>
 	Name			[E] [I] [M]
