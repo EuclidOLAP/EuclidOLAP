@@ -111,7 +111,6 @@
 	AllMembers		(M)
 	Ascendants		(M)
 	Axis		(M)
-	BottomCount		(I) (M)
 	BottomSum		(I) (M)
 	CurrentOrdinal		(M)
 	Exists		(M)
@@ -263,6 +262,7 @@
 	DrillupLevel				[E] [I] [M]
 	DrillupMember				[E] [I] [M]
 	Ancestors					[E] [I] [M]
+	BottomCount					[E] [I] [M] [O]
 
 << String Functions >>
 	Name			[E] [I] [M]

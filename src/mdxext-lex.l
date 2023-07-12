@@ -189,6 +189,10 @@ Ancestors {
 	return ANCESTORS;
 }
 
+BottomCount {
+	return BOTTOM_COUNT;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }
