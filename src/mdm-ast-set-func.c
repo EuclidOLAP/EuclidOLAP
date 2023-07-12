@@ -1416,3 +1416,33 @@ void *interpret_BottomCount(void *md_ctx_, void *nil, void *bc, void *ctx_tuple_
 
 	return set;
 }
+
+// for ASTSetFunc_BottomTopSum
+void *interpret_BottomTopSum(void *md_ctx_, void *nil, void *bts, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_BottomTopSum *botop = bts;
+	MddSet *set = ids_setdef__build(md_ctx_, botop->setdef, ctx_tuple_, cube_);
+
+	unsigned int setsz = als_size(set->tuples);
+	GridData *cellarr = mam_alloc(sizeof(GridData) * setsz, OBJ_TYPE__RAW_BYTES, NULL, 0);
+	for (int i=0;i<setsz;i++) {
+		MddTuple *tup = als_get(set->tuples, i);
+		Expression_evaluate(md_ctx_, botop->expdef2, cube_, tuple__merge(ctx_tuple_, tup), cellarr + i);
+	}
+
+	_bottop_sort_(botop->type, cellarr, set->tuples);
+
+	GridData valcell;
+	Expression_evaluate(md_ctx_, botop->expdef1, cube_, ctx_tuple_, &valcell);
+
+	double sum = 0;
+	for (int i=0;i<setsz;i++) {
+		sum += cellarr[i].val;
+		if (sum >= valcell.val) {
+			for (int j=setsz-1;j>i;j--)
+				als_rm_index(set->tuples, j);
+			break;
+		}
+	}
+
+	return set;
+}

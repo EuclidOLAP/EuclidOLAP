@@ -193,6 +193,14 @@ BottomCount {
 	return BOTTOM_COUNT;
 }
 
+BottomSum {
+	return BOTTOM_SUM;
+}
+
+TopSum {
+	return TOP_SUM;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }

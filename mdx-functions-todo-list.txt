@@ -111,7 +111,6 @@
 	AllMembers		(M)
 	Ascendants		(M)
 	Axis		(M)
-	BottomSum		(I) (M)
 	CurrentOrdinal		(M)
 	Exists		(M)
 	Extract		(I) (M)
@@ -130,7 +129,6 @@
 	StrToSet		(M)
 	Subset		(M) (O)
 	ToggleDrillState		(M)
-	TopSum		(I) (M)
 	TupleRange		(O)
 	Unorder		(M)
 	VisualTotals		(M)
@@ -263,6 +261,8 @@
 	DrillupMember				[E] [I] [M]
 	Ancestors					[E] [I] [M]
 	BottomCount					[E] [I] [M] [O]
+	BottomSum					[E] [I] [M] [O]
+	TopSum						[E] [I] [M] [O]
 
 << String Functions >>
 	Name			[E] [I] [M]

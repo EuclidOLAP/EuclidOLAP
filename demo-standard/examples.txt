@@ -1497,6 +1497,50 @@ where ([Classes of Service].[Economy Plus]);
 ---
 
 with
+member [Measures].xxxxxxxxx as
+    [Measures].Revenue / 10000000
+select
+[Measures].xxxxxxxxx on 0,
+order(
+    [Aircraft Models].[Airbus].children(),
+    [Measures].Revenue
+) on 1
+from [Airline B]
+where ([Classes of Service].[Economy Plus]);
+
+---
+
+with
+member [Measures].xxxxxxxxx as
+    [Measures].Revenue / 10000000
+select
+[Measures].xxxxxxxxx on 0,
+topsum(
+    [Aircraft Models].[Airbus].children,
+    50,
+    [Measures].xxxxxxxxx
+) on 1
+from [Airline B]
+where ([Classes of Service].[Economy Plus]);
+
+---
+
+with
+member [Measures].xxxxxxxxx as
+    [Measures].Revenue / 10000000
+select
+[Measures].xxxxxxxxx on 0,
+Bottomsum(
+    [Aircraft Models].[Airbus].children,
+    50,
+    [Measures].xxxxxxxxx
+) on 1
+from [Airline B]
+where ([Classes of Service].[Economy Plus]);
+
+---
+
+with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
 select

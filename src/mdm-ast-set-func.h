@@ -275,4 +275,16 @@ typedef struct
 // for ASTSetFunc_BottomCount
 void *interpret_BottomCount(void *md_ctx_, void *nil, void *bc, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *expdef1;
+    Expression *expdef2;
+    char type; // 'b' - Bottom, 't' - Top
+} ASTSetFunc_BottomTopSum;
+
+// for ASTSetFunc_BottomTopSum
+void *interpret_BottomTopSum(void *md_ctx_, void *nil, void *bts, void *ctx_tuple_, void *cube_);
+
 #endif
