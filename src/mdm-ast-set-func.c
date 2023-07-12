@@ -1388,3 +1388,31 @@ void *interpret_Ancestors(void *md_ctx_, void *nil, void *ancestors_, void *ctx_
 
 	return set;
 }
+
+// for ASTSetFunc_BottomCount
+void *interpret_BottomCount(void *md_ctx_, void *nil, void *bc, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_BottomCount *bottomcount = bc;
+	MddSet *set = ids_setdef__build(md_ctx_, bottomcount->setdef, ctx_tuple_, cube_);
+
+	unsigned int setsz = als_size(set->tuples);
+	GridData *cellarr = mam_alloc(sizeof(GridData) * setsz, OBJ_TYPE__RAW_BYTES, NULL, 0);
+	for (int i=0;i<setsz;i++) {
+		MddTuple *tup = als_get(set->tuples, i);
+		if (bottomcount->exp) {
+			Expression_evaluate(md_ctx_, bottomcount->exp, cube_, tuple__merge(ctx_tuple_, tup), cellarr + i);
+		} else {
+			do_calculate_measure_value(md_ctx_, cube_, tuple__merge(ctx_tuple_, tup), cellarr + i);
+		}
+	}
+
+	GridData countcell;
+	Expression_evaluate(md_ctx_, bottomcount->countexp, cube_, ctx_tuple_, &countcell);
+	int count = (int)countcell.val;
+
+	_bottop_sort_('b', cellarr, set->tuples);
+	for (int i=setsz-1;i>=count;i--) {
+		als_rm_index(set->tuples, i);
+	}
+
+	return set;
+}

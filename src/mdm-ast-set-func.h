@@ -264,4 +264,15 @@ typedef struct
 // for ASTSetFunc_Ancestors
 void *interpret_Ancestors(void *md_ctx_, void *nil, void *ancestors_, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    Expression *countexp;
+    Expression *exp;
+} ASTSetFunc_BottomCount;
+
+// for ASTSetFunc_BottomCount
+void *interpret_BottomCount(void *md_ctx_, void *nil, void *bc, void *ctx_tuple_, void *cube_);
+
 #endif

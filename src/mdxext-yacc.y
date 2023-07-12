@@ -84,6 +84,7 @@ Stack AST_STACK = { 0 };
 %token DRILLUP_LEVEL		/* DrillupLevel */
 %token DRILLUP_MEMBER		/* DrillupMember */
 %token ANCESTORS		/* Ancestors */
+%token BOTTOM_COUNT		/* BottomCount */
 
 /* member functions key words */
 %token PARENT			/* parent */
@@ -1123,6 +1124,27 @@ set_function:
 	set_func_DrillupMember {}
   |
 	set_func_Ancestors {}
+  |
+	set_func_BottomCount {}
+;
+
+set_func_BottomCount:
+	BOTTOM_COUNT ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTSetFunc_BottomCount *func = mam_alloc(sizeof(ASTSetFunc_BottomCount), OBJ_TYPE__ASTSetFunc_BottomCount, NULL, 0);
+		func->head.interpret = interpret_BottomCount;
+		stack_pop(&AST_STACK, (void **)&(func->exp));
+		stack_pop(&AST_STACK, (void **)&(func->countexp));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	BOTTOM_COUNT ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTSetFunc_BottomCount *func = mam_alloc(sizeof(ASTSetFunc_BottomCount), OBJ_TYPE__ASTSetFunc_BottomCount, NULL, 0);
+		func->head.interpret = interpret_BottomCount;
+		stack_pop(&AST_STACK, (void **)&(func->countexp));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 set_func_Ancestors:
