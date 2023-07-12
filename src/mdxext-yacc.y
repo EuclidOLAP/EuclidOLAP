@@ -83,6 +83,7 @@ Stack AST_STACK = { 0 };
 %token RECURSIVE		/* param: Recursive */
 %token DRILLUP_LEVEL		/* DrillupLevel */
 %token DRILLUP_MEMBER		/* DrillupMember */
+%token ANCESTORS		/* Ancestors */
 
 /* member functions key words */
 %token PARENT			/* parent */
@@ -121,6 +122,7 @@ Stack AST_STACK = { 0 };
 %token LIN_REG_SLOPE		/* LinRegSlope */
 %token LIN_REG_VARIANCE		/* LinRegVariance */
 %token STDEV				/* Stdev */
+%token FN_VAR				/* Var */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -573,6 +575,25 @@ expression_function:
 	exp_fn__LinRegVariance {}
   |
 	exp_fn__Stdev {}
+  |
+	exp_fn__Var {}
+;
+
+exp_fn__Var:
+	FN_VAR ROUND_BRACKET_L set_statement COMMA expression ROUND_BRACKET_R {
+		ASTNumFunc_Var *func = mam_alloc(sizeof(ASTNumFunc_Var), OBJ_TYPE__ASTNumFunc_Var, NULL, 0);
+		func->head.interpret = interpret_Var;
+		stack_pop(&AST_STACK, (void **) &(func->expdef));
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	FN_VAR ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		ASTNumFunc_Var *func = mam_alloc(sizeof(ASTNumFunc_Var), OBJ_TYPE__ASTNumFunc_Var, NULL, 0);
+		func->head.interpret = interpret_Var;
+		stack_pop(&AST_STACK, (void **) &(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__Stdev:
@@ -1100,6 +1121,30 @@ set_function:
 	set_func_DrillupLevel {}
   |
 	set_func_DrillupMember {}
+  |
+	set_func_Ancestors {}
+;
+
+set_func_Ancestors:
+	ANCESTORS ROUND_BRACKET_L mdm_entity_universal_path COMMA mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTSetFunc_Ancestors *func = mam_alloc(sizeof(ASTSetFunc_Ancestors), OBJ_TYPE__ASTSetFunc_Ancestors, NULL, 0);
+		func->head.interpret = interpret_Ancestors;
+		stack_pop(&AST_STACK, (void **)&(func->lvdef));
+		stack_pop(&AST_STACK, (void **)&(func->mrdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	ANCESTORS ROUND_BRACKET_L mdm_entity_universal_path COMMA decimal_value ROUND_BRACKET_R {
+		ASTSetFunc_Ancestors *func = mam_alloc(sizeof(ASTSetFunc_Ancestors), OBJ_TYPE__ASTSetFunc_Ancestors, NULL, 0);
+		func->head.interpret = interpret_Ancestors;
+
+		long dist;
+		stack_pop(&AST_STACK, (void **)&dist);
+		func->distance = (unsigned int)dist;
+
+		stack_pop(&AST_STACK, (void **)&(func->mrdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 set_func_DrillupMember:
@@ -2474,17 +2519,6 @@ levels_list:
 	}
 ;
 
-decimal_value:
-	DECIMAL {
-		long level = atoi(yytext);
-		stack_push(&AST_STACK, *((void **)&level));
-	}
-  | MINUS DECIMAL {
-		long level = 0 - atoi(yytext);
-		stack_push(&AST_STACK, *((void **)&level));
-	}
-;
-
 create_members:
 	CREATE MEMBERS mdm_entity_universal_path {
 		MDMEntityUniversalPath *eup = NULL;
@@ -2828,6 +2862,17 @@ str_token:
 		char *str = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__STRING, NULL, 0);
 		memcpy(str, yytext + 1, strlen(yytext) - 2);
 		stack_push(&AST_STACK, str);
+	}
+;
+
+decimal_value:
+	DECIMAL {
+		long level = atoi(yytext);
+		stack_push(&AST_STACK, *((void **)&level));
+	}
+  | MINUS DECIMAL {
+		long level = 0 - atoi(yytext);
+		stack_push(&AST_STACK, *((void **)&level));
 	}
 ;
 

@@ -253,4 +253,15 @@ typedef struct
 // for ASTSetFunc_DrillupMember
 void *interpret_drillupmember(void *md_ctx_, void *nil, void *dum_, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mrdef;
+    MDMEntityUniversalPath *lvdef;
+    unsigned int distance;
+} ASTSetFunc_Ancestors;
+
+// for ASTSetFunc_Ancestors
+void *interpret_Ancestors(void *md_ctx_, void *nil, void *ancestors_, void *ctx_tuple_, void *cube_);
+
 #endif

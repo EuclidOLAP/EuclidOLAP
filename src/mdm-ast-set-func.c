@@ -1347,3 +1347,44 @@ void *interpret_drillupmember(void *md_ctx_, void *nil, void *dum_, void *ctx_tu
 
 	return set1;
 }
+
+// for ASTSetFunc_Ancestors
+void *interpret_Ancestors(void *md_ctx_, void *nil, void *ancestors_, void *ctx_tuple_, void *cube_) {
+
+	ASTSetFunc_Ancestors *ancestors = ancestors_;
+
+	MddMemberRole *mrole = up_evolving(md_ctx_, ancestors->mrdef, cube_, ctx_tuple_);
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: interpret_Ancestors - The member cannot be determined.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
+
+	if (ancestors->lvdef) {
+		LevelRole *lvrole = up_evolving(md_ctx_, ancestors->lvdef, cube_, ctx_tuple_);
+		if (!lvrole || obj_type_of(lvrole) != OBJ_TYPE__LevelRole) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: interpret_Ancestors - The level cannot be determined.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+		ancestors->distance = mrole->member->lv - lvrole->lv->level;
+	}
+
+	if (ancestors->distance < 0 || mrole->member->lv - ancestors->distance < 0) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: interpret_Ancestors - Invalid distance.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+	}
+
+	Member *m = mrole->member;
+	for (int i=0;i<ancestors->distance;i++) {
+		m = find_member_by_gid(m->p_gid);
+	}
+
+	MddTuple *tup = mdd_tp__create();
+	mdd_tp__add_mbrole(tup, mdd_mr__create(m, mrole->dim_role));
+	MddSet *set = mdd_set__create();
+	mddset__add_tuple(set, tup);
+
+	return set;
+}

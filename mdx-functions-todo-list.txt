@@ -101,7 +101,6 @@
 	Todate		(O)
 	Truncate		(O)
 	Value		(M)
-	Var		(I) (M)
 	Variance		(M)
 	VarianceP		(M)
 	VarP		(M)
@@ -110,7 +109,6 @@
 << Set Functions >>
 	AddCalculatedMembers		(M)
 	AllMembers		(M)
-	Ancestors		(I) (M)
 	Ascendants		(M)
 	Axis		(M)
 	BottomCount		(I) (M)
@@ -236,6 +234,7 @@
 	LinRegSlope			[E] [I] [M]
 	LinRegVariance		[E] [I] [M]
 	Stdev				[E] [I] [M]
+	Var					[E] [I] [M]
 
 
 << Set Functions >>
@@ -263,6 +262,7 @@
 	DrillDownMemberTop			[E] [I] [M]
 	DrillupLevel				[E] [I] [M]
 	DrillupMember				[E] [I] [M]
+	Ancestors					[E] [I] [M]
 
 << String Functions >>
 	Name			[E] [I] [M]
