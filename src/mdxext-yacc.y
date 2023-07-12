@@ -85,6 +85,8 @@ Stack AST_STACK = { 0 };
 %token DRILLUP_MEMBER		/* DrillupMember */
 %token ANCESTORS		/* Ancestors */
 %token BOTTOM_COUNT		/* BottomCount */
+%token BOTTOM_SUM		/* BottomSum */
+%token TOP_SUM		/* TopSum */
 
 /* member functions key words */
 %token PARENT			/* parent */
@@ -1126,6 +1128,34 @@ set_function:
 	set_func_Ancestors {}
   |
 	set_func_BottomCount {}
+  |
+	set_func_BottomSum {}
+  |
+	set_func_TopSum {}
+;
+
+set_func_TopSum:
+	TOP_SUM ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTSetFunc_BottomTopSum *func = mam_alloc(sizeof(ASTSetFunc_BottomTopSum), OBJ_TYPE__ASTSetFunc_BottomTopSum, NULL, 0);
+		func->head.interpret = interpret_BottomTopSum;
+		func->type = 't';
+		stack_pop(&AST_STACK, (void **)&(func->expdef2));
+		stack_pop(&AST_STACK, (void **)&(func->expdef1));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+;
+
+set_func_BottomSum:
+	BOTTOM_SUM ROUND_BRACKET_L set_statement COMMA expression COMMA expression ROUND_BRACKET_R {
+		ASTSetFunc_BottomTopSum *func = mam_alloc(sizeof(ASTSetFunc_BottomTopSum), OBJ_TYPE__ASTSetFunc_BottomTopSum, NULL, 0);
+		func->head.interpret = interpret_BottomTopSum;
+		func->type = 'b';
+		stack_pop(&AST_STACK, (void **)&(func->expdef2));
+		stack_pop(&AST_STACK, (void **)&(func->expdef1));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 set_func_BottomCount:
