@@ -1446,3 +1446,67 @@ void *interpret_BottomTopSum(void *md_ctx_, void *nil, void *bts, void *ctx_tupl
 
 	return set;
 }
+
+// for ASTSetFunc_Extract
+void *interpret_Extract(void *md_ctx_, void *nil, void *extract_, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_Extract *extract = extract_;
+	MddSet *set = ids_setdef__build(md_ctx_, extract->setdef, ctx_tuple_, cube_);
+
+	ArrayList *dimroles = als_new(512, "DimensionRole *", THREAD_MAM, NULL);
+	ArrayList *heiroles = als_new(512, "HierarchyRole *", THREAD_MAM, NULL);
+
+	unsigned int upsz = als_size(extract->dhlist);
+	for (unsigned int i=0;i<upsz;i++) {
+		void *ent = up_evolving(md_ctx_, als_get(extract->dhlist, i), cube_, ctx_tuple_);
+		if (!ent)
+			continue;
+		if (obj_type_of(ent) == OBJ_TYPE__DimensionRole) {
+			als_add(dimroles, ent);
+		} if (obj_type_of(ent) == OBJ_TYPE__HierarchyRole) {
+			als_add(heiroles, ent);
+		}
+	}
+
+	if (als_size(dimroles) == 0 && als_size(heiroles) == 0) {
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: A exception throwed in fn:interpret_Extract.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
+
+	MddSet *result = mdd_set__create();
+
+	unsigned int setsz = als_size(set->tuples);
+	for (unsigned int i=0;i<setsz;i++) {
+		MddTuple *tup = als_get(set->tuples, i);
+
+		MddTuple *newtup = mdd_tp__create();
+
+		for (unsigned int j=0;j<als_size(tup->mr_ls);j++) {
+			MddMemberRole *mrole = als_get(tup->mr_ls, j);
+			for (unsigned int d=0;d<als_size(dimroles);d++) {
+				DimensionRole *dr = als_get(dimroles, d);
+				if (mrole->dim_role->gid == dr->gid) {
+					mdd_tp__add_mbrole(newtup, mrole);
+					goto continue_j;
+				}
+			}
+			for (unsigned int h=0;h<als_size(heiroles);h++) {
+				HierarchyRole *hr = als_get(heiroles, h);
+				if (mrole->dim_role->gid == hr->dim_role->gid && mrole->member->hierarchy_gid == hr->hierarchy->gid) {
+					mdd_tp__add_mbrole(newtup, mrole);
+					goto continue_j;
+				}
+			}
+			continue_j:
+		}
+
+		mddset__add_tuple(result, newtup);
+	}
+
+	for (unsigned int i=als_size(result->tuples)-1;i>0;i--) {
+		if (Tuple__cmp(als_get(result->tuples, i), als_get(result->tuples, i - 1)) == 0)
+			als_rm_index(result->tuples, i);
+	}
+
+	return result;
+}

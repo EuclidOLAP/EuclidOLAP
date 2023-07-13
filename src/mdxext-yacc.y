@@ -87,6 +87,7 @@ Stack AST_STACK = { 0 };
 %token BOTTOM_COUNT		/* BottomCount */
 %token BOTTOM_SUM		/* BottomSum */
 %token TOP_SUM		/* TopSum */
+%token EXTRACT		/* Extract */
 
 /* member functions key words */
 %token PARENT			/* parent */
@@ -1132,6 +1133,34 @@ set_function:
 	set_func_BottomSum {}
   |
 	set_func_TopSum {}
+  |
+	set_func_Extract {}
+;
+
+set_func_Extract:
+	EXTRACT ROUND_BRACKET_L extract_params ROUND_BRACKET_R {}
+;
+
+extract_params:
+	set_statement COMMA mdm_entity_universal_path {
+		ASTSetFunc_Extract *func = mam_alloc(sizeof(ASTSetFunc_Extract), OBJ_TYPE__ASTSetFunc_Extract, NULL, 0);
+		func->head.interpret = interpret_Extract;
+		func->dhlist = als_new(8, "MDMEntityUniversalPath *", THREAD_MAM, NULL);
+		void *up = NULL;
+		stack_pop(&AST_STACK, (void **)&up);
+		als_add(func->dhlist, up);
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	extract_params COMMA mdm_entity_universal_path {
+		void *up = NULL;
+		stack_pop(&AST_STACK, (void **)&up);
+		ASTSetFunc_Extract *func = NULL;
+		stack_pop(&AST_STACK, (void **)&func);
+		als_add(func->dhlist, up);
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 set_func_TopSum:

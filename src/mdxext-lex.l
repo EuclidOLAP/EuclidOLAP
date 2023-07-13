@@ -201,6 +201,10 @@ TopSum {
 	return TOP_SUM;
 }
 
+Extract {
+	return EXTRACT;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }

@@ -113,7 +113,6 @@
 	Axis		(M)
 	CurrentOrdinal		(M)
 	Exists		(M)
-	Extract		(I) (M)
 	Generate		(M) (O)
 	Head		(M) (O)
 	Hierarchize		(M)
@@ -263,6 +262,7 @@
 	BottomCount					[E] [I] [M] [O]
 	BottomSum					[E] [I] [M] [O]
 	TopSum						[E] [I] [M] [O]
+	Extract						[E] [I] [M] [O]
 
 << String Functions >>
 	Name			[E] [I] [M]

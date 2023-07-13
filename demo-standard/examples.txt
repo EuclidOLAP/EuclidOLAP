@@ -1540,6 +1540,42 @@ where ([Classes of Service].[Economy Plus]);
 
 ---
 
+select
+Extract(crossjoin([Aircraft Models].Root.Children(), Date.[2022].Children), [Aircraft Models].[Aircraft Models]) on Rows,
+members( [Measures] ) on 0
+from [Airline B];
+
+---
+
+SELECT
+ Extract(
+         {
+           ([Date].[2019], [Ending Point].[Africa]), 
+           ([Date].[2020], [Ending Point].[North America]), 
+           ([Date].[2022].Q1, [Starting Point].[North America]),
+           ([Date].[2022].Q2, [Starting Point].[Africa])
+         }, Date
+ )
+ON COLUMNS,
+members( [Measures] ) on 1
+from [Airline B];
+
+---
+
+select
+Extract(
+    crossjoin(
+        [Aircraft Models].Root.Children(), 
+        Date.[2022].Children,
+        [Ending Point].[Africa]
+    ), 
+    [Aircraft Models].[Aircraft Models], Date
+) on Rows,
+members( [Measures] ) on 0
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
