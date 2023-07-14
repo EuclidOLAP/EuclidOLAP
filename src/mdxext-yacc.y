@@ -87,6 +87,7 @@ Stack AST_STACK = { 0 };
 %token BOTTOM_COUNT		/* BottomCount */
 %token BOTTOM_SUM		/* BottomSum */
 %token TOP_SUM		/* TopSum */
+%token EXTRACT		/* Extract */
 
 /* member functions key words */
 %token PARENT			/* parent */
@@ -126,6 +127,12 @@ Stack AST_STACK = { 0 };
 %token LIN_REG_VARIANCE		/* LinRegVariance */
 %token STDEV				/* Stdev */
 %token FN_VAR				/* Var */
+
+%token CASE			/* Case */
+%token ELSE			/* Else */
+%token END			/* end */
+%token WHEN			/* when */
+%token THEN			/* then */
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
@@ -531,6 +538,101 @@ factory:
 		fac->str_literal = mam_alloc(strlen(yytext) - 1, OBJ_TYPE__STRING, NULL, 0);
 		memcpy(fac->str_literal, yytext + 1, strlen(yytext) - 2);
 		stack_push(&AST_STACK, fac);
+	}
+  |
+	case_statement {
+		Factory *factory = Factory_creat();
+		factory->t_cons = FACTORY_DEF__EXP_FN;
+		stack_pop(&AST_STACK, (void **) &(factory->exp));
+		stack_push(&AST_STACK, factory);
+	}
+;
+
+case_statement:
+	CASE expression simple_case ELSE expression END {
+		Expression *else_exp = NULL;
+		ASTNumFunc_CaseStatement *func = NULL;
+		Expression *input_exp = NULL;
+		stack_pop(&AST_STACK, (void **) &else_exp);
+		stack_pop(&AST_STACK, (void **) &func);
+		stack_pop(&AST_STACK, (void **) &input_exp);
+		func->input_exp = input_exp;
+		func->else_result_exp = else_exp;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	CASE expression simple_case END {
+		ASTNumFunc_CaseStatement *func = NULL;
+		Expression *input_exp = NULL;
+		stack_pop(&AST_STACK, (void **) &func);
+		stack_pop(&AST_STACK, (void **) &input_exp);
+		func->input_exp = input_exp;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	CASE search_case ELSE expression END {
+		Expression *else_exp = NULL;
+		ASTNumFunc_CaseStatement *func = NULL;
+		stack_pop(&AST_STACK, (void **) &else_exp);
+		stack_pop(&AST_STACK, (void **) &func);
+		func->else_result_exp = else_exp;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	CASE search_case END {}
+;
+
+simple_case:
+	WHEN expression THEN expression {
+		ASTNumFunc_CaseStatement *func = mam_alloc(sizeof(ASTNumFunc_CaseStatement), OBJ_TYPE__ASTNumFunc_CaseStatement, NULL, 0);
+		func->head.interpret = interpret_CaseStatement;
+		func->when_then_ls = als_new(16, "BooleanExpression|Expression", THREAD_MAM, NULL);
+		Expression *whenexp = NULL;
+		Expression *thenexp = NULL;
+		stack_pop(&AST_STACK, (void **) &thenexp);
+		stack_pop(&AST_STACK, (void **) &whenexp);
+		als_add(func->when_then_ls, whenexp);
+		als_add(func->when_then_ls, thenexp);
+		stack_push(&AST_STACK, func);
+	}
+  |
+	simple_case WHEN expression THEN expression {
+		Expression *whenexp = NULL;
+		Expression *thenexp = NULL;
+		stack_pop(&AST_STACK, (void **) &thenexp);
+		stack_pop(&AST_STACK, (void **) &whenexp);
+		ASTNumFunc_CaseStatement *func = NULL;
+		stack_pop(&AST_STACK, (void **) &func);
+		als_add(func->when_then_ls, whenexp);
+		als_add(func->when_then_ls, thenexp);
+		stack_push(&AST_STACK, func);
+	}
+;
+
+search_case:
+	WHEN boolean_expression THEN expression {
+		ASTNumFunc_CaseStatement *func = mam_alloc(sizeof(ASTNumFunc_CaseStatement), OBJ_TYPE__ASTNumFunc_CaseStatement, NULL, 0);
+		func->head.interpret = interpret_CaseStatement;
+		func->when_then_ls = als_new(16, "BooleanExpression|Expression", THREAD_MAM, NULL);
+		BooleanExpression *whenexp = NULL;
+		Expression *thenexp = NULL;
+		stack_pop(&AST_STACK, (void **) &thenexp);
+		stack_pop(&AST_STACK, (void **) &whenexp);
+		als_add(func->when_then_ls, whenexp);
+		als_add(func->when_then_ls, thenexp);
+		stack_push(&AST_STACK, func);
+	}
+  |
+	search_case WHEN boolean_expression THEN expression {
+		BooleanExpression *whenexp = NULL;
+		Expression *thenexp = NULL;
+		stack_pop(&AST_STACK, (void **) &thenexp);
+		stack_pop(&AST_STACK, (void **) &whenexp);
+		ASTNumFunc_CaseStatement *func = NULL;
+		stack_pop(&AST_STACK, (void **) &func);
+		als_add(func->when_then_ls, whenexp);
+		als_add(func->when_then_ls, thenexp);
+		stack_push(&AST_STACK, func);
 	}
 ;
 
@@ -1132,6 +1234,34 @@ set_function:
 	set_func_BottomSum {}
   |
 	set_func_TopSum {}
+  |
+	set_func_Extract {}
+;
+
+set_func_Extract:
+	EXTRACT ROUND_BRACKET_L extract_params ROUND_BRACKET_R {}
+;
+
+extract_params:
+	set_statement COMMA mdm_entity_universal_path {
+		ASTSetFunc_Extract *func = mam_alloc(sizeof(ASTSetFunc_Extract), OBJ_TYPE__ASTSetFunc_Extract, NULL, 0);
+		func->head.interpret = interpret_Extract;
+		func->dhlist = als_new(8, "MDMEntityUniversalPath *", THREAD_MAM, NULL);
+		void *up = NULL;
+		stack_pop(&AST_STACK, (void **)&up);
+		als_add(func->dhlist, up);
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	extract_params COMMA mdm_entity_universal_path {
+		void *up = NULL;
+		stack_pop(&AST_STACK, (void **)&up);
+		ASTSetFunc_Extract *func = NULL;
+		stack_pop(&AST_STACK, (void **)&func);
+		als_add(func->dhlist, up);
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 set_func_TopSum:

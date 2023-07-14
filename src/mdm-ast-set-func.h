@@ -287,4 +287,14 @@ typedef struct
 // for ASTSetFunc_BottomTopSum
 void *interpret_BottomTopSum(void *md_ctx_, void *nil, void *bts, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    ArrayList *dhlist;
+} ASTSetFunc_Extract;
+
+// for ASTSetFunc_Extract
+void *interpret_Extract(void *md_ctx_, void *nil, void *extract_, void *ctx_tuple_, void *cube_);
+
 #endif

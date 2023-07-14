@@ -201,6 +201,10 @@ TopSum {
 	return TOP_SUM;
 }
 
+Extract {
+	return EXTRACT;
+}
+
 crossjoin {
 	return CROSS_JOIN;
 }
@@ -383,6 +387,26 @@ coalesceEmpty {
 
 IsEmpty {
 	return IS_EMPTY;
+}
+
+Case {
+	return CASE;
+}
+
+Else {
+	return ELSE;
+}
+
+End {
+	return END;
+}
+
+When {
+	return WHEN;
+}
+
+Then {
+	return THEN;
 }
 
 Name {

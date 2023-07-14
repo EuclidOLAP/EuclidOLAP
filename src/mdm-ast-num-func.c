@@ -686,3 +686,46 @@ void *interpret_Var(void *md_ctx_, void *nil, void *numfunc, void *ctx_tuple_, v
 
     return result;
 }
+
+// for ASTNumFunc_CaseStatement
+void *interpret_CaseStatement(void *md_ctx_, void *nil, void *cs, void *ctx_tuple_, void *cube_) {
+
+    ASTNumFunc_CaseStatement *cases = cs;
+
+    GridData in_cell;
+    if (cases->input_exp) {
+        Expression_evaluate(md_ctx_, cases->input_exp, cube_, ctx_tuple_, &in_cell);
+    }
+
+    GridData *res_cell = mam_alloc(sizeof(GridData), OBJ_TYPE__GridData, NULL, 0);
+
+    int i, len = als_size(cases->when_then_ls);
+    for (int i=0; i<len ;i+=2) {
+        if (cases->input_exp) {
+            Expression *when_exp = als_get(cases->when_then_ls, i);
+            GridData w_cell;
+            Expression_evaluate(md_ctx_, when_exp, cube_, ctx_tuple_, &w_cell);
+            if (w_cell.val != in_cell.val)
+                continue;
+        } else {
+            BooleanExpression *bool_exp = als_get(cases->when_then_ls, i);
+            GridData bool_cell;
+            BooleanExpression_evaluate(md_ctx_, bool_exp, cube_, ctx_tuple_, &bool_cell);
+            if (bool_cell.boolean != GRIDDATA_BOOL_TRUE)
+                continue;
+        }
+        
+        Expression *then_exp = als_get(cases->when_then_ls, i+1);
+        Expression_evaluate(md_ctx_, then_exp, cube_, ctx_tuple_, res_cell);
+        return res_cell;
+    }
+
+    if (cases->else_result_exp) {
+        Expression_evaluate(md_ctx_, cases->else_result_exp, cube_, ctx_tuple_, res_cell);
+        return res_cell;
+    }
+
+    res_cell->type = GRIDDATA_TYPE_NUM;
+    res_cell->null_flag = 1;
+    return res_cell;
+}
