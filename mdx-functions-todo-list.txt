@@ -118,7 +118,6 @@
 	Mtd		(I) (M)
 	NameToSet		(M)
 	NonEmptyCrossjoin		(M)
-	Qtd		(I) (M)
 	Siblings		(M)
 	StripCalculatedMembers		(M)
 	StrToSet		(M)
@@ -246,6 +245,7 @@
 	TopPercent		[E] [I] [M]
 	Union			[E] [I] [M] [O]
 	Ytd				[E] [I] [M]
+	Qtd				[E] [I] [M]
 	Distinct		[E] [I] [M] [O]
 	DrilldownLevel	[E] [I] [M]
 	DrilldownLevelBottom		[E] [I] [M]

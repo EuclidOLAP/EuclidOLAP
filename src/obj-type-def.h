@@ -76,6 +76,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTSetFunc_BottomTopSum         424
 #define OBJ_TYPE__ASTSetFunc_Extract         425
 #define OBJ_TYPE__ASTSetFunc_PeriodsToDate         425
+#define OBJ_TYPE__ASTSetFunc_QTD         426
 #define OBJ_TYPE__AST_SET_FUNC_MAX        500
 
 

@@ -66,6 +66,7 @@ Stack AST_STACK = { 0 };
 %token EXCEPT			/* except */
 %token ALL				/* ALL */
 %token YTD				/* Ytd */
+%token QTD				/* Qtd */
 %token DESCENDANTS
 %token TAIL
 %token BOTTOM_PERCENT
@@ -1200,6 +1201,8 @@ set_function:
   |
 	set_func_ytd {}
   |
+	set_func_qtd {}
+  |
 	set_func_descendants {}
   |
 	set_func_tail {}
@@ -1810,6 +1813,21 @@ set_func_ytd:
 		ASTSetFunc_YTD *func = mam_alloc(sizeof(ASTSetFunc_YTD), OBJ_TYPE__ASTSetFunc_YTD, NULL, 0);
 		func->head.interpret = interpret_ytd;
 		stack_pop(&AST_STACK, (void **)&(func->mrole_def));
+		stack_push(&AST_STACK, func);
+	}
+;
+
+set_func_qtd:
+	QTD ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTSetFunc_QTD *func = mam_alloc(sizeof(ASTSetFunc_QTD), OBJ_TYPE__ASTSetFunc_QTD, NULL, 0);
+		func->head.interpret = interpret_qtd;
+		stack_pop(&AST_STACK, (void **)&(func->mrole_def));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	QTD ROUND_BRACKET_L ROUND_BRACKET_R {
+		ASTSetFunc_QTD *func = mam_alloc(sizeof(ASTSetFunc_QTD), OBJ_TYPE__ASTSetFunc_QTD, NULL, 0);
+		func->head.interpret = interpret_qtd;
 		stack_push(&AST_STACK, func);
 	}
 ;
