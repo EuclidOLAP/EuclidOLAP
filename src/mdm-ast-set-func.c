@@ -1510,3 +1510,67 @@ void *interpret_Extract(void *md_ctx_, void *nil, void *extract_, void *ctx_tupl
 
 	return result;
 }
+
+// for ASTSetFunc_PeriodsToDate
+void *interpret_PeriodsToDate(void *md_ctx_, void *nil, void *p2d, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_PeriodsToDate *pertd = p2d;
+
+	LevelRole *lvrole = NULL;
+	MddMemberRole *mrole = NULL;
+
+	MddTuple *ctx_tuple = ctx_tuple_;
+
+	// PeriodsToDate()
+	if (pertd->lrole_def == NULL && pertd->mrole_def == NULL) {
+		ArrayList *datedrs = Cube_find_date_dim_roles(cube_);
+		DimensionRole *date_dr = als_get(datedrs, 0);
+		for (int i=0;i<als_size(ctx_tuple->mr_ls);i++) {
+			MddMemberRole *mr = als_get(ctx_tuple->mr_ls, i);
+			if (mr->dim_role->gid == date_dr->gid) {
+				mrole = mr;
+				break;
+			}
+		}
+		for (int i=0;i<als_size(levels_pool);i++) {
+			Level *lv = als_get(levels_pool, i);
+			if (lv->hierarchy_gid == mrole->member->hierarchy_gid && lv->level == mrole->member->lv - 1) {
+				lvrole = LevelRole_creat(lv, mrole->dim_role);
+				break;
+			}
+		}
+		goto fnlogical;
+	}
+
+	// PeriodsToDate(<level>)
+	if (pertd->lrole_def && pertd->mrole_def == NULL) {
+		lvrole = up_evolving(md_ctx_, pertd->lrole_def, cube_, ctx_tuple);
+		for (int i=0;i<als_size(ctx_tuple->mr_ls);i++) {
+			MddMemberRole *mr = als_get(ctx_tuple->mr_ls, i);
+			if (mr->dim_role->gid == lvrole->dim_role->gid) {
+				mrole = mr;
+				break;
+			}
+		}	
+		goto fnlogical;	
+	}
+
+	// PeriodsToDate(<level>, <member>)
+	if (pertd->lrole_def && pertd->mrole_def) {
+		lvrole = up_evolving(md_ctx_, pertd->lrole_def, cube_, ctx_tuple);
+		mrole = up_evolving(md_ctx_, pertd->mrole_def, cube_, ctx_tuple);
+	}
+
+	fnlogical:
+
+	MddSet *rsset = mdd_set__create();
+	ArrayList *list = mdd__lv_ancestor_peer_descendants(lvrole->lv, mrole->member);
+	for (int i=0;i<als_size(list);i++) {
+		Member *mbr = als_get(list, i);
+		MddTuple *tup = mdd_tp__create();
+		mdd_tp__add_mbrole(tup, mdd_mr__create(mbr, mrole->dim_role));
+		mddset__add_tuple(rsset, tup);
+		if (mbr->gid == mrole->member->gid)
+			break;
+	}
+	return rsset;
+}

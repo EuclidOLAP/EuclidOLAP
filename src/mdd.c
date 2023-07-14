@@ -2273,6 +2273,12 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 	longjmp(thrd_mam->excep_ctx_env, -1);
 }
 
+static void *_up_interpret_segment_lvr(MDContext *md_ctx, LevelRole *lvrole, MdmEntityUpSegment *seg, Cube *cube, MddTuple *ctx_tuple) {
+	MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+	thrd_mam->exception_desc = "ERR: _up_interpret_segment_lvr: Program logic is missing.";
+	longjmp(thrd_mam->excep_ctx_env, -1);
+}
+
 static void *_up_interpret_segment_hr
 	(MDContext *md_ctx, HierarchyRole *hr, MdmEntityUpSegment *seg, Cube *cube, MddTuple *ctx_tuple) {
 
@@ -2611,8 +2617,10 @@ static void *_up_interpret_segment(MDContext *md_ctx, void *entity, MdmEntityUpS
 		return _up_interpret_segment_hr(md_ctx, entity, seg, cube, ctx_tuple);
 	}
 
+	if (_type == OBJ_TYPE__LevelRole) {
+		return _up_interpret_segment_lvr(md_ctx, entity, seg, cube, ctx_tuple);
+	}
 
-	// TODO Level Role
 	// TODO Tuple
 	// TODO Set
 	// TODO Other

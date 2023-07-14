@@ -297,4 +297,14 @@ typedef struct
 // for ASTSetFunc_Extract
 void *interpret_Extract(void *md_ctx_, void *nil, void *extract_, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *lrole_def;
+    MDMEntityUniversalPath *mrole_def;
+} ASTSetFunc_PeriodsToDate;
+
+// for ASTSetFunc_PeriodsToDate
+void *interpret_PeriodsToDate(void *md_ctx_, void *nil, void *p2d, void *ctx_tuple_, void *cube_);
+
 #endif
