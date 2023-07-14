@@ -2049,9 +2049,11 @@ void BooleanExpression_evaluate(MDContext *md_ctx, BooleanExpression *boolExp, C
 		if (data.boolean == GRIDDATA_BOOL_TRUE)
 		{
 			grid_data->boolean = GRIDDATA_BOOL_TRUE;
-			return;
 		}
 	}
+
+	if (boolExp->reversed)
+		grid_data->boolean = grid_data->boolean == GRIDDATA_BOOL_TRUE ? GRIDDATA_BOOL_FALSE : GRIDDATA_BOOL_TRUE;
 }
 
 void BooleanTerm_evaluate(MDContext *md_ctx, BooleanTerm *boolTerm, Cube *cube, MddTuple *ctx_tuple, GridData *grid_data)

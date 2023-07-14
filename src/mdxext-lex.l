@@ -389,6 +389,10 @@ IsEmpty {
 	return IS_EMPTY;
 }
 
+Not {
+	return NOT;
+}
+
 Case {
 	return CASE;
 }

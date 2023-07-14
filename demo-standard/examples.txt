@@ -1660,6 +1660,21 @@ WHERE ([Measures].xxxxxxxxx)
 
 ---
 
+WITH MEMBER [Measures].xxxxxxxxx AS   
+CASE 
+   WHEN not [Measures].QQQQQQ >= 40 THEN "small ?"
+   WHEN [Measures].QQQQQQ = 100 THEN [Measures].QQQQQQ
+   WHEN not [Measures].QQQQQQ > 50 and [Measures].QQQQQQ <= 60 THEN "hahahahaha"
+      ELSE [Measures].QQQQQQ
+END  
+member [Measures].QQQQQQ as [Measures].Revenue / 10000000
+SELECT Date.[ALL].children on 0,
+[Starting Point].Root.Children ON 1  
+FROM [Airline B]  
+WHERE ([Measures].xxxxxxxxx)
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

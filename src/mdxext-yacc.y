@@ -137,6 +137,8 @@ Stack AST_STACK = { 0 };
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
 
+%token NOT			/* Not */
+
 /* String Functions */
 %token NAME				/* Name */
 
@@ -1981,6 +1983,15 @@ boolean_expression:
 		stack_pop(&AST_STACK, (void **) &bt);
 		BooleanExpression *bool_exp;
 		stack_pop(&AST_STACK, (void **) &bool_exp);
+		BooleanExpression_addTerm(bool_exp, bt);
+		stack_push(&AST_STACK, bool_exp);
+	}
+  |
+	NOT boolean_term {
+		BooleanTerm *bt;
+		stack_pop(&AST_STACK, (void **) &bt);
+		BooleanExpression *bool_exp = BooleanExpression_creat();
+		bool_exp->reversed = 1;
 		BooleanExpression_addTerm(bool_exp, bt);
 		stack_push(&AST_STACK, bool_exp);
 	}

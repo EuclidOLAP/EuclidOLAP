@@ -40,7 +40,6 @@
 	IsSibling		(M) (O)
 	IsUda		(O)
 	IsValid		(O)
-	Not		(I)
 
 
 << Member Functions >>
