@@ -29,7 +29,6 @@
 
 
 << Logical Functions >>
-	Case		(I)
 	Contains		(O)
 	Is		(O)
 	IsAccType		(O)
@@ -64,7 +63,6 @@
 << Numeric Functions >>
 	CalculationCurrentPass		(M)
 	CalculationPassValue		(M)
-	Case		(O)
 	CellValue		(O)
 	CovarianceN		(M)
 	DateDiff		(O)
@@ -193,6 +191,7 @@
 
 << Logical Functions >>
 	IsEmpty				[E] [I] [M] [O]
+	Case				[E] [I] [M] [O]
 
 << Member Functions >>
 	ClosingPeriod		[E] [I] [M] [O]

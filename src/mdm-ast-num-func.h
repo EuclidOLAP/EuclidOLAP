@@ -172,4 +172,15 @@ typedef struct
 // for ASTNumFunc_Var
 void *interpret_Var(void *md_ctx_, void *nil, void *numfunc, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    Expression *input_exp;
+    ArrayList *when_then_ls;
+    Expression *else_result_exp;
+} ASTNumFunc_CaseStatement;
+
+// for ASTNumFunc_CaseStatement
+void *interpret_CaseStatement(void *md_ctx_, void *nil, void *cs, void *ctx_tuple_, void *cube_);
+
 #endif

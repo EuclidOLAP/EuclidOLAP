@@ -1576,6 +1576,90 @@ from [Airline B];
 
 ---
 
+WITH MEMBER [Measures].xxxxxxxxx AS   
+CASE [Measures].Revenue
+   WHEN 0 THEN "NONE"  
+   WHEN 1 THEN "SMALL"  
+   WHEN 2 THEN "SMALL"  
+   WHEN 3 THEN "MEDIUM"  
+   WHEN 4 THEN "MEDIUM"  
+   WHEN 5 THEN "LARGE"  
+   WHEN 6 THEN "LARGE"  
+      ELSE "VERY LARGE"  
+END  
+SELECT Date.[ALL].Children() on 0,
+[Starting Point].Root.Children ON 1  
+FROM [Airline B]  
+WHERE ([Measures].xxxxxxxxx)
+
+---
+
+WITH MEMBER [Measures].xxxxxxxxx AS   
+CASE [Measures].Revenue
+   WHEN [Measures].Revenue THEN [Measures].Revenue
+   WHEN 1 THEN "SMALL"  
+   WHEN 2 THEN "SMALL"  
+   WHEN 3 THEN "MEDIUM"  
+   WHEN 4 THEN "MEDIUM"  
+   WHEN 5 THEN "LARGE"  
+   WHEN 6 THEN "LARGE"  
+      ELSE "VERY LARGE"  
+END  
+SELECT Date.[ALL].Children() on 0,
+[Starting Point].Root.Children ON 1  
+FROM [Airline B]  
+WHERE ([Measures].xxxxxxxxx)
+
+---
+
+WITH MEMBER [Measures].xxxxxxxxx AS   
+CASE [Measures].Revenue
+   WHEN 567728820.00 THEN [Measures].Revenue
+   WHEN 1 THEN "SMALL"  
+   WHEN 2 THEN "SMALL"  
+   WHEN 3 THEN "MEDIUM"  
+   WHEN 4 THEN "MEDIUM"  
+   WHEN 5 THEN "LARGE"  
+   WHEN 6 THEN "LARGE"  
+      ELSE "VERY LARGE"  
+END  
+SELECT Date.[ALL].Children() on 0,
+[Starting Point].Root.Children ON 1  
+FROM [Airline B]  
+WHERE ([Measures].xxxxxxxxx)
+
+---
+
+WITH MEMBER [Measures].xxxxxxxxx AS   
+CASE 
+   WHEN [Measures].QQQQQQ < 100 THEN "small"
+   WHEN [Measures].QQQQQQ = 200 THEN "medium"
+   WHEN [Measures].QQQQQQ > 300 THEN "large"
+      ELSE [Measures].QQQQQQ
+END  
+member [Measures].QQQQQQ as [Measures].Revenue / 10000000
+SELECT Date.[ALL] on 0,
+[Starting Point].Root.Children ON 1  
+FROM [Airline B]  
+WHERE ([Measures].xxxxxxxxx)
+
+---
+
+WITH MEMBER [Measures].xxxxxxxxx AS   
+CASE 
+   WHEN [Measures].QQQQQQ < 100 THEN "small"
+   WHEN [Measures].QQQQQQ = 100 THEN "medium"
+   WHEN [Measures].QQQQQQ > 100 and [Measures].QQQQQQ <= 200 THEN "large"
+      ELSE [Measures].QQQQQQ
+END  
+member [Measures].QQQQQQ as [Measures].Revenue / 10000000
+SELECT Date.[ALL] on 0,
+[Starting Point].Root.Children ON 1  
+FROM [Airline B]  
+WHERE ([Measures].xxxxxxxxx)
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

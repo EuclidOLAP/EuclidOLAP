@@ -95,6 +95,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTNumFunc_LinRegVariance        513
 #define OBJ_TYPE__ASTNumFunc_Stdev        514
 #define OBJ_TYPE__ASTNumFunc_Var        515
+#define OBJ_TYPE__ASTNumFunc_CaseStatement        516
 #define OBJ_TYPE__ASTNUMFUNC_MAX        600
 
 

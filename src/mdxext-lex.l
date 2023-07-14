@@ -389,6 +389,26 @@ IsEmpty {
 	return IS_EMPTY;
 }
 
+Case {
+	return CASE;
+}
+
+Else {
+	return ELSE;
+}
+
+End {
+	return END;
+}
+
+When {
+	return WHEN;
+}
+
+Then {
+	return THEN;
+}
+
 Name {
 	return NAME;
 }
