@@ -219,6 +219,7 @@ void BooleanTerm_addFactory(BooleanTerm *, BooleanFactory *);
 
 typedef struct Boolean_Expression_
 {
+    char reversed;
     ArrayList *terms;
 } BooleanExpression;
 BooleanExpression *BooleanExpression_creat();

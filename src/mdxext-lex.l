@@ -345,6 +345,10 @@ ALL {
 	return ALL;
 }
 
+PeriodsToDate {
+	return PERIODS_TO_DATE;
+}
+
 Ytd {
 	return YTD;
 }
@@ -387,6 +391,10 @@ coalesceEmpty {
 
 IsEmpty {
 	return IS_EMPTY;
+}
+
+Not {
+	return NOT;
 }
 
 Case {

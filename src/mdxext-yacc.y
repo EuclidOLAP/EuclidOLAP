@@ -88,6 +88,7 @@ Stack AST_STACK = { 0 };
 %token BOTTOM_SUM		/* BottomSum */
 %token TOP_SUM		/* TopSum */
 %token EXTRACT		/* Extract */
+%token PERIODS_TO_DATE		/* PeriodsToDate */
 
 /* member functions key words */
 %token PARENT			/* parent */
@@ -136,6 +137,8 @@ Stack AST_STACK = { 0 };
 
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
+
+%token NOT			/* Not */
 
 /* String Functions */
 %token NAME				/* Name */
@@ -1236,6 +1239,32 @@ set_function:
 	set_func_TopSum {}
   |
 	set_func_Extract {}
+  |
+	set_func_PeriodsToDate {}
+;
+
+// PeriodsToDate
+set_func_PeriodsToDate:
+	PERIODS_TO_DATE ROUND_BRACKET_L mdm_entity_universal_path COMMA mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTSetFunc_PeriodsToDate *func = mam_alloc(sizeof(ASTSetFunc_PeriodsToDate), OBJ_TYPE__ASTSetFunc_PeriodsToDate, NULL, 0);
+		func->head.interpret = interpret_PeriodsToDate;
+		stack_pop(&AST_STACK, (void **)&(func->mrole_def));
+		stack_pop(&AST_STACK, (void **)&(func->lrole_def));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	PERIODS_TO_DATE ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTSetFunc_PeriodsToDate *func = mam_alloc(sizeof(ASTSetFunc_PeriodsToDate), OBJ_TYPE__ASTSetFunc_PeriodsToDate, NULL, 0);
+		func->head.interpret = interpret_PeriodsToDate;
+		stack_pop(&AST_STACK, (void **)&(func->lrole_def));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	PERIODS_TO_DATE ROUND_BRACKET_L ROUND_BRACKET_R {
+		ASTSetFunc_PeriodsToDate *func = mam_alloc(sizeof(ASTSetFunc_PeriodsToDate), OBJ_TYPE__ASTSetFunc_PeriodsToDate, NULL, 0);
+		func->head.interpret = interpret_PeriodsToDate;
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 set_func_Extract:
@@ -1981,6 +2010,15 @@ boolean_expression:
 		stack_pop(&AST_STACK, (void **) &bt);
 		BooleanExpression *bool_exp;
 		stack_pop(&AST_STACK, (void **) &bool_exp);
+		BooleanExpression_addTerm(bool_exp, bt);
+		stack_push(&AST_STACK, bool_exp);
+	}
+  |
+	NOT boolean_term {
+		BooleanTerm *bt;
+		stack_pop(&AST_STACK, (void **) &bt);
+		BooleanExpression *bool_exp = BooleanExpression_creat();
+		bool_exp->reversed = 1;
 		BooleanExpression_addTerm(bool_exp, bt);
 		stack_push(&AST_STACK, bool_exp);
 	}

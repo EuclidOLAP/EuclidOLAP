@@ -1660,6 +1660,78 @@ WHERE ([Measures].xxxxxxxxx)
 
 ---
 
+WITH MEMBER [Measures].xxxxxxxxx AS   
+CASE 
+   WHEN not [Measures].QQQQQQ >= 40 THEN "small ?"
+   WHEN [Measures].QQQQQQ = 100 THEN [Measures].QQQQQQ
+   WHEN not [Measures].QQQQQQ > 50 and [Measures].QQQQQQ <= 60 THEN "hahahahaha"
+      ELSE [Measures].QQQQQQ
+END  
+member [Measures].QQQQQQ as [Measures].Revenue / 10000000
+SELECT Date.[ALL].children on 0,
+[Starting Point].Root.Children ON 1  
+FROM [Airline B]  
+WHERE ([Measures].xxxxxxxxx)
+
+---
+
+with member 
+
+[Measures].[XXXXXX] as Sum(
+    PeriodsToDate([Date].[Quarter]),
+    [Measures].[Revenue]
+)
+
+select { [Measures].[XXXXXX] } on rows, 
+{ [Classes of Service].Root } on columns from [Airline B]
+
+where ( [Date].[2022].Q3.M9)
+
+---
+
+select PeriodsToDate([Date].[Quarter], [Date].[2022].Q3.M9) on rows, 
+{ [Classes of Service].Root } on columns from [Airline B]
+
+---
+
+WITH MEMBER [Date].[First8Months2022] AS  
+    Aggregate(  
+        PeriodsToDate(  
+            [Date].[Calendar].[Year],   
+            [Date].[Calendar].[2022].Q3.M8
+        )  
+    )  
+SELECT   
+    [Date].[First8Months2022] ON COLUMNS,  
+    [Aircraft Models].[ALL].Children ON ROWS  
+FROM  
+    [Airline A]  
+WHERE  
+    ([Measures].Cost);
+
+---
+
+SELECT   
+    PeriodsToDate(  
+            [Date].[Calendar].[Year],   
+            [Date].[Calendar].[2022].Q3.M8
+        ) ON COLUMNS,  
+    [Aircraft Models].[ALL].Children ON ROWS  
+FROM  
+    [Airline A]  
+WHERE  
+    ([Measures].Cost);
+
+---
+
+select
+PeriodsToDate (Date.Year, Date.[2022].Q3) on 1,
+[Measures].members on 0
+from [Airline B];
+// returns the set:
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
