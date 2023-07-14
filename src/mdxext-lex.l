@@ -353,6 +353,10 @@ Ytd {
 	return YTD;
 }
 
+Qtd {
+	return QTD;
+}
+
 descendants {
 	return DESCENDANTS;
 }

@@ -100,6 +100,15 @@ typedef struct
 // for ASTSetFunc_YTD
 void *interpret_ytd(void *md_ctx_, void *mrole_, void *ytd_, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mrole_def;
+} ASTSetFunc_QTD;
+
+// for ASTSetFunc_QTD
+void *interpret_qtd(void *md_ctx_, void *mrole_, void *qtd_, void *ctx_tuple_, void *cube_);
+
 typedef enum
 {
     SELF,

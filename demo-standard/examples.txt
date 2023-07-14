@@ -1732,6 +1732,13 @@ from [Airline B];
 
 ---
 
+select 
+[Aircraft Models].root.Children() on columns, 
+QTD( Date.[2022].Q1.M3 )
+on rows from [Airline A];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
