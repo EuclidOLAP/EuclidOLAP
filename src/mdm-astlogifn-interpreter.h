@@ -21,4 +21,14 @@ typedef struct
 // for ASTLogicalFunc_IsAncestor
 void *interpret_IsAncestor(void *md_context, void *bool_cell, void *isancestor_, void *context_tuple, void *cube);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mrdef;
+    int generation_number;
+} ASTLogicalFunc_IsGeneration;
+
+// for ASTLogicalFunc_IsGeneration
+void *interpret_IsGeneration(void *md_context, void *bool_cell, void *isgeneration_, void *context_tuple, void *cube);
+
 #endif

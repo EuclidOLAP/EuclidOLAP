@@ -139,6 +139,7 @@ Stack AST_STACK = { 0 };
 /* Logical Functions */
 %token IS_EMPTY			/* IsEmpty */
 %token IS_ANCESTOR		/* IsAncestor */
+%token IS_GENERATION		/* IsGeneration */
 
 %token NOT			/* Not */
 
@@ -2879,6 +2880,22 @@ boolean_function:
 	}
   |
 	logical_func_IsAncestor {}
+  |
+	logical_func_IsGeneration {}
+;
+
+logical_func_IsGeneration:
+	IS_GENERATION ROUND_BRACKET_L mdm_entity_universal_path COMMA decimal_value ROUND_BRACKET_R {
+		ASTLogicalFunc_IsGeneration *func = mam_alloc(sizeof(ASTLogicalFunc_IsGeneration), OBJ_TYPE__ASTLogicalFunc_IsGeneration, NULL, 0);
+		func->head.interpret = interpret_IsGeneration;
+
+		long gnum;
+		stack_pop(&AST_STACK, (void **)&gnum);
+		func->generation_number = (unsigned int)gnum;
+
+		stack_pop(&AST_STACK, (void **)&(func->mrdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 logical_func_IsAncestor:

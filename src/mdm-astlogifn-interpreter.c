@@ -7,6 +7,12 @@
 #include "mdd.h"
 #include "mdm-astlogifn-interpreter.h"
 
+extern ArrayList *dims_pool;
+extern ArrayList *hierarchies_pool;
+extern ArrayList *member_pool;
+extern ArrayList *cubes_pool;
+extern ArrayList *levels_pool;
+
 // for ASTLogicalFunc_IsEmpty
 void *interpret_ast_is_empty(void *md_context, void *grid_data, void *_is_empty, void *context_tuple, void *_cube)
 {
@@ -69,6 +75,37 @@ void *interpret_IsAncestor(void *md_context, void *bool_cell, void *isancestor_,
             break;
         }
     }
+
+    return cell;
+}
+
+// for ASTLogicalFunc_IsGeneration
+void *interpret_IsGeneration(void *md_context, void *bool_cell, void *isgeneration_, void *context_tuple, void *cube) {
+    ASTLogicalFunc_IsGeneration *isgeneration = isgeneration_;
+
+    GridData *cell = bool_cell;
+    cell->type = GRIDDATA_TYPE_BOOL;
+    cell->boolean = GRIDDATA_BOOL_FALSE;
+
+    MddMemberRole *mrole = up_evolving(md_context, isgeneration->mrdef, cube, context_tuple);
+    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
+        return cell;
+    }
+
+    ArrayList *hyls = als_new(8, "Hierarchy *", THREAD_MAM, NULL);
+
+    for (int i=0;i<als_size(hierarchies_pool);i++) {
+        Hierarchy *hy = als_get(hierarchies_pool, i);
+        if (hy->dimension_gid == mrole->dim_role->dim_gid)
+            als_add(hyls, hy);
+    }
+
+    if (isgeneration->generation_number > als_size(hyls))
+        return cell;
+
+    Hierarchy *hy = als_get(hyls, isgeneration->generation_number - 1);
+    if (mrole->member->hierarchy_gid == hy->gid)
+        cell->boolean = GRIDDATA_BOOL_TRUE;
 
     return cell;
 }
