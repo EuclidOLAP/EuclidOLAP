@@ -64,12 +64,6 @@ typedef struct _ast_function_common_head_
 } ASTFunctionCommonHead;
 
 
-typedef struct _ast_logical_func_is_empty_
-{
-    ASTFunctionCommonHead head;
-    Expression *exp;
-} ASTLogicalFunc_IsEmpty;
-
 typedef struct ast_str_func_name
 {
     ASTFunctionCommonHead head;

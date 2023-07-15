@@ -1739,6 +1739,22 @@ on rows from [Airline A];
 
 ---
 
+SELECT
+ Filter([Aircraft Models].members, IsAncestor([Aircraft Models].CurrentMember, [Aircraft Models].Airbus.A380))
+ON 11,
+[Measures].members on 1
+FROM [Airline A]
+
+---
+
+SELECT
+ Filter({[Aircraft Models].[Airbus], [Aircraft Models].[Boeing]}, IsAncestor([Aircraft Models].CurrentMember, [Aircraft Models].Airbus.A380))
+ON 11,
+[Measures].members on 1
+FROM [Airline A];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

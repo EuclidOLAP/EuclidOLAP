@@ -32,7 +32,6 @@
 	Contains		(O)
 	Is		(O)
 	IsAccType		(O)
-	IsAncestor		(M) (O)
 	IsChild		(O)
 	IsGeneration		(M) (O)
 	IsLeaf		(M) (O)
@@ -189,6 +188,7 @@
 << Logical Functions >>
 	IsEmpty				[E] [I] [M] [O]
 	Case				[E] [I] [M] [O]
+	IsAncestor			[E] [M] [O]
 
 << Member Functions >>
 	ClosingPeriod		[E] [I] [M] [O]

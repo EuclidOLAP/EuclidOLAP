@@ -393,6 +393,10 @@ coalesceEmpty {
 	return COALESCE_EMPTY;
 }
 
+IsAncestor {
+	return IS_ANCESTOR;
+}
+
 IsEmpty {
 	return IS_EMPTY;
 }
