@@ -124,3 +124,28 @@ void *interpret_IsLeaf(void *md_context, void *bool_cell, void *isleaf_, void *c
         cell->boolean = GRIDDATA_BOOL_TRUE;
     return cell;
 }
+
+// for ASTLogicalFunc_IsSibling
+void *interpret_IsSibling(void *md_context, void *bool_cell, void *issibling_, void *context_tuple, void *cube) {
+    ASTLogicalFunc_IsSibling *issibling = issibling_;
+    MddMemberRole *mrole1 = up_evolving(md_context, issibling->mrdef1, cube, context_tuple);
+    MddMemberRole *mrole2 = up_evolving(md_context, issibling->mrdef2, cube, context_tuple);
+
+    GridData *cell = bool_cell;
+    cell->type = GRIDDATA_TYPE_BOOL;
+    cell->boolean = GRIDDATA_BOOL_FALSE;
+
+    if ((!mrole1 || obj_type_of(mrole1) != OBJ_TYPE__MddMemberRole) || (!mrole2 || obj_type_of(mrole2) != OBJ_TYPE__MddMemberRole)) {
+        return cell;
+    }
+
+    if (mrole1->dim_role->gid == mrole2->dim_role->gid 
+        && mrole1->member->hierarchy_gid == mrole2->member->hierarchy_gid 
+        && mrole1->member->p_gid == mrole2->member->p_gid) {
+
+            cell->boolean = (mrole1->member->gid != mrole2->member->gid) 
+                ? GRIDDATA_BOOL_TRUE 
+                : (issibling->include_member ? GRIDDATA_BOOL_TRUE : GRIDDATA_BOOL_FALSE);
+    }
+    return cell;
+}

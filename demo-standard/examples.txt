@@ -1797,6 +1797,30 @@ from [Airline A]
 
 ---
 
+// IsSibling
+select
+filter(
+    [Classes of Service].members, not IsLeaf([Classes of Service].currentmember)
+) on 0,
+filter(
+    [Aircraft Models].members,  IsSibling([Aircraft Models].currentmember, [Aircraft Models].root.FirstChild)
+) on 1
+from [Airline A]
+
+---
+
+// IsSibling
+select
+filter(
+    [Classes of Service].members, not IsLeaf([Classes of Service].currentmember)
+) on 0,
+filter(
+    [Aircraft Models].members,  IsSibling([Aircraft Models].currentmember, [Aircraft Models].root.FirstChild, include_member)
+) on 1
+from [Airline B]
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

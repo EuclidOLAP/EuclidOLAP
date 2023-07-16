@@ -34,7 +34,6 @@
 	IsAccType		(O)
 	IsChild		(O)
 	IsLevel		(O)
-	IsSibling		(M) (O)
 	IsUda		(O)
 	IsValid		(O)
 
@@ -189,6 +188,7 @@
 	IsAncestor			[E] [M] [O]
 	IsGeneration		[E] [M] [O]
 	IsLeaf				[E] [M] [O]
+	IsSibling			[E] [M] [O]
 
 << Member Functions >>
 	ClosingPeriod		[E] [I] [M] [O]

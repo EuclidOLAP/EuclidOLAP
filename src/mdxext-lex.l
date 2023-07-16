@@ -405,6 +405,10 @@ IsLeaf {
 	return IS_LEAF;
 }
 
+IsSibling {
+	return IS_SIBLING;
+}
+
 IsEmpty {
 	return IS_EMPTY;
 }

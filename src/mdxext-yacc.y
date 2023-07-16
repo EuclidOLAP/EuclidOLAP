@@ -141,6 +141,7 @@ Stack AST_STACK = { 0 };
 %token IS_ANCESTOR		/* IsAncestor */
 %token IS_GENERATION		/* IsGeneration */
 %token IS_LEAF		/* IsLeaf */
+%token IS_SIBLING		/* IsSibling */
 
 %token NOT			/* Not */
 
@@ -2885,6 +2886,27 @@ boolean_function:
 	logical_func_IsGeneration {}
   |
 	logical_func_IsLeaf {}
+  |
+	logical_func_IsSibling {}
+;
+
+logical_func_IsSibling:
+	IS_SIBLING ROUND_BRACKET_L mdm_entity_universal_path COMMA mdm_entity_universal_path COMMA VAR ROUND_BRACKET_R {
+		ASTLogicalFunc_IsSibling *func = mam_alloc(sizeof(ASTLogicalFunc_IsSibling), OBJ_TYPE__ASTLogicalFunc_IsSibling, NULL, 0);
+		func->head.interpret = interpret_IsSibling;
+		func->include_member = 1;
+		stack_pop(&AST_STACK, (void **)&(func->mrdef2));
+		stack_pop(&AST_STACK, (void **)&(func->mrdef1));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	IS_SIBLING ROUND_BRACKET_L mdm_entity_universal_path COMMA mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTLogicalFunc_IsSibling *func = mam_alloc(sizeof(ASTLogicalFunc_IsSibling), OBJ_TYPE__ASTLogicalFunc_IsSibling, NULL, 0);
+		func->head.interpret = interpret_IsSibling;
+		stack_pop(&AST_STACK, (void **)&(func->mrdef2));
+		stack_pop(&AST_STACK, (void **)&(func->mrdef1));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 logical_func_IsLeaf:
