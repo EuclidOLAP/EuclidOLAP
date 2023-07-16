@@ -39,11 +39,9 @@
 
 
 << Member Functions >>
-	Cousin		(M) (O)
 	CurrentAxisMember		(O)
 	DataMember		(M)
 	DateToMember		(O)
-	DefaultMember		(M) (O)
 	Item (Member)		(M)
 	LinkMember		(M)
 	Members (String)		(M)
@@ -204,6 +202,8 @@
 	PrevMember			[E] [I] [M] [O]
 	NextMember			[E] [I] [M] [O]
 	Ancestor			[E] [M] [O]
+	Cousin				[E] [M] [O]
+	DefaultMember		[E] [M] [O]
 
 
 << Numeric Functions >>

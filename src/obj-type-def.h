@@ -31,6 +31,8 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTMemberFn_OpeningPeriod 22
 #define OBJ_TYPE__ASTMemberFn_NextMember 23
 #define OBJ_TYPE__ASTMemberFn_Ancestor 24
+#define OBJ_TYPE__ASTMemberFn_Cousin 25
+#define OBJ_TYPE__ASTMemberFn_DefaultMember 26
 
 #define OBJ_TYPE__ASTMEMBERFUNC__MAX 200
 

@@ -1847,6 +1847,24 @@ from [Airline B]
 
 ---
 
+select
+[Measures].[Cost] on 0, 
+{Date.[2022].Q1.M2.Cousin(Date.[2022].Q4), Date.[2022].Q4.M11} on 1
+from [Airline A] ;
+
+---
+
+select
+{
+    Date.DefaultMember,
+    Date.Financial.DefaultMember
+}
+ on 1,
+[Measures].members on 0
+from [Airline B]
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
