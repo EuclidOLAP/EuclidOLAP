@@ -40,6 +40,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTLogicalFunc_IsEmpty    201
 #define OBJ_TYPE__ASTLogicalFunc_IsAncestor    202
 #define OBJ_TYPE__ASTLogicalFunc_IsGeneration    203
+#define OBJ_TYPE__ASTLogicalFunc_IsLeaf    204
 
 #define OBJ_TYPE__ASTLOGICALFUNC__MAX       300
 

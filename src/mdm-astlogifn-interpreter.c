@@ -109,3 +109,18 @@ void *interpret_IsGeneration(void *md_context, void *bool_cell, void *isgenerati
 
     return cell;
 }
+
+// for ASTLogicalFunc_IsLeaf
+void *interpret_IsLeaf(void *md_context, void *bool_cell, void *isleaf_, void *context_tuple, void *cube) {
+    ASTLogicalFunc_IsLeaf *isleaf = isleaf_;
+    MddMemberRole *mrole = up_evolving(md_context, isleaf->mrdef, cube, context_tuple);
+    GridData *cell = bool_cell;
+    cell->type = GRIDDATA_TYPE_BOOL;
+    cell->boolean = GRIDDATA_BOOL_FALSE;
+    if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
+        return cell;
+    }
+    if (!(mrole->member->bin_attr & MDD_MEMBER__BIN_ATTR_FLAG__NON_LEAF))
+        cell->boolean = GRIDDATA_BOOL_TRUE;
+    return cell;
+}

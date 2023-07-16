@@ -31,4 +31,13 @@ typedef struct
 // for ASTLogicalFunc_IsGeneration
 void *interpret_IsGeneration(void *md_context, void *bool_cell, void *isgeneration_, void *context_tuple, void *cube);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mrdef;
+} ASTLogicalFunc_IsLeaf;
+
+// for ASTLogicalFunc_IsLeaf
+void *interpret_IsLeaf(void *md_context, void *bool_cell, void *isleaf_, void *context_tuple, void *cube);
+
 #endif

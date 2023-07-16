@@ -140,6 +140,7 @@ Stack AST_STACK = { 0 };
 %token IS_EMPTY			/* IsEmpty */
 %token IS_ANCESTOR		/* IsAncestor */
 %token IS_GENERATION		/* IsGeneration */
+%token IS_LEAF		/* IsLeaf */
 
 %token NOT			/* Not */
 
@@ -2882,6 +2883,17 @@ boolean_function:
 	logical_func_IsAncestor {}
   |
 	logical_func_IsGeneration {}
+  |
+	logical_func_IsLeaf {}
+;
+
+logical_func_IsLeaf:
+	IS_LEAF ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTLogicalFunc_IsLeaf *func = mam_alloc(sizeof(ASTLogicalFunc_IsLeaf), OBJ_TYPE__ASTLogicalFunc_IsLeaf, NULL, 0);
+		func->head.interpret = interpret_IsLeaf;
+		stack_pop(&AST_STACK, (void **)&(func->mrdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 logical_func_IsGeneration:

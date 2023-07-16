@@ -265,6 +265,7 @@ Hierarchy *create_hierarchy(Dimension *dimension, char *hierarchy_name) {
 	member->hierarchy_gid = hierarchy->gid;
 	member->p_gid = 0;
 	member->lv = 0;
+	member->bin_attr |= MDD_MEMBER__BIN_ATTR_FLAG__NON_LEAF;
 
 	append_file_data(get_cfg()->profiles.members, (char *)member, sizeof(Member));
 	als_add(member_pool, member);
@@ -390,14 +391,14 @@ void mdd__use_level(Level *lv)
 	als_add(levels_pool, lv);
 }
 
-Member *create_member(MDMEntityUniversalPath *eup) {
+Member *create_member(MDMEntityUniversalPath *eup, char leaf) {
 	MdmEntityUpSegment *up_seg = als_rm_index(eup->list, als_size(eup->list) - 1);
 	void *leftobj = up_evolving(NULL, eup, NULL, NULL);
 
 	Member *parent = NULL;
 
 	if (leftobj == NULL) {
-		parent = create_member(eup);
+		parent = create_member(eup, 0);
 		goto do_create;
 	}
 
@@ -422,6 +423,7 @@ do_create:
 	member->hierarchy_gid = parent->hierarchy_gid;
 	member->p_gid = parent->gid;
 	member->lv = parent->lv + 1;
+	member->bin_attr = leaf ? (member->bin_attr & ~MDD_MEMBER__BIN_ATTR_FLAG__NON_LEAF) : (member->bin_attr | MDD_MEMBER__BIN_ATTR_FLAG__NON_LEAF);
 
 	append_file_data(get_cfg()->profiles.members, (char *)member, sizeof(Member));
 	als_add(member_pool, member);
@@ -436,7 +438,7 @@ int create_members(ArrayList *mbrs_info_als)
 	int i = 0;
 	while (i < size)
 	{
-		create_member(als_get(mbrs_info_als, i++));
+		create_member(als_get(mbrs_info_als, i++), 1);
 	}
 	return 0;
 }

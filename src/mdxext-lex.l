@@ -401,6 +401,10 @@ IsGeneration {
 	return IS_GENERATION;
 }
 
+IsLeaf {
+	return IS_LEAF;
+}
+
 IsEmpty {
 	return IS_EMPTY;
 }
