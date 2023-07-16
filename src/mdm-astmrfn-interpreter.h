@@ -116,4 +116,15 @@ typedef struct
 // for ASTMemberFn_NextMember
 void *interpret_nextmember(void *md_ctx, void *mrole, void *nm, void *ctx_tuple, void *cube);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mrdef;
+    MDMEntityUniversalPath *lvdef;
+    unsigned int distance;
+} ASTMemberFn_Ancestor;
+
+// for ASTMemberFn_Ancestor
+void *interpret_Ancestor(void *md_ctx_, void *mr, void *anc, void *ctx_tuple_, void *cube_);
+
 #endif

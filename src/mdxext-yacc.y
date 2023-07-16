@@ -105,6 +105,7 @@ Stack AST_STACK = { 0 };
 %token LAG				/* Lag */
 %token LEAD				/* Lead */
 %token NEXT_MEMBER		/* NextMember */
+%token ANCESTOR			/* Ancestor */
 
 /* Numeric Functions key words */
 %token SUM				/* sum */
@@ -140,6 +141,8 @@ Stack AST_STACK = { 0 };
 %token IS_EMPTY			/* IsEmpty */
 %token IS_ANCESTOR		/* IsAncestor */
 %token IS_GENERATION		/* IsGeneration */
+%token IS_LEAF		/* IsLeaf */
+%token IS_SIBLING		/* IsSibling */
 
 %token NOT			/* Not */
 
@@ -2513,6 +2516,48 @@ member_function:
 	member_func_opening_period {}
   |
 	member_func_next_member {}
+  |
+	member_func_Ancestor {}
+;
+
+member_func_Ancestor:
+	ANCESTOR ROUND_BRACKET_L mdm_entity_universal_path COMMA mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_Ancestor *func = mam_alloc(sizeof(ASTMemberFn_Ancestor), OBJ_TYPE__ASTMemberFn_Ancestor, NULL, 0);
+		func->head.interpret = interpret_Ancestor;
+		stack_pop(&AST_STACK, (void **)&(func->lvdef));
+		stack_pop(&AST_STACK, (void **)&(func->mrdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	ANCESTOR ROUND_BRACKET_L mdm_entity_universal_path COMMA decimal_value ROUND_BRACKET_R {
+		ASTMemberFn_Ancestor *func = mam_alloc(sizeof(ASTMemberFn_Ancestor), OBJ_TYPE__ASTMemberFn_Ancestor, NULL, 0);
+		func->head.interpret = interpret_Ancestor;
+
+		long dist;
+		stack_pop(&AST_STACK, (void **)&dist);
+		func->distance = (unsigned int)dist;
+
+		stack_pop(&AST_STACK, (void **)&(func->mrdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	ANCESTOR ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_Ancestor *func = mam_alloc(sizeof(ASTMemberFn_Ancestor), OBJ_TYPE__ASTMemberFn_Ancestor, NULL, 0);
+		func->head.interpret = interpret_Ancestor;
+		stack_pop(&AST_STACK, (void **)&(func->lvdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	ANCESTOR ROUND_BRACKET_L decimal_value ROUND_BRACKET_R {
+		ASTMemberFn_Ancestor *func = mam_alloc(sizeof(ASTMemberFn_Ancestor), OBJ_TYPE__ASTMemberFn_Ancestor, NULL, 0);
+		func->head.interpret = interpret_Ancestor;
+
+		long dist;
+		stack_pop(&AST_STACK, (void **)&dist);
+		func->distance = (unsigned int)dist;
+
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 insert_cube_measures:
@@ -2882,6 +2927,38 @@ boolean_function:
 	logical_func_IsAncestor {}
   |
 	logical_func_IsGeneration {}
+  |
+	logical_func_IsLeaf {}
+  |
+	logical_func_IsSibling {}
+;
+
+logical_func_IsSibling:
+	IS_SIBLING ROUND_BRACKET_L mdm_entity_universal_path COMMA mdm_entity_universal_path COMMA VAR ROUND_BRACKET_R {
+		ASTLogicalFunc_IsSibling *func = mam_alloc(sizeof(ASTLogicalFunc_IsSibling), OBJ_TYPE__ASTLogicalFunc_IsSibling, NULL, 0);
+		func->head.interpret = interpret_IsSibling;
+		func->include_member = 1;
+		stack_pop(&AST_STACK, (void **)&(func->mrdef2));
+		stack_pop(&AST_STACK, (void **)&(func->mrdef1));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	IS_SIBLING ROUND_BRACKET_L mdm_entity_universal_path COMMA mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTLogicalFunc_IsSibling *func = mam_alloc(sizeof(ASTLogicalFunc_IsSibling), OBJ_TYPE__ASTLogicalFunc_IsSibling, NULL, 0);
+		func->head.interpret = interpret_IsSibling;
+		stack_pop(&AST_STACK, (void **)&(func->mrdef2));
+		stack_pop(&AST_STACK, (void **)&(func->mrdef1));
+		stack_push(&AST_STACK, func);
+	}
+;
+
+logical_func_IsLeaf:
+	IS_LEAF ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTLogicalFunc_IsLeaf *func = mam_alloc(sizeof(ASTLogicalFunc_IsLeaf), OBJ_TYPE__ASTLogicalFunc_IsLeaf, NULL, 0);
+		func->head.interpret = interpret_IsLeaf;
+		stack_pop(&AST_STACK, (void **)&(func->mrdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 logical_func_IsGeneration:

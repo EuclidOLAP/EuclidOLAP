@@ -309,6 +309,10 @@ LastSibling {
 	return LAST_SIBLING;
 }
 
+Ancestor {
+	return ANCESTOR;
+}
+
 Lag {
 	return LAG;
 }
@@ -399,6 +403,14 @@ IsAncestor {
 
 IsGeneration {
 	return IS_GENERATION;
+}
+
+IsLeaf {
+	return IS_LEAF;
+}
+
+IsSibling {
+	return IS_SIBLING;
 }
 
 IsEmpty {

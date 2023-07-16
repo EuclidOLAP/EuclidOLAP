@@ -791,3 +791,42 @@ void *interpret_nextmember(void *md_ctx, void *mrole_, void *nm, void *ctx_tuple
 	}
 	return meam ? mdd_mr__create(meam, mrole->dim_role) : mrole;
 }
+
+// for ASTMemberFn_Ancestor
+void *interpret_Ancestor(void *md_ctx_, void *mr, void *anc, void *ctx_tuple_, void *cube_) {
+
+	ASTMemberFn_Ancestor *ancestor = anc;
+
+	MddMemberRole *mrole = mr;
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
+		mrole = up_evolving(md_ctx_, ancestor->mrdef, cube_, ctx_tuple_);
+		if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: interpret_Ancestor - The member cannot be determined.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}		
+	}
+
+	if (ancestor->lvdef) {
+		LevelRole *lvrole = up_evolving(md_ctx_, ancestor->lvdef, cube_, ctx_tuple_);
+		if (!lvrole || obj_type_of(lvrole) != OBJ_TYPE__LevelRole) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: interpret_Ancestor - The level cannot be determined.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}
+		ancestor->distance = mrole->member->lv - lvrole->lv->level;
+	}
+
+	if (ancestor->distance < 0 || mrole->member->lv - ancestor->distance < 0) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: interpret_Ancestor - Invalid distance.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+	}
+
+	Member *m = mrole->member;
+	for (int i=0;i<ancestor->distance;i++) {
+		m = find_member_by_gid(m->p_gid);
+	}
+
+	return mdd_mr__create(m, mrole->dim_role);
+}

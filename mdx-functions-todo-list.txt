@@ -33,15 +33,12 @@
 	Is		(O)
 	IsAccType		(O)
 	IsChild		(O)
-	IsLeaf		(M) (O)
 	IsLevel		(O)
-	IsSibling		(M) (O)
 	IsUda		(O)
 	IsValid		(O)
 
 
 << Member Functions >>
-	Ancestor		(M) (O)
 	Cousin		(M) (O)
 	CurrentAxisMember		(O)
 	DataMember		(M)
@@ -189,6 +186,8 @@
 	Case				[E] [I] [M] [O]
 	IsAncestor			[E] [M] [O]
 	IsGeneration		[E] [M] [O]
+	IsLeaf				[E] [M] [O]
+	IsSibling			[E] [M] [O]
 
 << Member Functions >>
 	ClosingPeriod		[E] [I] [M] [O]
@@ -204,6 +203,7 @@
 	Parent				[E] [I] [M] [O]
 	PrevMember			[E] [I] [M] [O]
 	NextMember			[E] [I] [M] [O]
+	Ancestor			[E] [M] [O]
 
 
 << Numeric Functions >>

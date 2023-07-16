@@ -1775,6 +1775,78 @@ from [Airline B]
 
 ---
 
+select
+filter(
+    [Classes of Service].members, IsLeaf([Classes of Service].currentmember)
+) on 0,
+filter(
+    [Aircraft Models].members, not IsLeaf([Aircraft Models].currentmember)
+) on 1
+from [Airline A]
+
+---
+
+select
+filter(
+    [Classes of Service].members, not IsLeaf([Classes of Service].currentmember)
+) on 0,
+filter(
+    [Aircraft Models].members,  IsLeaf([Aircraft Models].currentmember)
+) on 1
+from [Airline A]
+
+---
+
+// IsSibling
+select
+filter(
+    [Classes of Service].members, not IsLeaf([Classes of Service].currentmember)
+) on 0,
+filter(
+    [Aircraft Models].members,  IsSibling([Aircraft Models].currentmember, [Aircraft Models].root.FirstChild)
+) on 1
+from [Airline A]
+
+---
+
+// IsSibling
+select
+filter(
+    [Classes of Service].members, not IsLeaf([Classes of Service].currentmember)
+) on 0,
+filter(
+    [Aircraft Models].members,  IsSibling([Aircraft Models].currentmember, [Aircraft Models].root.FirstChild, include_member)
+) on 1
+from [Airline B]
+
+---
+
+with
+member Date.AAA as 123
+member Date.SSS as 222333
+member Date.DDD as 777777777
+select
+{Date.AAA, Date.SSS, Date.DDD, Date.AAA,
+    Ancestor(Date.[2022].Q1.M3, 2)
+} on 1,
+[Measures].members on 0
+from [Airline A]
+
+---
+
+with
+member Date.AAA as 123
+member Date.SSS as 222333
+member Date.DDD as 777777777
+select
+{Date.AAA, Date.SSS, Date.DDD, Date.AAA,
+    Date.[2022].Q1.M3.Ancestor(Date.Quarter)
+} on 1,
+[Measures].members on 0
+from [Airline B]
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
