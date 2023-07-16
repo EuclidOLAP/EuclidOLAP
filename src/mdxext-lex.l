@@ -313,6 +313,10 @@ Ancestor {
 	return ANCESTOR;
 }
 
+Cousin {
+	return COUSIN;
+}
+
 Lag {
 	return LAG;
 }

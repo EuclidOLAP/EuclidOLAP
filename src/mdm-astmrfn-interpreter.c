@@ -830,3 +830,43 @@ void *interpret_Ancestor(void *md_ctx_, void *mr, void *anc, void *ctx_tuple_, v
 
 	return mdd_mr__create(m, mrole->dim_role);
 }
+
+// for ASTMemberFn_Cousin
+void *interpret_Cousin(void *md_ctx_, void *mr, void *cousin_, void *ctx_tuple_, void *cube_) {
+	ASTMemberFn_Cousin *cousin = cousin_;
+
+	MddMemberRole *mrole = mr;
+	if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
+		mrole = up_evolving(md_ctx_, cousin->mrdef, cube_, ctx_tuple_);
+		if (!mrole || obj_type_of(mrole) != OBJ_TYPE__MddMemberRole) {
+			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+			thrd_mam->exception_desc = "exception: interpret_Cousin - The member cannot be determined.";
+			longjmp(thrd_mam->excep_ctx_env, -1);
+		}		
+	}
+
+	MddMemberRole *ance = up_evolving(md_ctx_, cousin->ancedef, cube_, ctx_tuple_);
+	if (!ance || obj_type_of(ance) != OBJ_TYPE__MddMemberRole) {
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: interpret_Cousin - The ance cannot be determined.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
+
+	ArrayList *siblings = find_member_children(find_member_by_gid(mrole->member->p_gid));
+	int idx = -1;
+	for (int i=0;i<als_size(siblings);i++) {
+		Member *sibling = als_get(siblings, i);
+		if (sibling->gid == mrole->member->gid) {
+			idx = i;
+			break;
+		}
+	}
+
+	siblings = find_member_children(ance->member);
+
+	if (idx < als_size(siblings)) {
+		return mdd_mr__create(als_get(siblings, idx), ance->dim_role);
+	}
+
+	return NULL;
+}

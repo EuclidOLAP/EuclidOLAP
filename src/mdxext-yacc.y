@@ -106,6 +106,7 @@ Stack AST_STACK = { 0 };
 %token LEAD				/* Lead */
 %token NEXT_MEMBER		/* NextMember */
 %token ANCESTOR			/* Ancestor */
+%token COUSIN			/* Cousin */
 
 /* Numeric Functions key words */
 %token SUM				/* sum */
@@ -2518,6 +2519,25 @@ member_function:
 	member_func_next_member {}
   |
 	member_func_Ancestor {}
+  |
+	member_func_Cousin {}
+;
+
+member_func_Cousin:
+	COUSIN ROUND_BRACKET_L mdm_entity_universal_path COMMA mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_Cousin *func = mam_alloc(sizeof(ASTMemberFn_Cousin), OBJ_TYPE__ASTMemberFn_Cousin, NULL, 0);
+		func->head.interpret = interpret_Cousin;
+		stack_pop(&AST_STACK, (void **)&(func->ancedef));
+		stack_pop(&AST_STACK, (void **)&(func->mrdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	COUSIN ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_Cousin *func = mam_alloc(sizeof(ASTMemberFn_Cousin), OBJ_TYPE__ASTMemberFn_Cousin, NULL, 0);
+		func->head.interpret = interpret_Cousin;
+		stack_pop(&AST_STACK, (void **)&(func->ancedef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 member_func_Ancestor:

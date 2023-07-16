@@ -127,4 +127,14 @@ typedef struct
 // for ASTMemberFn_Ancestor
 void *interpret_Ancestor(void *md_ctx_, void *mr, void *anc, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *mrdef;
+    MDMEntityUniversalPath *ancedef;
+} ASTMemberFn_Cousin;
+
+// for ASTMemberFn_Cousin
+void *interpret_Cousin(void *md_ctx_, void *mr, void *cousin_, void *ctx_tuple_, void *cube_);
+
 #endif
