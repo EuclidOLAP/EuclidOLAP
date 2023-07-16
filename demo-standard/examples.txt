@@ -1854,6 +1854,17 @@ from [Airline A] ;
 
 ---
 
+select
+{
+    Date.DefaultMember,
+    Date.Financial.DefaultMember
+}
+ on 1,
+[Measures].members on 0
+from [Airline B]
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

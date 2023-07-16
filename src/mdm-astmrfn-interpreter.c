@@ -870,3 +870,52 @@ void *interpret_Cousin(void *md_ctx_, void *mr, void *cousin_, void *ctx_tuple_,
 
 	return NULL;
 }
+
+// for ASTMemberFn_DefaultMember
+void *interpret_DefaultMember(void *md_ctx_, void *dhr, void *defm, void *ctx_tuple_, void *cube_) {
+	ASTMemberFn_DefaultMember *default_member = defm;
+
+	DimensionRole *drole = NULL;
+	Hierarchy *hy = NULL;
+
+	if (dhr && obj_type_of(dhr) == OBJ_TYPE__HierarchyRole) {
+		HierarchyRole *hyrole = dhr;
+		hy = hyrole->hierarchy;
+		drole = hyrole->dim_role;
+		goto p0;
+	}
+
+	if (dhr && obj_type_of(dhr) == OBJ_TYPE__DimensionRole) {
+		drole = dhr;
+		Dimension *dim = find_dim_by_gid(drole->dim_gid);
+		hy = find_hierarchy(dim->def_hierarchy_gid);
+		goto p0;
+	}
+
+	void *unrole = up_evolving(md_ctx_, default_member->dhdef, cube_, ctx_tuple_);
+
+	if (unrole && obj_type_of(unrole) == OBJ_TYPE__HierarchyRole) {
+		HierarchyRole *hyrole = unrole;
+		hy = hyrole->hierarchy;
+		drole = hyrole->dim_role;
+		goto p0;
+	}
+
+	if (unrole && obj_type_of(unrole) == OBJ_TYPE__DimensionRole) {
+		drole = unrole;
+		Dimension *dim = find_dim_by_gid(drole->dim_gid);
+		hy = find_hierarchy(dim->def_hierarchy_gid);
+		goto p0;
+	}
+
+p0:
+
+	for (int i=0; i<als_size(member_pool) ;i++) {
+		Member *m = als_get(member_pool, i);
+		if (m->hierarchy_gid == hy->gid && m->p_gid == 0) {
+			return mdd_mr__create(m, drole);
+		}
+	}
+
+	return NULL;
+}
