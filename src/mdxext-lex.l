@@ -393,6 +393,14 @@ coalesceEmpty {
 	return COALESCE_EMPTY;
 }
 
+IsAncestor {
+	return IS_ANCESTOR;
+}
+
+IsGeneration {
+	return IS_GENERATION;
+}
+
 IsEmpty {
 	return IS_EMPTY;
 }
