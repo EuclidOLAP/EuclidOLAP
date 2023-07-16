@@ -309,6 +309,10 @@ LastSibling {
 	return LAST_SIBLING;
 }
 
+Ancestor {
+	return ANCESTOR;
+}
+
 Lag {
 	return LAG;
 }

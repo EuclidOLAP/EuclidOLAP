@@ -1822,6 +1822,32 @@ from [Airline B]
 ---
 
 with
+member Date.AAA as 123
+member Date.SSS as 222333
+member Date.DDD as 777777777
+select
+{Date.AAA, Date.SSS, Date.DDD, Date.AAA,
+    Ancestor(Date.[2022].Q1.M3, 2)
+} on 1,
+[Measures].members on 0
+from [Airline A]
+
+---
+
+with
+member Date.AAA as 123
+member Date.SSS as 222333
+member Date.DDD as 777777777
+select
+{Date.AAA, Date.SSS, Date.DDD, Date.AAA,
+    Date.[2022].Q1.M3.Ancestor(Date.Quarter)
+} on 1,
+[Measures].members on 0
+from [Airline B]
+
+---
+
+with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
 select

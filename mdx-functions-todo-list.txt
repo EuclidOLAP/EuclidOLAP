@@ -39,7 +39,6 @@
 
 
 << Member Functions >>
-	Ancestor		(M) (O)
 	Cousin		(M) (O)
 	CurrentAxisMember		(O)
 	DataMember		(M)
@@ -204,6 +203,7 @@
 	Parent				[E] [I] [M] [O]
 	PrevMember			[E] [I] [M] [O]
 	NextMember			[E] [I] [M] [O]
+	Ancestor			[E] [M] [O]
 
 
 << Numeric Functions >>

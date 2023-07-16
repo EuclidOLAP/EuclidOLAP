@@ -105,6 +105,7 @@ Stack AST_STACK = { 0 };
 %token LAG				/* Lag */
 %token LEAD				/* Lead */
 %token NEXT_MEMBER		/* NextMember */
+%token ANCESTOR			/* Ancestor */
 
 /* Numeric Functions key words */
 %token SUM				/* sum */
@@ -2515,6 +2516,48 @@ member_function:
 	member_func_opening_period {}
   |
 	member_func_next_member {}
+  |
+	member_func_Ancestor {}
+;
+
+member_func_Ancestor:
+	ANCESTOR ROUND_BRACKET_L mdm_entity_universal_path COMMA mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_Ancestor *func = mam_alloc(sizeof(ASTMemberFn_Ancestor), OBJ_TYPE__ASTMemberFn_Ancestor, NULL, 0);
+		func->head.interpret = interpret_Ancestor;
+		stack_pop(&AST_STACK, (void **)&(func->lvdef));
+		stack_pop(&AST_STACK, (void **)&(func->mrdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	ANCESTOR ROUND_BRACKET_L mdm_entity_universal_path COMMA decimal_value ROUND_BRACKET_R {
+		ASTMemberFn_Ancestor *func = mam_alloc(sizeof(ASTMemberFn_Ancestor), OBJ_TYPE__ASTMemberFn_Ancestor, NULL, 0);
+		func->head.interpret = interpret_Ancestor;
+
+		long dist;
+		stack_pop(&AST_STACK, (void **)&dist);
+		func->distance = (unsigned int)dist;
+
+		stack_pop(&AST_STACK, (void **)&(func->mrdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	ANCESTOR ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTMemberFn_Ancestor *func = mam_alloc(sizeof(ASTMemberFn_Ancestor), OBJ_TYPE__ASTMemberFn_Ancestor, NULL, 0);
+		func->head.interpret = interpret_Ancestor;
+		stack_pop(&AST_STACK, (void **)&(func->lvdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	ANCESTOR ROUND_BRACKET_L decimal_value ROUND_BRACKET_R {
+		ASTMemberFn_Ancestor *func = mam_alloc(sizeof(ASTMemberFn_Ancestor), OBJ_TYPE__ASTMemberFn_Ancestor, NULL, 0);
+		func->head.interpret = interpret_Ancestor;
+
+		long dist;
+		stack_pop(&AST_STACK, (void **)&dist);
+		func->distance = (unsigned int)dist;
+
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 insert_cube_measures:
