@@ -1866,6 +1866,33 @@ from [Airline B]
 ---
 
 with
+member [Measures].XXXXXX as Name(Level([Ending Point].CurrentMember))
+select
+[Ending Point].members on rows,
+[Measures].XXXXXX on columns
+from [Airline B];
+
+---
+
+with
+member [Measures].XXXXXX as [Classes of Service].CurrentMember().Level.Name()
+select
+[Classes of Service].members on rows,
+[Measures].XXXXXX on columns
+from [Airline A];
+
+---
+
+with
+member [Measures].XXXXXX as Date.CurrentMember().Level.Name()
+select
+[Date].members on rows,
+[Measures].XXXXXX on columns
+from [Airline A];
+
+---
+
+with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
 select
