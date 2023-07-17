@@ -24,7 +24,6 @@
 << Level Functions >>
 	Generation		(O)
 	Generations		(O)
-	Level		(M) (O)
 	Levels		(M) (O)
 
 
@@ -177,6 +176,7 @@
 
 
 << Level Functions >>
+	Level			[E] [M] [O]
 
 
 << Logical Functions >>

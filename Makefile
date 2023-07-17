@@ -18,7 +18,8 @@ SRC_FILES = src/cfg.c \
 	src/mathematics.c \
 	src/env.c \
 	src/mdm-ast-set-func.c \
-	src/mdm-ast-num-func.c
+	src/mdm-ast-num-func.c \
+	src/mdm-ast-lv-func.c
 OBJ_FILES = src/cfg.o \
 	src/net.o \
 	src/utils.o \
@@ -39,7 +40,8 @@ OBJ_FILES = src/cfg.o \
 	src/mathematics.o \
 	src/env.o \
 	src/mdm-ast-set-func.o \
-	src/mdm-ast-num-func.o
+	src/mdm-ast-num-func.o \
+	src/mdm-ast-lv-func.o
 
 euclid: src/euclid-svr.c src/euclid-cli.c $(SRC_FILES) src/euclid-svr.o src/euclid-cli.o $(OBJ_FILES)
 	cc      $(OBJ_FILES)  src/euclid-svr.o  -o src/euclid-svr      -lpthread -lm

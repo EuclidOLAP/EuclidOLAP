@@ -29,6 +29,10 @@ hierarchy {
 	return HIERARCHY;
 }
 
+Level {
+	return LEVEL;
+}
+
 levels {
 	return LEVELS;
 }

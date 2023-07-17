@@ -428,6 +428,27 @@ do_create:
 	append_file_data(get_cfg()->profiles.members, (char *)member, sizeof(Member));
 	als_add(member_pool, member);
 
+	Level *lvl = NULL;
+	for (int i=0;i<als_size(levels_pool);i++) {
+		lvl = als_get(levels_pool, i);
+		if (lvl->hierarchy_gid == member->hierarchy_gid && lvl->level == member->lv) {
+			break;
+		}
+		lvl = NULL;
+	}
+
+	if (!lvl) {
+		lvl = mam_alloc(sizeof(Level), OBJ_TYPE__Level, meta_mam, 0);
+		lvl->gid = gen_md_gid();
+		sprintf(lvl->name, "Level %d", member->lv);
+		lvl->dim_gid = member->dim_gid;
+		lvl->level = member->lv;
+		lvl->hierarchy_gid = member->hierarchy_gid;
+
+		mdd__save_level(lvl);
+		mdd__use_level(lvl);
+	}
+
 	return member;
 }
 
@@ -2270,6 +2291,10 @@ static void *_up_interpret_0(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube
 		return ((ASTFunctionCommonHead *)seg_0)->interpret(md_ctx, NULL, seg_0, ctx_tuple, cube);
 	}
 
+	if (is_type_ast_lv_func(_type)) {
+		return ((ASTFunctionCommonHead *)seg_0)->interpret(md_ctx, NULL, seg_0, ctx_tuple, cube);
+	}
+
 	MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 	thrd_mam->exception_desc = "ERR: An unknown multidimensional entity definition prevents MDX from being resolved.";
 	longjmp(thrd_mam->excep_ctx_env, -1);
@@ -2671,6 +2696,11 @@ void *up_evolving(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube *cube, Mdd
 		}
 
 		if (is_type_ast_set_func(_type)) {
+			entity = ((ASTFunctionCommonHead *)elei)->interpret(md_ctx, entity, elei, ctx_tuple, cube);
+			continue;
+		}
+
+		if (is_type_ast_lv_func(_type)) {
 			entity = ((ASTFunctionCommonHead *)elei)->interpret(md_ctx, entity, elei, ctx_tuple, cube);
 			continue;
 		}

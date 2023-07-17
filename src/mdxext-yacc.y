@@ -10,6 +10,7 @@
 #include "mdm-ast-str-fn.h"
 #include "mdm-ast-set-func.h"
 #include "mdm-ast-num-func.h"
+#include "mdm-ast-lv-func.h"
 
 int yyerror(const char *);
 
@@ -21,6 +22,8 @@ extern void eucparser_cleanup();
 extern char *yytext;
 
 Stack AST_STACK = { 0 };
+
+static void ast_func_append_to_up(void);
 %}
 
 %token EOF_			/* <<EOF>> */
@@ -147,6 +150,9 @@ Stack AST_STACK = { 0 };
 %token IS_SIBLING		/* IsSibling */
 
 %token NOT			/* Not */
+
+/* Level Functions */
+%token LEVEL				/* Level */
 
 /* String Functions */
 %token NAME				/* Name */
@@ -2604,6 +2610,31 @@ member_func_Ancestor:
 	}
 ;
 
+level_function:
+	lv_func_Level {}
+;
+
+lv_func_Level:
+	LEVEL ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTLvFunc_Level *func = mam_alloc(sizeof(ASTLvFunc_Level), OBJ_TYPE__ASTLvFunc_Level, NULL, 0);
+		func->head.interpret = interpret_Level;
+		stack_pop(&AST_STACK, (void **)&(func->mrdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	LEVEL ROUND_BRACKET_L ROUND_BRACKET_R {
+		ASTLvFunc_Level *func = mam_alloc(sizeof(ASTLvFunc_Level), OBJ_TYPE__ASTLvFunc_Level, NULL, 0);
+		func->head.interpret = interpret_Level;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	LEVEL {
+		ASTLvFunc_Level *func = mam_alloc(sizeof(ASTLvFunc_Level), OBJ_TYPE__ASTLvFunc_Level, NULL, 0);
+		func->head.interpret = interpret_Level;
+		stack_push(&AST_STACK, func);
+	}
+;
+
 insert_cube_measures:
 	INSERT var_or_block vector_measures {
 		IDSVectorMears *ids_vm;
@@ -3097,45 +3128,33 @@ mdm_entity_universal_path:
 		stack_push(&AST_STACK, up);
 	}
   |
-	mdm_entity_universal_path DOT mdm_entity_up_segment {
-		MdmEntityUpSegment *up_seg = NULL;
-		stack_pop(&AST_STACK, (void **) &up_seg);
-		MDMEntityUniversalPath *up = NULL;
-		stack_pop(&AST_STACK, (void **) &up);
-
-		als_add(up->list, up_seg);
+	level_function {
+		void *lv_func = NULL;
+		stack_pop(&AST_STACK, (void **) &lv_func);
+		MDMEntityUniversalPath *up = mam_alloc(sizeof(MDMEntityUniversalPath), OBJ_TYPE__MDMEntityUniversalPath, NULL, 0);
+		up->list = als_new(8, NULL, THREAD_MAM, NULL);
+		als_add(up->list, lv_func);
 		stack_push(&AST_STACK, up);
-
+	}
+  |
+	mdm_entity_universal_path DOT mdm_entity_up_segment {
+		ast_func_append_to_up();
 	}
   |
 	mdm_entity_universal_path DOT member_function {
-		void *member_func = NULL;
-		stack_pop(&AST_STACK, (void **) &member_func);
-		MDMEntityUniversalPath *up = NULL;
-		stack_pop(&AST_STACK, (void **) &up);
-
-		als_add(up->list, member_func);
-		stack_push(&AST_STACK, up);
+		ast_func_append_to_up();
 	}
   |
 	mdm_entity_universal_path DOT set_function {
-		void *suf_setfn_tpl = NULL;
-		stack_pop(&AST_STACK, (void **) &suf_setfn_tpl);
-		MDMEntityUniversalPath *up = NULL;
-		stack_pop(&AST_STACK, (void **) &up);
-
-		als_add(up->list, suf_setfn_tpl);
-		stack_push(&AST_STACK, up);
+		ast_func_append_to_up();
 	}
   |
 	mdm_entity_universal_path DOT string_function {
-		void *strfunc = NULL;
-		stack_pop(&AST_STACK, (void **) &strfunc);
-		MDMEntityUniversalPath *up = NULL;
-		stack_pop(&AST_STACK, (void **) &up);
-
-		als_add(up->list, strfunc);
-		stack_push(&AST_STACK, up);
+		ast_func_append_to_up();
+	}
+  |
+	mdm_entity_universal_path DOT level_function {
+		ast_func_append_to_up();
 	}
 ;
 
@@ -3340,3 +3359,12 @@ int yyerror(const char *s)
     return -100;
 }
 // yacc_f_004
+
+static void ast_func_append_to_up(void) {
+	void *ast_func = NULL;
+	stack_pop(&AST_STACK, (void **) &ast_func);
+	MDMEntityUniversalPath *up = NULL;
+	stack_pop(&AST_STACK, (void **) &up);
+	als_add(up->list, ast_func);
+	stack_push(&AST_STACK, up);
+}

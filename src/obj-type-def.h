@@ -13,6 +13,7 @@ typedef short type_obj;
 #define is_type_ast_str_func(obj_type) (obj_type >= OBJ_TYPE__AST_STR_FUNC__MIN && obj_type <= OBJ_TYPE__AST_STR_FUNC__MAX)
 #define is_type_ast_set_func(obj_type) (obj_type >= OBJ_TYPE__AST_SET_FUNC_MIN && obj_type <= OBJ_TYPE__AST_SET_FUNC_MAX)
 #define is_type_ast_num_func(obj_type) (obj_type >= OBJ_TYPE__ASTNUMFUNC_MIN && obj_type <= OBJ_TYPE__ASTNUMFUNC_MAX)
+#define is_type_ast_lv_func(obj_type) (obj_type >= OBJ_TYPE__ASTLVFUNC_MIN && obj_type <= OBJ_TYPE__ASTLVFUNC_MAX)
 
 
 // The range reserved for the member functions of the AST is 1 ~ 200.
@@ -106,6 +107,12 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTNumFunc_Var        515
 #define OBJ_TYPE__ASTNumFunc_CaseStatement        516
 #define OBJ_TYPE__ASTNUMFUNC_MAX        600
+
+
+// The range reserved for the Level functions of the AST is 601 ~ 700.
+#define OBJ_TYPE__ASTLVFUNC_MIN        601
+#define OBJ_TYPE__ASTLvFunc_Level        601
+#define OBJ_TYPE__ASTLVFUNC_MAX        700
 
 
 #define OBJ_TYPE__RAW_BYTES 10001
