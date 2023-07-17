@@ -1899,6 +1899,30 @@ from [Airline B]
 
 ---
 
+with 
+member [Measures].EEEEEE
+  as Date.currentMember.level.Ordinal() + 200000
+member [Measures].QQQQQQ
+  as [Measures].EEEEEE + 100000
+select 
+  [Measures].EEEEEE on 1,
+  Date.members on 10 
+from [Airline B] 
+where ([Ending Point].[South America]);
+
+---
+
+with 
+member [Measures].EEEEEE
+  // as Date.currentMember.level.Ordinal()
+  as Ordinal(Date.currentMember.level)
+select 
+  [Measures].EEEEEE on 1,
+  Date.members on 10 
+from [Airline B];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

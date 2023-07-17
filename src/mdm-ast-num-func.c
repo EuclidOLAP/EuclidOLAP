@@ -729,3 +729,24 @@ void *interpret_CaseStatement(void *md_ctx_, void *nil, void *cs, void *ctx_tupl
     res_cell->null_flag = 1;
     return res_cell;
 }
+
+// for ASTNumFunc_Ordinal
+void *interpret_Ordinal(void *md_ctx_, void *lvrole_, void *ordinal_, void *ctx_tuple_, void *cube_) {
+    ASTNumFunc_Ordinal *ordinal = ordinal_;
+
+	LevelRole *lvrole = lvrole_;
+	if (!lvrole || obj_type_of(lvrole) != OBJ_TYPE__LevelRole) {
+	    lvrole = up_evolving(md_ctx_, ordinal->lrdef, cube_, ctx_tuple_);
+    	if (!lvrole || obj_type_of(lvrole) != OBJ_TYPE__LevelRole) {
+            MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+            thrd_mam->exception_desc = "exception: interpret_Ordinal - The Level cannot be determined.";
+            longjmp(thrd_mam->excep_ctx_env, -1);
+        }
+	}
+
+    GridData *res_cell = mam_alloc(sizeof(GridData), OBJ_TYPE__GridData, NULL, 0);
+    res_cell->type = GRIDDATA_TYPE_NUM;
+    res_cell->val = lvrole->lv->level;
+
+    return res_cell;
+}

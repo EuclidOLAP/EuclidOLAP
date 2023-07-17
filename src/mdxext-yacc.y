@@ -135,6 +135,7 @@ static void ast_func_append_to_up(void);
 %token LIN_REG_VARIANCE		/* LinRegVariance */
 %token STDEV				/* Stdev */
 %token FN_VAR				/* Var */
+%token ORDINAL				/* Ordinal */
 
 %token CASE			/* Case */
 %token ELSE			/* Else */
@@ -699,6 +700,29 @@ expression_function:
 	exp_fn__Stdev {}
   |
 	exp_fn__Var {}
+  |
+	exp_fn__Ordinal {}
+;
+
+exp_fn__Ordinal:
+	ORDINAL ROUND_BRACKET_L mdm_entity_universal_path ROUND_BRACKET_R {
+		ASTNumFunc_Ordinal *func = mam_alloc(sizeof(ASTNumFunc_Ordinal), OBJ_TYPE__ASTNumFunc_Ordinal, NULL, 0);
+		func->head.interpret = interpret_Ordinal;
+		stack_pop(&AST_STACK, (void **) &(func->lrdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	ORDINAL ROUND_BRACKET_L ROUND_BRACKET_R {
+		ASTNumFunc_Ordinal *func = mam_alloc(sizeof(ASTNumFunc_Ordinal), OBJ_TYPE__ASTNumFunc_Ordinal, NULL, 0);
+		func->head.interpret = interpret_Ordinal;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	ORDINAL {
+		ASTNumFunc_Ordinal *func = mam_alloc(sizeof(ASTNumFunc_Ordinal), OBJ_TYPE__ASTNumFunc_Ordinal, NULL, 0);
+		func->head.interpret = interpret_Ordinal;
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 exp_fn__Var:
@@ -3173,6 +3197,10 @@ mdm_entity_universal_path:
 	}
   |
 	mdm_entity_universal_path DOT level_function {
+		ast_func_append_to_up();
+	}
+  |
+	mdm_entity_universal_path DOT expression_function {
 		ast_func_append_to_up();
 	}
 ;

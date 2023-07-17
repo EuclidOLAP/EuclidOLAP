@@ -177,6 +177,10 @@ LinRegVariance {
 	return LIN_REG_VARIANCE;
 }
 
+Ordinal {
+	return ORDINAL;
+}
+
 Stdev {
 	return STDEV;
 }
