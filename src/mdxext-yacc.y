@@ -2612,6 +2612,25 @@ member_func_Ancestor:
 
 level_function:
 	lv_func_Level {}
+  |
+	lv_func_Levels {}
+;
+
+lv_func_Levels:
+	LEVELS ROUND_BRACKET_L mdm_entity_universal_path COMMA expression ROUND_BRACKET_R {
+		ASTLvFunc_Levels *func = mam_alloc(sizeof(ASTLvFunc_Levels), OBJ_TYPE__ASTLvFunc_Levels, NULL, 0);
+		func->head.interpret = interpret_Levels;
+		stack_pop(&AST_STACK, (void **)&(func->lvexp));
+		stack_pop(&AST_STACK, (void **)&(func->dhdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	LEVELS ROUND_BRACKET_L expression ROUND_BRACKET_R {
+		ASTLvFunc_Levels *func = mam_alloc(sizeof(ASTLvFunc_Levels), OBJ_TYPE__ASTLvFunc_Levels, NULL, 0);
+		func->head.interpret = interpret_Levels;
+		stack_pop(&AST_STACK, (void **)&(func->lvexp));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 lv_func_Level:

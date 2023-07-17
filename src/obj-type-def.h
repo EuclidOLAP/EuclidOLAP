@@ -112,6 +112,7 @@ typedef short type_obj;
 // The range reserved for the Level functions of the AST is 601 ~ 700.
 #define OBJ_TYPE__ASTLVFUNC_MIN        601
 #define OBJ_TYPE__ASTLvFunc_Level        601
+#define OBJ_TYPE__ASTLvFunc_Levels        602
 #define OBJ_TYPE__ASTLVFUNC_MAX        700
 
 
