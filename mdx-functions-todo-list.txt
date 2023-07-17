@@ -72,7 +72,6 @@
 	Mod		(O)
 	NonEmptyCount		(O)
 	NTile		(O)
-	Ordinal		(M) (O)
 	Percentile		(O)
 	Power		(O)
 	Predict		(M)
@@ -227,6 +226,7 @@
 	LinRegVariance		[E] [I] [M]
 	Stdev				[E] [I] [M]
 	Var					[E] [I] [M]
+	Ordinal				[E] [M] [O]
 
 
 << Set Functions >>

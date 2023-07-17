@@ -183,4 +183,13 @@ typedef struct
 // for ASTNumFunc_CaseStatement
 void *interpret_CaseStatement(void *md_ctx_, void *nil, void *cs, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    MDMEntityUniversalPath *lrdef;
+} ASTNumFunc_Ordinal;
+
+// for ASTNumFunc_Ordinal
+void *interpret_Ordinal(void *md_ctx_, void *lvrole_, void *ordinal_, void *ctx_tuple_, void *cube_);
+
 #endif

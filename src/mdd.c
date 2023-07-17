@@ -2705,6 +2705,11 @@ void *up_evolving(MDContext *md_ctx, MDMEntityUniversalPath *up, Cube *cube, Mdd
 			continue;
 		}
 
+		if (is_type_ast_num_func(_type)) {
+			entity = ((ASTFunctionCommonHead *)elei)->interpret(md_ctx, entity, elei, ctx_tuple, cube);
+			continue;
+		}
+
 		// TODO elei is a define of AST set function.
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 		thrd_mam->exception_desc = "exception: // TODO up_evolving :: Code is missing.";
