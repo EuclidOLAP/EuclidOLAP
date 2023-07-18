@@ -337,4 +337,15 @@ typedef struct
 // for ASTSetFunc_Head
 void *interpret_Head(void *md_ctx_, void *nil, void *head_, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    int index;
+    int count;
+} ASTSetFunc_Subset;
+
+// for ASTSetFunc_Subset
+void *interpret_Subset(void *md_ctx_, void *nil, void *ss, void *ctx_tuple_, void *cube_);
+
 #endif

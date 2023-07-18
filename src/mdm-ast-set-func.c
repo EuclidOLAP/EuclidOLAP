@@ -1673,3 +1673,23 @@ void *interpret_Head(void *md_ctx_, void *nil, void *head_, void *ctx_tuple_, vo
 
 	return set;
 }
+
+// for ASTSetFunc_Subset
+void *interpret_Subset(void *md_ctx_, void *nil, void *ss, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_Subset *subset = ss;
+
+	MddSet *set = ids_setdef__build(md_ctx_, subset->setdef, ctx_tuple_, cube_);
+
+	MddSet *rsset = mdd_set__create();
+
+	if (subset->index >= (int) als_size(set->tuples) || subset->index < 0)
+		return rsset;
+
+	for (int i=0;i<subset->count;i++)
+		if (subset->index + i >= (int) als_size(set->tuples))
+			break;
+		else
+			mddset__add_tuple(rsset, als_get(set->tuples, subset->index + i));
+
+	return rsset;
+}

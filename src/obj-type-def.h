@@ -87,6 +87,7 @@ typedef short type_obj;
 #define OBJ_TYPE__ASTSetFunc_QTD         426
 #define OBJ_TYPE__ASTSetFunc_Generate         427
 #define OBJ_TYPE__ASTSetFunc_Head         428
+#define OBJ_TYPE__ASTSetFunc_Subset         429
 #define OBJ_TYPE__AST_SET_FUNC_MAX        500
 
 

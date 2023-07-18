@@ -109,7 +109,6 @@
 	Siblings		(M)
 	StripCalculatedMembers		(M)
 	StrToSet		(M)
-	Subset		(M) (O)
 	ToggleDrillState		(M)
 	TupleRange		(O)
 	Unorder		(M)
@@ -260,6 +259,7 @@
 	PeriodsToDate				[E] [I] [M] [O]
 	Generate					[E] [M] [O]
 	Head						[E] [M] [O]
+	Subset						[E] [M] [O]
 
 << String Functions >>
 	Name			[E] [I] [M]

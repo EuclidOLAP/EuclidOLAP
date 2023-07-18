@@ -2005,6 +2005,49 @@ from [Airline B] ;
 
 ---
 
+select
+  Children([Aircraft Models].[Boeing]) on rows,
+  CrossJoin(Children(Date.Root), { [Measures].Cost }) on 111
+from [Airline A];
+
+---
+
+select
+  Children([Aircraft Models].[Boeing]) on rows,
+  Subset(
+    CrossJoin(Children(Date.Root), { [Measures].Cost }), 0
+  ) on 111
+from [Airline A];
+
+---
+
+select
+  Children([Aircraft Models].[Boeing]) on rows,
+  Subset(
+    CrossJoin(Children(Date.Root), { [Measures].Cost }), 3, 3
+  ) on 111
+from [Airline A];
+
+---
+
+select
+  Children([Aircraft Models].[Boeing]) on rows,
+  Subset(
+    CrossJoin(Children(Date.Root), { [Measures].Cost }), 1, 3
+  ) on 111
+from [Airline A];
+
+---
+
+select
+  Children([Aircraft Models].[Boeing]) on rows,
+  Subset(
+    CrossJoin(Children(Date.Root), { [Measures].Cost }), 100, -101
+  ) on 111
+from [Airline A];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880
