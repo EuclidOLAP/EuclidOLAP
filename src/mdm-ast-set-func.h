@@ -316,4 +316,36 @@ typedef struct
 // for ASTSetFunc_PeriodsToDate
 void *interpret_PeriodsToDate(void *md_ctx_, void *nil, void *p2d, void *ctx_tuple_, void *cube_);
 
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef1;
+    SetDef *setdef2;
+    char all;
+} ASTSetFunc_Generate;
+
+// for ASTSetFunc_Generate
+void *interpret_Generate(void *md_ctx_, void *nil, void *gen_, void *ctx_tuple_, void *cube_);
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    int count;
+} ASTSetFunc_Head;
+
+// for ASTSetFunc_Head
+void *interpret_Head(void *md_ctx_, void *nil, void *head_, void *ctx_tuple_, void *cube_);
+
+typedef struct
+{
+    ASTFunctionCommonHead head;
+    SetDef *setdef;
+    int index;
+    int count;
+} ASTSetFunc_Subset;
+
+// for ASTSetFunc_Subset
+void *interpret_Subset(void *md_ctx_, void *nil, void *ss, void *ctx_tuple_, void *cube_);
+
 #endif

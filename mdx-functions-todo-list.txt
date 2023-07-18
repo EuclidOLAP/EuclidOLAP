@@ -100,8 +100,6 @@
 	Axis		(M)
 	CurrentOrdinal		(M)
 	Exists		(M)
-	Generate		(M) (O)
-	Head		(M) (O)
 	Hierarchize		(M)
 	LastPeriods		(M)
 	Members (Set)		(M)
@@ -111,7 +109,6 @@
 	Siblings		(M)
 	StripCalculatedMembers		(M)
 	StrToSet		(M)
-	Subset		(M) (O)
 	ToggleDrillState		(M)
 	TupleRange		(O)
 	Unorder		(M)
@@ -124,7 +121,6 @@
 	CoalesceEmpty		(M)
 	Concat		(O)
 	FormatDate		(O)
-	Generate		(M)
 	Left		(O)
 	LookupCube		(M)
 	Lower		(O)
@@ -261,6 +257,9 @@
 	TopSum						[E] [I] [M] [O]
 	Extract						[E] [I] [M] [O]
 	PeriodsToDate				[E] [I] [M] [O]
+	Generate					[E] [M] [O]
+	Head						[E] [M] [O]
+	Subset						[E] [M] [O]
 
 << String Functions >>
 	Name			[E] [I] [M]

@@ -217,6 +217,18 @@ crossjoin {
 	return CROSS_JOIN;
 }
 
+Generate {
+	return GENERATE;
+}
+
+Head {
+	return HEAD;
+}
+
+Subset {
+	return SUB_SET;
+}
+
 DrilldownLevel {
 	return DRILL_DOWN_LEVEL;
 }

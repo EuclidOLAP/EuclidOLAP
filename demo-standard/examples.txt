@@ -1923,6 +1923,131 @@ from [Airline B];
 
 ---
 
+WITH SET [Top4 Quarter Services] 
+AS 
+  Generate (
+    Date.[2022].Children,
+    TopCount([Classes of Service].Root.Children, 4)
+  )
+SELECT
+ [Top4 Quarter Services]
+ON 111, 
+ [Measures].members
+ON ROWS
+FROM [Airline A];
+
+---
+
+WITH SET [Bottom3 Quarter Services] 
+AS 
+  Generate (
+    Date.[2022].Children,
+    BottomCount([Classes of Service].Root.Children, 3)
+  )
+SELECT
+ [Bottom3 Quarter Services]
+ON 111, 
+ [Measures].members
+ON ROWS
+FROM [Airline A];
+
+---
+
+with 
+set SSSSSS 
+    as filter(descendants(Date.Calendar.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].[Revenue]) > 1) 
+member [Measures].XXXXXX 
+    as ([Measures].[Revenue]) - 20000 
+select 
+    // topPercent(SSSSSS, 25, ([Measures].[Revenue])) on 10, 
+    SSSSSS on 2,
+    {([Measures].XXXXXX)} on 1 
+from [Airline B] ;
+
+---
+
+with 
+set SSSSSS 
+    as filter(descendants(Date.Calendar.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].[Revenue]) > 1) 
+member [Measures].XXXXXX 
+    as ([Measures].[Revenue]) - 20000 
+select 
+    // topPercent(SSSSSS, 25, ([Measures].[Revenue])) on 10, 
+    head(SSSSSS) on 2,
+    {([Measures].XXXXXX)} on 1 
+from [Airline B] ;
+
+---
+
+with 
+set SSSSSS 
+    as filter(descendants(Date.Calendar.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].[Revenue]) > 1) 
+member [Measures].XXXXXX 
+    as ([Measures].[Revenue]) - 20000 
+select 
+    // topPercent(SSSSSS, 25, ([Measures].[Revenue])) on 10, 
+    head(SSSSSS, 3) on 2,
+    {([Measures].XXXXXX)} on 1 
+from [Airline B] ;
+
+---
+
+with 
+set SSSSSS 
+    as filter(descendants(Date.Calendar.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].[Revenue]) > 1) 
+member [Measures].XXXXXX 
+    as ([Measures].[Revenue]) - 20000 
+select 
+    // topPercent(SSSSSS, 25, ([Measures].[Revenue])) on 10, 
+    head(SSSSSS, -3) on 2,
+    {([Measures].XXXXXX)} on 1 
+from [Airline B] ;
+
+---
+
+select
+  Children([Aircraft Models].[Boeing]) on rows,
+  CrossJoin(Children(Date.Root), { [Measures].Cost }) on 111
+from [Airline A];
+
+---
+
+select
+  Children([Aircraft Models].[Boeing]) on rows,
+  Subset(
+    CrossJoin(Children(Date.Root), { [Measures].Cost }), 0
+  ) on 111
+from [Airline A];
+
+---
+
+select
+  Children([Aircraft Models].[Boeing]) on rows,
+  Subset(
+    CrossJoin(Children(Date.Root), { [Measures].Cost }), 3, 3
+  ) on 111
+from [Airline A];
+
+---
+
+select
+  Children([Aircraft Models].[Boeing]) on rows,
+  Subset(
+    CrossJoin(Children(Date.Root), { [Measures].Cost }), 1, 3
+  ) on 111
+from [Airline A];
+
+---
+
+select
+  Children([Aircraft Models].[Boeing]) on rows,
+  Subset(
+    CrossJoin(Children(Date.Root), { [Measures].Cost }), 100, -101
+  ) on 111
+from [Airline A];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

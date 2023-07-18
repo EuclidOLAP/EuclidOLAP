@@ -1634,3 +1634,62 @@ void *interpret_PeriodsToDate(void *md_ctx_, void *nil, void *p2d, void *ctx_tup
 	}
 	return rsset;
 }
+
+// for ASTSetFunc_Generate
+void *interpret_Generate(void *md_ctx_, void *nil, void *gen_, void *ctx_tuple_, void *cube_) {
+
+	ASTSetFunc_Generate *gen = gen_;
+	MddSet *set_1 = ids_setdef__build(md_ctx_, gen->setdef1, ctx_tuple_, cube_);
+
+	MddSet *rsset = mdd_set__create();
+
+	for (int i=0;i<als_size(set_1->tuples);i++) {
+		MddSet *set_2_seg = ids_setdef__build(md_ctx_, gen->setdef2, tuple__merge(ctx_tuple_, als_get(set_1->tuples, i)), cube_);
+		for (int j=0;j<als_size(set_2_seg->tuples);j++) {
+			mddset__add_tuple(rsset, tuple__merge(als_get(set_1->tuples, i), als_get(set_2_seg->tuples, j)));
+		}
+	}
+
+	return rsset;
+}
+
+// for ASTSetFunc_Head
+void *interpret_Head(void *md_ctx_, void *nil, void *head_, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_Head *head = head_;
+
+	MddSet *set = ids_setdef__build(md_ctx_, head->setdef, ctx_tuple_, cube_);
+
+	if (head->count >= (int) als_size(set->tuples))
+		return set;
+
+	MddSet *rsset = mdd_set__create();
+
+	if (head->count < 1)
+		return rsset;
+
+	for (int i = als_size(set->tuples) - 1; i > head->count - 1; i--) {
+		als_rm_index(set->tuples, i);
+	}
+
+	return set;
+}
+
+// for ASTSetFunc_Subset
+void *interpret_Subset(void *md_ctx_, void *nil, void *ss, void *ctx_tuple_, void *cube_) {
+	ASTSetFunc_Subset *subset = ss;
+
+	MddSet *set = ids_setdef__build(md_ctx_, subset->setdef, ctx_tuple_, cube_);
+
+	MddSet *rsset = mdd_set__create();
+
+	if (subset->index >= (int) als_size(set->tuples) || subset->index < 0)
+		return rsset;
+
+	for (int i=0;i<subset->count;i++)
+		if (subset->index + i >= (int) als_size(set->tuples))
+			break;
+		else
+			mddset__add_tuple(rsset, als_get(set->tuples, subset->index + i));
+
+	return rsset;
+}
