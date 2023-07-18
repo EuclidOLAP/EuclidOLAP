@@ -94,6 +94,7 @@ static void ast_func_append_to_up(void);
 %token EXTRACT		/* Extract */
 %token PERIODS_TO_DATE		/* PeriodsToDate */
 %token GENERATE		/* Generate */
+%token HEAD			/* Head */
 
 /* member functions key words */
 %token PARENT			/* parent */
@@ -1284,6 +1285,26 @@ set_function:
 	set_func_PeriodsToDate {}
   |
 	set_func_Generate {}
+  |
+	set_func_Head {}
+;
+
+set_func_Head:
+	HEAD ROUND_BRACKET_L set_statement COMMA decimal_value ROUND_BRACKET_R {
+		ASTSetFunc_Head *func = mam_alloc(sizeof(ASTSetFunc_Head), OBJ_TYPE__ASTSetFunc_Head, NULL, 0);
+		func->head.interpret = interpret_Head;
+		stack_pop(&AST_STACK, (void **)&(func->count));
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
+  |
+	HEAD ROUND_BRACKET_L set_statement ROUND_BRACKET_R {
+		ASTSetFunc_Head *func = mam_alloc(sizeof(ASTSetFunc_Head), OBJ_TYPE__ASTSetFunc_Head, NULL, 0);
+		func->head.interpret = interpret_Head;
+		func->count = 1;
+		stack_pop(&AST_STACK, (void **)&(func->setdef));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 set_func_Generate:

@@ -100,7 +100,6 @@
 	Axis		(M)
 	CurrentOrdinal		(M)
 	Exists		(M)
-	Head		(M) (O)
 	Hierarchize		(M)
 	LastPeriods		(M)
 	Members (Set)		(M)
@@ -260,6 +259,7 @@
 	Extract						[E] [I] [M] [O]
 	PeriodsToDate				[E] [I] [M] [O]
 	Generate					[E] [M] [O]
+	Head						[E] [M] [O]
 
 << String Functions >>
 	Name			[E] [I] [M]

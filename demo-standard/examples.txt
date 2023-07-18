@@ -1953,6 +1953,58 @@ FROM [Airline A];
 
 ---
 
+with 
+set SSSSSS 
+    as filter(descendants(Date.Calendar.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].[Revenue]) > 1) 
+member [Measures].XXXXXX 
+    as ([Measures].[Revenue]) - 20000 
+select 
+    // topPercent(SSSSSS, 25, ([Measures].[Revenue])) on 10, 
+    SSSSSS on 2,
+    {([Measures].XXXXXX)} on 1 
+from [Airline B] ;
+
+---
+
+with 
+set SSSSSS 
+    as filter(descendants(Date.Calendar.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].[Revenue]) > 1) 
+member [Measures].XXXXXX 
+    as ([Measures].[Revenue]) - 20000 
+select 
+    // topPercent(SSSSSS, 25, ([Measures].[Revenue])) on 10, 
+    head(SSSSSS) on 2,
+    {([Measures].XXXXXX)} on 1 
+from [Airline B] ;
+
+---
+
+with 
+set SSSSSS 
+    as filter(descendants(Date.Calendar.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].[Revenue]) > 1) 
+member [Measures].XXXXXX 
+    as ([Measures].[Revenue]) - 20000 
+select 
+    // topPercent(SSSSSS, 25, ([Measures].[Revenue])) on 10, 
+    head(SSSSSS, 3) on 2,
+    {([Measures].XXXXXX)} on 1 
+from [Airline B] ;
+
+---
+
+with 
+set SSSSSS 
+    as filter(descendants(Date.Calendar.[ALL].[2021], 1, SELF_AND_AFTER), ([Measures].[Revenue]) > 1) 
+member [Measures].XXXXXX 
+    as ([Measures].[Revenue]) - 20000 
+select 
+    // topPercent(SSSSSS, 25, ([Measures].[Revenue])) on 10, 
+    head(SSSSSS, -3) on 2,
+    {([Measures].XXXXXX)} on 1 
+from [Airline B] ;
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

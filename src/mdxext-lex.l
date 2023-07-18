@@ -221,6 +221,10 @@ Generate {
 	return GENERATE;
 }
 
+Head {
+	return HEAD;
+}
+
 DrilldownLevel {
 	return DRILL_DOWN_LEVEL;
 }
