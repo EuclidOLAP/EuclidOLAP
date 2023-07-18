@@ -217,6 +217,10 @@ crossjoin {
 	return CROSS_JOIN;
 }
 
+Generate {
+	return GENERATE;
+}
+
 DrilldownLevel {
 	return DRILL_DOWN_LEVEL;
 }

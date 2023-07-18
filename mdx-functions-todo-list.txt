@@ -100,7 +100,6 @@
 	Axis		(M)
 	CurrentOrdinal		(M)
 	Exists		(M)
-	Generate		(M) (O)
 	Head		(M) (O)
 	Hierarchize		(M)
 	LastPeriods		(M)
@@ -124,7 +123,6 @@
 	CoalesceEmpty		(M)
 	Concat		(O)
 	FormatDate		(O)
-	Generate		(M)
 	Left		(O)
 	LookupCube		(M)
 	Lower		(O)
@@ -261,6 +259,7 @@
 	TopSum						[E] [I] [M] [O]
 	Extract						[E] [I] [M] [O]
 	PeriodsToDate				[E] [I] [M] [O]
+	Generate					[E] [M] [O]
 
 << String Functions >>
 	Name			[E] [I] [M]

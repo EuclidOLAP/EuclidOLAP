@@ -1923,6 +1923,36 @@ from [Airline B];
 
 ---
 
+WITH SET [Top4 Quarter Services] 
+AS 
+  Generate (
+    Date.[2022].Children,
+    TopCount([Classes of Service].Root.Children, 4)
+  )
+SELECT
+ [Top4 Quarter Services]
+ON 111, 
+ [Measures].members
+ON ROWS
+FROM [Airline A];
+
+---
+
+WITH SET [Bottom3 Quarter Services] 
+AS 
+  Generate (
+    Date.[2022].Children,
+    BottomCount([Classes of Service].Root.Children, 3)
+  )
+SELECT
+ [Bottom3 Quarter Services]
+ON 111, 
+ [Measures].members
+ON ROWS
+FROM [Airline A];
+
+---
+
 with
 member [Measures].[################ finished ################] as 660880
 member [Measures].[##########################################] as 660880

@@ -1634,3 +1634,21 @@ void *interpret_PeriodsToDate(void *md_ctx_, void *nil, void *p2d, void *ctx_tup
 	}
 	return rsset;
 }
+
+// for ASTSetFunc_Generate
+void *interpret_Generate(void *md_ctx_, void *nil, void *gen_, void *ctx_tuple_, void *cube_) {
+
+	ASTSetFunc_Generate *gen = gen_;
+	MddSet *set_1 = ids_setdef__build(md_ctx_, gen->setdef1, ctx_tuple_, cube_);
+
+	MddSet *rsset = mdd_set__create();
+
+	for (int i=0;i<als_size(set_1->tuples);i++) {
+		MddSet *set_2_seg = ids_setdef__build(md_ctx_, gen->setdef2, tuple__merge(ctx_tuple_, als_get(set_1->tuples, i)), cube_);
+		for (int j=0;j<als_size(set_2_seg->tuples);j++) {
+			mddset__add_tuple(rsset, tuple__merge(als_get(set_1->tuples, i), als_get(set_2_seg->tuples, j)));
+		}
+	}
+
+	return rsset;
+}

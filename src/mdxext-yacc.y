@@ -93,6 +93,7 @@ static void ast_func_append_to_up(void);
 %token TOP_SUM		/* TopSum */
 %token EXTRACT		/* Extract */
 %token PERIODS_TO_DATE		/* PeriodsToDate */
+%token GENERATE		/* Generate */
 
 /* member functions key words */
 %token PARENT			/* parent */
@@ -1281,6 +1282,27 @@ set_function:
 	set_func_Extract {}
   |
 	set_func_PeriodsToDate {}
+  |
+	set_func_Generate {}
+;
+
+set_func_Generate:
+	GENERATE ROUND_BRACKET_L set_statement COMMA set_statement COMMA ALL ROUND_BRACKET_R {
+		ASTSetFunc_Generate *func = mam_alloc(sizeof(ASTSetFunc_Generate), OBJ_TYPE__ASTSetFunc_Generate, NULL, 0);
+		func->head.interpret = interpret_Generate;
+		stack_pop(&AST_STACK, (void **)&(func->setdef2));
+		stack_pop(&AST_STACK, (void **)&(func->setdef1));
+		func->all = 1;
+		stack_push(&AST_STACK, func);
+	}
+  |
+	GENERATE ROUND_BRACKET_L set_statement COMMA set_statement ROUND_BRACKET_R {
+		ASTSetFunc_Generate *func = mam_alloc(sizeof(ASTSetFunc_Generate), OBJ_TYPE__ASTSetFunc_Generate, NULL, 0);
+		func->head.interpret = interpret_Generate;
+		stack_pop(&AST_STACK, (void **)&(func->setdef2));
+		stack_pop(&AST_STACK, (void **)&(func->setdef1));
+		stack_push(&AST_STACK, func);
+	}
 ;
 
 // PeriodsToDate
