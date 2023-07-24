@@ -910,8 +910,8 @@ static void MeasureSpace_coordinate_intersection_value(MeasureSpace *space, unsi
     gridData->null_flag = 0; // default not null
 
     unsigned long segment_num = index / space->segment_scope;
-    if (segment_num != 0 && !(index % space->segment_scope))
-        --segment_num;
+    // if (segment_num != 0 && !(index % space->segment_scope))
+    //     --segment_num;
 
     unsigned long cells_count = space->data_lens[segment_num];
 
