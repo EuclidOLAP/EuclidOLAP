@@ -731,13 +731,11 @@ void CoordinateSystem__calculate_offset(CoordinateSystem *coor)
                     sor->gid = id;
                     sor->offset = axis->coor_offset;
                     sor->end_position = sor->start_position = row;
-                    sor->start_offset = sor->end_offset = row * axis->coor_offset;
                     rbt_add(axis->sor_idx_tree, sor);
                 }
                 else
                 {
                     sor->end_position = row;
-                    sor->end_offset = row * axis->coor_offset;
                 }
 
                 prev_id = id;
@@ -903,7 +901,7 @@ static void _do_calculate_measure_value(
 
 void ScaleOffsetRange_print(ScaleOffsetRange *sor)
 {
-    log_print("[ ScaleOffsetRange %p ] gid = %lu, position [ %lu, %lu ], offset [ %lu, %lu ]\n", sor, sor->gid, sor->start_position, sor->end_position, sor->start_offset, sor->end_offset);
+    log_print("[ ScaleOffsetRange %p ] gid = %lu, position [ %lu, %lu ]\n", sor, sor->gid, sor->start_position, sor->end_position);
 }
 
 int ScaleOffsetRange_cmp(void *_obj, void *_other)
