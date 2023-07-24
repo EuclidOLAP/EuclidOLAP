@@ -165,6 +165,8 @@ static void *ScaleOffsetRange_print__rbt(RBNode *node, void *param)
 
 void reload_space(unsigned long cs_id)
 {
+    long timestamp = now_microseconds();
+
     space_unload(cs_id);
 
     ByteBuf *tmp_buf = buf__alloc(0x01UL << 10);
@@ -203,6 +205,9 @@ void reload_space(unsigned long cs_id)
 
     FILE *data_fd = fopen(data_file, "a+");
     int coor_pointer_len;
+
+    log_print(">>> RELOAD_SPACE { 1 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
+    timestamp = now_microseconds();
 
     while (fread(&coor_pointer_len, sizeof(int), 1, data_fd) > 0)
     {
@@ -262,6 +267,9 @@ void reload_space(unsigned long cs_id)
 
     fclose(data_fd);
 
+    log_print(">>> RELOAD_SPACE { 2 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
+    timestamp = now_microseconds();
+
     // Calculate the actual size of the multidimensional array corresponding to the coordinate system.
     unsigned long space_capacity = 1;
     for (i = 0; i < axes_count; i++)
@@ -295,6 +303,9 @@ void reload_space(unsigned long cs_id)
 
     unsigned long load_meval_count = 0;
     char *cellcm = NULL;
+
+    log_print(">>> RELOAD_SPACE { 3 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
+    timestamp = now_microseconds();
 
     while (1)
     {
@@ -337,12 +348,14 @@ void reload_space(unsigned long cs_id)
 
         space_add_measure(space, measure_space_idx, cell);
         ++load_meval_count;
-
-        if (load_meval_count % 10000 == 0)
-            log_print(":::::::::::::::::::::::::::::::::::::::: load_meval_count = %lu\n", load_meval_count);
     }
 
 finished:
+
+    log_print("::::::::::::::::::: load_meval_count = %lu\n", load_meval_count);
+
+    log_print(">>> RELOAD_SPACE { 4 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
+    timestamp = now_microseconds();
 
     buf_release(tmp_buf);
 
@@ -354,6 +367,8 @@ finished:
     CoordinateSystem__calculate_offset(cs);
 
     als_add(space_ls, space);
+
+    log_print(">>> RELOAD_SPACE { 5 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
 }
 
 CoordinateSystem *coosys_new(unsigned long id, int axes_count, MemAllocMng *mam)
