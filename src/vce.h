@@ -61,9 +61,6 @@ typedef struct _scale_offset_range
     unsigned long end_position;
 
     unsigned long offset;
-
-    unsigned long start_offset;
-    unsigned long end_offset;
 } ScaleOffsetRange;
 
 void ScaleOffsetRange_print(ScaleOffsetRange *);
