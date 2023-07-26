@@ -163,6 +163,29 @@ static void *ScaleOffsetRange_print__rbt(RBNode *node, void *param)
     return NULL;
 }
 
+/**
+ * @param cell is a block of memory
+ *
+ * cell structure:
+ * 8 bytes - position
+ * (
+ *   8 bytes - measure value
+ *   1 byte - null flag
+ * )+
+ *
+ */
+int cell_cmp(void *cell, void *other)
+{
+    unsigned long c_posi = *((unsigned long *)cell);
+    unsigned long o_posi = *((unsigned long *)other);
+    return o_posi < c_posi ? -1 : (o_posi > c_posi ? 1 : 0);
+}
+
+static void *_cell__destory(void *cell)
+{
+    // _release_mem_(cell);
+}
+
 void reload_space(unsigned long cs_id)
 {
     long timestamp = now_microseconds();
@@ -307,6 +330,12 @@ void reload_space(unsigned long cs_id)
     log_print(">>> RELOAD_SPACE { 3 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
     timestamp = now_microseconds();
 
+    ArrayList *tree_ls_h = als_new((unsigned int)space_partition_count, "RedBlackTree *", SPEC_MAM, cs_mam);
+    for (int i=0; i<space_partition_count ;i++) {
+        MemAllocMng *mam = MemAllocMng_new();
+        als_add(tree_ls_h, rbt_create("*cell", cell_cmp, _cell__destory, SPEC_MAM, mam));
+    }
+
     while (1)
     {
         __uint64_t measure_space_idx = 0;
@@ -346,13 +375,15 @@ void reload_space(unsigned long cs_id)
         *((unsigned long *)cell) = measure_space_idx;
         fread(cell + sizeof(measure_space_idx), cell_mem_sz, 1, data_fd);
 
-        space_add_measure(space, measure_space_idx, cell);
+        // space_add_measure(space, measure_space_idx, cell);
+        rbt_add(als_get(tree_ls_h, (unsigned int)(measure_space_idx / space->segment_scope)), cell);
         ++load_meval_count;
+
+        if (load_meval_count % 1000000 == 0)
+            log_print("::::::::::::::::::: load_meval_count = %lu\n", load_meval_count);
     }
 
 finished:
-
-    log_print("::::::::::::::::::: load_meval_count = %lu\n", load_meval_count);
 
     log_print(">>> RELOAD_SPACE { 4 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
     timestamp = now_microseconds();
@@ -361,7 +392,7 @@ finished:
 
     fclose(data_fd);
 
-    space_plan(space);
+    space_plan(space, tree_ls_h);
 
     CoordinateSystem__gen_auxiliary_index(cs);
     CoordinateSystem__calculate_offset(cs);
@@ -481,29 +512,6 @@ int ax_size(Axis *axis)
     return rbt__size(axis->rbtree);
 }
 
-/**
- * @param cell is a block of memory
- *
- * cell structure:
- * 8 bytes - position
- * (
- *   8 bytes - measure value
- *   1 byte - null flag
- * )+
- *
- */
-int cell_cmp(void *cell, void *other)
-{
-    unsigned long c_posi = *((unsigned long *)cell);
-    unsigned long o_posi = *((unsigned long *)other);
-    return o_posi < c_posi ? -1 : (o_posi > c_posi ? 1 : 0);
-}
-
-static void *_cell__destory(void *cell)
-{
-    // _release_mem_(cell);
-}
-
 MeasureSpace *space_new(unsigned long id, size_t segment_count, size_t segment_scope, int cell_vals_count, MemAllocMng *mam)
 {
 
@@ -512,12 +520,12 @@ MeasureSpace *space_new(unsigned long id, size_t segment_count, size_t segment_s
     s->cell_vals_count = cell_vals_count;
     s->segment_count = segment_count;
     s->segment_scope = segment_scope;
-    s->tree_ls_h = mam_alloc(sizeof(RedBlackTree *) * segment_count, OBJ_TYPE__RedBlackTree, mam, 0);
+    // s->tree_ls_h = mam_alloc(sizeof(RedBlackTree *) * segment_count, OBJ_TYPE__RedBlackTree, mam, 0);
     s->data_ls_h = mam_alloc(sizeof(void *) * segment_count, OBJ_TYPE__RAW_BYTES, mam, 0);
     s->data_lens = mam_alloc(sizeof(unsigned long) * segment_count, OBJ_TYPE__RAW_BYTES, mam, 0);
 
-    for (int i = 0; i < segment_count; i++)
-        s->tree_ls_h[i] = rbt_create("*cell", cell_cmp, _cell__destory, SPEC_MAM, mam);
+    // for (int i = 0; i < segment_count; i++)
+    //     s->tree_ls_h[i] = rbt_create("*cell", cell_cmp, _cell__destory, SPEC_MAM, mam);
 
     return s;
 }
@@ -529,7 +537,7 @@ void *build_space_measure(RBNode *node, void *callback_params)
     memcpy(block_addr + cell_size * (node->index), node->obj, cell_size);
 }
 
-void space_plan(MeasureSpace *space)
+void space_plan(MeasureSpace *space, ArrayList *tree_ls_h)
 {
     short type;
     enum_oms strat;
@@ -538,7 +546,7 @@ void space_plan(MeasureSpace *space)
 
     for (int i = 0; i < space->segment_count; i++)
     {
-        RedBlackTree *tree = space->tree_ls_h[i];
+        RedBlackTree *tree = als_get(tree_ls_h, i);
         rbt__reordering(tree);
 
         int cell_size = space->cell_vals_count * (sizeof(double) + sizeof(char));
@@ -551,7 +559,15 @@ void space_plan(MeasureSpace *space)
         *((int *)callback_params) = cell_size;
         memcpy(&(callback_params[sizeof(int)]), space->data_ls_h + i, sizeof(void *));
         rbt__scan_do(tree, callback_params, build_space_measure);
-        rbt__clear(tree);
+        // rbt__clear(tree);
+
+        short rbt_type;
+        enum_oms rbt_strat;
+        MemAllocMng *rbt_mam = NULL;
+        obj_info(tree, &rbt_type, &rbt_strat, &rbt_mam);
+        mam_reset(rbt_mam);
+        obj_release(rbt_mam->current_block);
+        obj_release(rbt_mam);
     }
 }
 
@@ -570,7 +586,7 @@ __uint64_t cs_axis_span(CoordinateSystem *cs, int axis_order)
 
 void space_add_measure(MeasureSpace *space, __uint64_t measure_position, void *cell)
 {
-    rbt_add(space->tree_ls_h[measure_position / space->segment_scope], cell);
+    // rbt_add(space->tree_ls_h[measure_position / space->segment_scope], cell);
 }
 
 void Scale_print(Scale *s)
@@ -589,8 +605,8 @@ void space__destory(MeasureSpace *s)
     size_t i;
     for (i = 0; i < s->segment_count; i++)
     {
-        if (s->tree_ls_h[i])
-            rbt__destory(s->tree_ls_h[i]);
+        // if (s->tree_ls_h[i])
+        //     rbt__destory(s->tree_ls_h[i]);
 
         // if (s->data_ls_h[i])
         //     _release_mem_(s->data_ls_h[i]);

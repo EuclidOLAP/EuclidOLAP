@@ -56,13 +56,13 @@ int net_service_startup()
 
 	if (bind(ss_fd, (struct sockaddr *)&ss_addr, sizeof(ss_addr)) != 0)
 	{
-		log_print("program exit. cause: bind failed.");
+		log_print("program exit. cause: bind failed.\n");
 		exit(1);
 	}
 
 	if (listen(ss_fd, 5) != 0)
 	{
-		log_print("program exit. cause: listen failed.");
+		log_print("program exit. cause: listen failed.\n");
 		exit(1);
 	}
 	log_print("Net service startup on port %d\n", cfg->port);
