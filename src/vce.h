@@ -84,7 +84,7 @@ typedef struct _measure_space_
     __uint64_t id;
     size_t segment_count;
     size_t segment_scope;
-    RedBlackTree **tree_ls_h;
+    // RedBlackTree **tree_ls_h;
     void **data_ls_h;
     unsigned long *data_lens;
     int cell_vals_count;
@@ -100,7 +100,7 @@ __uint64_t cs_axis_span(CoordinateSystem *cs, int axis_order);
 
 void space_add_measure(MeasureSpace *space, __uint64_t measure_position, void *cell);
 
-void space_plan(MeasureSpace *space);
+void space_plan(MeasureSpace *space, ArrayList *tree_ls_h);
 
 void space__destory(MeasureSpace *);
 

@@ -3026,6 +3026,10 @@ int compare_member_position(Member *mem, Member *oth) {
 		return oth->hierarchy_gid - mem->hierarchy_gid;
 
 	int slv = mem->lv < oth->lv ? mem->lv : oth->lv;
+
+	mdd__gen_mbr_abs_path(mem);
+	mdd__gen_mbr_abs_path(oth);
+
 	for (int i=0;i<slv;i++) {
 		if (mem->abs_path[i] != oth->abs_path[i])
 			return oth->abs_path[i] - mem->abs_path[i];
