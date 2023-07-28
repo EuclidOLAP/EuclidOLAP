@@ -21,7 +21,6 @@ ByteBuf *buf__alloc(size_t capacity) {
 	ByteBuf *byte_buf = obj_alloc(sizeof(ByteBuf), OBJ_TYPE__ByteBuf);
 	byte_buf->capacity = capacity;
 	byte_buf->index = 0;
-	// byte_buf->buf_addr = obj_alloc(capacity, OBJ_TYPE__RAW_BYTES);
 	byte_buf->buf_addr = allocate_memory(capacity);
 
 	return byte_buf;
