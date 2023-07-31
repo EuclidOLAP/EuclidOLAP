@@ -1978,6 +1978,7 @@ void Factory_evaluate(MDContext *md_ctx, Factory *fac, Cube *cube, MddTuple *ctx
 	}
 	else if (fac->t_cons == FACTORY_DEF__DECIMAL)
 	{
+		grid_data->type = GRIDDATA_TYPE_NUM;
 		grid_data->val = fac->decimal;
 		grid_data->null_flag = 0;
 		return;

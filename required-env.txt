@@ -1,0 +1,10 @@
+######################
+##      Debian      ##
+######################
+Problem:
+root@ip-172-31-33-135:~/EuclidOLAP# /root/EuclidOLAP/bin/euclid-svr-debian: 
+/lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.34' not found 
+(required by /root/EuclidOLAP/bin/euclid-svr-debian)
+Workaround:
+sudo apt-get update
+sudo apt-get install libc6
