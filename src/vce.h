@@ -8,7 +8,7 @@
 #include "mdx.h"
 
 #define SPACE_DEF_PARTITION_COUNT 128
-#define SPACE_DEF_PARTITION_SPAN_MIN 270000
+#define SPACE_DEF_PARTITION_SPAN_MIN 10000000
 
 typedef struct _coordinate_system
 {
