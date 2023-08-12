@@ -18,3 +18,11 @@ select
 R1.members on rows
 from OC1M
 where (R2.o1.o11.o111, R3.o1.o11.o111, R4.o1.o11.o111, R5.o1.o11.o111, R6.o1.o11.o111);
+
+---
+
+select
+[Measures].MeaA on columns,
+R1.o1.o11.o111 on rows
+from OC1M
+where (R2.o1.o11.o111, R3.o1.o11.o111, R4.o1.o11.o111, R5.o1.o11.o111, R6.o1.o11.o111);
