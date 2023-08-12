@@ -7,6 +7,7 @@ create dimensions
     [Sales Channels]
     [Classes of Service]
     [Aircraft Models]
+    [Orderly]
 ;
 
 ---
@@ -71,6 +72,31 @@ dimensions
     [Region]:[Starting Point]
     [Region]:[Ending Point]
 measures [Revenue] [Cost]
+;
+
+---
+
+build cube [OC]
+dimensions
+    [Orderly]:[r]
+    [Orderly]:[rr]
+    [Orderly]:[rrr]
+    [Orderly]:[rrrr]
+    [Orderly]:[rrrrr]
+measures [m] [mm] [mmm]
+;
+
+---
+
+build cube OC1M
+dimensions
+    [Orderly]:[R1]
+    [Orderly]:[R2]
+    [Orderly]:[R3]
+    [Orderly]:[R4]
+    [Orderly]:[R5]
+    [Orderly]:[R6]
+measures MeaA MeaB MeaC
 ;
 
 ---
@@ -1881,3 +1907,17 @@ create members
 [Aircraft Models].[Embraer].[E175],
 [Aircraft Models].[Embraer].[E190],
 [Aircraft Models].[Embraer].[E195];
+
+---
+
+create members
+[Orderly].[o1].[o11].[o111],
+[Orderly].[o1].[o11].[o112],
+[Orderly].[o1].[o12].[o121],
+[Orderly].[o1].[o12].[o122],
+[Orderly].[o1].[o13].[o131],
+[Orderly].[o1].[o13].[o132],
+[Orderly].[o2].[o21].[o211],
+[Orderly].[o2].[o21].[o212],
+[Orderly].[o2].[o22].[o221],
+[Orderly].[o2].[o22].[o222];
