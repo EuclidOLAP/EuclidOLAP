@@ -14,6 +14,8 @@ static char *def_log_file = NULL;
 
 static void __log_prt__(const char *fmt, va_list ap);
 
+static void __log_prt_raw__(const char *fmt, va_list ap);
+
 extern OLAPEnv olap_env;
 
 void log_print(const char *fmt, ...)
@@ -21,6 +23,13 @@ void log_print(const char *fmt, ...)
 	va_list ap;
 	va_start(ap, fmt);
 	__log_prt__(fmt, ap);
+	va_end(ap);
+}
+
+void log_(const char *fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+	__log_prt_raw__(fmt, ap);
 	va_end(ap);
 }
 
@@ -65,6 +74,30 @@ static void __log_prt__(const char *fmt, va_list ap)
 	}
 
 	fprintf(log_fd, "%02d-%02d-%d %02d:%02d:%02d ", tmins->tm_mon + 1, tmins->tm_mday, tmins->tm_year + 1900, tmins->tm_hour, tmins->tm_min, tmins->tm_sec);
+	vfprintf(log_fd, fmt, ap);
+
+	fflush(log_fd);
+	fclose(log_fd);
+}
+
+static void __log_prt_raw__(const char *fmt, va_list ap) {
+
+	if (def_log_file == NULL)
+		return;
+
+	FILE *log_fd = fopen(def_log_file, "a");
+	for (int i = 0; i < 5 && log_fd == NULL; i++)
+	{
+		usleep(10000);
+		log_fd = fopen(def_log_file, "a");
+	}
+
+	if (log_fd == NULL)
+	{
+		fprintf(stderr, "Can't open the log file<%s>.\n", def_log_file);
+		return;
+	}
+
 	vfprintf(log_fd, fmt, ap);
 
 	fflush(log_fd);

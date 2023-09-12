@@ -98,6 +98,11 @@ Cube *find_cube_by_gid(md_gid);
  */
 int gen_member_gid_abs_path(Cube *cube, MddMemberRole *mr, char *abs_path);
 
+/**
+ * @return 0 - normal; not 0 - mistake
+ */
+int gen_member_gid_abs_path_excluderoot(Cube *cube, MddMemberRole *mr, char *abs_path);
+
 int store_measure(EuclidCommand *ec);
 
 int distribute_store_measure(EuclidCommand *ec, unsigned long worker_id);

@@ -5,4 +5,6 @@ void log__set_log_file(char *file);
 
 void log_print(const char *fmt, ...);
 
+void log_(const char *fmt, ...);
+
 #endif

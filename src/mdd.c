@@ -819,9 +819,11 @@ int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear, unsig
 		{
 			MDMEntityUniversalPath *eup = als_get(ids_vm->ls_vector, j);
 			MddMemberRole *mr = up_evolving(NULL, eup, cube, NULL);
-			size_t ap_bsz = sizeof(int) + sizeof(md_gid) * (mr->member->lv + 1);
 
-			if (gen_member_gid_abs_path(cube, mr, buf_cutting(buf, ap_bsz)) != 0) {
+			// size_t ap_bsz = sizeof(int) + sizeof(md_gid) * (mr->member->lv + 1);
+			size_t ap_bsz = sizeof(int) + sizeof(md_gid) * mr->member->lv;
+
+			if (gen_member_gid_abs_path_excluderoot(cube, mr, buf_cutting(buf, ap_bsz)) != 0) {
 				buf_release(buf);
 				MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 				thrd_mam->exception_desc = "exception: A member name found cannot be matched.";
@@ -918,6 +920,23 @@ int gen_member_gid_abs_path(Cube *cube, MddMemberRole *mr, char *abs_path)
 	}
 
 	return 0;
+}
+
+/**
+ * @return 0 - normal; not 0 - mistake
+ */
+int gen_member_gid_abs_path_excluderoot(Cube *cube, MddMemberRole *mr, char *abs_path) {
+	
+	Member *member = mr->member;
+	*((unsigned int *)abs_path) = member->lv;
+	while (1) {
+		*((md_gid *)(abs_path + sizeof(unsigned int) + sizeof(md_gid) * (member->lv - 1))) = member->gid;
+		if (member->lv == 1)
+			break;
+		member = find_member_by_gid(member->p_gid);
+	}
+	return 0;
+
 }
 
 static long query_times = 1;
