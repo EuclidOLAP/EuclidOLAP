@@ -28,6 +28,8 @@ typedef struct _coordinate_axis
     char *index;
     unsigned long coor_offset;
     unsigned int max_path_len;
+
+    size_t scales_count; // A scale corresponds to a leaf dimension member in a multidimensional model.
 } Axis;
 
 Axis *ax_create(MemAllocMng *mam);

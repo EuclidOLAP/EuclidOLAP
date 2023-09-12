@@ -26,7 +26,19 @@ static void _do_calculate_measure_value(
     // MDContext *md_ctx,
     MeasureSpace *space, ArrayList *sor_ls, int deep, unsigned long offset, GridData *grid_data, int mea_val_idx);
 
+/*
+ * Aggregations based on dynamic sparse indexes.
+ * The third parameter, 'dyc_uidx_len', represents the dynamic union index length,
+ * which can be understood as the number of dimensions involved in the dynamic sparse dimension.
+ */
+static void agg_based_on_dynamic_sparse_idx
+    (MeasureSpace *space, ArrayList *sor_ls, int dyc_uidx_len, int deep, unsigned long offset, GridData *grid_data, int mea_val_idx);
+
 static void MeasureSpace_coordinate_intersection_value(MeasureSpace *space, unsigned long index, int mea_val_idx, GridData *gridData);
+
+static void summarize_space_scope(MeasureSpace *space, unsigned long starting, unsigned long ending, int mea_val_idx, GridData *gridData);
+
+static void calculates_the_full_summary_value(MeasureSpace *space, GridData *gridData, int mea_val_idx);
 
 void vce_init()
 {
@@ -147,7 +159,7 @@ int vce_append(EuclidCommand *action)
     int _offset = sizeof(pkg_capacity) + sizeof(intent) + sizeof(cs_id) + sizeof(axes_count) + sizeof(vals_count);
     append_file_data(data_file, (void *)(bytes + _offset), pkg_capacity - _offset);
 
-    reload_space(cs_id);
+    // reload_space(cs_id);
     return 0;
 }
 
@@ -254,6 +266,7 @@ void reload_space(unsigned long cs_id)
             scale->fragments_len = sample->fragments_len;
             memcpy(scale->fragments, sample->fragments, coor_pointer_len * sizeof(md_gid));
             ax_set_scale(axis, scale);
+            axis->scales_count++;
         }
 
         for (i = 1; i < axes_count; i++)
@@ -278,6 +291,7 @@ void reload_space(unsigned long cs_id)
                 scale->fragments_len = sample->fragments_len;
                 memcpy(scale->fragments, sample->fragments, coor_pointer_len * sizeof(md_gid));
                 ax_set_scale(axis, scale);
+                axis->scales_count++;
             }
         }
 
@@ -840,23 +854,23 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
             continue;
         }
 
-        Axis *ax = cs_get_axis(coor, i);
-
         ScaleOffsetRange *key = mam_alloc(sizeof(ScaleOffsetRange), OBJ_TYPE__ScaleOffsetRange, NULL, 0);
-        key->gid = mr->member->gid;
-
-        RBNode *node = rbt__find(ax->sor_idx_tree, key);
-
-        if (node == NULL)
-        {
-            // If there is no corresponding coordinate, return a null value directly.
-            grid_data->null_flag = 1;
-            return;
+        if (mr->member->lv == 0) {
+            key->gid = 0;
+            als_add(sor_ls, key);
+        } else {
+            Axis *ax = cs_get_axis(coor, i);
+            key->gid = mr->member->gid;
+            RBNode *node = rbt__find(ax->sor_idx_tree, key);
+            if (node == NULL)
+            {
+                // If there is no corresponding coordinate, return a null value directly.
+                grid_data->null_flag = 1;
+                return;
+            }
+            ScaleOffsetRange *sor = (ScaleOffsetRange *)node->obj;
+            als_add(sor_ls, sor);
         }
-
-        ScaleOffsetRange *sor = (ScaleOffsetRange *)node->obj;
-
-        als_add(sor_ls, sor);
     }
 
     int mea_val_idx = 0;
@@ -883,6 +897,9 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
 
     memset(grid_data, 0, sizeof(GridData));
     grid_data->null_flag = 1; // measure value is default null
+
+    // Each time the cell is queried, it is executed once.
+    // sor_ls observed, dimensions that are all summarized are represented by a 0
     _do_calculate_measure_value(
         // md_ctx,
         space, sor_ls, 0, 0, grid_data, mea_val_idx);
@@ -892,27 +909,26 @@ static void _do_calculate_measure_value(
     // MDContext *md_ctx,
     MeasureSpace *space, ArrayList *sor_ls, int deep, unsigned long offset, GridData *grid_data, int mea_val_idx)
 {
-    ScaleOffsetRange *sor = (ScaleOffsetRange *)als_get(sor_ls, deep);
-    unsigned long _position;
-    for (_position = sor->start_position; _position <= sor->end_position; _position++)
-    {
-        if (deep == (als_size(sor_ls) - 1))
-        {
-            GridData date;
-            MeasureSpace_coordinate_intersection_value(space, offset + _position * sor->offset, mea_val_idx, &date);
-            if (date.null_flag == 0)
-            {
-                grid_data->val += date.val;
-                grid_data->null_flag = 0;
-            }
-        }
-        else
-        {
-            _do_calculate_measure_value(
-                // md_ctx,
-                space, sor_ls, deep + 1, offset + _position * sor->offset, grid_data, mea_val_idx);
+    // Observe the sor_ls and make a range summary from the last position that is not 0
+    // If all are 0s, a full rollup is performed.
+    // This operation should not be too CPU-intensive.
+    int dynamic_index_scope = als_size(sor_ls);
+    for (int i=als_size(sor_ls)-1;i>=0;i--) {
+        ScaleOffsetRange *scor = als_get(sor_ls, i);
+        if (scor->gid) {
+            break;
+        } else {
+            dynamic_index_scope--;
         }
     }
+
+    if (dynamic_index_scope == 0) {
+        // Fully summarized
+        calculates_the_full_summary_value(space, grid_data, mea_val_idx);
+        return;
+    }
+
+    agg_based_on_dynamic_sparse_idx(space, sor_ls, dynamic_index_scope, deep, offset, grid_data, mea_val_idx);
 }
 
 void ScaleOffsetRange_print(ScaleOffsetRange *sor)
@@ -932,6 +948,203 @@ void *ScaleOffsetRange_destory(void *sor)
     // TODO may 17 2022 - 20:00:05
     // log_print("[ func - ScaleOffsetRange_destory ] This function has not been implemented yet.\n");
     return NULL;
+}
+
+static void calculates_the_full_summary_value(MeasureSpace *space, GridData *gridData, int mea_val_idx) {
+    gridData->type = GRIDDATA_TYPE_NUM;
+    gridData->null_flag = 1;
+    gridData->val = 0;
+    int vlen = sizeof(unsigned long) + ( sizeof(double) + sizeof(char) ) * space->cell_vals_count;
+    for (size_t i=0;i<space->segment_count;i++) {
+        char *data_segment = space->data_ls_h[i];
+        for (unsigned long j=0;j<space->data_lens[i];j++) {
+            char *val_addr = data_segment + vlen * j + sizeof(unsigned long) + ( sizeof(double) + sizeof(char) ) * mea_val_idx;
+            if (*(char *)(val_addr + sizeof(double)) == 0) {
+                gridData->null_flag = 0;
+                gridData->val += *(double *)val_addr;
+            }
+        }
+    }
+}
+
+static void summarize_space_scope(MeasureSpace *space, unsigned long starting, unsigned long ending, int mea_val_idx, GridData *gridData) {
+
+    if (starting == ending) {
+        MeasureSpace_coordinate_intersection_value(space, starting, mea_val_idx, gridData);
+        return;
+    }
+
+    assert(ending > starting);
+
+    unsigned long staing_seg_num = starting / space->segment_scope;
+    unsigned long ending_seg_num = ending / space->segment_scope;
+
+    assert(ending_seg_num >= staing_seg_num);
+
+    int a_cell_bytes_count = space->cell_vals_count * (sizeof(double) + sizeof(char)) + sizeof(unsigned long);
+
+    /**
+     * Head position
+     * If the header position precedes the start point of the block, the header position is equal to the start pointer.
+     * If the header position is after the end of the block, the header position is equal to NULL.
+     * If neither of the above, find the first pointer that is not less than the coordinate index of the header position,
+     * and the head position is equal to it.
+     */
+    char *first_block = space->data_ls_h[staing_seg_num];
+    unsigned long first_cells_count = space->data_lens[staing_seg_num];
+
+    char *f_tail_addr = first_block + (first_cells_count - 1) * a_cell_bytes_count;
+
+    unsigned long f_head_idx = *(unsigned long *)first_block;
+    unsigned long f_tail_idx = *(unsigned long *)f_tail_addr;
+    char *start_index = NULL;
+    if (starting < f_head_idx) {
+        start_index = first_block;
+    } else if (starting > f_tail_idx) {
+        start_index = NULL;
+    } else {
+        unsigned long range_start = 0;
+        unsigned long range_end = first_cells_count - 1;
+        while (1) {
+            if (range_end - range_start > 1) {
+                unsigned long range_mid = (range_start + range_end) / 2;
+                unsigned long seg_cell_mid_pos = *((unsigned long *)(first_block + range_mid * a_cell_bytes_count));
+                if (seg_cell_mid_pos == starting)
+                {
+                    start_index = first_block + range_mid * a_cell_bytes_count;
+                    break;
+                }
+                if (starting < seg_cell_mid_pos)
+                    range_end = range_mid - 1;
+                else
+                    range_start = range_mid + 1;
+            } else {
+                unsigned long seg_cell_start_pos = *((unsigned long *)(first_block + range_start * a_cell_bytes_count));
+                if (starting == seg_cell_start_pos) {
+                    start_index = first_block + range_start * a_cell_bytes_count;
+                } else {
+                    start_index = first_block + range_end * a_cell_bytes_count;
+                }
+                break;
+            }
+        }
+    }
+
+    /**
+     * Tail position
+     * If the tail position is after the end of the data block, the tail position is equal to the end pointer.
+     * If the tail position precedes the start of the block, the tail position is equal to NULL.
+     * If neither of the above, find the last pointer that is not greater than the index of the tail position coordinates,
+     * and the tail position is equal to it.
+     */
+    char *last_block = space->data_ls_h[ending_seg_num];
+    unsigned long last_cells_count = space->data_lens[ending_seg_num];
+
+    char *l_tail_addr = last_block + (last_cells_count - 1) * a_cell_bytes_count;
+
+    unsigned long l_head_idx = *(unsigned long *)last_block;
+    unsigned long l_tail_idx = *(unsigned long *)l_tail_addr;
+    char *end_index = NULL;
+    if (ending > l_tail_idx) {
+        end_index = last_block + (last_cells_count - 1) * a_cell_bytes_count;
+    } else if (ending < l_head_idx) {
+        end_index = NULL;
+    } else {
+        unsigned long range_start = 0;
+        unsigned long range_end = last_cells_count - 1;
+        while (1) {
+            if (range_end - range_start > 1) {
+                unsigned long range_mid = (range_start + range_end) / 2;
+                unsigned long seg_cell_mid_pos = *((unsigned long *)(last_block + range_mid * a_cell_bytes_count));
+                if (seg_cell_mid_pos == ending)
+                {
+                    end_index = last_block + range_mid * a_cell_bytes_count;
+                    break;
+                }
+                if (ending > seg_cell_mid_pos)
+                    range_start = range_mid + 1;
+                else
+                    range_end = range_mid - 1;
+            } else {
+                unsigned long seg_cell_end_pos = *((unsigned long *)(last_block + range_end * a_cell_bytes_count));
+                if (ending == seg_cell_end_pos) {
+                    end_index = last_block + range_end * a_cell_bytes_count;
+                } else {
+                    end_index = last_block + range_start * a_cell_bytes_count;
+                }
+                break;
+            }
+        }
+    }
+
+    char *cursor = NULL;
+
+    if (staing_seg_num == ending_seg_num) {
+        if (start_index && end_index) {
+            cursor = start_index;
+            while (cursor <= end_index) {
+                char nullflag = *(char *)(cursor + sizeof(unsigned long) + mea_val_idx * (sizeof(double) + sizeof(char)) + sizeof(double));
+                if (!nullflag) {
+                    double meaval = *(double *)(cursor + sizeof(unsigned long) + mea_val_idx * (sizeof(double) + sizeof(char)));
+                    gridData->null_flag = 0;
+                    gridData->val += meaval;
+                }
+                cursor += a_cell_bytes_count;
+            }
+        } else {
+            gridData->null_flag = 1;
+        }
+    } else {
+        // If the start_index is not NULL, summarize the data block of start
+        if (start_index) {
+            cursor = start_index;
+            while (cursor <= f_tail_addr) {
+                char nullflag = *(char *)(cursor + sizeof(unsigned long) + mea_val_idx * (sizeof(double) + sizeof(char)) + sizeof(double));
+                if (!nullflag) {
+                    double meaval = *(double *)(cursor + sizeof(unsigned long) + mea_val_idx * (sizeof(double) + sizeof(char)));
+                    gridData->null_flag = 0;
+                    gridData->val += meaval;
+                }
+                cursor += a_cell_bytes_count;
+            }
+        }
+
+        // Summarize blocks of data between start and end.
+        // assert(ending_seg_num >= staing_seg_num);
+        for (unsigned long i = staing_seg_num + 1; i < ending_seg_num; i++) {
+            char *mid_block = space->data_ls_h[i];
+            unsigned long midblk_cells_count = space->data_lens[i];
+
+            char *midblk_tail_addr = mid_block + (midblk_cells_count - 1) * a_cell_bytes_count;
+
+            unsigned long midblk_head_idx = *(unsigned long *)mid_block;
+            unsigned long midblk_tail_idx = *(unsigned long *)midblk_tail_addr;
+            cursor = mid_block;
+            while (cursor <= midblk_tail_addr) {
+                char nullflag = *(char *)(cursor + sizeof(unsigned long) + mea_val_idx * (sizeof(double) + sizeof(char)) + sizeof(double));
+                if (!nullflag) {
+                    double meaval = *(double *)(cursor + sizeof(unsigned long) + mea_val_idx * (sizeof(double) + sizeof(char)));
+                    gridData->null_flag = 0;
+                    gridData->val += meaval;
+                }
+                cursor += a_cell_bytes_count;
+            }
+        }
+
+        // If the end_index is not NULL, summarize the end data block.
+        if (end_index) {
+            cursor = last_block;
+            while (cursor <= end_index) {
+                char nullflag = *(char *)(cursor + sizeof(unsigned long) + mea_val_idx * (sizeof(double) + sizeof(char)) + sizeof(double));
+                if (!nullflag) {
+                    double meaval = *(double *)(cursor + sizeof(unsigned long) + mea_val_idx * (sizeof(double) + sizeof(char)));
+                    gridData->null_flag = 0;
+                    gridData->val += meaval;
+                }
+                cursor += a_cell_bytes_count;
+            }
+        }
+    }
 }
 
 static void MeasureSpace_coordinate_intersection_value(MeasureSpace *space, unsigned long index, int mea_val_idx, GridData *gridData)
@@ -1316,4 +1529,56 @@ ArrayList *worker_aggregate_measure(EuclidCommand *ec)
     }
 
     return grids;
+}
+
+/**
+ * The third parameter dyc_uidx_len which represents the dynamic union index length,
+ * can be understood as the number of dimensions involved in the dynamic sparse dimension.
+ */
+static void agg_based_on_dynamic_sparse_idx
+        (MeasureSpace *space, ArrayList *sor_ls, int dyc_uidx_len, int deep,
+        unsigned long offset, GridData *grid_data, int mea_val_idx) {
+
+    ScaleOffsetRange *sor = (ScaleOffsetRange *)als_get(sor_ls, deep);
+    unsigned long _position;
+
+    // It can be summarized on the current axis (the subsequent axes are all summarized).
+    CoordinateSystem *coor = NULL;
+    for (int i = 0; i < als_size(coor_sys_ls); i++)
+    {
+        coor = als_get(coor_sys_ls, i);
+        if (coor->id == space->id) {
+            break;
+        }
+        coor = NULL;
+    }
+
+    Axis *ax = cs_get_axis(coor, deep);
+
+    if (deep != (dyc_uidx_len - 1)) {
+        // Continue to recurse backwards.
+        if (sor->gid) {
+            for (_position = sor->start_position; _position <= sor->end_position; _position++) {
+                agg_based_on_dynamic_sparse_idx(space, sor_ls, dyc_uidx_len, deep + 1, offset + _position * sor->offset, grid_data, mea_val_idx);
+            }
+        } else {
+            for (_position = 0; _position < ax->scales_count; _position++) {
+                agg_based_on_dynamic_sparse_idx(space, sor_ls, dyc_uidx_len, deep + 1, offset + _position * ax->coor_offset, grid_data, mea_val_idx);
+            }
+        }
+        return;
+    }
+
+    GridData chip;
+    memset(&chip, 0, sizeof(GridData));
+
+    summarize_space_scope(space, 
+        offset + sor->start_position * sor->offset, 
+        offset + (sor->end_position + 1) * sor->offset - 1, 
+        mea_val_idx, &chip);
+
+    if (chip.null_flag == 0) {
+        grid_data->null_flag = 0;
+        grid_data->val += chip.val;
+    }
 }

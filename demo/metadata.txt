@@ -8,6 +8,7 @@ create dimensions
     [Classes of Service]
     [Aircraft Models]
     [Orderly]
+    [tinydimension]
 ;
 
 ---
@@ -97,6 +98,15 @@ dimensions
     [Orderly]:[R5]
     [Orderly]:[R6]
 measures MeaA MeaB MeaC
+;
+
+---
+
+build cube tinycube1
+dimensions
+    [tinydimension]:[dr1]
+    [tinydimension]:[dr2]
+measures MeaA
 ;
 
 ---
@@ -1921,3 +1931,9 @@ create members
 [Orderly].[o2].[o21].[o212],
 [Orderly].[o2].[o22].[o221],
 [Orderly].[o2].[o22].[o222];
+
+---
+
+create members
+[tinydimension].[t1],
+[tinydimension].[t2];
