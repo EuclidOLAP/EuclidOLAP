@@ -1,4 +1,246 @@
 select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+where ([Goods].[Foodstuff].[Meat].[Beef], [Region].[Europe].[United Kingdom], [Payment Methods].[PayPal], [Customer Types].[New customers], [Sales Channels].[Direct sales])
+
+---
+
+select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+where ([Goods].[Foodstuff].[Meat].[Beef], [Region].[Europe].[United Kingdom], [Payment Methods].[PayPal], [Customer Types].[New customers], [Sales Channels].[Direct sales])
+
+---
+
+select
+[Measures].Sales on columns,
+[Date].[2019].[Q3].[M8].[26] on rows
+from [Sahara Online Store]
+where (
+    [Goods].[Foodstuff].[Fruits].[Lemon],
+    [Region].[Europe].[Liechtenstein],
+    [Payment Methods].[PayPal],
+    [Customer Types].[New customers],
+    [Sales Channels].[Dropshipping]
+);
+
+---
+
+select
+[Measures].Sales on columns,
+[Date].[2019].[Q3].[M8].[26] on rows
+from [Sahara Online Store];
+
+---
+
+select
+[Measures].Sales on columns,
+[Date].[2019].[Q3].[M8] on rows
+from [Sahara Online Store];
+
+---
+
+select
+[Measures].Sales on columns,
+[Date].[2019].[Q3] on rows
+from [Sahara Online Store];
+
+---
+
+select
+[Measures].Sales on columns,
+[Date].[2019] on rows
+from [Sahara Online Store];
+
+---
+
+select
+[Measures].Sales on columns,
+[Date].[ALL] on rows
+from [Sahara Online Store];
+
+---
+
+select
+[Measures].MeaA on columns,
+[R1].[o1].[o11] on rows
+from [OC1M];
+
+---
+
+select
+[Measures].Sales on columns,
+[Date].[2019].[Q3].[M8] on rows
+from [Sahara Online Store];
+
+---
+
+select
+[Measures].members on columns,
+r.members on rows
+from OC
+where (rr.o1.o11.o111, rrr.o1.o11.o111, rrrr.o1.o11.o111, rrrrr.o1.o11.o111);
+
+---
+
+select
+[Measures].members on columns,
+R1.members on rows
+from OC1M
+where (R2.o1.o11.o111, R3.o1.o11.o111, R4.o1.o11.o111, R5.o1.o11.o111, R6.o1.o11.o111);
+
+---
+
+select
+[Measures].MeaA on columns,
+R1.o1.o11.o111 on rows
+from OC1M
+where (R2.o1.o11.o111, R3.o1.o11.o111, R4.o1.o11.o111, R5.o1.o11.o111, R6.o1.o11.o111);
+
+---
+
+select
+[Measures].MeaA on columns,
+{R1.[ALL], R1.o1, R1.o2} on rows
+from OC1M
+where (R2.o1, R3.o1, R4.o1, R5.o1, R6.o1)
+
+---
+
+select
+[Measures].MeaA on columns,
+{R1.[ALL], R1.o1, R1.o2} on rows
+from OC1M
+
+---
+
+select
+[Measures].MeaA on columns,
+R1.o2 on rows
+from OC1M
+where (R3.o1, R5.o1, R6.o1)
+
+---
+
+select
+[Measures].members on columns,
+[Date].root on rows
+from [Sahara Online Store]
+
+---
+
+select
+[Measures].MeaA on columns,
+dr1.root on rows
+from tinycube1
+where (dr2.t1);
+
+---
+
+select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+where ([Goods].[Foodstuff].[Meat].[Beef], [Region].[Europe].[United Kingdom], [Payment Methods].[PayPal], [Customer Types].[New customers], [Sales Channels].[Direct sales])
+
+---
+
+select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+where ([Region].[Europe].[United Kingdom], [Payment Methods].[PayPal], [Customer Types].[New customers], [Sales Channels].[Direct sales])
+
+---
+
+select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+where ([Payment Methods].[PayPal], [Customer Types].[New customers], [Sales Channels].[Direct sales])
+
+---
+
+select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+where ([Customer Types].[New customers], [Sales Channels].[Direct sales])
+
+---
+
+select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+where ([Sales Channels].[Direct sales])
+
+---
+
+select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+
+---
+
+select
+[Measures].members on columns,
+Date.[ALL] on rows
+from [Sahara Online Store]
+
+---
+
+select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+where ([Goods].[Foodstuff].[Meat].[Beef], [Region].[Europe].[United Kingdom], [Payment Methods].[PayPal], [Customer Types].[New customers], [Sales Channels].[Direct sales])
+
+---
+
+select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+where ([Goods].[Foodstuff].[Meat].[Beef], [Region].[Europe].[United Kingdom], [Payment Methods].[PayPal], [Customer Types].[New customers])
+
+---
+
+select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+where ([Goods].[Foodstuff].[Meat].[Beef], [Region].[Europe].[United Kingdom], [Payment Methods].[PayPal])
+
+---
+
+select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+where ([Goods].[Foodstuff].[Meat].[Beef], [Region].[Europe].[United Kingdom])
+
+---
+
+select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+where ([Goods].[Foodstuff].[Meat].[Beef])
+
+---
+
+select
+[Measures].members on columns,
+Date.[2022].Children() on rows
+from [Sahara Online Store]
+
+---
+
+select
 {
   [Date].[2020],
   [Date].[2021]
