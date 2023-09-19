@@ -473,6 +473,10 @@ Name {
 	return NAME;
 }
 
+DISABLE_RELOAD_MEASURES {
+	return DisableReloadMeasures;
+}
+
 [_a-zA-Z][_a-zA-Z0-9]*	{
 	return VAR;
 }

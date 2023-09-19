@@ -241,4 +241,15 @@ typedef struct ExpFn_CoalesceEmpty
 
 ExpFnCoalesceEmpty *ExpFnCoalesceEmpty_creat(ArrayList *exp_ls);
 
+
+enum ReloadMeasuresOption {
+    ReloadMeasures_Enable, // default
+    ReloadMeasures_Disable
+};
+
+typedef struct {
+    enum ReloadMeasuresOption re_mea_opt;
+    int worker_id;
+} InsertingMeasuresOptions;
+
 #endif

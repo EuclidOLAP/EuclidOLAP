@@ -87,7 +87,7 @@ void DimensionRole_print(DimensionRole *);
 
 int build_cube(char *name, ArrayList *dim_role_ls, ArrayList *measures);
 
-int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear, unsigned long worker_id);
+int insert_cube_measure_vals(char *cube_name, ArrayList *ls_ids_vctr_mear, InsertingMeasuresOptions *imo);
 
 Cube *find_cube_by_name(char *cube_name);
 
@@ -105,7 +105,7 @@ int gen_member_gid_abs_path_excluderoot(Cube *cube, MddMemberRole *mr, char *abs
 
 int store_measure(EuclidCommand *ec);
 
-int distribute_store_measure(EuclidCommand *ec, unsigned long worker_id);
+int distribute_store_measure(EuclidCommand *ec, InsertingMeasuresOptions *imo);
 
 // void MultiDimResult_print(MultiDimResult *);
 

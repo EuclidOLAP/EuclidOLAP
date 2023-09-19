@@ -58,6 +58,8 @@ static void ast_func_append_to_up(void);
 
 %token NIL			/* null */
 
+%token DisableReloadMeasures	/* DISABLE_RELOAD_MEASURES */
+
 /* set functions key words */
 %token SET				/* set */
 %token CHILDREN			/* children */
@@ -2759,38 +2761,64 @@ lv_func_Level:
 ;
 
 insert_cube_measures:
-	INSERT var_or_block vector_measures {
-		IDSVectorMears *ids_vm;
+	INSERT var_or_block {
+		InsertingMeasuresOptions *imo = mam_alloc(sizeof(InsertingMeasuresOptions), OBJ_TYPE__RAW_BYTES, NULL, 0);
+		imo->re_mea_opt = ReloadMeasures_Enable; // default
+		imo->worker_id = 0;
+		stack_push(&AST_STACK, imo);
+	} vector_measures {
+		IDSVectorMears *ids_vm = NULL;
 		stack_pop(&AST_STACK, (void **) &ids_vm);
-
 		ArrayList *ls_vms = als_new(128, "{ insert_cube_measures ::= }, { IDSVectorMears * }", THREAD_MAM, NULL);
 		als_add(ls_vms, ids_vm);
-
-		stack_push(&AST_STACK, NULL); // NULL is 0
-
 		stack_push(&AST_STACK, ls_vms);
 	}
   |
-	INSERT var_or_block EQUIVALENT_TO DECIMAL {
-		unsigned long worker_id = atoi(yytext);
-		stack_push(&AST_STACK, *((void **)&worker_id));
-	} vector_measures {
-		IDSVectorMears *ids_vm;
+	INSERT var_or_block insert_cube_measures_options vector_measures {
+		IDSVectorMears *ids_vm = NULL;
 		stack_pop(&AST_STACK, (void **) &ids_vm);
-
 		ArrayList *ls_vms = als_new(128, "{ insert_cube_measures ::= }, { IDSVectorMears * }", THREAD_MAM, NULL);
 		als_add(ls_vms, ids_vm);
-
 		stack_push(&AST_STACK, ls_vms);
 	}
   |
 	insert_cube_measures COMMA vector_measures {
-		IDSVectorMears *ids_vm;
+		IDSVectorMears *ids_vm = NULL;
 		stack_pop(&AST_STACK, (void **) &ids_vm);
-		ArrayList *ls_vms;
+		ArrayList *ls_vms = NULL;
 		stack_pop(&AST_STACK, (void **) &ls_vms);
 		als_add(ls_vms, ids_vm);
 		stack_push(&AST_STACK, ls_vms);
+	}
+;
+
+insert_cube_measures_options:
+	EQUIVALENT_TO DECIMAL {
+		InsertingMeasuresOptions *imo = mam_alloc(sizeof(InsertingMeasuresOptions), OBJ_TYPE__RAW_BYTES, NULL, 0);
+		imo->re_mea_opt = ReloadMeasures_Enable;
+		imo->worker_id = atoi(yytext);
+		stack_push(&AST_STACK, imo);
+	}
+  |
+	DisableReloadMeasures {
+		InsertingMeasuresOptions *imo = mam_alloc(sizeof(InsertingMeasuresOptions), OBJ_TYPE__RAW_BYTES, NULL, 0);
+		imo->re_mea_opt = ReloadMeasures_Disable;
+		imo->worker_id = 0;
+		stack_push(&AST_STACK, imo);
+	}
+  |
+	insert_cube_measures_options EQUIVALENT_TO DECIMAL {
+		InsertingMeasuresOptions *imo = NULL;
+		stack_pop(&AST_STACK, (void **) &imo);
+		imo->worker_id = atoi(yytext);
+		stack_push(&AST_STACK, imo);
+	}
+  |
+	insert_cube_measures_options DisableReloadMeasures {
+		InsertingMeasuresOptions *imo = NULL;
+		stack_pop(&AST_STACK, (void **) &imo);
+		imo->re_mea_opt = ReloadMeasures_Disable;
+		stack_push(&AST_STACK, imo);
 	}
 ;
 
