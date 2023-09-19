@@ -112,6 +112,8 @@ int vce_append(EuclidCommand *action)
     unsigned int pkg_capacity = *((unsigned int *)bytes);
     size_t i = sizeof(int) + sizeof(short);
 
+    InsertingMeasuresOptions *options = (InsertingMeasuresOptions *)slide_over_mem(bytes, sizeof(InsertingMeasuresOptions), &i);
+
     unsigned long cs_id = *((unsigned long *)slide_over_mem(bytes, sizeof(long), &i));
     unsigned int axes_count = *((unsigned int *)slide_over_mem(bytes, sizeof(int), &i));
     unsigned int vals_count = *((unsigned int *)slide_over_mem(bytes, sizeof(int), &i));
@@ -156,10 +158,13 @@ int vce_append(EuclidCommand *action)
     memset(data_file, 0, 256);
     sprintf(data_file, "%s/data/data-%lu", olap_env.OLAP_HOME, cs_id);
     // sprintf(data_file, "data/data-%lu", cs_id);
-    int _offset = sizeof(pkg_capacity) + sizeof(intent) + sizeof(cs_id) + sizeof(axes_count) + sizeof(vals_count);
+    int _offset = sizeof(pkg_capacity) + sizeof(intent) + sizeof(InsertingMeasuresOptions)
+        + sizeof(cs_id) + sizeof(axes_count) + sizeof(vals_count);
     append_file_data(data_file, (void *)(bytes + _offset), pkg_capacity - _offset);
 
-    // reload_space(cs_id);
+    if (options->re_mea_opt == ReloadMeasures_Enable)
+        reload_space(cs_id);
+
     return 0;
 }
 

@@ -209,7 +209,7 @@ static int execute_command(EuclidCommand *action)
 	{
 		// This line of code is executed only when running in worker mode.
 		assert(get_cfg()->mode == MODE_WORKER);
-		distribute_store_measure(action, 0);
+		distribute_store_measure(action, NULL);
 	}
 	else if (inte == INTENT__MDX /* || inte == INTENT__MDX_EXPECT_RESULT_TXT */)
 	{
@@ -268,12 +268,13 @@ static int execute_command(EuclidCommand *action)
 		else if (ids_type == IDS_CXOBJ_ISRTCUBEMEARS)
 		{
 			ArrayList *ls_vms = NULL;
-			unsigned long worker_id = 0;
+			InsertingMeasuresOptions *imo = NULL;
+			// unsigned long worker_id = 0;
 			char *cube_name = NULL;
 			stack_pop(&stk, (void **)&ls_vms);
-			stack_pop(&stk, (void **)&worker_id);
+			stack_pop(&stk, (void **)&imo);
 			stack_pop(&stk, (void **)&cube_name);
-			insert_cube_measure_vals(cube_name, ls_vms, worker_id);
+			insert_cube_measure_vals(cube_name, ls_vms, imo);
 		}
 		else if (ids_type == IDS_MULTI_DIM_SELECT_DEF)
 		{

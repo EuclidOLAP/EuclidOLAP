@@ -1,4 +1,4 @@
-insert tinycube1
+insert tinycube1 -> 1
 ( [dr1].[t1], [dr2].[t1] Measures [MeaA] 1 ),
 ( [dr1].[t1], [dr2].[t2] Measures [MeaA] 10 ),
 ( [dr1].[t2], [dr2].[t1] Measures [MeaA] 100 ),

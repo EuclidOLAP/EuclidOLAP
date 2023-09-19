@@ -51,6 +51,7 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
  *
  * 4 bytes - data package capacity
  * 2 bytes - intention
+ * N bytes - N = sizeof(InsertingMeasuresOptions), these bytes are a InsertingMeasuresOptions instance.
  * 8 bytes - cube g_id
  * 4 bytes - {DimRoles amount} - the number of coordinate axes, which is the number of dimension-roles.
  * 4 bytes - {MeasureMbrs amount} - the number of measure-dimension members.
