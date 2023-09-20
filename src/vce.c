@@ -81,24 +81,6 @@ void vce_load()
 
     closedir(dir);
 
-    // FILE *cubes_fd = open_file(META_DEF_CUBES_FILE_PATH, "r");
-
-    // md_gid cube_id;
-    // while (fread((void *)&cube_id, sizeof(md_gid), 1, cubes_fd) > 0) {
-
-    //     char src_dir[128];
-    //     memset(src_dir, 0, 128);
-    //     getcwd(src_dir, 80);
-
-    //     char profile_path[128];
-    //     memset(profile_path, 0, 128);
-    //     sprintf(profile_path, "%s/data/profile-%lu", src_dir, cube_id);
-
-    //     if (access(profile_path, F_OK) == 0)
-    //         reload_space(cube_id);
-    // }
-
-    // fclose(cubes_fd);
 }
 
 /* TODO
