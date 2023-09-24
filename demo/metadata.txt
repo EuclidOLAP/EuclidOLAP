@@ -1,6 +1,8 @@
 create dimensions
     [Region]
+    [Region2]
     [Date].Calendar
+    [Date2].Calendar
     [Goods]
     [Payment Methods]
     [Customer Types]
@@ -23,6 +25,7 @@ create Hierarchy [Aircraft Models].[Aircraft Size];
 
 create levels
     [Date].Calendar (1:[Year], 2:[Quarter], 3:[Month], 4:[Day]),
+    [Date2].Calendar (1:[Year], 2:[Quarter], 3:[Month]),
     [Date].[Financial] (1:[Financial Year], 2:[Financial Quarter], 3:[Financial Month]),
     [Aircraft Models] (1:[Manufacturer], 2:[Model]),
     [Aircraft Models].[Aircraft Size] (1:[Size], 2:[Model]);
@@ -118,6 +121,24 @@ dimensions
     [tinydimension]:[dr2]
 measures MeaA
 ;
+
+---
+
+build cube [Panda Store]
+dimensions
+    [Region2]:[Region]
+    [Date2]:[Date]
+    Goods
+measures Sales [Sales Count];
+
+---
+
+build cube [Dolphin Store]
+dimensions
+    [Region2]:[Region]
+    [Date2]:[Date]
+    Goods
+measures Sales [Sales Count];
 
 ---
 
@@ -2112,3 +2133,64 @@ make
 [Date].[Financial].[Financial 2022].[Q3].[M7] -> [Date].[2022].[Q4].[M10],
 [Date].[Financial].[Financial 2022].[Q3].[M8] -> [Date].[2022].[Q4].[M11],
 [Date].[Financial].[Financial 2022].[Q3].[M9] -> [Date].[2022].[Q4].[M12];
+
+---
+
+create members
+[Region2].[Africa].[Kenya],
+[Region2].[Africa].[Lesotho],
+[Region2].[Africa].[Liberia],
+[Region2].[Asia].[China],
+[Region2].[Asia].[India],
+[Region2].[Asia].[Japan],
+[Region2].[Asia].[Singapore],
+[Region2].[Europe].[France],
+[Region2].[Europe].[Germany],
+[Region2].[Europe].[Italy],
+[Region2].[Europe].[Spain],
+[Region2].[Europe].[United Kingdom],
+[Region2].[North America].[Canada],
+[Region2].[North America].[Mexico],
+[Region2].[North America].[United States of America],
+[Region2].[Oceania].[Australia],
+[Region2].[Oceania].[Fiji],
+[Region2].[Oceania].[New Zealand],
+[Region2].[South America].[Argentina],
+[Region2].[South America].[Brazil],
+[Region2].[South America].[Chile],
+[Date2].[2020].[Q1].[M1],
+[Date2].[2020].[Q1].[M2],
+[Date2].[2020].[Q1].[M3],
+[Date2].[2020].[Q2].[M4],
+[Date2].[2020].[Q2].[M5],
+[Date2].[2020].[Q2].[M6],
+[Date2].[2020].[Q3].[M7],
+[Date2].[2020].[Q3].[M8],
+[Date2].[2020].[Q3].[M9],
+[Date2].[2020].[Q4].[M10],
+[Date2].[2020].[Q4].[M11],
+[Date2].[2020].[Q4].[M12],
+[Date2].[2021].[Q1].[M1],
+[Date2].[2021].[Q1].[M2],
+[Date2].[2021].[Q1].[M3],
+[Date2].[2021].[Q2].[M4],
+[Date2].[2021].[Q2].[M5],
+[Date2].[2021].[Q2].[M6],
+[Date2].[2021].[Q3].[M7],
+[Date2].[2021].[Q3].[M8],
+[Date2].[2021].[Q3].[M9],
+[Date2].[2021].[Q4].[M10],
+[Date2].[2021].[Q4].[M11],
+[Date2].[2021].[Q4].[M12],
+[Date2].[2022].[Q1].[M1],
+[Date2].[2022].[Q1].[M2],
+[Date2].[2022].[Q1].[M3],
+[Date2].[2022].[Q2].[M4],
+[Date2].[2022].[Q2].[M5],
+[Date2].[2022].[Q2].[M6],
+[Date2].[2022].[Q3].[M7],
+[Date2].[2022].[Q3].[M8],
+[Date2].[2022].[Q3].[M9],
+[Date2].[2022].[Q4].[M10],
+[Date2].[2022].[Q4].[M11],
+[Date2].[2022].[Q4].[M12];
