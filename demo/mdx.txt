@@ -159,30 +159,6 @@ select
 [Measures].members on columns,
 Date.[2022].Children() on rows
 from [Sahara Online Store]
-where ([Payment Methods].[PayPal], [Customer Types].[New customers], [Sales Channels].[Direct sales])
-
----
-
-select
-[Measures].members on columns,
-Date.[2022].Children() on rows
-from [Sahara Online Store]
-where ([Customer Types].[New customers], [Sales Channels].[Direct sales])
-
----
-
-select
-[Measures].members on columns,
-Date.[2022].Children() on rows
-from [Sahara Online Store]
-where ([Sales Channels].[Direct sales])
-
----
-
-select
-[Measures].members on columns,
-Date.[2022].Children() on rows
-from [Sahara Online Store]
 
 ---
 
@@ -807,30 +783,6 @@ select
   { ([Measures].[Cost]), ([Measures].XXX) } ON 0, 
   FIlter(members(Date), ([Measures].[Revenue]) > 350000000) on 1 
 from [Airline A];
-
----
-
-with 
-member [Starting Point].PPPPPP 
-  as ([Starting Point].Asia) + [Starting Point].[North America]
-member [Measures].MMMMMM 
-  as (paREnt([Starting Point].currentMember), [Measures].Cost) 
-select
-  { ([Measures].Cost), ([Measures].MMMMMM) } on 1,
-  filter(members([Starting Point]), ([Measures].Cost) > 1) on 200 
-from [Airline B] ;
-// where ( [Goods].[ALL].[electronic product].[computer] , Transport.[ALL].railway, [starting region].[ALL].[Europe].[UK], [ending region].[ALL].[Europe].[Italy], [completion date].[ALL].[2020].[Q1].[M3] );
-
----
-
-with 
-member [Aircraft Models].XXX 
-  as (paREnt([Measures].currentMember()), [Aircraft Models].[Boeing]) 
-select 
-  members([Measures]) on 1, 
-  { ( [Aircraft Models].[ATR] ), ([Aircraft Models].XXX) } on 0 
-from [Airline B] 
-where ([Ending Point].[South America]);
 
 ---
 
@@ -1606,21 +1558,6 @@ select
 [Measures].[XXXXXX] on rows, 
 [Aircraft Models].Root on columns 
 
-from [Airline B];
-
----
-
-with
-member [Measures].XXXXXX
-    as Covariance(
-        children([Ending Point].root),
-        [Measures].Revenue,
-        // [Measures].Revenue
-        [Measures].Cost
-    )
-Select
-[Measures].XXXXXX on 1,
-[Starting Point].[ALL] on 0
 from [Airline B];
 
 ---
@@ -3326,3 +3263,74 @@ select
     (measure.[##########################################])
 } on SECTIons
 from [Online Store];
+
+---
+
+Select
+Region.members on columns,
+Date.members on rows
+from [Panda Store]
+where ([Goods].[Foodstuff]);
+
+---
+
+Select
+{Date.[2022].Q1,Date.[2022].Q2,Date.[2022].Q3,Date.[2022].Q4} on columns,
+Goods.Foodstuff.children on rows
+from [Panda Store]
+where ([Region].[North America]);
+
+---
+
+Select
+{Date.[2022].Q1,Date.[2022].Q2,Date.[2022].Q3,Date.[2022].Q4} on columns,
+{[Measures].[Sales],[Measures].[Sales Count]} on rows
+from [Panda Store]
+where ([Region].[North America], Goods.Foodstuff);
+
+---
+
+Select
+Region.[ALL].children on columns,
+Goods.[ALL].children on rows
+from [Panda Store]
+where (Date.[2022].Q3);
+
+---
+
+Select
+union(Goods.Foodstuff.Fruits, Goods.Foodstuff.Fruits.children) on columns,
+[Measures].Sales on rows
+from [Panda Store];
+
+---
+
+Select
+union(Goods.Foodstuff, Goods.Foodstuff.children) on columns,
+[Measures].Sales on rows
+from [Panda Store];
+
+---
+
+with
+member [Measures].DrinkRate as [Measures].Sales / (Goods.currentmember.parent, [Measures].Sales)
+Select
+Goods.Foodstuff.Drink.children on columns,
+{[Measures]. DrinkRate, [Measures].Sales} on rows
+from [Panda Store];
+
+---
+
+Select
+Children(Date.[2022]) on columns,
+[Measures].members on rows
+from [Panda Store];
+
+---
+
+with member [Measures].otherCubeSales
+as lookupcube("Dolphin Store", "[Measures].Sales")
+select
+Date.[2022] on rows,
+{[Measures].Sales, [Measures].otherCubeSales} on columns
+from [Panda Store];

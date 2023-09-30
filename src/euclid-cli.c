@@ -189,9 +189,14 @@ int main(int argc, char *argv[])
 			printf("%s ...\n", exe_stat);
 		}
 
+		long starting = now_microseconds();
+
 		send(sock_fd, mdx_ec->bytes, ec_get_capacity(mdx_ec), 0);
 
 		read_sock_pkg(sock_fd, &buf, &buf_len);
+
+		printf("\n(consumed %ldms)\n", (now_microseconds() - starting) / 1000);
+
 		EuclidCommand *result = create_command(buf);
 
 		switch (ec_get_intent(result))
