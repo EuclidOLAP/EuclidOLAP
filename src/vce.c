@@ -1268,7 +1268,8 @@ void dispatchAggregateMeasure(/*MDContext *md_context,*/ Cube *cube, ArrayList *
                 continue;
             }
 
-            *((md_gid *)buf_cutting(buff, sizeof(md_gid))) = mr->member->gid;
+            // if member is a root, then use zero to replace its gid.
+            *((md_gid *)buf_cutting(buff, sizeof(md_gid))) = mr->member->p_gid ? mr->member->gid : 0;
         }
 
         // int mea_val_idx = 0;
@@ -1473,8 +1474,14 @@ ArrayList *worker_aggregate_measure(EuclidCommand *ec)
             Axis *ax = cs_get_axis(cs, j);
 
             md_gid member_gid = *((md_gid *)(payload + idx));
-            // idx += sizeof(md_gid);
+            idx += sizeof(md_gid);
             // log_print("\tmember_gid = %ld\n", member_gid);
+
+            if (member_gid == 0) {
+                als_add(sor_ls, mam_alloc(sizeof(ScaleOffsetRange), OBJ_TYPE__ScaleOffsetRange, NULL, 0));
+                continue;
+            }
+
             key.gid = member_gid;
 
             RBNode *node = rbt__find(ax->sor_idx_tree, &key);
@@ -1491,7 +1498,7 @@ ArrayList *worker_aggregate_measure(EuclidCommand *ec)
                 als_add(sor_ls, sor);
             }
 
-            idx += sizeof(md_gid);
+            // idx += sizeof(md_gid);
         }
 
         if (mark_null)
