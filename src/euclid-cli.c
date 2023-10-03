@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
 
 		read_sock_pkg(sock_fd, &buf, &buf_len);
 
-		printf("\n(consumed %ldms)\n", (now_microseconds() - starting) / 1000);
+		// printf("\n(consumed %ldms)\n", (now_microseconds() - starting) / 1000);
 
 		EuclidCommand *result = create_command(buf);
 
