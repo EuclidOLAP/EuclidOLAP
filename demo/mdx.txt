@@ -3334,3 +3334,100 @@ select
 Date.[2022] on rows,
 {[Measures].Sales, [Measures].otherCubeSales} on columns
 from [Panda Store];
+
+---
+
+Select
+Date.[2022] on columns,
+[Measures].Sales on rows
+from [Panda Store];
+
+---
+
+select
+dr2.t2 on columns,
+dr1.ROOT on rows
+from tinycube1;
+
+---
+
+select
+[Measures].MeaA on columns,
+[R1].[ALL] on rows
+from [OC1M];
+
+---
+
+select
+[Measures].MeaA on columns,
+[R1].[o1] on rows
+from [OC1M];
+
+---
+
+select
+[Measures].MeaA on columns,
+[R1].[o1].[o11] on rows
+from [OC1M];
+
+---
+
+select
+[Measures].members on columns,
+R1.members on rows
+from OC1M
+where (R2.o1.o11.o111, R3.o1.o11.o111, R4.o1.o11.o111, R5.o1.o11.o111, R6.o1.o11.o111);
+
+---
+
+select
+[Measures].MeaA on columns,
+R1.o1.o11.o111 on rows
+from OC1M
+where (R2.o1.o11.o111, R3.o1.o11.o111, R4.o1.o11.o111, R5.o1.o11.o111, R6.o1.o11.o111);
+
+---
+
+select
+[Measures].MeaA on columns,
+{R1.[ALL], R1.o1, R1.o2} on rows
+from OC1M
+where (R2.o1, R3.o1, R4.o1, R5.o1, R6.o1)
+
+---
+
+select
+[Measures].MeaA on columns,
+{R1.[ALL], R1.o1, R1.o2} on rows
+from OC1M
+
+---
+
+select
+[Measures].MeaA on columns,
+R1.o2 on rows
+from OC1M
+where (R3.o1, R5.o1, R6.o1)
+
+---
+
+select
+[Measures].MeaA on columns,
+R1.o1 on rows
+from OC1M
+where (R2.o1.o11.o111, R3.o1.o11.o111, R4.o1.o11.o111, R5.o1.o11.o111, R6.o1.o11.o111);
+
+---
+
+select
+{[Measures].MeaA, [Measures].MeaB, [Measures].MeaC} on columns,
+[R1].[o1] on rows
+from [OC1M];
+
+---
+
+select
+[Measures].MeaA on columns,
+R1.o1 on rows
+from OC1M
+where (R2.o1.o11.o111, R3.o1.o11.o111, R4.o1.o11.o111, R5.o1.o11.o111);

@@ -36,7 +36,7 @@ static void agg_based_on_dynamic_sparse_idx
 
 static void MeasureSpace_coordinate_intersection_value(MeasureSpace *space, unsigned long index, int mea_val_idx, GridData *gridData);
 
-static void summarize_space_scope(MeasureSpace *space, unsigned long starting, unsigned long ending, int mea_val_idx, GridData *gridData);
+static void summarize_space_scope(MeasureSpace *space, unsigned long start_offset, unsigned long end_offset, int mea_val_idx, GridData *gridData);
 
 static void calculates_the_full_summary_value(MeasureSpace *space, GridData *gridData, int mea_val_idx);
 
@@ -954,17 +954,17 @@ static void calculates_the_full_summary_value(MeasureSpace *space, GridData *gri
     }
 }
 
-static void summarize_space_scope(MeasureSpace *space, unsigned long starting, unsigned long ending, int mea_val_idx, GridData *gridData) {
+static void summarize_space_scope(MeasureSpace *space, unsigned long start_offset, unsigned long end_offset, int mea_val_idx, GridData *gridData) {
 
-    if (starting == ending) {
-        MeasureSpace_coordinate_intersection_value(space, starting, mea_val_idx, gridData);
+    if (start_offset == end_offset) {
+        MeasureSpace_coordinate_intersection_value(space, start_offset, mea_val_idx, gridData);
         return;
     }
 
-    assert(ending > starting);
+    assert(end_offset > start_offset);
 
-    unsigned long staing_seg_num = starting / space->segment_scope;
-    unsigned long ending_seg_num = ending / space->segment_scope;
+    unsigned long staing_seg_num = start_offset / space->segment_scope;
+    unsigned long ending_seg_num = end_offset / space->segment_scope;
 
     assert(ending_seg_num >= staing_seg_num);
 
@@ -982,35 +982,39 @@ static void summarize_space_scope(MeasureSpace *space, unsigned long starting, u
 
     char *f_tail_addr = first_block + (first_cells_count - 1) * a_cell_bytes_count;
 
-    unsigned long f_head_idx = *(unsigned long *)first_block;
-    unsigned long f_tail_idx = *(unsigned long *)f_tail_addr;
-    char *start_index = NULL;
-    if (starting < f_head_idx) {
-        start_index = first_block;
-    } else if (starting > f_tail_idx) {
-        start_index = NULL;
+    unsigned long f_head_offset = *(unsigned long *)first_block;
+    unsigned long f_tail_offset = *(unsigned long *)f_tail_addr;
+
+    char *start_addr = NULL;
+
+    if (start_offset < f_head_offset) {
+        start_addr = first_block;
+    } else if (start_offset > f_tail_offset) {
+        start_addr = NULL;
     } else {
         unsigned long range_start = 0;
         unsigned long range_end = first_cells_count - 1;
+
         while (1) {
             if (range_end - range_start > 1) {
                 unsigned long range_mid = (range_start + range_end) / 2;
-                unsigned long seg_cell_mid_pos = *((unsigned long *)(first_block + range_mid * a_cell_bytes_count));
-                if (seg_cell_mid_pos == starting)
+                char *mid_addr = first_block + range_mid * a_cell_bytes_count;
+                unsigned long mid_offset = *((unsigned long *)mid_addr);
+                if (mid_offset == start_offset)
                 {
-                    start_index = first_block + range_mid * a_cell_bytes_count;
+                    start_addr = mid_addr;
                     break;
+                } else if (start_offset < mid_offset) {
+                    range_end = range_mid;
+                } else { // start_offset > mid_offset
+                    range_start = range_mid;
                 }
-                if (starting < seg_cell_mid_pos)
-                    range_end = range_mid - 1;
-                else
-                    range_start = range_mid + 1;
             } else {
-                unsigned long seg_cell_start_pos = *((unsigned long *)(first_block + range_start * a_cell_bytes_count));
-                if (starting == seg_cell_start_pos) {
-                    start_index = first_block + range_start * a_cell_bytes_count;
+                unsigned long range_start_offset = *((unsigned long *)(first_block + range_start * a_cell_bytes_count));
+                if (range_start_offset >= start_offset) {
+                    start_addr = first_block + range_start * a_cell_bytes_count;
                 } else {
-                    start_index = first_block + range_end * a_cell_bytes_count;
+                    start_addr = first_block + range_end * a_cell_bytes_count;
                 }
                 break;
             }
@@ -1029,35 +1033,39 @@ static void summarize_space_scope(MeasureSpace *space, unsigned long starting, u
 
     char *l_tail_addr = last_block + (last_cells_count - 1) * a_cell_bytes_count;
 
-    unsigned long l_head_idx = *(unsigned long *)last_block;
-    unsigned long l_tail_idx = *(unsigned long *)l_tail_addr;
-    char *end_index = NULL;
-    if (ending > l_tail_idx) {
-        end_index = last_block + (last_cells_count - 1) * a_cell_bytes_count;
-    } else if (ending < l_head_idx) {
-        end_index = NULL;
+    unsigned long l_head_offset = *(unsigned long *)last_block;
+    unsigned long l_tail_offset = *(unsigned long *)l_tail_addr;
+    char *end_addr = NULL;
+
+    if (end_offset > l_tail_offset) {
+        end_addr = l_tail_addr;
+    } else if (end_offset < l_head_offset) {
+        end_addr = NULL;
     } else {
         unsigned long range_start = 0;
         unsigned long range_end = last_cells_count - 1;
+
         while (1) {
             if (range_end - range_start > 1) {
                 unsigned long range_mid = (range_start + range_end) / 2;
-                unsigned long seg_cell_mid_pos = *((unsigned long *)(last_block + range_mid * a_cell_bytes_count));
-                if (seg_cell_mid_pos == ending)
+                char *mid_addr = last_block + range_mid * a_cell_bytes_count;
+                unsigned long mid_offset = *((unsigned long *)mid_addr);
+
+                if (mid_offset == end_offset)
                 {
-                    end_index = last_block + range_mid * a_cell_bytes_count;
+                    end_addr = mid_addr;
                     break;
+                } else if (end_offset < mid_offset) {
+                    range_end = range_mid;
+                } else { // end_offset > mid_offset
+                    range_start = range_mid;
                 }
-                if (ending > seg_cell_mid_pos)
-                    range_start = range_mid + 1;
-                else
-                    range_end = range_mid - 1;
             } else {
-                unsigned long seg_cell_end_pos = *((unsigned long *)(last_block + range_end * a_cell_bytes_count));
-                if (ending == seg_cell_end_pos) {
-                    end_index = last_block + range_end * a_cell_bytes_count;
+                unsigned long range_end_offset = *((unsigned long *)(last_block + range_end * a_cell_bytes_count));
+                if (range_end_offset <= end_offset) {
+                    end_addr = last_block + range_end * a_cell_bytes_count;
                 } else {
-                    end_index = last_block + range_start * a_cell_bytes_count;
+                    end_addr = last_block + range_start * a_cell_bytes_count;
                 }
                 break;
             }
@@ -1067,9 +1075,9 @@ static void summarize_space_scope(MeasureSpace *space, unsigned long starting, u
     char *cursor = NULL;
 
     if (staing_seg_num == ending_seg_num) {
-        if (start_index && end_index) {
-            cursor = start_index;
-            while (cursor <= end_index) {
+        if (start_addr && end_addr) {
+            cursor = start_addr;
+            while (cursor <= end_addr) {
                 char nullflag = *(char *)(cursor + sizeof(unsigned long) + mea_val_idx * (sizeof(double) + sizeof(char)) + sizeof(double));
                 if (!nullflag) {
                     double meaval = *(double *)(cursor + sizeof(unsigned long) + mea_val_idx * (sizeof(double) + sizeof(char)));
@@ -1083,8 +1091,8 @@ static void summarize_space_scope(MeasureSpace *space, unsigned long starting, u
         }
     } else {
         // If the start_index is not NULL, summarize the data block of start
-        if (start_index) {
-            cursor = start_index;
+        if (start_addr) {
+            cursor = start_addr;
             while (cursor <= f_tail_addr) {
                 char nullflag = *(char *)(cursor + sizeof(unsigned long) + mea_val_idx * (sizeof(double) + sizeof(char)) + sizeof(double));
                 if (!nullflag) {
@@ -1119,9 +1127,9 @@ static void summarize_space_scope(MeasureSpace *space, unsigned long starting, u
         }
 
         // If the end_index is not NULL, summarize the end data block.
-        if (end_index) {
+        if (end_addr) {
             cursor = last_block;
-            while (cursor <= end_index) {
+            while (cursor <= end_addr) {
                 char nullflag = *(char *)(cursor + sizeof(unsigned long) + mea_val_idx * (sizeof(double) + sizeof(char)) + sizeof(double));
                 if (!nullflag) {
                     double meaval = *(double *)(cursor + sizeof(unsigned long) + mea_val_idx * (sizeof(double) + sizeof(char)));
