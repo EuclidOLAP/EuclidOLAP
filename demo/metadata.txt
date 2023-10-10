@@ -115,6 +115,19 @@ measures MeaA MeaB MeaC
 
 ---
 
+build cube OC100M
+dimensions
+    [Orderly]:[R1]
+    [Orderly]:[R2]
+    [Orderly]:[R3]
+    [Orderly]:[R4]
+    [Orderly]:[R5]
+    [Orderly]:[R6]
+    [Orderly]:[R7]
+measures MeaA MeaB MeaC MeaD Mea_5 Mea_6 Mea_7 Mea_8 Mea_9 Mea_10;
+
+---
+
 build cube tinycube1
 dimensions
     [tinydimension]:[dr1]
