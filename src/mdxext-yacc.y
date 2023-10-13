@@ -38,6 +38,7 @@ static void ast_func_append_to_up(void);
 %token CUBE			/* cube */
 %token MEASURES		/* measures */
 %token INSERT		/* insert */
+%token RELOAD		/* reload */
 %token WITH			/* with */
 %token SELECT		/* select */
 %token FROM			/* from */
@@ -322,6 +323,24 @@ euclidolap_mdx:
   |
 	insert_cube_measures EOF_ {
 	  	stack_push(&AST_STACK, IDS_CXOBJ_ISRTCUBEMEARS);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
+	}
+  |
+	RELOAD cube__statement EOF_ {
+	  	stack_push(&AST_STACK, IDS_RELOAD_CUBE_MEASURE_VALUE);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0001;
+		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags & 0xFFFD;
+	}
+  |
+	RELOAD cube__statement SEMICOLON EOF_ {
+	  	stack_push(&AST_STACK, IDS_RELOAD_CUBE_MEASURE_VALUE);
 
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();

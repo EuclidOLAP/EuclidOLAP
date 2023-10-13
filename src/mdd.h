@@ -240,4 +240,6 @@ int tup_is_calculated(MddTuple *tuple);
  *************************************************************************************/
 Cube *select_def__get_cube(SelectDef *sd);
 
+void reload_measure_values_of_cube(CubeDef *cube_def);
+
 #endif

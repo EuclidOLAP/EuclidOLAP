@@ -58,6 +58,18 @@ measures [Sales] [Sales Count]
 
 ---
 
+build cube [Nile Online Store]
+dimensions
+    [Date]
+    [Goods]
+    [Region]
+    [Payment Methods]
+    [Customer Types]
+    [Sales Channels]
+measures [Sales];
+
+---
+
 build cube [Light E-commerce]
 dimensions
     [Date]
