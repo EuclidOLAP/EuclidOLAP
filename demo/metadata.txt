@@ -58,6 +58,18 @@ measures [Sales] [Sales Count]
 
 ---
 
+build cube [Nile Online Store]
+dimensions
+    [Date]
+    [Goods]
+    [Region]
+    [Payment Methods]
+    [Customer Types]
+    [Sales Channels]
+measures [Sales];
+
+---
+
 build cube [Light E-commerce]
 dimensions
     [Date]
@@ -112,6 +124,19 @@ dimensions
     [Orderly]:[R6]
 measures MeaA MeaB MeaC
 ;
+
+---
+
+build cube OC100M
+dimensions
+    [Orderly]:[R1]
+    [Orderly]:[R2]
+    [Orderly]:[R3]
+    [Orderly]:[R4]
+    [Orderly]:[R5]
+    [Orderly]:[R6]
+    [Orderly]:[R7]
+measures MeaA MeaB MeaC MeaD Mea_5 Mea_6 Mea_7 Mea_8 Mea_9 Mea_10;
 
 ---
 

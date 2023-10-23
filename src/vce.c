@@ -189,7 +189,7 @@ void reload_space(unsigned long cs_id)
 {
     long timestamp = now_microseconds();
 
-    space_unload(cs_id);
+    // space_unload(cs_id);
 
     ByteBuf *tmp_buf = buf__alloc(0x01UL << 10);
 
@@ -217,7 +217,7 @@ void reload_space(unsigned long cs_id)
     // Create a coordinate system object by MemAllocMng.
     MemAllocMng *cs_mam = MemAllocMng_new();
     CoordinateSystem *cs = coosys_new(cs_id, axes_count, cs_mam);
-    als_add(coor_sys_ls, cs);
+    // als_add(coor_sys_ls, cs);
 
     char data_file[256];
     assert(strlen(olap_env.OLAP_HOME) < 200);
@@ -398,6 +398,8 @@ finished:
     CoordinateSystem__gen_auxiliary_index(cs);
     CoordinateSystem__calculate_offset(cs);
 
+    space_unload(cs_id);
+    als_add(coor_sys_ls, cs);
     als_add(space_ls, space);
 
     log_print(">>> RELOAD_SPACE { 5 } %lf\n", (now_microseconds() - timestamp) / 1000.0);

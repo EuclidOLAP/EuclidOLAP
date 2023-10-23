@@ -57,6 +57,10 @@ insert	{
 	return INSERT;
 }
 
+reload {
+	return RELOAD;
+}
+
 make	{
 	return MAKE;
 }
