@@ -775,7 +775,14 @@ void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, 
         if (mr->member_formula)
         {
             Expression *exp = mr->member_formula->exp;
-            Expression_evaluate(md_ctx, exp, cube, tuple, grid_data);
+            
+            Member *def_mbr = get_default_dimension_member(cube, find_dim_by_gid(mr->dim_role->dim_gid));
+            MddMemberRole *def_mrole = mdd_mr__create(def_mbr, mr->dim_role);
+            MddTuple *temp_tuple = mdd_tp__create();
+            mdd_tp__add_mbrole(temp_tuple, def_mrole);
+            MddTuple *new_tuple = tuple__merge(tuple, temp_tuple);
+
+            Expression_evaluate(md_ctx, exp, cube, new_tuple, grid_data);
             return;
         }
     }
