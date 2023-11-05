@@ -3463,3 +3463,19 @@ select
 R1.ROOT on rows
 from OC100M
 where (R4.o1, R5.o1);
+
+---
+
+with member [Measures].XXX as (dr2.t2, [Measures].MeaA)
+select
+{[Measures].XXX, [Measures].MeaA} on 0,
+dr1.root on 1
+from [tinycube1];
+
+---
+
+with member [Measures].XXX as dr2.t2
+select
+[Measures].XXX on 0,
+dr1.root on 1
+from [tinycube1];

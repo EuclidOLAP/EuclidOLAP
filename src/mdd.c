@@ -1206,18 +1206,7 @@ static MddTuple *cube__basic_ref_vector(Cube *cube)
 	for (i = 0; i < r_count; i++)
 	{
 		DimensionRole *dim_role = als_get(cube->dim_role_ls, i);
-		Dimension *dim = find_dim_by_gid(dim_role->dim_gid);
-		int mp_size = als_size(member_pool);
-		for (j = 0; j < mp_size; j++)
-		{
-			Member *mbr = als_get(member_pool, j);
-			if (mbr->hierarchy_gid == dim->def_hierarchy_gid && (mbr->lv == 0) && (strcmp(mbr->name, "Root") == 0))
-			{
-				MddMemberRole *mbr_role = mdd_mr__create(mbr, dim_role);
-				mdd_tp__add_mbrole(tuple, mbr_role);
-				break;
-			}
-		}
+		mdd_tp__add_mbrole(tuple, mdd_mr__create(get_default_dimension_member(cube, find_dim_by_gid(dim_role->dim_gid)), dim_role));
 	}
 
 	DimensionRole *meadr = mam_alloc(sizeof(DimensionRole), OBJ_TYPE__DimensionRole, NULL, 0);
@@ -1226,7 +1215,7 @@ static MddTuple *cube__basic_ref_vector(Cube *cube)
 	meadr->dim_gid = cube->measure_dim->gid;
 	meadr->gid = 0;
 
-	MddMemberRole *measure_mr = mdd_mr__create(als_get(cube->measure_mbrs, 0), meadr);
+	MddMemberRole *measure_mr = mdd_mr__create(get_default_dimension_member(cube, NULL), meadr);
 	// MddMemberRole *measure_mr = mdd_mr__create(als_get(cube->measure_mbrs, 0), NULL);
 
 	mdd_tp__add_mbrole(tuple, measure_mr);
@@ -3094,4 +3083,24 @@ int compare_member_position(Member *mem, Member *oth) {
 	}
 
 	return oth->lv > mem->lv ? 1 : (oth->lv < mem->lv ? -1 : 0);
+}
+
+Member *get_default_dimension_member(Cube *cube, Dimension *dim) {
+
+	if (dim == NULL || strcmp(dim->name, STANDARD_MEASURE_DIMENSION) == 0) {
+		return als_get(cube->measure_mbrs, 0);
+	}
+
+	int mp_size = als_size(member_pool);
+	for (int i = 0; i < mp_size; i++)
+	{
+		Member *mbr = als_get(member_pool, i);
+		if (mbr->hierarchy_gid == dim->def_hierarchy_gid && (mbr->lv == 0) && (strcmp(mbr->name, "Root") == 0))
+		{
+			return mbr;
+		}
+	}
+
+	log_print("[ERROR] The default dimension member could not be found, and this error caused the process to end.\n");
+	exit(EXIT_FAILURE);
 }
