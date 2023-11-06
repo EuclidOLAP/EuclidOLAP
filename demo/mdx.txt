@@ -3479,3 +3479,17 @@ select
 [Measures].XXX on 0,
 dr1.root on 1
 from [tinycube1];
+
+---
+
+select
+[Measures].Sales on 0,
+Date.[2022].Q3 on 1
+from [Nile Online Store];
+
+---
+
+select
+[Measures].Sales on 0,
+Date.[ALL] on 1
+from [Nile Online Store];
