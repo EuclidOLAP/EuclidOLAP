@@ -1784,7 +1784,11 @@ ArrayList *Cube_find_date_dim_roles(Cube *cube)
 	for (i = 0; i < dr_count; i++)
 	{
 		DimensionRole *dr = als_get(cube->dim_role_ls, i);
-		if (strcmp(find_dim_by_gid(dr->dim_gid)->name, "Calendar") == 0 || strcmp(find_dim_by_gid(dr->dim_gid)->name, "Date") == 0)
+		char *dimension_name = find_dim_by_gid(dr->dim_gid)->name;
+
+		// TODO Replace the following way of judging only the name of the dimension with more rigorous logic.
+		if (strcmp(dimension_name, "Dates") == 0
+				|| strcmp(dimension_name, "Calendar") == 0 || strcmp(dimension_name, "Date") == 0)
 			als_add(date_drs, dr);
 	}
 	return date_drs;
