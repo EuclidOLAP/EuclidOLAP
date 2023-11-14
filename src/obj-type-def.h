@@ -183,4 +183,6 @@ typedef short type_obj;
 #define OBJ_TYPE__GridData 10084
 #define OBJ_TYPE__ASTStrExp 10085
 
+#define OBJ_TYPE__AxisBuildAssist 10086
+
 #endif
