@@ -18,23 +18,26 @@ typedef struct _coordinate_system
 
 CoordinateSystem *coosys_new(unsigned long id, int axes_count, MemAllocMng *mam);
 
-void CoordinateSystem__gen_auxiliary_index(CoordinateSystem *);
-void CoordinateSystem__calculate_offset(CoordinateSystem *);
+typedef struct _ax_build_assist_ {
+    RedBlackTree *leaf_scales_rbt;
+    char *scales_table;
+} AxisBuildAssist;
 
 typedef struct _coordinate_axis
 {
-    RedBlackTree *rbtree;
     RedBlackTree *sor_idx_tree; // ScaleOffsetRange *
-    char *index;
-    unsigned long coor_offset;
+    unsigned int sor_idx_tree_size;
+
+    unsigned long leaf_scale_offset;
     unsigned int max_path_len;
 
     size_t scales_count; // A scale corresponds to a leaf dimension member in a multidimensional model.
+
+    AxisBuildAssist *assist;
 } Axis;
 
 Axis *ax_create(MemAllocMng *mam);
 
-void ax_reordering(Axis *axis);
 int ax_size(Axis *axis);
 
 Axis *cs_get_axis(CoordinateSystem *cs, int axis_position);
@@ -53,8 +56,6 @@ void *scal__destory(void *scale);
 
 int scal_cmp(void *_one, void *_other);
 
-// void scal_set_len(Scale *scale, int fgs_len);
-
 typedef struct _scale_offset_range
 {
     md_gid gid; // ID of the non-measure dimension member (can be a leaf member or a non-leaf member)
@@ -71,11 +72,11 @@ int ScaleOffsetRange_cmp(void *obj, void *other);
 
 void *ScaleOffsetRange_destory(void *);
 
-void ax_set_scale(Axis *axis, Scale *scale);
-
 int vce_append(EuclidCommand *ec);
 
 void reload_space(unsigned long cs_id);
+
+void do_solidify_mirror(unsigned long cs_id);
 
 void vce_init();
 
@@ -102,7 +103,7 @@ __uint64_t cs_axis_span(CoordinateSystem *cs, int axis_order);
 
 void space_add_measure(MeasureSpace *space, __uint64_t measure_position, void *cell);
 
-void space_plan(MeasureSpace *space, ArrayList *tree_ls_h);
+void space_plan(MeasureSpace *space, RedBlackTree **tmp_rbt_hs);
 
 void space__destory(MeasureSpace *);
 

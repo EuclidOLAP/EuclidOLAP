@@ -18,6 +18,7 @@ void parse_mdx(char *mdx, Stack *stk);
 #define IDS_CREATE_HIERARCHY ((void *)0x07)
 #define IDS_MAKE_EQUIVALENT ((void *)0x08)
 #define IDS_RELOAD_CUBE_MEASURE_VALUE ((void *)0x09)
+#define IDS_SOLIDIFY_MIRROR_OF_SPACE ((void *)0x0A)
 
 typedef struct general_chain_expression
 {

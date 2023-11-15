@@ -279,6 +279,10 @@ static int execute_command(EuclidCommand *action)
 			CubeDef *cube_def = NULL;
 			stack_pop(&stk, (void **)&cube_def);
 			reload_measure_values_of_cube(cube_def);
+		} else if (ids_type == IDS_SOLIDIFY_MIRROR_OF_SPACE) {
+			CubeDef *cube_def = NULL;
+			stack_pop(&stk, (void **)&cube_def);
+			solidify_mirror_of_space(cube_def);
 		}
 		else if (ids_type == IDS_MULTI_DIM_SELECT_DEF)
 		{
@@ -423,6 +427,8 @@ static int execute_command(EuclidCommand *action)
 		action->result = create_command(payload);
 	} else if (inte == INTENT__RELOAD_SPACE_OF_MEASURES) {
 		reload_space(*(md_gid *)(action->bytes + sizeof(int) + sizeof(short)));
+	} else if (inte == INTENT__SOLIDIFY_MIRROR_OF_SPACE) {
+		do_solidify_mirror(*(md_gid *)(action->bytes + sizeof(int) + sizeof(short)));
 	}
 	else if (inte == INTENT__AGGREGATE_TASK_RESULT)
 	{

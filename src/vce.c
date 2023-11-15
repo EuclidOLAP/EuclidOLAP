@@ -17,6 +17,8 @@
 
 extern OLAPEnv olap_env;
 
+extern ArrayList *cubes_pool;
+
 static MemAllocMng *vce_mam;
 static ArrayList *space_mam_ls;
 static ArrayList *coor_sys_ls;
@@ -39,6 +41,14 @@ static void MeasureSpace_coordinate_intersection_value(MeasureSpace *space, unsi
 static void summarize_space_scope(MeasureSpace *space, unsigned long start_offset, unsigned long end_offset, int mea_val_idx, GridData *gridData);
 
 static void calculates_the_full_summary_value(MeasureSpace *space, GridData *gridData, int mea_val_idx);
+
+static void *__set_ax_max_path_len(RBNode *node, void *param);
+
+static void *__Axis_build_index(RBNode *node, void *axis);
+
+static void load_space(char *profile, char *data_file, unsigned long cs_id, CoordinateSystem **_cs, MeasureSpace **ms_);
+
+static void load_mirror(char *coorsys_mirror, char *data_mirror, unsigned long cs_id, CoordinateSystem **_cs, MeasureSpace **ms_);
 
 void vce_init()
 {
@@ -69,18 +79,39 @@ void vce_load()
 
     assert(dir != NULL);
 
+    MemAllocMng *temp_mam = MemAllocMng_new();
+    ArrayList *loaded_id_ls = als_new(20, "unsigned long *", SPEC_MAM, temp_mam);  
+
     while ((entry = readdir(dir)) != NULL)
     {
-        if (strncmp(entry->d_name, prefix, prefix_len) == 0)
-        {
-            suffix = entry->d_name + prefix_len;
-            cube_id = strtol(suffix, &endptr, 10);
-            reload_space(cube_id);
+        if (strncmp(entry->d_name, "data-", strlen("data-")) == 0) {
+            suffix = entry->d_name + strlen("data-");
+        } else if (strncmp(entry->d_name, "mirror-data-", strlen("mirror-data-")) == 0) {
+            suffix = entry->d_name + strlen("mirror-data-");
+        } else {
+            continue;
         }
+
+        cube_id = strtol(suffix, &endptr, 10);
+        for (int i=0; i<als_size(loaded_id_ls); i++) {
+            if (cube_id == *(unsigned long *)als_get(loaded_id_ls, i)) {
+                goto space_had_loaded;
+            }
+        }
+
+        reload_space(cube_id);
+        unsigned long *loaded_id = mam_alloc(sizeof(cube_id), OBJ_TYPE__RAW_BYTES, temp_mam, 0);
+        *loaded_id = cube_id;
+        als_add(loaded_id_ls, loaded_id);
+
+space_had_loaded:
     }
 
     closedir(dir);
 
+    mam_reset(temp_mam);
+    obj_release(temp_mam->current_block);
+    obj_release(temp_mam);
 }
 
 /* TODO
@@ -100,25 +131,6 @@ int vce_append(EuclidCommand *action)
     unsigned int axes_count = *((unsigned int *)slide_over_mem(bytes, sizeof(int), &i));
     unsigned int vals_count = *((unsigned int *)slide_over_mem(bytes, sizeof(int), &i));
 
-    // char src_dir[128];
-    // memset(src_dir, 0, 128);
-    // getcwd(src_dir, 80);
-
-    // char profile[128];
-    // memset(profile, 0, 128);
-    // sprintf(profile, "data/profile-%lu", cs_id);
-
-    // char profile_path[128];
-    // memset(profile_path, 0, 128);
-    // sprintf(profile_path, "%s/%s", src_dir, profile);
-
-    // if (access(profile_path, F_OK) != 0)
-    // {
-    //     // create persistent file about the CoordinateSystem
-    //     append_file_data(profile, (void *)&cs_id, sizeof(cs_id));
-    //     append_file_data(profile, (void *)&axes_count, sizeof(axes_count));
-    //     append_file_data(profile, (void *)&vals_count, sizeof(vals_count));
-    // }
 
     char cube_prof[256];
     assert(strlen(olap_env.OLAP_HOME) < 200);
@@ -185,127 +197,245 @@ static void *_cell__destory(void *cell)
     // _release_mem_(cell);
 }
 
-void reload_space(unsigned long cs_id)
-{
-    long timestamp = now_microseconds();
+void *put_rbtelements_into_list(RBNode *node, void *param) {
+    ArrayList *list = param;
+    als_add(list, node->obj);
+    return NULL;
+}
 
-    // space_unload(cs_id);
+void do_solidify_mirror(unsigned long cs_id) {
+
+    assert(strlen(olap_env.OLAP_HOME) < 200);
+
+    char coorsys_mirror[256], data_mirror[256];
+    memset(coorsys_mirror, 0, 256);
+    memset(data_mirror, 0, 256);
+    sprintf(coorsys_mirror, "%s/data/mirror-coorsys-%lu", olap_env.OLAP_HOME, cs_id);
+    sprintf(data_mirror, "%s/data/mirror-data-%lu", olap_env.OLAP_HOME, cs_id);
+
+    if (access(coorsys_mirror, F_OK) == 0) {
+        remove(coorsys_mirror);
+    }
+
+    if (access(data_mirror, F_OK) == 0) {
+        remove(data_mirror);
+    }
+
+    CoordinateSystem *coorsys = NULL;
+    MeasureSpace *measpace = NULL;
+
+    for (int i = 0; i < als_size(coor_sys_ls); i++) {
+        coorsys = coorsys ? coorsys : als_get(coor_sys_ls, i);
+        measpace = measpace ? measpace : als_get(space_ls, i);
+        if (coorsys->id != cs_id)
+            coorsys = NULL;
+        if (measpace->id != cs_id)
+            measpace = NULL;
+    }
+
+
+    assert(coorsys && measpace);
+
+
+    MemAllocMng *temp_mam = MemAllocMng_new();
+
+
+    int cs_axes_count = als_size(coorsys->axes);
+
+    for (int i=0; i<cs_axes_count; i++) {
+        Axis *axis = als_get(coorsys->axes, i);
+        ArrayList *tmpls = als_new(rbt__size(axis->sor_idx_tree), "ScaleOffsetRange *", SPEC_MAM, temp_mam);
+        rbt__scan_do(axis->sor_idx_tree, tmpls, put_rbtelements_into_list);
+
+        Axis *copyed_axis = mam_alloc(sizeof(Axis), OBJ_TYPE__Axis, temp_mam, 1);
+        memcpy(copyed_axis, axis, sizeof(Axis));
+        copyed_axis->sor_idx_tree = NULL;
+        copyed_axis->assist = NULL;
+
+        append_file_data(coorsys_mirror, (char *)copyed_axis, sizeof(Axis));
+        for (int j=0; j<als_size(tmpls); j++) {
+            append_file_data(coorsys_mirror, als_get(tmpls, j), sizeof(ScaleOffsetRange));
+        }
+    }
+
+
+    MeasureSpace *copyed_space = mam_alloc(sizeof(MeasureSpace), OBJ_TYPE__MeasureSpace, temp_mam, 1);
+    memcpy(copyed_space, measpace, sizeof(MeasureSpace));
+    copyed_space->data_lens = NULL;
+    copyed_space->data_ls_h = NULL;
+    append_file_data(data_mirror, (char *)copyed_space, sizeof(MeasureSpace));
+
+    append_file_data(data_mirror, (char *)(measpace->data_lens), measpace->segment_count * sizeof(unsigned long));
+
+    for (size_t i=0; i<measpace->segment_count; i++) {
+        append_file_data(data_mirror, measpace->data_ls_h[i], (sizeof(unsigned long) + measpace->cell_vals_count * (sizeof(double) + sizeof(char))) * measpace->data_lens[i]);
+    }
+
+
+    mam_reset(temp_mam);
+    obj_release(temp_mam->current_block);
+    obj_release(temp_mam);
+}
+
+static void load_mirror(char *coorsys_mirror, char *data_mirror, unsigned long cs_id, CoordinateSystem **_cs, MeasureSpace **ms_) {
+
+    // Create a coordinate system object by MemAllocMng.
+    MemAllocMng *space_mam = MemAllocMng_new();
+    CoordinateSystem *coorsys = mam_alloc(sizeof(CoordinateSystem), OBJ_TYPE__CoordinateSystem, space_mam, 1);
+    coorsys->id = cs_id;
+    coorsys->axes = als_new(4, "Axis *", SPEC_MAM, space_mam);
+
+
+    FILE *csm_fd = fopen(coorsys_mirror, "r");
+
+    while (1) {
+        Axis *ax = mam_alloc(sizeof(Axis), OBJ_TYPE__Axis, space_mam, 1);
+        if (fread(ax, sizeof(Axis), 1, csm_fd) < 1)
+            goto load_csm_done;
+
+        ax->sor_idx_tree = rbt_create("ScaleOffsetRange *", ScaleOffsetRange_cmp, ScaleOffsetRange_destory, SPEC_MAM, space_mam);
+        for (int i=0; i<ax->sor_idx_tree_size; i++) {
+            ScaleOffsetRange *sor = mam_alloc(sizeof(ScaleOffsetRange), OBJ_TYPE__ScaleOffsetRange, space_mam, 0);
+            fread(sor, sizeof(ScaleOffsetRange), 1, csm_fd);
+            rbt_add(ax->sor_idx_tree, sor);
+        }
+        als_add(coorsys->axes, ax);
+    }
+
+load_csm_done:
+
+    fclose(csm_fd);
+
+
+    MeasureSpace *mea_space = mam_alloc(sizeof(MeasureSpace), OBJ_TYPE__MeasureSpace, space_mam, 1);
+
+    FILE *sdm_fd = fopen(data_mirror, "r");
+    fread(mea_space, sizeof(MeasureSpace), 1, sdm_fd);
+    mea_space->data_ls_h = mam_alloc(sizeof(void *) * mea_space->segment_count, OBJ_TYPE__RAW_BYTES, space_mam, 0);
+    mea_space->data_lens = mam_alloc(sizeof(unsigned long) * mea_space->segment_count, OBJ_TYPE__RAW_BYTES, space_mam, 0);
+
+
+    fread(mea_space->data_lens, mea_space->segment_count * sizeof(unsigned long), 1, sdm_fd);
+
+    for (size_t i=0; i<mea_space->segment_count; i++) {
+        mea_space->data_ls_h[i] = mam_alloc(
+            (sizeof(unsigned long) + mea_space->cell_vals_count * (sizeof(double) + sizeof(char))) * mea_space->data_lens[i],
+            OBJ_TYPE__RAW_BYTES, space_mam, 0);
+
+        fread(mea_space->data_ls_h[i],
+            (sizeof(unsigned long) + mea_space->cell_vals_count * (sizeof(double) + sizeof(char))) * mea_space->data_lens[i],
+            1, sdm_fd);
+    }
+
+
+    fclose(sdm_fd);
+
+
+    *_cs = coorsys;
+    *ms_ = mea_space;
+}
+
+static void load_space(char *profile, char *data_file, unsigned long cs_id, CoordinateSystem **_cs, MeasureSpace **ms_) {
+
+    unsigned int axes_count, vals_count;
+
 
     ByteBuf *tmp_buf = buf__alloc(0x01UL << 10);
 
-    char profile[256];
-    assert(strlen(olap_env.OLAP_HOME) < 200);
-    memset(profile, 0, 256);
-    sprintf(profile, "%s/data/profile-%lu", olap_env.OLAP_HOME, cs_id);
-    // sprintf(profile, "data/profile-%lu", cs_id);
 
-    unsigned int axes_count;
-    unsigned int vals_count;
+    FILE *profile_fd = fopen(profile, "a+");
+    fread(buf_cutting(tmp_buf, sizeof(cs_id)), sizeof(cs_id), 1, profile_fd);
+    fread(&axes_count, sizeof(axes_count), 1, profile_fd);
+    fread(&vals_count, sizeof(vals_count), 1, profile_fd);
+    fclose(profile_fd);
 
-    // FILE *pfd = open_file(profile, "r");
-    FILE *pfd = fopen(profile, "a+");
 
-    // fread(tmpbuf, sizeof(cs_id), 1, pfd);
-    fread(buf_cutting(tmp_buf, sizeof(cs_id)), sizeof(cs_id), 1, pfd);
+    long timestamp = now_microseconds();
 
-    fread(&axes_count, sizeof(axes_count), 1, pfd);
-    fread(&vals_count, sizeof(vals_count), 1, pfd);
-    fclose(pfd);
-
-    int i;
 
     // Create a coordinate system object by MemAllocMng.
-    MemAllocMng *cs_mam = MemAllocMng_new();
-    CoordinateSystem *cs = coosys_new(cs_id, axes_count, cs_mam);
-    // als_add(coor_sys_ls, cs);
+    MemAllocMng *space_mam = MemAllocMng_new();
+    CoordinateSystem *coorsys = coosys_new(cs_id, axes_count, space_mam);
 
-    char data_file[256];
-    assert(strlen(olap_env.OLAP_HOME) < 200);
-    memset(data_file, 0, 256);
-    sprintf(data_file, "%s/data/data-%lu", olap_env.OLAP_HOME, cs_id);
-    // sprintf(data_file, "data/data-%lu", cs_id);
-
-    FILE *data_fd = fopen(data_file, "a+");
-    int coor_pointer_len;
 
     log_print(">>> RELOAD_SPACE { 1 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
     timestamp = now_microseconds();
 
-    while (fread(&coor_pointer_len, sizeof(int), 1, data_fd) > 0)
+
+    MemAllocMng *temp_mam = MemAllocMng_new();
+
+
+    unsigned long vector_size = (sizeof(double) + sizeof(char)) * vals_count;
+
+
+    for (int i = 0; i < axes_count; i++) {
+        AxisBuildAssist *aba = mam_alloc(sizeof(AxisBuildAssist), OBJ_TYPE__AxisBuildAssist, temp_mam, 0);
+        aba->leaf_scales_rbt = rbt_create("Scale *", scal_cmp, scal__destory, SPEC_MAM, temp_mam);
+        ((Axis *)cs_get_axis(coorsys, i))->assist = aba;
+    }
+
+
+    FILE *data_fd = fopen(data_file, "a+");
+    while (1)
     {
-
-        // fread(tmpbuf, coor_pointer_len * sizeof(__uint64_t), 1, data_fd);
-        buf_clear(tmp_buf);
-
-        // At the same time, hang the scale objects on the corresponding axis in the coordinate system object.
-        Scale *sample = buf_cutting(tmp_buf, sizeof(Scale));
-        scal_init(sample);
-        sample->fragments_len = coor_pointer_len;
-
-        sample->fragments = buf_cutting(tmp_buf, coor_pointer_len * sizeof(md_gid));
-        fread(sample->fragments, coor_pointer_len * sizeof(md_gid), 1, data_fd);
-
-        Axis *axis = cs_get_axis(cs, 0);
-        if (ax_find_scale(axis, sample) == NULL)
-        {
-            Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
-            scale->fragments = mam_alloc(coor_pointer_len * sizeof(md_gid), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
-            scale->fragments_len = sample->fragments_len;
-            memcpy(scale->fragments, sample->fragments, coor_pointer_len * sizeof(md_gid));
-            ax_set_scale(axis, scale);
-            axis->scales_count++;
-        }
-
-        for (i = 1; i < axes_count; i++)
-        {
-
-            fread(&coor_pointer_len, sizeof(int), 1, data_fd);
-
+        for (int i = 0; i < axes_count; i++) {
             buf_clear(tmp_buf);
+            // At the same time, hang the scale objects on the corresponding axis in the coordinate system object.
+            Scale *sample = buf_cutting(tmp_buf, sizeof(Scale));
+            if (fread(&(sample->fragments_len), sizeof(sample->fragments_len), 1, data_fd) < 1)
+                goto has_loaded_scales;
+            sample->fragments = buf_cutting(tmp_buf, sample->fragments_len * sizeof(md_gid));
+            fread(sample->fragments, sample->fragments_len * sizeof(md_gid), 1, data_fd);
 
-            sample = buf_cutting(tmp_buf, sizeof(Scale));
-            scal_init(sample);
-            sample->fragments_len = coor_pointer_len;
-
-            sample->fragments = buf_cutting(tmp_buf, coor_pointer_len * sizeof(md_gid));
-            fread(sample->fragments, coor_pointer_len * sizeof(md_gid), 1, data_fd);
-
-            axis = cs_get_axis(cs, i);
-            if (ax_find_scale(axis, sample) == NULL)
+            Axis *axis = cs_get_axis(coorsys, i);
+            if (rbt__find(axis->assist->leaf_scales_rbt, sample) == NULL)
             {
-                Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, cs_mam, 0);
-                scale->fragments = mam_alloc(coor_pointer_len * sizeof(md_gid), OBJ_TYPE__RAW_BYTES, cs_mam, 0);
+                Scale *scale = mam_alloc(sizeof(Scale), OBJ_TYPE__Scale, temp_mam, 0);
                 scale->fragments_len = sample->fragments_len;
-                memcpy(scale->fragments, sample->fragments, coor_pointer_len * sizeof(md_gid));
-                ax_set_scale(axis, scale);
-                axis->scales_count++;
+                scale->fragments = mam_alloc(scale->fragments_len * sizeof(md_gid), OBJ_TYPE__RAW_BYTES, temp_mam, 0);
+                memcpy(scale->fragments, sample->fragments, scale->fragments_len * sizeof(md_gid));
+                rbt_add(axis->assist->leaf_scales_rbt, scale);
             }
         }
 
         // skip some bytes
-        // fread(tmpbuf, (sizeof(double) + sizeof(char)) * vals_count, 1, data_fd);
-        unsigned long skip_bytes = (sizeof(double) + sizeof(char)) * vals_count;
         buf_clear(tmp_buf);
-        fread(buf_cutting(tmp_buf, skip_bytes), skip_bytes, 1, data_fd);
+        fread(buf_cutting(tmp_buf, vector_size), vector_size, 1, data_fd);
     }
 
+has_loaded_scales:
+
     fclose(data_fd);
+
+    // Calculate the actual size of the multidimensional array corresponding to the coordinate system.
+    unsigned long space_capacity = 1;
+
+    for (int i = 0; i < axes_count; i++) {
+        Axis *axis = cs_get_axis(coorsys, i);
+        rbt__reordering(axis->assist->leaf_scales_rbt);
+        axis->scales_count = rbt__size(axis->assist->leaf_scales_rbt);
+
+        // TODO FIXME
+        // FIXME May exceed the maximum value of the long data type, if so, you need to customize the data type.
+        space_capacity *= axis->scales_count;
+    }
+
+
+    {
+        Axis *ax_n, *ax = als_get(coorsys->axes, axes_count - 1);
+        ax->leaf_scale_offset = 1;
+        for (int i = axes_count - 2; i >= 0; i--)
+        {
+            ax = als_get(coorsys->axes, i);
+            ax_n = als_get(coorsys->axes, i + 1);
+            ax->leaf_scale_offset = rbt__size(ax_n->assist->leaf_scales_rbt) * ax_n->leaf_scale_offset;
+        }
+    }
+
 
     log_print(">>> RELOAD_SPACE { 2 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
     timestamp = now_microseconds();
 
-    // Calculate the actual size of the multidimensional array corresponding to the coordinate system.
-    unsigned long space_capacity = 1;
-    for (i = 0; i < axes_count; i++)
-    {
-        Axis *axis = cs_get_axis(cs, i);
-        ax_reordering(axis);
-        int sz = ax_size(axis);
-
-        // TODO FIXME
-        // FIXME May exceed the maximum value of the long data type, if so, you need to customize the data type.
-        space_capacity *= sz;
-    }
 
     size_t space_partition_count = space_capacity / SPACE_DEF_PARTITION_SPAN_MIN;
     if (space_partition_count == 0)
@@ -317,92 +447,174 @@ void reload_space(unsigned long cs_id)
         ++space_partition_count;
     }
 
-    // log_print("[debug] space_capacity < %lu >, SPACE_DEF_PARTITION_COUNT < %d >, space_partition_count < %lu >\n", space_capacity, SPACE_DEF_PARTITION_COUNT, space_partition_count);
 
     // Creates a new logical multidimensional array object by MemAllocMng.
-    MeasureSpace *space = space_new(cs_id, space_partition_count, SPACE_DEF_PARTITION_SPAN_MIN, vals_count, cs_mam);
+    MeasureSpace *space = space_new(cs_id, space_partition_count, SPACE_DEF_PARTITION_SPAN_MIN, vals_count, space_mam);
 
-    // Traverse the data file and insert all measure data into the logical multidimensional array.
-    data_fd = fopen(data_file, "a+");
-
-    unsigned long load_meval_count = 0;
-    char *cellcm = NULL;
 
     log_print(">>> RELOAD_SPACE { 3 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
     timestamp = now_microseconds();
 
-    ArrayList *tree_ls_h = als_new((unsigned int)space_partition_count, "RedBlackTree *", SPEC_MAM, cs_mam);
-    for (int i=0; i<space_partition_count ;i++) {
-        MemAllocMng *mam = MemAllocMng_new();
-        als_add(tree_ls_h, rbt_create("*cell", cell_cmp, _cell__destory, SPEC_MAM, mam));
-    }
+
+    unsigned long *loaded_pmea_count = mam_alloc(sizeof(unsigned long) * space_partition_count, OBJ_TYPE__RAW_BYTES, temp_mam, 0);
+    char **cell_cursors = mam_alloc(sizeof(char *) * space_partition_count, OBJ_TYPE__RAW_BYTES, temp_mam, 0);
+
+    RedBlackTree **tmp_rbt_hs = mam_alloc(sizeof(RedBlackTree *) * space_partition_count, OBJ_TYPE__RAW_BYTES, temp_mam, 0);
+    for (size_t i=0; i<space_partition_count ;i++)
+        tmp_rbt_hs[i] = rbt_create("*cell", cell_cmp, _cell__destory, SPEC_MAM, MemAllocMng_new());
+
+
+    // Traverse the data file and insert all measure data into the logical multidimensional array.
+    data_fd = fopen(data_file, "a+");
 
     while (1)
     {
-        __uint64_t measure_space_idx = 0;
-        for (i = 0; i < axes_count; i++)
+        unsigned long vector_offset = 0;
+        for (int i = 0; i < axes_count; i++)
         {
             buf_clear(tmp_buf);
-
             Scale *sample = buf_cutting(tmp_buf, sizeof(Scale));
-            scal_init(sample);
-
             if (fread(&(sample->fragments_len), sizeof(int), 1, data_fd) < 1)
-                goto finished;
+                goto loaded_vectors_done;
 
             sample->fragments = buf_cutting(tmp_buf, sample->fragments_len * sizeof(md_gid));
-            // fread(sample->fragments, coor_pointer_len * sizeof(md_gid), 1, data_fd);
             fread(sample->fragments, sizeof(md_gid), sample->fragments_len, data_fd);
-
-            Axis *axis = cs_get_axis(cs, i);
-
-            RBNode *__inl_n = rbt__find(axis->rbtree, sample);
-            __uint64_t sc_posi = __inl_n->index;
-
-            __uint64_t ax_span = cs_axis_span(cs, i);
-            measure_space_idx += sc_posi * ax_span;
+            Axis *axis = cs_get_axis(coorsys, i);
+            vector_offset += rbt__find(axis->assist->leaf_scales_rbt, sample)->index * axis->leaf_scale_offset;
         }
-        size_t cell_mem_sz = vals_count * (sizeof(double) + sizeof(char));
 
-        // todo at once, modify it be use a temp memory allocation manager
-        // void *cell = mam_alloc(sizeof(measure_space_idx) + cell_mem_sz, OBJ_TYPE__RAW_BYTES, cs_mam, 0);
-        if (load_meval_count % BYTES_ALIGNMENT == 0)
+        unsigned long segment_number = vector_offset / space->segment_scope;
+        if (loaded_pmea_count[segment_number] % BYTES_ALIGNMENT == 0)
         {
-            cellcm = mam_hlloc(cs_mam, (sizeof(measure_space_idx) + cell_mem_sz) * BYTES_ALIGNMENT);
+            MemAllocMng *seg_mam = obj_mam(tmp_rbt_hs[segment_number]);
+            cell_cursors[segment_number] = mam_hlloc(seg_mam, (sizeof(vector_offset) + vector_size) * BYTES_ALIGNMENT);
         }
-        // void *cell = mam_hlloc(cs_mam, sizeof(measure_space_idx) + cell_mem_sz);
-        void *cell = cellcm + (sizeof(measure_space_idx) + cell_mem_sz) * (load_meval_count % BYTES_ALIGNMENT);
-
-        *((unsigned long *)cell) = measure_space_idx;
-        fread(cell + sizeof(measure_space_idx), cell_mem_sz, 1, data_fd);
-
-        // space_add_measure(space, measure_space_idx, cell);
-        rbt_add(als_get(tree_ls_h, (unsigned int)(measure_space_idx / space->segment_scope)), cell);
-        ++load_meval_count;
-
-        if (load_meval_count % 1000000 == 0)
-            log_print("::::::::::::::::::: load_meval_count = %lu\n", load_meval_count);
+        void *cell = cell_cursors[segment_number] + (sizeof(vector_offset) + vector_size) * (loaded_pmea_count[segment_number] % BYTES_ALIGNMENT);
+        *((unsigned long *)cell) = vector_offset;
+        fread(cell + sizeof(vector_offset), vector_size, 1, data_fd);
+        rbt_add(tmp_rbt_hs[segment_number], cell);
+        ++(loaded_pmea_count[segment_number]);
+        if (loaded_pmea_count[segment_number] % 1000000 == 0)
+            log_print("::::::::::::::::::: load_meval_count[%lu] = %lu\n", segment_number, loaded_pmea_count[segment_number]);
     }
 
-finished:
-
-    log_print(">>> RELOAD_SPACE { 4 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
-    timestamp = now_microseconds();
+loaded_vectors_done:
 
     buf_release(tmp_buf);
 
     fclose(data_fd);
 
-    space_plan(space, tree_ls_h);
 
-    CoordinateSystem__gen_auxiliary_index(cs);
-    CoordinateSystem__calculate_offset(cs);
+    log_print(">>> RELOAD_SPACE { 4 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
+    timestamp = now_microseconds();
 
-    space_unload(cs_id);
-    als_add(coor_sys_ls, cs);
-    als_add(space_ls, space);
+
+    space_plan(space, tmp_rbt_hs);
+
+
+    {
+        for (int i = 0; i < axes_count; i++)
+        {
+            Axis *ax = als_get(coorsys->axes, i);
+            RedBlackTree *tree = ax->assist->leaf_scales_rbt;
+            rbt__scan_do(tree, &(ax->max_path_len), __set_ax_max_path_len);
+            ax->assist->scales_table = mam_alloc(rbt__size(tree) * ax->max_path_len * sizeof(md_gid), OBJ_TYPE__RAW_BYTES, temp_mam, 0);
+            rbt__scan_do(tree, ax, __Axis_build_index);
+        }
+    }
+
+
+    {
+        for (int i = 0; i < axes_count; i++)
+        {
+            Axis *axis = als_get(coorsys->axes, i);
+
+            /* TODO
+            * When the red-black tree adds elements, if there is another equal element, the red-black tree will not do anything,
+            * which may cause some problems. Here, a new red-black tree is temporarily created, and this place needs to be
+            * performed in the follow-up. Revise.
+            */
+            axis->sor_idx_tree = rbt_create("ScaleOffsetRange *", ScaleOffsetRange_cmp, ScaleOffsetRange_destory, SPEC_MAM, space_mam);
+            int tree_sz = rbt__size(axis->assist->leaf_scales_rbt);
+            ScaleOffsetRange *sor = NULL;
+            md_gid id, prev_id = 0;
+
+            int row, col;
+            for (col = 0; col < axis->max_path_len; col++)
+            {
+                for (row = 0; row < tree_sz; row++)
+                {
+                    id = ((md_gid *)axis->assist->scales_table)[row * axis->max_path_len + col];
+
+                    if (sor == NULL || id != prev_id)
+                    {
+                        sor = mam_alloc(sizeof(ScaleOffsetRange), OBJ_TYPE__ScaleOffsetRange, space_mam, 0);
+                        sor->gid = id;
+                        sor->offset = axis->leaf_scale_offset;
+                        sor->end_position = sor->start_position = row;
+                        rbt_add(axis->sor_idx_tree, sor);
+                    }
+                    else
+                    {
+                        sor->end_position = row;
+                    }
+
+                    prev_id = id;
+                }
+            }
+            rbt__reordering(axis->sor_idx_tree);
+            axis->sor_idx_tree_size = rbt__size(axis->sor_idx_tree);
+        }
+    }
+
+
+    for (int i = 0; i < axes_count; i++)
+        ((Axis *)cs_get_axis(coorsys, i))->assist = NULL;
+
+
+    mam_reset(temp_mam);
+    obj_release(temp_mam->current_block);
+    obj_release(temp_mam);
+
 
     log_print(">>> RELOAD_SPACE { 5 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
+
+
+    *_cs = coorsys;
+    *ms_ = space;
+
+}
+
+void reload_space(unsigned long cs_id)
+{
+    assert(strlen(olap_env.OLAP_HOME) < 200);
+
+    char profile[256], data_file[256], coorsys_mirror[256], data_mirror[256];
+    memset(profile, 0, 256);
+    memset(data_file, 0, 256);
+    memset(coorsys_mirror, 0, 256);
+    memset(data_mirror, 0, 256);
+    sprintf(profile, "%s/data/profile-%lu", olap_env.OLAP_HOME, cs_id);
+    sprintf(data_file, "%s/data/data-%lu", olap_env.OLAP_HOME, cs_id);
+    sprintf(coorsys_mirror, "%s/data/mirror-coorsys-%lu", olap_env.OLAP_HOME, cs_id);
+    sprintf(data_mirror, "%s/data/mirror-data-%lu", olap_env.OLAP_HOME, cs_id);
+
+
+    CoordinateSystem *coorsys = NULL;
+    MeasureSpace *space = NULL;
+
+
+    if (access(coorsys_mirror, F_OK) == 0 && access(data_mirror, F_OK) == 0) {
+        load_mirror(coorsys_mirror, data_mirror, cs_id, &coorsys, &space);
+    } else if (access(profile, F_OK) == 0 && access(data_file, F_OK) == 0) {
+        load_space(profile, data_file, cs_id, &coorsys, &space);
+    } else {
+        return;
+    }
+
+    space_unload(cs_id);
+    als_add(coor_sys_ls, coorsys);
+    als_add(space_ls, space);
 }
 
 CoordinateSystem *coosys_new(unsigned long id, int axes_count, MemAllocMng *mam)
@@ -425,7 +637,7 @@ Axis *ax_create(MemAllocMng *mam)
 {
     Axis *ax = mam_alloc(sizeof(Axis), OBJ_TYPE__Axis, mam, 0);
 
-    ax->rbtree = rbt_create("struct _axis_scale *", scal_cmp, scal__destory, SPEC_MAM, mam);
+    // ax->rbtree = rbt_create("struct _axis_scale *", scal_cmp, scal__destory, SPEC_MAM, mam);
 
     ax->sor_idx_tree = rbt_create("ScaleOffsetRange *", ScaleOffsetRange_cmp, ScaleOffsetRange_destory, SPEC_MAM, mam);
 
@@ -447,12 +659,6 @@ void *scal__destory(void *scale)
 void cs_add_axis(CoordinateSystem *cs, Axis *axis)
 {
     als_add(cs->axes, axis);
-}
-
-void ax_set_scale(Axis *axis, Scale *scale)
-{
-    // Scale_print(scale);
-    rbt_add(axis->rbtree, scale);
 }
 
 int scal_cmp(void *_one, void *_other)
@@ -505,14 +711,9 @@ void space_unload(__uint64_t id)
     }
 }
 
-void ax_reordering(Axis *axis)
-{
-    rbt__reordering(axis->rbtree);
-}
-
 int ax_size(Axis *axis)
 {
-    return rbt__size(axis->rbtree);
+    return rbt__size(axis->assist->leaf_scales_rbt);
 }
 
 MeasureSpace *space_new(unsigned long id, size_t segment_count, size_t segment_scope, int cell_vals_count, MemAllocMng *mam)
@@ -540,37 +741,28 @@ void *build_space_measure(RBNode *node, void *callback_params)
     memcpy(block_addr + cell_size * (node->index), node->obj, cell_size);
 }
 
-void space_plan(MeasureSpace *space, ArrayList *tree_ls_h)
+void space_plan(MeasureSpace *space, RedBlackTree **tmp_rbt_hs)
 {
-    short type;
-    enum_oms strat;
-    MemAllocMng *mam;
-    obj_info(space, &type, &strat, &mam);
-
+    MemAllocMng *space_mam = obj_mam(space);
+    int cell_size = space->cell_vals_count * (sizeof(double) + sizeof(char));
     for (int i = 0; i < space->segment_count; i++)
     {
-        RedBlackTree *tree = als_get(tree_ls_h, i);
+        RedBlackTree *tree = tmp_rbt_hs[i];
         rbt__reordering(tree);
-
-        int cell_size = space->cell_vals_count * (sizeof(double) + sizeof(char));
         unsigned int actual_cells_sz = rbt__size(tree);
         space->data_lens[i] = actual_cells_sz;
         int posi_cell_sz = (sizeof(unsigned long) + cell_size);
-        space->data_ls_h[i] = mam_alloc(actual_cells_sz * posi_cell_sz, OBJ_TYPE__RAW_BYTES, mam, 0);
+        space->data_ls_h[i] = mam_alloc(actual_cells_sz * posi_cell_sz, OBJ_TYPE__RAW_BYTES, space_mam, 0);
 
         char callback_params[sizeof(int) + sizeof(void *)];
         *((int *)callback_params) = cell_size;
         memcpy(&(callback_params[sizeof(int)]), space->data_ls_h + i, sizeof(void *));
         rbt__scan_do(tree, callback_params, build_space_measure);
-        // rbt__clear(tree);
 
-        short rbt_type;
-        enum_oms rbt_strat;
-        MemAllocMng *rbt_mam = NULL;
-        obj_info(tree, &rbt_type, &rbt_strat, &rbt_mam);
-        mam_reset(rbt_mam);
-        obj_release(rbt_mam->current_block);
-        obj_release(rbt_mam);
+        MemAllocMng *tmp_seg_mam = obj_mam(tree);
+        mam_reset(tmp_seg_mam);
+        obj_release(tmp_seg_mam->current_block);
+        obj_release(tmp_seg_mam);
     }
 }
 
@@ -582,7 +774,7 @@ __uint64_t cs_axis_span(CoordinateSystem *cs, int axis_order)
     for (i = axes_count - 1; i > axis_order; i--)
     {
         Axis *x = cs_get_axis(cs, i);
-        span *= rbt__size(x->rbtree);
+        span *= rbt__size(x->assist->leaf_scales_rbt);
     }
     return span;
 }
@@ -692,77 +884,10 @@ void *__Axis_build_index(RBNode *node, void *axis)
 {
     Scale *scale = node->obj;
     Axis *ax = axis;
-    memcpy(ax->index + node->index * ax->max_path_len * sizeof(md_gid), scale->fragments, scale->fragments_len * sizeof(md_gid));
+    memcpy(ax->assist->scales_table + node->index * ax->max_path_len * sizeof(md_gid), scale->fragments, scale->fragments_len * sizeof(md_gid));
     return NULL;
 }
 
-void CoordinateSystem__gen_auxiliary_index(CoordinateSystem *coor)
-{
-    MemAllocMng *coormam = obj_mam(coor);
-    unsigned int i, ax_sz = als_size(coor->axes);
-    for (i = 0; i < ax_sz; i++)
-    {
-        Axis *ax = als_get(coor->axes, i);
-        RedBlackTree *tree = ax->rbtree;
-        rbt__scan_do(tree, &(ax->max_path_len), __set_ax_max_path_len);
-        ax->index = mam_alloc(rbt__size(tree) * ax->max_path_len * sizeof(md_gid), OBJ_TYPE__RAW_BYTES, coormam, 0);
-        rbt__scan_do(tree, ax, __Axis_build_index);
-    }
-}
-
-void CoordinateSystem__calculate_offset(CoordinateSystem *coor)
-{
-    int i, ax_sz = als_size(coor->axes);
-    Axis *ax_n, *ax = als_get(coor->axes, ax_sz - 1);
-    ax->coor_offset = 1;
-
-    for (i = ax_sz - 2; i >= 0; i--)
-    {
-        ax = als_get(coor->axes, i);
-        ax_n = als_get(coor->axes, i + 1);
-        ax->coor_offset = ax_size(ax_n) * ax_n->coor_offset;
-    }
-
-    int row, col;
-    for (i = 0; i < ax_sz; i++)
-    {
-        Axis *axis = als_get(coor->axes, i);
-
-        /* TODO
-         * When the red-black tree adds elements, if there is another equal element, the red-black tree will not do anything,
-         * which may cause some problems. Here, a new red-black tree is temporarily created, and this place needs to be
-         * performed in the follow-up. Revise.
-         */
-        axis->sor_idx_tree = rbt_create("ScaleOffsetRange *", ScaleOffsetRange_cmp, ScaleOffsetRange_destory, SPEC_MAM, obj_mam(coor));
-        int tree_sz = rbt__size(axis->rbtree);
-        ScaleOffsetRange *sor = NULL;
-        md_gid id, prev_id = 0;
-
-        for (col = 0; col < axis->max_path_len; col++)
-        {
-            for (row = 0; row < tree_sz; row++)
-            {
-                id = ((md_gid *)axis->index)[row * axis->max_path_len + col];
-
-                if (sor == NULL || id != prev_id)
-                {
-                    sor = mam_alloc(sizeof(ScaleOffsetRange), OBJ_TYPE__ScaleOffsetRange, obj_mam(coor), 0);
-                    sor->gid = id;
-                    sor->offset = axis->coor_offset;
-                    sor->end_position = sor->start_position = row;
-                    rbt_add(axis->sor_idx_tree, sor);
-                }
-                else
-                {
-                    sor->end_position = row;
-                }
-
-                prev_id = id;
-            }
-        }
-        rbt__reordering(axis->sor_idx_tree);
-    }
-}
 
 void do_calculate_measure_value(MDContext *md_ctx, Cube *cube, MddTuple *tuple, GridData *grid_data)
 {
@@ -1423,7 +1548,7 @@ void MeasureSpace_print(MeasureSpace *space)
 // Axis(struct _coordinate_axis) functions
 Scale *ax_find_scale(Axis *axis, Scale *sample)
 {
-    RBNode *node = rbt__find(axis->rbtree, sample);
+    RBNode *node = rbt__find(axis->assist->leaf_scales_rbt, sample);
     return node ? node->obj : NULL;
 }
 
@@ -1574,7 +1699,7 @@ static void agg_based_on_dynamic_sparse_idx
             }
         } else {
             for (_position = 0; _position < ax->scales_count; _position++) {
-                agg_based_on_dynamic_sparse_idx(space, sor_ls, dyc_uidx_len, deep + 1, offset + _position * ax->coor_offset, grid_data, mea_val_idx);
+                agg_based_on_dynamic_sparse_idx(space, sor_ls, dyc_uidx_len, deep + 1, offset + _position * ax->leaf_scale_offset, grid_data, mea_val_idx);
             }
         }
         return;

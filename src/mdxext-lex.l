@@ -65,6 +65,14 @@ make	{
 	return MAKE;
 }
 
+solidify	{
+	return SOLIDIFY;
+}
+
+mirror	{
+	return MIRROR;
+}
+
 with	{
 	return WITH;
 }

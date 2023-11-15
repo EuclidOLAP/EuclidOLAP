@@ -175,6 +175,15 @@ EuclidCommand *build_intent_command_mdx(char *mdx);
  */
 #define INTENT__RELOAD_SPACE_OF_MEASURES 12
 
+/**
+ * logic node(master node) -> aggregation node(worker node)
+ * 
+ * 4 bytes - data package capacity
+ * 2 bytes - intention
+ * 8 bytes - MeasureSpace::id (Cube::gid)
+ */
+#define INTENT__SOLIDIFY_MIRROR_OF_SPACE 13
+
 #define INTENT__UNKNOWN 65535
 
 int init_command_module();
