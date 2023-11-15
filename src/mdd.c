@@ -783,6 +783,38 @@ int distribute_store_measure(EuclidCommand *ec, InsertingMeasuresOptions *imo)
 	}
 }
 
+void solidify_mirror_of_space(CubeDef *cube_def) {
+	Cube *cube = find_cube_by_name(cube_def->name);
+	if (cube == NULL)
+	{
+		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
+		thrd_mam->exception_desc = "exception: An undefined cube was encountered.";
+		longjmp(thrd_mam->excep_ctx_env, -1);
+	}
+
+	EuclidConfig *cfg = get_cfg();
+	if (cfg->mode == MODE_MASTER) {
+		unsigned int pkg_size = sizeof(int) + sizeof(short) + sizeof(md_gid);
+		ByteBuf *buff = buf__alloc(pkg_size);
+
+		*((unsigned int *)buf_cutting(buff, sizeof(int))) = pkg_size;
+		*((unsigned short *)buf_cutting(buff, sizeof(short))) = INTENT__SOLIDIFY_MIRROR_OF_SPACE;
+		*((md_gid *)buf_cutting(buff, sizeof(md_gid))) = cube->gid;
+
+		ArrayList *node_list = worker_nodes();
+		for (int i = 0; i < als_size(node_list); i++)
+		{
+			SockIntentThread *node_sit = als_get(node_list, i);
+			ssize_t rscode = send(node_sit->sock_fd, buf_starting(buff), buf_size(buff), 0);
+		}
+
+		buf_release(buff);
+
+	} else { // MODE_STAND_ALONE or MODE_WORKER
+		do_solidify_mirror(cube->gid);
+	}
+}
+
 void reload_measure_values_of_cube(CubeDef *cube_def) {
 	Cube *cube = find_cube_by_name(cube_def->name);
 	if (cube == NULL)

@@ -50,6 +50,8 @@ static void ast_func_append_to_up(void);
 %token OR			/* or */
 
 %token MAKE			/* make */
+%token SOLIDIFY		/* solidify */
+%token MIRROR		/* mirror */
 
 %token COLUMNS		/* columns */
 %token ROWS			/* rows */
@@ -370,6 +372,24 @@ euclidolap_mdx:
 		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
 		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
 		cur_thrd_mam->bin_flags = cur_thrd_mam->bin_flags | 0x0003;
+	}
+  |
+	SOLIDIFY MIRROR cube__statement SEMICOLON EOF_ {
+	  	stack_push(&AST_STACK, IDS_SOLIDIFY_MIRROR_OF_SPACE);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags |= 0x0001;
+		cur_thrd_mam->bin_flags &= 0xFFFD;
+	}
+  |
+	SOLIDIFY MIRROR cube__statement EOF_ {
+	  	stack_push(&AST_STACK, IDS_SOLIDIFY_MIRROR_OF_SPACE);
+
+		// Set the MDX parsing done flag to 1 to indicate that the parsing process is complete.
+		MemAllocMng *cur_thrd_mam = MemAllocMng_current_thread_mam();
+		cur_thrd_mam->bin_flags |= 0x0001;
+		cur_thrd_mam->bin_flags &= 0xFFFD;
 	}
 ;
 

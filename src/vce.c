@@ -17,6 +17,8 @@
 
 extern OLAPEnv olap_env;
 
+extern ArrayList *cubes_pool;
+
 static MemAllocMng *vce_mam;
 static ArrayList *space_mam_ls;
 static ArrayList *coor_sys_ls;
@@ -43,6 +45,10 @@ static void calculates_the_full_summary_value(MeasureSpace *space, GridData *gri
 static void *__set_ax_max_path_len(RBNode *node, void *param);
 
 static void *__Axis_build_index(RBNode *node, void *axis);
+
+static void load_space(char *profile, char *data_file, unsigned long cs_id, CoordinateSystem **_cs, MeasureSpace **ms_);
+
+static void load_mirror(char *coorsys_mirror, char *data_mirror, unsigned long cs_id, CoordinateSystem **_cs, MeasureSpace **ms_);
 
 void vce_init()
 {
@@ -73,18 +79,39 @@ void vce_load()
 
     assert(dir != NULL);
 
+    MemAllocMng *temp_mam = MemAllocMng_new();
+    ArrayList *loaded_id_ls = als_new(20, "unsigned long *", SPEC_MAM, temp_mam);  
+
     while ((entry = readdir(dir)) != NULL)
     {
-        if (strncmp(entry->d_name, prefix, prefix_len) == 0)
-        {
-            suffix = entry->d_name + prefix_len;
-            cube_id = strtol(suffix, &endptr, 10);
-            reload_space(cube_id);
+        if (strncmp(entry->d_name, "data-", strlen("data-")) == 0) {
+            suffix = entry->d_name + strlen("data-");
+        } else if (strncmp(entry->d_name, "mirror-data-", strlen("mirror-data-")) == 0) {
+            suffix = entry->d_name + strlen("mirror-data-");
+        } else {
+            continue;
         }
+
+        cube_id = strtol(suffix, &endptr, 10);
+        for (int i=0; i<als_size(loaded_id_ls); i++) {
+            if (cube_id == *(unsigned long *)als_get(loaded_id_ls, i)) {
+                goto space_had_loaded;
+            }
+        }
+
+        reload_space(cube_id);
+        unsigned long *loaded_id = mam_alloc(sizeof(cube_id), OBJ_TYPE__RAW_BYTES, temp_mam, 0);
+        *loaded_id = cube_id;
+        als_add(loaded_id_ls, loaded_id);
+
+space_had_loaded:
     }
 
     closedir(dir);
 
+    mam_reset(temp_mam);
+    obj_release(temp_mam->current_block);
+    obj_release(temp_mam);
 }
 
 /* TODO
@@ -170,16 +197,145 @@ static void *_cell__destory(void *cell)
     // _release_mem_(cell);
 }
 
-void reload_space(unsigned long cs_id)
-{
-    // Spell the profile path and the data file path.
-    assert(strlen(olap_env.OLAP_HOME) < 200);
-    char profile[256], data_file[256];
-    memset(profile, 0, 256);
-    memset(data_file, 0, 256);
-    sprintf(profile, "%s/data/profile-%lu", olap_env.OLAP_HOME, cs_id);
-    sprintf(data_file, "%s/data/data-%lu", olap_env.OLAP_HOME, cs_id);
+void *put_rbtelements_into_list(RBNode *node, void *param) {
+    ArrayList *list = param;
+    als_add(list, node->obj);
+    return NULL;
+}
 
+void do_solidify_mirror(unsigned long cs_id) {
+
+    assert(strlen(olap_env.OLAP_HOME) < 200);
+
+    char coorsys_mirror[256], data_mirror[256];
+    memset(coorsys_mirror, 0, 256);
+    memset(data_mirror, 0, 256);
+    sprintf(coorsys_mirror, "%s/data/mirror-coorsys-%lu", olap_env.OLAP_HOME, cs_id);
+    sprintf(data_mirror, "%s/data/mirror-data-%lu", olap_env.OLAP_HOME, cs_id);
+
+    if (access(coorsys_mirror, F_OK) == 0) {
+        remove(coorsys_mirror);
+    }
+
+    if (access(data_mirror, F_OK) == 0) {
+        remove(data_mirror);
+    }
+
+    CoordinateSystem *coorsys = NULL;
+    MeasureSpace *measpace = NULL;
+
+    for (int i = 0; i < als_size(coor_sys_ls); i++) {
+        coorsys = coorsys ? coorsys : als_get(coor_sys_ls, i);
+        measpace = measpace ? measpace : als_get(space_ls, i);
+        if (coorsys->id != cs_id)
+            coorsys = NULL;
+        if (measpace->id != cs_id)
+            measpace = NULL;
+    }
+
+
+    assert(coorsys && measpace);
+
+
+    MemAllocMng *temp_mam = MemAllocMng_new();
+
+
+    int cs_axes_count = als_size(coorsys->axes);
+
+    for (int i=0; i<cs_axes_count; i++) {
+        Axis *axis = als_get(coorsys->axes, i);
+        ArrayList *tmpls = als_new(rbt__size(axis->sor_idx_tree), "ScaleOffsetRange *", SPEC_MAM, temp_mam);
+        rbt__scan_do(axis->sor_idx_tree, tmpls, put_rbtelements_into_list);
+
+        Axis *copyed_axis = mam_alloc(sizeof(Axis), OBJ_TYPE__Axis, temp_mam, 1);
+        memcpy(copyed_axis, axis, sizeof(Axis));
+        copyed_axis->sor_idx_tree = NULL;
+        copyed_axis->assist = NULL;
+
+        append_file_data(coorsys_mirror, (char *)copyed_axis, sizeof(Axis));
+        for (int j=0; j<als_size(tmpls); j++) {
+            append_file_data(coorsys_mirror, als_get(tmpls, j), sizeof(ScaleOffsetRange));
+        }
+    }
+
+
+    MeasureSpace *copyed_space = mam_alloc(sizeof(MeasureSpace), OBJ_TYPE__MeasureSpace, temp_mam, 1);
+    memcpy(copyed_space, measpace, sizeof(MeasureSpace));
+    copyed_space->data_lens = NULL;
+    copyed_space->data_ls_h = NULL;
+    append_file_data(data_mirror, (char *)copyed_space, sizeof(MeasureSpace));
+
+    append_file_data(data_mirror, (char *)(measpace->data_lens), measpace->segment_count * sizeof(unsigned long));
+
+    for (size_t i=0; i<measpace->segment_count; i++) {
+        append_file_data(data_mirror, measpace->data_ls_h[i], (sizeof(unsigned long) + measpace->cell_vals_count * (sizeof(double) + sizeof(char))) * measpace->data_lens[i]);
+    }
+
+
+    mam_reset(temp_mam);
+    obj_release(temp_mam->current_block);
+    obj_release(temp_mam);
+}
+
+static void load_mirror(char *coorsys_mirror, char *data_mirror, unsigned long cs_id, CoordinateSystem **_cs, MeasureSpace **ms_) {
+
+    // Create a coordinate system object by MemAllocMng.
+    MemAllocMng *space_mam = MemAllocMng_new();
+    CoordinateSystem *coorsys = mam_alloc(sizeof(CoordinateSystem), OBJ_TYPE__CoordinateSystem, space_mam, 1);
+    coorsys->id = cs_id;
+    coorsys->axes = als_new(4, "Axis *", SPEC_MAM, space_mam);
+
+
+    FILE *csm_fd = fopen(coorsys_mirror, "r");
+
+    while (1) {
+        Axis *ax = mam_alloc(sizeof(Axis), OBJ_TYPE__Axis, space_mam, 1);
+        if (fread(ax, sizeof(Axis), 1, csm_fd) < 1)
+            goto load_csm_done;
+
+        ax->sor_idx_tree = rbt_create("ScaleOffsetRange *", ScaleOffsetRange_cmp, ScaleOffsetRange_destory, SPEC_MAM, space_mam);
+        for (int i=0; i<ax->sor_idx_tree_size; i++) {
+            ScaleOffsetRange *sor = mam_alloc(sizeof(ScaleOffsetRange), OBJ_TYPE__ScaleOffsetRange, space_mam, 0);
+            fread(sor, sizeof(ScaleOffsetRange), 1, csm_fd);
+            rbt_add(ax->sor_idx_tree, sor);
+        }
+        als_add(coorsys->axes, ax);
+    }
+
+load_csm_done:
+
+    fclose(csm_fd);
+
+
+    MeasureSpace *mea_space = mam_alloc(sizeof(MeasureSpace), OBJ_TYPE__MeasureSpace, space_mam, 1);
+
+    FILE *sdm_fd = fopen(data_mirror, "r");
+    fread(mea_space, sizeof(MeasureSpace), 1, sdm_fd);
+    mea_space->data_ls_h = mam_alloc(sizeof(void *) * mea_space->segment_count, OBJ_TYPE__RAW_BYTES, space_mam, 0);
+    mea_space->data_lens = mam_alloc(sizeof(unsigned long) * mea_space->segment_count, OBJ_TYPE__RAW_BYTES, space_mam, 0);
+
+
+    fread(mea_space->data_lens, mea_space->segment_count * sizeof(unsigned long), 1, sdm_fd);
+
+    for (size_t i=0; i<mea_space->segment_count; i++) {
+        mea_space->data_ls_h[i] = mam_alloc(
+            (sizeof(unsigned long) + mea_space->cell_vals_count * (sizeof(double) + sizeof(char))) * mea_space->data_lens[i],
+            OBJ_TYPE__RAW_BYTES, space_mam, 0);
+
+        fread(mea_space->data_ls_h[i],
+            (sizeof(unsigned long) + mea_space->cell_vals_count * (sizeof(double) + sizeof(char))) * mea_space->data_lens[i],
+            1, sdm_fd);
+    }
+
+
+    fclose(sdm_fd);
+
+
+    *_cs = coorsys;
+    *ms_ = mea_space;
+}
+
+static void load_space(char *profile, char *data_file, unsigned long cs_id, CoordinateSystem **_cs, MeasureSpace **ms_) {
 
     unsigned int axes_count, vals_count;
 
@@ -407,6 +563,7 @@ loaded_vectors_done:
                 }
             }
             rbt__reordering(axis->sor_idx_tree);
+            axis->sor_idx_tree_size = rbt__size(axis->sor_idx_tree);
         }
     }
 
@@ -420,11 +577,44 @@ loaded_vectors_done:
     obj_release(temp_mam);
 
 
+    log_print(">>> RELOAD_SPACE { 5 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
+
+
+    *_cs = coorsys;
+    *ms_ = space;
+
+}
+
+void reload_space(unsigned long cs_id)
+{
+    assert(strlen(olap_env.OLAP_HOME) < 200);
+
+    char profile[256], data_file[256], coorsys_mirror[256], data_mirror[256];
+    memset(profile, 0, 256);
+    memset(data_file, 0, 256);
+    memset(coorsys_mirror, 0, 256);
+    memset(data_mirror, 0, 256);
+    sprintf(profile, "%s/data/profile-%lu", olap_env.OLAP_HOME, cs_id);
+    sprintf(data_file, "%s/data/data-%lu", olap_env.OLAP_HOME, cs_id);
+    sprintf(coorsys_mirror, "%s/data/mirror-coorsys-%lu", olap_env.OLAP_HOME, cs_id);
+    sprintf(data_mirror, "%s/data/mirror-data-%lu", olap_env.OLAP_HOME, cs_id);
+
+
+    CoordinateSystem *coorsys = NULL;
+    MeasureSpace *space = NULL;
+
+
+    if (access(coorsys_mirror, F_OK) == 0 && access(data_mirror, F_OK) == 0) {
+        load_mirror(coorsys_mirror, data_mirror, cs_id, &coorsys, &space);
+    } else if (access(profile, F_OK) == 0 && access(data_file, F_OK) == 0) {
+        load_space(profile, data_file, cs_id, &coorsys, &space);
+    } else {
+        return;
+    }
+
     space_unload(cs_id);
     als_add(coor_sys_ls, coorsys);
     als_add(space_ls, space);
-
-    log_print(">>> RELOAD_SPACE { 5 } %lf\n", (now_microseconds() - timestamp) / 1000.0);
 }
 
 CoordinateSystem *coosys_new(unsigned long id, int axes_count, MemAllocMng *mam)

@@ -242,6 +242,8 @@ Cube *select_def__get_cube(SelectDef *sd);
 
 void reload_measure_values_of_cube(CubeDef *cube_def);
 
+void solidify_mirror_of_space(CubeDef *cube_def);
+
 Member *get_default_dimension_member(Cube *cube, Dimension *dim);
 
 #endif

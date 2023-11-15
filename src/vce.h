@@ -26,6 +26,8 @@ typedef struct _ax_build_assist_ {
 typedef struct _coordinate_axis
 {
     RedBlackTree *sor_idx_tree; // ScaleOffsetRange *
+    unsigned int sor_idx_tree_size;
+
     unsigned long leaf_scale_offset;
     unsigned int max_path_len;
 
@@ -73,6 +75,8 @@ void *ScaleOffsetRange_destory(void *);
 int vce_append(EuclidCommand *ec);
 
 void reload_space(unsigned long cs_id);
+
+void do_solidify_mirror(unsigned long cs_id);
 
 void vce_init();
 
