@@ -14,6 +14,7 @@
 #include "net.h"
 
 #include "tools/elastic-byte-buffer.h"
+#include "memory-management.h"
 
 extern OLAPEnv olap_env;
 
@@ -49,6 +50,8 @@ static void *__Axis_build_index(RBNode *node, void *axis);
 static void load_space(char *profile, char *data_file, unsigned long cs_id, CoordinateSystem **_cs, MeasureSpace **ms_);
 
 static void load_mirror(char *coorsys_mirror, char *data_mirror, unsigned long cs_id, CoordinateSystem **_cs, MeasureSpace **ms_);
+
+static void loadsps_fastsort(char *sorted_bytes, size_t arr_len, int depth);
 
 void vce_init()
 {
@@ -456,12 +459,19 @@ has_loaded_scales:
     timestamp = now_microseconds();
 
 
-    unsigned long *loaded_pmea_count = mam_alloc(sizeof(unsigned long) * space_partition_count, OBJ_TYPE__RAW_BYTES, temp_mam, 0);
-    char **cell_cursors = mam_alloc(sizeof(char *) * space_partition_count, OBJ_TYPE__RAW_BYTES, temp_mam, 0);
 
-    RedBlackTree **tmp_rbt_hs = mam_alloc(sizeof(RedBlackTree *) * space_partition_count, OBJ_TYPE__RAW_BYTES, temp_mam, 0);
-    for (size_t i=0; i<space_partition_count ;i++)
-        tmp_rbt_hs[i] = rbt_create("*cell", cell_cmp, _cell__destory, SPEC_MAM, MemAllocMng_new());
+    // unsigned long *loaded_pmea_count = mam_alloc(sizeof(unsigned long) * space_partition_count, OBJ_TYPE__RAW_BYTES, temp_mam, 0);
+    // char **cell_cursors = mam_alloc(sizeof(char *) * space_partition_count, OBJ_TYPE__RAW_BYTES, temp_mam, 0);
+
+    // RedBlackTree **tmp_rbt_hs = mam_alloc(sizeof(RedBlackTree *) * space_partition_count, OBJ_TYPE__RAW_BYTES, temp_mam, 0);
+    // for (size_t i=0; i<space_partition_count ;i++)
+    //     tmp_rbt_hs[i] = rbt_create("*cell", cell_cmp, _cell__destory, SPEC_MAM, MemAllocMng_new());
+
+    // TODO Red-black trees eliminate duplicate measures, while quicksort doesn't. Duplicate measures should be overwritten.
+    size_t bvs_capacity = 8 * 1024 * 1024 / (sizeof(unsigned long) + sizeof(char *) + vector_size);
+    size_t tmp_blk_size = sizeof(unsigned long) + sizeof(char *) + bvs_capacity * (sizeof(unsigned long) + sizeof(char *) + vector_size);
+    char **vector_handles = mam_alloc(sizeof(char *) * space_partition_count, OBJ_TYPE__RAW_BYTES, temp_mam, 0);
+
 
 
     // Traverse the data file and insert all measure data into the logical multidimensional array.
@@ -484,18 +494,53 @@ has_loaded_scales:
         }
 
         unsigned long segment_number = vector_offset / space->segment_scope;
-        if (loaded_pmea_count[segment_number] % BYTES_ALIGNMENT == 0)
-        {
-            MemAllocMng *seg_mam = obj_mam(tmp_rbt_hs[segment_number]);
-            cell_cursors[segment_number] = mam_hlloc(seg_mam, (sizeof(vector_offset) + vector_size) * BYTES_ALIGNMENT);
+
+
+
+        // TODO The initial state of the reverse order affects the efficiency of the quicksort.
+        char *curr_handle = vector_handles[segment_number];
+        if (curr_handle == NULL || *(unsigned long *)curr_handle >= bvs_capacity) {
+            char *_newh = allocate_memory(tmp_blk_size);
+            memset(_newh, 0, tmp_blk_size);
+
+            char *_ref_head = _newh + sizeof(unsigned long) + sizeof(char *) + sizeof(unsigned long);
+            char *_first_vector_p = _newh + sizeof(unsigned long) + sizeof(char *) + bvs_capacity * (sizeof(unsigned long) + sizeof(void *));
+            for (size_t i=0; i<bvs_capacity; i++) {
+                *(char **)_ref_head = _first_vector_p;
+                _ref_head += sizeof(char *) + sizeof(unsigned long);
+                _first_vector_p += vector_size;
+            }
+
+            if (curr_handle) {
+                *(char **)(_newh + sizeof(unsigned long)) = curr_handle;
+            }
+            curr_handle = vector_handles[segment_number] = _newh;
         }
-        void *cell = cell_cursors[segment_number] + (sizeof(vector_offset) + vector_size) * (loaded_pmea_count[segment_number] % BYTES_ALIGNMENT);
-        *((unsigned long *)cell) = vector_offset;
-        fread(cell + sizeof(vector_offset), vector_size, 1, data_fd);
-        rbt_add(tmp_rbt_hs[segment_number], cell);
-        ++(loaded_pmea_count[segment_number]);
-        if (loaded_pmea_count[segment_number] % 1000000 == 0)
-            log_print("::::::::::::::::::: load_meval_count[%lu] = %lu\n", segment_number, loaded_pmea_count[segment_number]);
+        unsigned long *bv_num_p = (unsigned long *)curr_handle;
+
+        // if (loaded_pmea_count[segment_number] % BYTES_ALIGNMENT == 0)
+        // {
+        //     MemAllocMng *seg_mam = obj_mam(tmp_rbt_hs[segment_number]);
+        //     cell_cursors[segment_number] = mam_hlloc(seg_mam, (sizeof(vector_offset) + vector_size) * BYTES_ALIGNMENT);
+        // }
+        // void *cell = cell_cursors[segment_number] + (sizeof(vector_offset) + vector_size) * (loaded_pmea_count[segment_number] % BYTES_ALIGNMENT);
+        // *((unsigned long *)cell) = vector_offset;
+        // fread(cell + sizeof(vector_offset), vector_size, 1, data_fd);
+        // rbt_add(tmp_rbt_hs[segment_number], cell);
+
+        *(unsigned long *)(curr_handle + sizeof(unsigned long) + sizeof(char *) + (*bv_num_p) * (sizeof(unsigned long) + sizeof(void *))) = vector_offset;
+        fread(
+            curr_handle + (1 + bvs_capacity) * (sizeof(unsigned long) + sizeof(char *)) + (*bv_num_p) * vector_size,
+            vector_size, 1, data_fd);
+
+        *bv_num_p += 1;
+
+        // ++(loaded_pmea_count[segment_number]);
+        // if (loaded_pmea_count[segment_number] % 1000000 == 0)
+        //     log_print("::::::::::::::::::: load_meval_count[%lu] = %lu\n", segment_number, loaded_pmea_count[segment_number]);
+
+
+
     }
 
 loaded_vectors_done:
@@ -509,7 +554,51 @@ loaded_vectors_done:
     timestamp = now_microseconds();
 
 
-    space_plan(space, tmp_rbt_hs);
+    for (int i = 0; i < space->segment_count; i++)
+    {
+        space->data_lens[i] = 0;
+        char *curr_handle = vector_handles[i];
+        if (curr_handle == NULL)
+            continue;
+
+        while (curr_handle) {
+            space->data_lens[i] += *(unsigned long *)curr_handle;
+            curr_handle = *(char **)(curr_handle + sizeof(unsigned long));
+        }
+
+        space->data_ls_h[i] = mam_alloc(space->data_lens[i] * (sizeof(unsigned long) + vector_size), OBJ_TYPE__RAW_BYTES, space_mam, 0);
+
+        char *_offset_cursor = space->data_ls_h[i];
+
+        curr_handle = vector_handles[i];
+        while (curr_handle) {
+            memcpy(_offset_cursor,
+                curr_handle + sizeof(unsigned long) + sizeof(char *),
+                (sizeof(unsigned long) + sizeof(char *)) * (*(unsigned long *)curr_handle));
+
+            _offset_cursor += (sizeof(unsigned long) + sizeof(char *)) * (*(unsigned long *)curr_handle);
+            curr_handle = *(char **)(curr_handle + sizeof(unsigned long));
+        }
+
+        loadsps_fastsort(space->data_ls_h[i], space->data_lens[i], 0);
+
+        char *offset_cursor = space->data_ls_h[i] + (space->data_lens[i] - 1) * (sizeof(unsigned long) + sizeof(char *));
+        char *ofs_vector_cursor = space->data_ls_h[i] + (space->data_lens[i] - 1) * (sizeof(unsigned long) + vector_size);
+
+        while ((char *)offset_cursor >= space->data_ls_h[i]) {
+            memcpy(ofs_vector_cursor + sizeof(unsigned long), *(char **)(offset_cursor + sizeof(unsigned long)), vector_size);
+            *(unsigned long *)ofs_vector_cursor = *offset_cursor;
+            offset_cursor -= sizeof(unsigned long) + sizeof(char *);
+            ofs_vector_cursor -= sizeof(unsigned long) + vector_size;
+        }
+
+        curr_handle = vector_handles[i];
+        while (curr_handle) {
+            char *next = *(char **)(curr_handle + sizeof(unsigned long));
+            release_memory(curr_handle);
+            curr_handle = next;
+        }
+    }
 
 
     {
@@ -1717,4 +1806,59 @@ static void agg_based_on_dynamic_sparse_idx
         grid_data->null_flag = 0;
         grid_data->val += chip.val;
     }
+}
+
+static void loadsps_fastsort(char *sorted_bytes, size_t arr_len, int depth) {
+
+    size_t _szof_l = sizeof(unsigned long);
+    size_t _szof_p = sizeof(char *);
+    size_t _szof_lp = _szof_l + _szof_p;
+
+    char tmp_bytes[_szof_lp];
+
+    if (arr_len < 2)
+        return;
+
+    if (arr_len < 4) {
+        for (int i=0; i<arr_len-1; i++) {
+            for (int j=i+1; j<arr_len; j++) {
+                if (*((unsigned long *)(sorted_bytes + i * _szof_lp)) > *((unsigned long *)(sorted_bytes + j * _szof_lp))) {
+                    memcpy(tmp_bytes, sorted_bytes + i * _szof_lp, _szof_lp);
+                    memcpy(sorted_bytes + i * _szof_lp, sorted_bytes + j * _szof_lp, _szof_lp);
+                    memcpy(sorted_bytes + j * _szof_lp, tmp_bytes, _szof_lp);
+                }
+            }
+        }
+        return;
+    }
+
+    size_t lef_idx = 0;             // left index
+    size_t rig_idx = arr_len - 1;   // right index
+    size_t piv_idx = arr_len / 2;   // pivot index
+    memcpy(tmp_bytes, sorted_bytes + piv_idx * _szof_lp, _szof_lp);
+
+    while (1) {
+        while (lef_idx < piv_idx) {
+            if (*(unsigned long *)(sorted_bytes + lef_idx * _szof_lp) > *(unsigned long *)tmp_bytes) {
+                memcpy(sorted_bytes + piv_idx * _szof_lp, sorted_bytes + lef_idx * _szof_lp, _szof_lp);
+                piv_idx = lef_idx;
+            }
+            lef_idx++;
+        }
+        while (rig_idx > piv_idx) {
+            if (*(unsigned long *)(sorted_bytes + rig_idx * _szof_lp) < *(unsigned long *)tmp_bytes) {
+                memcpy(sorted_bytes + piv_idx * _szof_lp, sorted_bytes + rig_idx * _szof_lp, _szof_lp);
+                piv_idx = rig_idx;
+            }
+            rig_idx--;
+        }
+
+        if (lef_idx >= piv_idx && rig_idx <= piv_idx) {
+            memcpy(sorted_bytes + piv_idx * _szof_lp, tmp_bytes, _szof_lp);
+            break;
+        }
+    }
+
+    loadsps_fastsort(sorted_bytes, piv_idx, depth + 1);
+    loadsps_fastsort(sorted_bytes + (piv_idx + 1) * _szof_lp, arr_len - piv_idx - 1, depth + 1);
 }
