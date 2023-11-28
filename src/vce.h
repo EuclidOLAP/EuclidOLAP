@@ -88,7 +88,7 @@ typedef struct _measure_space_
     size_t segment_count;
     size_t segment_scope;
     // RedBlackTree **tree_ls_h;
-    void **data_ls_h;
+    char **data_ls_h;
     unsigned long *data_lens;
     int cell_vals_count;
 } MeasureSpace;
