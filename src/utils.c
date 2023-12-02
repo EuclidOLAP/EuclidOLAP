@@ -242,7 +242,8 @@ ssize_t read_sock_pkg(int sock_fd, void **buf, size_t *buf_len)
 
 	} while (buf_cursor < sizeof(pkg_capacity));
 
-	if (pkg_capacity <= sizeof(pkg_capacity))
+	// If the packet is too large or too small, the memory of the response is not allocated, but the failure is returned quickly.
+	if ((pkg_capacity <= sizeof(pkg_capacity)) || (pkg_capacity > (16 * 1024 * 1024)))
 		return -1;
 
 	// Memory needs to be freed manually.
@@ -250,10 +251,20 @@ ssize_t read_sock_pkg(int sock_fd, void **buf, size_t *buf_len)
 
 	memcpy(*buf, &pkg_capacity, sizeof(pkg_capacity));
 
+	remaining_retry = 10;
 	while (buf_cursor < pkg_capacity)
 	{
 		bs_count = read(sock_fd, *buf + buf_cursor, pkg_capacity - buf_cursor);
-		buf_cursor += bs_count;
+		if (bs_count) { // bs_count != 0
+			buf_cursor += bs_count;
+		} else { // bs_count == 0
+			remaining_retry--;
+			if (remaining_retry == 0) {
+				obj_release(*buf);
+				*buf = NULL;
+				return -1;
+			}
+		}
 	}
 // printf("READ PACKAGE DATA >>>>>> %12d %12d\n", *(int *)*buf, *(short *)((*buf) + sizeof(int)));
 
