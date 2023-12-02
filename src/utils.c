@@ -255,6 +255,7 @@ ssize_t read_sock_pkg(int sock_fd, void **buf, size_t *buf_len)
 		bs_count = read(sock_fd, *buf + buf_cursor, pkg_capacity - buf_cursor);
 		buf_cursor += bs_count;
 	}
+// printf("READ PACKAGE DATA >>>>>> %12d %12d\n", *(int *)*buf, *(short *)((*buf) + sizeof(int)));
 
 	return *buf_len = pkg_capacity;
 }
