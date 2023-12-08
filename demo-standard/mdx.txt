@@ -163,3 +163,24 @@ select
   [Regions].[North America] on 10 
 from [Andes Online Store]
 where ([Regions].[Asia]);
+
+---
+
+select
+[Goods] on rows,
+Regions on columns
+from [Andes Online Store];
+
+---
+
+select
+[Goods] on rows,
+[Measures] on columns
+from [Andes Online Store];
+
+---
+
+select
+[Goods] on rows,
+[Dates] on columns
+from [Andes Online Store];

@@ -1471,6 +1471,22 @@ MddTuple *ids_setdef__head_ref_tuple(MDContext *md_ctx, SetDef *set_def, MddTupl
 			return tuple;
 		}
 
+		if (obj_type == OBJ_TYPE__DimensionRole) {
+			DimensionRole *dr = (DimensionRole *)var;
+			MddTuple *tuple = mdd_tp__create();
+			if (dr->bin_attr & DR_MEASURE_MASK) {
+				mdd_tp__add_mbrole(tuple, mdd_mr__create(als_get(cube->measure_mbrs, 0), dr));
+			} else {
+				for (int i = 0; i < als_size(member_pool); i++) {
+					Member *member = als_get(member_pool, i);
+					if (member->dim_gid == dr->dim_gid && member->lv == 1) {
+						mdd_tp__add_mbrole(tuple, mdd_mr__create(member, dr));
+					}
+				}
+			}
+			return tuple;
+		}
+
 		MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 		thrd_mam->exception_desc = "Exception: A Set object is needed here.";
 		longjmp(thrd_mam->excep_ctx_env, -1);
@@ -1769,7 +1785,26 @@ MddSet *ids_setdef__build(MDContext *md_ctx, SetDef *set_def, MddTuple *ctx_tupl
 			MddSet *set = mdd_set__create();
 			mddset__add_tuple(set, tuple);
 			return set;
-
+		} else if (obj_type == OBJ_TYPE__DimensionRole) {
+			DimensionRole *dr = entity;
+			MddSet *set = mdd_set__create();
+			if (dr->bin_attr & DR_MEASURE_MASK) {
+				for (int i=0; i<als_size(cube->measure_mbrs); i++) {
+					MddTuple *tuple = mdd_tp__create();
+					mdd_tp__add_mbrole(tuple, mdd_mr__create(als_get(cube->measure_mbrs, i), dr));
+					mddset__add_tuple(set, tuple);
+				}
+			} else {
+				for (int i=0; i<als_size(member_pool); i++) {
+					Member *member = als_get(member_pool, i);
+					if (member->dim_gid == dr->dim_gid && member->lv == 1) {
+						MddTuple *tuple = mdd_tp__create();
+						mdd_tp__add_mbrole(tuple, mdd_mr__create(member, dr));
+						mddset__add_tuple(set, tuple);
+					}
+				}
+			}
+			return set;
 		} else {
 			MemAllocMng *thrd_mam = MemAllocMng_current_thread_mam();
 			thrd_mam->exception_desc = "Exception: 0 - A Set object is needed here.";
