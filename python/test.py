@@ -60,8 +60,19 @@ def test_01():
     print(id(tuple_c))
 
 
+def test_02():
+    for i in range(1000):
+        cli_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        cli_socket.connect(("192.168.66.66", 8760))
+        protocol_size = 30000000
+        cli_socket.send(protocol_size.to_bytes(4, 'little') + INTENT__TERMINAL_CONTROL__BYTES)
+        cli_socket.close()
+        print(f">>> {i}")
+
+
 def main():
     # test_01()
+    # test_02()
     # create_standard_demo_metadata()
     query_mdx()
 
