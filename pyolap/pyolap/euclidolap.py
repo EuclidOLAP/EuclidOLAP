@@ -49,6 +49,25 @@ class OlapContext:
 
         dim_list = []
         for dim_name in dims:
-            dim_list.append(Dimension(dim_name))
+            dim_list.append(Dimension(dim_name, self))
 
         return dim_list
+
+    def get_dimension_by_name(self, dim_name: str) -> Dimension:
+        return Dimension(dim_name, self)
+
+    def create_members(self, dim: Dimension, members_info: list):
+
+        new_ms_info = []
+        for m_info in members_info:
+            if isinstance(m_info, str):
+                new_ms_info.append(f"[{m_info}]")
+            else:
+                ms_info_ls: list = m_info
+                new_ms_info.append(".".join([f"[{ele}]" for ele in ms_info_ls]))
+
+        statement = "create members\n" + ",\n".join([f"[{dim.name}].{ele}" for ele in new_ms_info]) + ";"
+        # print(">>>>>>>>>>>>>>>>>>>>>>>>!!!")
+        # print(statement)
+        # print(">>>>>>>>>>>>>>>>>>>>>>>>???")
+        self.execute(statement)
