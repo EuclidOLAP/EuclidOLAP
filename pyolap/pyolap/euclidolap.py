@@ -2,6 +2,7 @@ import socket
 
 from pyolap import communication
 from pyolap.mdmodels import Dimension
+from pyolap.mdmodels import Cube
 
 comm = communication
 
@@ -71,3 +72,15 @@ class OlapContext:
         # print(statement)
         # print(">>>>>>>>>>>>>>>>>>>>>>>>???")
         self.execute(statement)
+
+    def build_cube(self, cube_name: str, dimensions: list[Dimension], measures: list):
+        statement = f"build cube [{cube_name}]"\
+                    + "\ndimensions " + " ".join([f"[{dim.name}]" for dim in dimensions])\
+                    + "\nmeasures " + " ".join([f"[{mea}]" for mea in measures])\
+                    + ";"
+        # print(statement)
+        self.execute(statement)
+        return Cube(cube_name, self)
+
+    def get_cube_by_name(self, cube_name: str):
+        return Cube(cube_name, self)
