@@ -33,7 +33,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
         # echo "Mandrake Linux detected."
     elif [ -f /etc/debian_version ]; then
         current_os="debian"
-        # echo "Ubuntu/Debian Linux detected."
+        echo "Ubuntu/Debian Linux detected."
     else
         current_os="unknown linux distribution"
         # echo "Unknown Linux distribution."
