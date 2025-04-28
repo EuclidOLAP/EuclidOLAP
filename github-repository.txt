@@ -1,8 +1,0 @@
-https
-https://github.com/EuclidOLAP/EuclidOLAP.git
-
-ssh
-git@github.com:EuclidOLAP/EuclidOLAP.git
-
-github cli
-gh repo clone EuclidOLAP/EuclidOLAP
