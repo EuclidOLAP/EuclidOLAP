@@ -1,4 +1,4 @@
-<h1 style='font-size: 64px;'>EuclidOLAP</h1>
+<h1 style='font-size: 96px;'>EuclidOLAP</h1>
 
 # What is a Multidimensional Database?
 
