@@ -1,35 +1,33 @@
-<!-- https://www.cnblogs.com/Tifahfyf/p/18853500 -->
-
-# EuclidOLAP
+<h1 style='font-size: 64px;'>EuclidOLAP</h1>
 
 # What is a Multidimensional Database?
 
-From the perspective of how data is organized, databases can generally be classified into the following categories:
+Databases can be categorized based on how they organize and manage data:
 
 ## Relational Database
-Data is stored in two-dimensional tables (rows and columns), much like spreadsheets. Best suited for recording structured information such as customer lists, order records, and inventory details. Commonly used in daily transaction processing systems (OLTP).
+Data is stored in two-dimensional tables (rows and columns), similar to spreadsheets. It is suitable for storing structured information such as customer lists, order records, and inventory. Common use cases include daily transaction processing systems (OLTP).
 
 ## Graph Database
-Data is organized as "nodes" and "edges," focusing on the relationships between entities — such as friendship networks, supply chains, or transaction flows. Ideal for managing complex networks like social media, financial risk control, and fraud detection.
+Data is organized using nodes and edges, emphasizing the relationships between entities—such as friendships, supply chains, or transaction links. It is well-suited for managing complex networks like social media, financial risk control, and fraud detection.
 
 ## Time-Series Database
-Designed specifically to record data over time, like a timeline where new data points are continuously added. Suitable for monitoring systems, logging, and IoT sensor data.
+Specifically designed to record data in chronological order, like a timeline with continuously increasing data points. It is ideal for monitoring, log management, and collecting sensor data.
 
 ## Multidimensional Database
-Data is organized as a "hypercube" in multidimensional space. Each axis represents a business dimension — for example, Region, Date, Organization, Task, Equipment, Event, or Status. Each data point corresponds to a specific position in this multidimensional space.
+Data is structured as a hypercube in multidimensional space. Each axis represents a business dimension—such as region, date, organization, task, equipment, event, or status. Each data point corresponds to a specific coordinate in this space.
 
 In a multidimensional database, we typically distinguish:
-- Dimension: The perspectives for analysis, such as Time, Region, Department.
-- Measure: The numerical values being calculated or aggregated, such as Sales Amount, Inventory Quantity, Completion Rate.
+- Dimension: Analytical perspectives such as "Date," "Organization," or "Region."
+- Measure: Numerical values to be calculated or aggregated, such as "Sales," "Inventory," or "Completion Rate."
 
-Compared to traditional relational databases, a multidimensional database offers significant advantages:
-- Multi-perspective analysis: Freely combine different dimensions for cross-analysis — e.g., view sales data by Region, Month, and Product Category.
-- Fast aggregation and drill-down: Easily summarize or zoom into details — from national sales to city-level, even down to a specific product on a specific day.
-- Better decision support: Enables faster discovery of trends, issues, and opportunities, especially when handling large, complex datasets.
+Compared to relational databases, multidimensional databases offer distinct advantages in data analysis:
+- Multi-perspective analysis: Freely combine dimensions for cross-analysis—e.g., viewing sales by region, month, and product category.
+- Fast aggregation and drill-down: Flexibly move from high-level overviews to granular details—e.g., drilling from national sales to the daily sales of a product in a specific city.
+- Effective decision support: Enables decision-makers to quickly identify trends, problems, and opportunities—especially when dealing with large and complex datasets.
 
-Typical application scenarios include:
-- Military battlefield situation analysis
-- Government resource planning and logistics
-- Business sales, finance, and supply chain performance analysis
+Common application scenarios include:
+- Sales analysis, financial analysis, and supply chain performance evaluation for enterprises
+- Government resource planning and allocation
+- Battlefield situation analysis in the defense sector
 
-A multidimensional database forms the core foundation of OLAP (Online Analytical Processing) systems and is an essential technology for complex data analysis.
+Multidimensional analysis is a key capability of OLAP systems, and it serves as the core benchmark for evaluating whether the system truly enables deep insight, complex decision support, and multi-scenario analysis.
