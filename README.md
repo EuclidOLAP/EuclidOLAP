@@ -1,3 +1,5 @@
+<!-- https://www.cnblogs.com/Tifahfyf/p/18853500 -->
+
 # EuclidOLAP
 
 # What is a Multidimensional Database?
