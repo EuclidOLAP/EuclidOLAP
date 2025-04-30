@@ -8,15 +8,19 @@ Multidimensional database kernel
 Databases can be categorized based on how they organize and manage data:
 
 ### Relational Database
+![Relational Database](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/img/relational_database.png "Relational Database")
 Data is stored in two-dimensional tables (rows and columns), similar to spreadsheets. It is suitable for storing structured information such as customer lists, order records, and inventory. Common use cases include daily transaction processing systems (OLTP).
 
 ### Graph Database
+![Graph Database](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/img/graph_database.png "Graph Database")
 Data is organized using nodes and edges, emphasizing the relationships between entities—such as friendships, supply chains, or transaction links. It is well-suited for managing complex networks like social media, financial risk control, and fraud detection.
 
 ### Time-Series Database
+![Time-Series Database](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/img/time-series_database.png "Time-Series Database")
 Specifically designed to record data in chronological order, like a timeline with continuously increasing data points. It is ideal for monitoring, log management, and collecting sensor data.
 
 ### Multidimensional Database
+![Multidimensional Database](https://euclidolap-presentations.oss-us-west-1.aliyuncs.com/img/multidimensional_database.png "Multidimensional Database")
 Data is structured as a hypercube in multidimensional space. Each axis represents a business dimension—such as region, date, organization, task, equipment, event, or status. Each data point corresponds to a specific coordinate in this space.
 
 In a multidimensional database, we typically distinguish:
