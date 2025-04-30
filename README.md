@@ -1,4 +1,4 @@
-[阅读中文版本](README_zh-CN.md)
+<!-- [阅读中文版本](README_zh-CN.md) -->
 
 # EuclidOLAP
 Multidimensional database kernel

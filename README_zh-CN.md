@@ -1,4 +1,4 @@
-[Read English Version](README.md)
+<!-- [Read English Version](README.md) -->
 
 # EuclidOLAP
 多维数据库内核
